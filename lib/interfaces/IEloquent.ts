@@ -1,4 +1,4 @@
-export interface IEloquent<NativeType> {
+export interface IEloquent {
   getClassName(): string
 
   fill(attributes: Object): this

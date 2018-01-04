@@ -1,7 +1,7 @@
 import { IEloquent } from '../interfaces/IEloquent'
 import { attributes_proxy } from '../components/attributes_proxy'
 
-export abstract class Eloquent<NativeRecord extends Object = {}> implements IEloquent<NativeRecord> {
+export abstract class Eloquent<NativeRecord extends Object = {}> implements IEloquent {
   protected __knownAttributeList: Array<string>
   protected attributes: NativeRecord
   protected fillable: Array<string>

@@ -21,19 +21,11 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
     "skipDefaultLibCheck": true,
-    "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "*": [
-        "node_modules/*"
-      ],
-      "collect.js": [
-        "../collect.js"
-      ]
-    }
+    "skipLibCheck": true
   },
   "include": [
     "./lib/**/*.ts",
+    "./syntax/**/*.ts",
     "./test/**/*.ts"
   ],
   "exclude": [

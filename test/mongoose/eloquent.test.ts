@@ -37,7 +37,7 @@ class Document extends Eloquent.Mongoose<IDocument, Document>() {
   set doc(value: string) {}
 }
 
-class Child extends Document.Class<Child>() {
+class Child extends Document.Class<{}, Child>() {
   getChildName() {}
 
   getClassName(): string {
@@ -56,7 +56,9 @@ describe('Eloquent', function() {
     console.log(document.category)
 
     const test = (await Document.select().all()).first()
+    console.log(test)
     const child = (await Child.select().all()).first()
+    console.log(child)
 
     const userInstance = new User()
     userInstance.getUserName()

@@ -1,7 +1,13 @@
 {
   "name": "najs-eloquent",
   "version": "0.0.1",
-  "scripts": {},
+  "scripts": {
+    "build": "npm run build-ts && npm run tslint",
+    "build-ts": "tsc",
+    "coverage": "jest --coverage --forceExit",
+    "test": "jest --forceExit",
+    "tslint": "tslint -c tslint.json -p tsconfig.json"
+  },
   "jest": {
     "globals": {
       "ts-jest": {
@@ -9,18 +15,11 @@
         "skipBabel": true
       }
     },
-    "moduleFileExtensions": [
-      "js",
-      "ts",
-      "json"
-    ],
+    "moduleFileExtensions": ["js", "ts", "json"],
     "transform": {
       "^.+\\.(ts|tsx)$": "./node_modules/ts-jest/preprocessor.js"
     },
-    "testMatch": [
-      "**/test/**/*.test.ts",
-      "**/test/**/*Test.ts"
-    ],
+    "testMatch": ["**/test/**/*.test.ts", "**/test/**/*Test.ts"],
     "testEnvironment": "node"
   },
   "repository": {
