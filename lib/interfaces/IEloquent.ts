@@ -1,7 +1,5 @@
-export interface IEloquent {
-  __knownAttributeList: Array<string>
-  attributes: Object
-  fillable: Array<string>
+export interface IEloquent<NativeType> {
+  getClassName(): string
 
   fill(attributes: Object): this
 

@@ -1,8 +1,12 @@
-import { EloquentMongoose } from './drivers/EloquentMongoose'
+import { EloquentMongoose } from './eloquent/EloquentMongoose'
 import { EloquentMongooseSpec } from './specs/EloquentMongooseSpec'
 
+// declare class Model {}
+
+// export const Model: Model = <any>EloquentMongoose
+
 export const Eloquent = {
-  Mongoose<T>(): EloquentMongooseSpec<T> {
+  Mongoose<T, R>(): EloquentMongooseSpec<T, R> {
     return <any>EloquentMongoose
   }
 }

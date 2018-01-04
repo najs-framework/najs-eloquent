@@ -1,12 +1,14 @@
-export interface IQueryFetchResult<EloquentModel> {
-  all(): Promise<Array<EloquentModel>>
+import { Collection } from 'collect.js'
 
-  get(): Promise<Array<EloquentModel>>
+export interface IQueryFetchResult<T = {}> {
+  all(): Promise<Collection<T>>
 
-  find(): Promise<EloquentModel>
+  // get(): Promise<Collection<Eloquent>>
 
-  pluck(): Promise<Object>
+  // find(): Promise<Eloquent | null>
 
-  update(): Promise<any>
-  delete(): Promise<any>
+  // pluck(): Promise<Object>
+
+  // update(): Promise<any>
+  // delete(): Promise<any>
 }

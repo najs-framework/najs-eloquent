@@ -9,11 +9,18 @@
         "skipBabel": true
       }
     },
-    "moduleFileExtensions": ["js", "ts", "json"],
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "json"
+    ],
     "transform": {
       "^.+\\.(ts|tsx)$": "./node_modules/ts-jest/preprocessor.js"
     },
-    "testMatch": ["**/test/**/*.test.ts", "**/test/**/*Test.ts"],
+    "testMatch": [
+      "**/test/**/*.test.ts",
+      "**/test/**/*Test.ts"
+    ],
     "testEnvironment": "node"
   },
   "repository": {
@@ -25,10 +32,12 @@
     "email": "najs@ntworld.net"
   },
   "dependencies": {
+    "@types/pluralize": "^0.0.28",
     "collect.js": "https://github.com/nhat-phan/collect.js",
     "coveralls": "^3.0.0",
     "lodash": "^4.17.4",
     "mongoose": "^5.0.0-rc0",
+    "pluralize": "^7.0.0",
     "sinon": "^4.1.3"
   },
   "devDependencies": {
