@@ -1,22 +1,51 @@
-import { collect, Collection } from 'collect.js'
 import { IQueryFetchResult } from '../interfaces/IQueryFetchResult'
-import { EloquentMongoose as Eloquent } from '../eloquent/EloquentMongoose'
-import { Model, DocumentQuery } from 'mongoose'
+// import { EloquentMongoose as Eloquent } from '../eloquent/EloquentMongoose'
+// import { make } from 'najs'
+import { collect, Collection } from 'collect.js'
+import { Model, DocumentQuery, Mongoose } from 'mongoose'
+import { QueryBuilder } from './QueryBuilder'
 
-export class MongooseQueryBuilder<T = {}> implements IQueryFetchResult<T> {
-  model: Model<any>
-  query: DocumentQuery<any, any>
+export type QueryOperator = '=' | '==' | '!=' | '<>' | '<' | '<=' | '=<' | '>' | '>=' | '=>'
 
-  constructor(modelName: string) {}
+export type QueryCondition = {
+  not: boolean
+  bool: 'and' | 'or'
+  operator: QueryOperator
+  field: string
+  value: string
+  queries?: QueryCondition[]
+}
+
+export class MongooseQueryBuilder<T = {}> extends QueryBuilder<T> implements IQueryFetchResult<T> {
+  mongooseModel: Model<any>
+  mongooseQuery: DocumentQuery<any, any>
+
+  constructor(modelName: string) {
+    super()
+    const mongoose: Mongoose = this.getMongoose()
+    if (mongoose.modelNames().indexOf(modelName) === -1) {
+      throw new Error('Model ' + modelName + ' Not Found')
+    }
+
+    this.mongooseModel = mongoose.model(modelName)
+  }
+
+  protected getMongoose(): Mongoose {
+    return <any>{}
+  }
 
   protected getQuery(): DocumentQuery<any, any> {
-    return this.query
+    return this.mongooseQuery
   }
+
+  // -------------------------------------------------------------------------------------------------------------------
 
   async all(): Promise<Collection<T>>
   async all<R>(): Promise<Collection<R>> {
-    const result: Eloquent<T>[] = await this.getQuery().exec()
-    return collect(<any>result.map(item => item))
+    return collect([])
+    // const eloquent = make<Eloquent<T>>('')
+    // const result: Eloquent<T>[] = await this.getQuery().exec()
+    // return collect(eloquent.newCollection(result))
   }
 
   // async get(): Promise<Collection<Eloquent<Document>>> {

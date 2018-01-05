@@ -1,16 +1,33 @@
+import { Collection } from 'collect.js'
+
 export interface IEloquent {
   getClassName(): string
 
-  fill(attributes: Object): this
+  fill(data: Object): this
+  forceFill(data: Object): this
 
-  setAttribute(attribute: string, value: any): this
+  getFillable(): string[]
+  getGuarded(): string[]
 
+  isFillable(key: string): boolean
+  isGuarded(key: string): boolean
+
+  setAttribute(attribute: string, value: any): boolean
   getAttribute(attribute: string): any
 
+  toObject(): Object
   toJson(): Object
 
   save(): Promise<any>
-  create(): Promise<any>
-  update(): Promise<any>
   delete(): Promise<any>
+  forceDelete(): Promise<any>
+  fresh(): Promise<this | undefined>
+
+  is(model: IEloquent): boolean
+
+  fireEvent(event: string): this
+
+  newQuery(): any
+  newInstance(data: Object | undefined): any
+  newCollection(dataset: any[]): Collection<IEloquent>
 }
