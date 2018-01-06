@@ -30,6 +30,10 @@ export class QueryBuilder<T> {
     return this
   }
 
+  protected getConditions(): Object[] {
+    return this.conditions.map(item => item.toObject())
+  }
+
   select(field: string): this
   select(fields: string[]): this
   select(...fields: Array<string | string[]>): this
@@ -70,9 +74,18 @@ export class QueryBuilder<T> {
   where(field: string, value: any): this
   where(field: string, operator: Operator, value: any): this
   where(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this {
-    // this.condition.where(<any>arg0, arg1, arg2)
     const condition = new QueryCondition()
     condition.where(<any>arg0, arg1, arg2)
+    this.conditions.push(condition)
+    return this
+  }
+
+  orWhere(conditionBuilder: SubCondition): this
+  orWhere(field: string, value: any): this
+  orWhere(field: string, operator: Operator, value: any): this
+  orWhere(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this {
+    const condition = new QueryCondition()
+    condition.orWhere(<any>arg0, arg1, arg2)
     this.conditions.push(condition)
     return this
   }

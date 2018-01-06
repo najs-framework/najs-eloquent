@@ -131,18 +131,172 @@ describe('QueryBuilder', function() {
   })
 
   describe('where()', function() {
-    it('is chain-able, and has init value is undefined', function() {
+    it('is chain-able', function() {
       const query = new QueryBuilder()
       expect(query.where('a', 0)).toEqual(query)
+    })
 
-      query.where('b', 1)
-      query.where(function() {
-        this.where('c', 2)
+    it('adds new QueryCondition instance to conditions array with operator and', function() {
+      const query = new QueryBuilder()
+      query.where('a', 1).where('b', 2)
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'a', operator: '=', value: 1 },
+        { bool: 'and', field: 'b', operator: '=', value: 2 }
+      ])
+    })
+
+    it('can add new QueryCondition instance with custom operator', function() {
+      const query = new QueryBuilder()
+      query.where('a', '<', 1).where('b', '>', 2)
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'a', operator: '<', value: 1 },
+        { bool: 'and', field: 'b', operator: '>', value: 2 }
+      ])
+    })
+
+    it('adds new QueryCondition instance with bool and queries if user use sub-query builder', function() {
+      const query = new QueryBuilder()
+      query.where('first', 'condition').where(query => {
+        query.where('a', 1).where('b', 2)
       })
-      console.log(query.conditions)
-      // for (const subquery of query.condition.queries) {
-      //   console.log(subquery)
-      // }
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'first', operator: '=', value: 'condition' },
+        {
+          bool: 'and',
+          queries: [
+            { bool: 'and', field: 'a', operator: '=', value: 1 },
+            { bool: 'and', field: 'b', operator: '=', value: 2 }
+          ]
+        }
+      ])
+    })
+
+    it('can add subQuery multiple levels', function() {
+      const query = new QueryBuilder()
+      query.where('first', 'condition').where(query => {
+        query
+          .where('a', 1)
+          .where('b', 2)
+          .where(query => {
+            query
+              .where('c', 3)
+              .where('d', 4)
+              .where(query => {
+                query.where('e', 5).where('f', 6)
+              })
+          })
+      })
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'first', operator: '=', value: 'condition' },
+        {
+          bool: 'and',
+          queries: [
+            { bool: 'and', field: 'a', operator: '=', value: 1 },
+            { bool: 'and', field: 'b', operator: '=', value: 2 },
+            {
+              bool: 'and',
+              queries: [
+                { bool: 'and', field: 'c', operator: '=', value: 3 },
+                { bool: 'and', field: 'd', operator: '=', value: 4 },
+                {
+                  bool: 'and',
+                  queries: [
+                    { bool: 'and', field: 'e', operator: '=', value: 5 },
+                    { bool: 'and', field: 'f', operator: '=', value: 6 }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ])
+    })
+  })
+
+  describe('orWhere()', function() {
+    it('is chain-able', function() {
+      const query = new QueryBuilder()
+      expect(query.orWhere('a', 0)).toEqual(query)
+    })
+
+    it('adds new QueryCondition instance to conditions array with operator and', function() {
+      const query = new QueryBuilder()
+      query.where('a', 1).orWhere('b', 2)
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'a', operator: '=', value: 1 },
+        { bool: 'or', field: 'b', operator: '=', value: 2 }
+      ])
+    })
+
+    it('can add new QueryCondition instance with custom operator', function() {
+      const query = new QueryBuilder()
+      query
+        .where('a', '<', 1)
+        .orWhere('b', '>', 2)
+        .orWhere('c', '<>', 3)
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'a', operator: '<', value: 1 },
+        { bool: 'or', field: 'b', operator: '>', value: 2 },
+        { bool: 'or', field: 'c', operator: '<>', value: 3 }
+      ])
+    })
+
+    it('adds new QueryCondition instance with bool and queries if user use sub-query builder', function() {
+      const query = new QueryBuilder()
+      query.where('first', 'condition').where(query => {
+        query.where('a', 1).orWhere('b', 2)
+      })
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'first', operator: '=', value: 'condition' },
+        {
+          bool: 'and',
+          queries: [
+            { bool: 'and', field: 'a', operator: '=', value: 1 },
+            { bool: 'or', field: 'b', operator: '=', value: 2 }
+          ]
+        }
+      ])
+    })
+
+    it('can add subQuery multiple levels', function() {
+      const query = new QueryBuilder()
+      query.where('first', 'condition').orWhere(query => {
+        query
+          .where('a', 1)
+          .orWhere('b', 2)
+          .orWhere(query => {
+            query
+              .where('c', 3)
+              .orWhere('d', 4)
+              .orWhere(query => {
+                query.where('e', 5).orWhere('f', 6)
+              })
+          })
+      })
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'first', operator: '=', value: 'condition' },
+        {
+          bool: 'or',
+          queries: [
+            { bool: 'and', field: 'a', operator: '=', value: 1 },
+            { bool: 'or', field: 'b', operator: '=', value: 2 },
+            {
+              bool: 'or',
+              queries: [
+                { bool: 'and', field: 'c', operator: '=', value: 3 },
+                { bool: 'or', field: 'd', operator: '=', value: 4 },
+                {
+                  bool: 'or',
+                  queries: [
+                    { bool: 'and', field: 'e', operator: '=', value: 5 },
+                    { bool: 'or', field: 'f', operator: '=', value: 6 }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ])
     })
   })
 })
