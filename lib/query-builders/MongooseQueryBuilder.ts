@@ -5,17 +5,6 @@ import { collect, Collection } from 'collect.js'
 import { Model, DocumentQuery, Mongoose } from 'mongoose'
 import { QueryBuilder } from './QueryBuilder'
 
-export type QueryOperator = '=' | '==' | '!=' | '<>' | '<' | '<=' | '=<' | '>' | '>=' | '=>'
-
-export type QueryCondition = {
-  not: boolean
-  bool: 'and' | 'or'
-  operator: QueryOperator
-  field: string
-  value: string
-  queries?: QueryCondition[]
-}
-
 export class MongooseQueryBuilder<T = {}> extends QueryBuilder<T> implements IQueryFetchResult<T> {
   mongooseModel: Model<any>
   mongooseQuery: DocumentQuery<any, any>

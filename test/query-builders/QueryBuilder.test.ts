@@ -99,7 +99,7 @@ describe('QueryBuilder', function() {
     })
   })
 
-  describe('_flatten_and_assign_to', function() {
+  describe('_flatten_and_assign_to()', function() {
     it('is chain-able', function() {
       const query = new QueryBuilder()
       expect(query['_flatten_and_assign_to']('a', ['b'])).toEqual(query)
@@ -127,6 +127,22 @@ describe('QueryBuilder', function() {
       const query = new QueryBuilder()
       query['_flatten_and_assign_to']('result', <any>[[['1', '2']], '3'])
       expect(query['result']).toEqual([['1', '2'], '3'])
+    })
+  })
+
+  describe('where()', function() {
+    it('is chain-able, and has init value is undefined', function() {
+      const query = new QueryBuilder()
+      expect(query.where('a', 0)).toEqual(query)
+
+      query.where('b', 1)
+      query.where(function() {
+        this.where('c', 2)
+      })
+      console.log(query.conditions)
+      // for (const subquery of query.condition.queries) {
+      //   console.log(subquery)
+      // }
     })
   })
 })

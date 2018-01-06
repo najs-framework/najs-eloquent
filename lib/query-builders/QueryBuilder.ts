@@ -1,16 +1,6 @@
-import { OrderDirection } from '../interfaces/IBasicQueryGrammar'
+import { QueryCondition } from './QueryConditionBuilder'
+import { OrderDirection, SubCondition } from '../interfaces/IBasicQueryGrammar'
 import { isString } from 'lodash'
-
-export type QueryOperator = '=' | '==' | '!=' | '<>' | '<' | '<=' | '=<' | '>' | '>=' | '=>'
-
-export type QueryCondition = {
-  not: boolean
-  bool: 'and' | 'or'
-  operator: QueryOperator
-  field: string
-  value: string
-  queries?: QueryCondition[]
-}
 
 export class QueryBuilder<T> {
   selectedFields: string[]
@@ -73,6 +63,17 @@ export class QueryBuilder<T> {
 
   limit(records: number): this {
     this.limitNumber = records
+    return this
+  }
+
+  where(conditionBuilder: SubCondition): this
+  where(field: string, value: any): this
+  where(field: string, operator: Operator, value: any): this
+  where(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this {
+    // this.condition.where(<any>arg0, arg1, arg2)
+    const condition = new QueryCondition()
+    condition.where(<any>arg0, arg1, arg2)
+    this.conditions.push(condition)
     return this
   }
 }
