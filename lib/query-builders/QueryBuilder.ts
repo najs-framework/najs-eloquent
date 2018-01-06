@@ -1,5 +1,5 @@
 import { QueryCondition } from './QueryConditionBuilder'
-import { OrderDirection, SubCondition } from '../interfaces/IBasicQueryGrammar'
+import { OrderDirection, SubCondition, Operator } from '../interfaces/IBasicQueryGrammar'
 import { isString } from 'lodash'
 
 export class QueryBuilder<T> {
@@ -88,5 +88,21 @@ export class QueryBuilder<T> {
     condition.orWhere(<any>arg0, arg1, arg2)
     this.conditions.push(condition)
     return this
+  }
+
+  whereIn(field: string, values: Array<any>): this {
+    return this.where(field, 'in', values)
+  }
+
+  whereNotIn(field: string, values: Array<any>): this {
+    return this.where(field, 'not-in', values)
+  }
+
+  orWhereIn(field: string, values: Array<any>): this {
+    return this.orWhere(field, 'in', values)
+  }
+
+  orWhereNotIn(field: string, values: Array<any>): this {
+    return this.orWhere(field, 'not-in', values)
   }
 }

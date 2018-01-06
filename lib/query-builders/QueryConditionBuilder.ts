@@ -1,7 +1,7 @@
-import { SubCondition, Operator } from './../interfaces/IBasicQueryGrammar'
+import { IBasicQueryConditionGrammar, SubCondition, Operator } from './../interfaces/IBasicQueryGrammar'
 import { isFunction } from 'lodash'
 
-export class QueryCondition {
+export class QueryCondition implements IBasicQueryConditionGrammar {
   isSubQuery: boolean
   bool: 'and' | 'or' | ''
   operator: Operator
@@ -67,17 +67,33 @@ export class QueryCondition {
     return this
   }
 
-  where(conditionBuilder: SubCondition): QueryCondition
-  where(field: string, value: any): QueryCondition
-  where(field: string, operator: Operator, value: any): QueryCondition
-  where(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): QueryCondition {
+  where(conditionBuilder: SubCondition): this
+  where(field: string, value: any): this
+  where(field: string, operator: Operator, value: any): this
+  where(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this {
     return this.buildQuery('and', arg0, arg1, arg2)
   }
 
-  orWhere(conditionBuilder: SubCondition): QueryCondition
-  orWhere(field: string, value: any): QueryCondition
-  orWhere(field: string, operator: Operator, value: any): QueryCondition
-  orWhere(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): QueryCondition {
+  orWhere(conditionBuilder: SubCondition): this
+  orWhere(field: string, value: any): this
+  orWhere(field: string, operator: Operator, value: any): this
+  orWhere(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this {
     return this.buildQuery('or', arg0, arg1, arg2)
+  }
+
+  whereIn(field: string, values: Array<any>): this {
+    return this.buildQuery('and', field, 'in', values)
+  }
+
+  whereNotIn(field: string, values: Array<any>): this {
+    return this.buildQuery('and', field, 'not-in', values)
+  }
+
+  orWhereIn(field: string, values: Array<any>): this {
+    return this.buildQuery('or', field, 'in', values)
+  }
+
+  orWhereNotIn(field: string, values: Array<any>): this {
+    return this.buildQuery('or', field, 'not-in', values)
   }
 }

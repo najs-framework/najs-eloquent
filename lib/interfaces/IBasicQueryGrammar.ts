@@ -1,9 +1,9 @@
 export type NativeQueryHandler = (native: any) => void
 export type OrderDirection = 'asc' | 'desc'
 export type Operator = '=' | '==' | '!=' | '<>' | '<' | '<=' | '=<' | '>' | '>=' | '=>' | 'in' | 'not-in'
-export type SubCondition = (query: ISubQueryGrammar) => any
+export type SubCondition = (query: IBasicQueryConditionGrammar) => any
 
-export interface ISubQueryGrammar {
+export interface IBasicQueryConditionGrammar {
   toObject(): Object
 
   where(conditionBuilder: SubCondition): this
@@ -14,12 +14,14 @@ export interface ISubQueryGrammar {
   orWhere(field: string, value: any): this
   orWhere(field: string, operator: Operator, value: any): this
 
-  // whereIn(field: string, values: Array<any>): this
+  whereIn(field: string, values: Array<any>): this
+  whereNotIn(field: string, values: Array<any>): this
 
-  // orWhereIn(field: string, values: Array<any>): this
+  orWhereIn(field: string, values: Array<any>): this
+  orWhereNotIn(field: string, values: Array<any>): this
 }
 
-export interface IBasicQueryGrammar {
+export interface IBasicQueryGrammar extends IBasicQueryConditionGrammar {
   native(handler: NativeQueryHandler): this
 
   select(field: string): this
@@ -36,17 +38,4 @@ export interface IBasicQueryGrammar {
   orderByDesc(field: string): this
 
   limit(record: number): this
-
-  where(conditionBuilder: SubCondition): this
-  where(field: string, value: any): this
-  where(field: string, operator: Operator, value: any): this
-
-  orWhere(conditionBuilder: SubCondition): this
-  orWhere(field: string, value: any): this
-  orWhere(field: string, operator: Operator, value: any): this
-
-  whereIn(field: string, values: Array<any>): this
-  whereNotIn(field: string, values: Array<any>): this
-
-  orWhereIn(field: string, values: Array<any>): this
 }

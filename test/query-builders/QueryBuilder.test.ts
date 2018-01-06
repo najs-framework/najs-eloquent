@@ -299,4 +299,116 @@ describe('QueryBuilder', function() {
       ])
     })
   })
+
+  describe('whereIn()', function() {
+    it('is chain-able', function() {
+      const query = new QueryBuilder()
+      expect(query.whereIn('a', [0])).toEqual(query)
+    })
+
+    it('calls where() with operator "in"', function() {
+      const query = new QueryBuilder()
+      const whereSpy = Sinon.spy(query, 'where')
+      query.whereIn('a', [0])
+      expect(whereSpy.calledWith('a', 'in', [0])).toBe(true)
+    })
+
+    it('calls QueryCondition.buildQuery with "and" + operator "in"', function() {
+      const query = new QueryBuilder()
+      query.where('a', true).where(function(query) {
+        query.whereIn('b', [0])
+      })
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'a', operator: '=', value: true },
+        {
+          bool: 'and',
+          queries: [{ bool: 'and', field: 'b', operator: 'in', value: [0] }]
+        }
+      ])
+    })
+  })
+
+  describe('whereNotIn()', function() {
+    it('is chain-able', function() {
+      const query = new QueryBuilder()
+      expect(query.whereNotIn('a', [0])).toEqual(query)
+    })
+
+    it('calls where() with operator "not-in"', function() {
+      const query = new QueryBuilder()
+      const whereSpy = Sinon.spy(query, 'where')
+      query.whereNotIn('a', [0])
+      expect(whereSpy.calledWith('a', 'not-in', [0])).toBe(true)
+    })
+
+    it('calls QueryCondition.buildQuery with "and" + operator "not-in"', function() {
+      const query = new QueryBuilder()
+      query.where('a', true).where(function(query) {
+        query.whereNotIn('b', [0])
+      })
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'a', operator: '=', value: true },
+        {
+          bool: 'and',
+          queries: [{ bool: 'and', field: 'b', operator: 'not-in', value: [0] }]
+        }
+      ])
+    })
+  })
+
+  describe('orWhereIn()', function() {
+    it('is chain-able', function() {
+      const query = new QueryBuilder()
+      expect(query.orWhereIn('a', [0])).toEqual(query)
+    })
+
+    it('calls orWhere() with operator "in"', function() {
+      const query = new QueryBuilder()
+      const whereSpy = Sinon.spy(query, 'orWhere')
+      query.orWhereIn('a', [0])
+      expect(whereSpy.calledWith('a', 'in', [0])).toBe(true)
+    })
+
+    it('calls QueryCondition.buildQuery with "or" + operator "in"', function() {
+      const query = new QueryBuilder()
+      query.where('a', true).where(function(query) {
+        query.orWhereIn('b', [0])
+      })
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'a', operator: '=', value: true },
+        {
+          bool: 'and',
+          queries: [{ bool: 'or', field: 'b', operator: 'in', value: [0] }]
+        }
+      ])
+    })
+  })
+
+  describe('orWhereNotIn()', function() {
+    it('is chain-able', function() {
+      const query = new QueryBuilder()
+      expect(query.orWhereNotIn('a', [0])).toEqual(query)
+    })
+
+    it('calls orWhere() with operator "not-in"', function() {
+      const query = new QueryBuilder()
+      const whereSpy = Sinon.spy(query, 'orWhere')
+      query.orWhereNotIn('a', [0])
+      expect(whereSpy.calledWith('a', 'not-in', [0])).toBe(true)
+    })
+
+    it('calls QueryCondition.buildQuery with "or" + operator "not-in"', function() {
+      const query = new QueryBuilder()
+      query.where('a', true).where(function(query) {
+        query.orWhereNotIn('b', [0])
+      })
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'a', operator: '=', value: true },
+        {
+          bool: 'and',
+          queries: [{ bool: 'or', field: 'b', operator: 'not-in', value: [0] }]
+        }
+      ])
+    })
+  })
 })
