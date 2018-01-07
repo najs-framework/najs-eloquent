@@ -1,4 +1,5 @@
-export type NativeQueryHandler = (native: any) => void
+import { IQueryFetchResult } from './IQueryFetchResult'
+export type NativeQueryHandler = (native: any) => any
 export type OrderDirection = 'asc' | 'desc'
 export type Operator = '=' | '==' | '!=' | '<>' | '<' | '<=' | '=<' | '>' | '>=' | '=>' | 'in' | 'not-in'
 export type SubCondition = (query: IBasicQueryConditionGrammar) => any
@@ -21,8 +22,8 @@ export interface IBasicQueryConditionGrammar {
   orWhereNotIn(field: string, values: Array<any>): this
 }
 
-export interface IBasicQueryGrammar extends IBasicQueryConditionGrammar {
-  native(handler: NativeQueryHandler): this
+export interface IBasicQueryGrammar<T> extends IBasicQueryConditionGrammar {
+  native(handler: NativeQueryHandler): IQueryFetchResult<T>
 
   select(field: string): this
   select(fields: string[]): this

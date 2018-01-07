@@ -1,14 +1,22 @@
+import { IBasicQueryGrammar } from '../interfaces/IBasicQueryGrammar'
 import { IQueryFetchResult } from '../interfaces/IQueryFetchResult'
 // import { EloquentMongoose as Eloquent } from '../eloquent/EloquentMongoose'
 // import { make } from 'najs'
+import { isEmpty, mapValues } from 'lodash'
 import { collect, Collection } from 'collect.js'
-import { Model, DocumentQuery, Mongoose } from 'mongoose'
+import { Model, Document, DocumentQuery, Mongoose } from 'mongoose'
 import { QueryBuilder } from './QueryBuilder'
 import { MongodbConditionConverter } from './MongodbConditionConverter'
 
-export class MongooseQueryBuilder<T = {}> extends QueryBuilder<T> implements IQueryFetchResult<T> {
-  mongooseModel: Model<any>
-  mongooseQuery: DocumentQuery<any, any>
+type MongooseQuery<T> =
+  | DocumentQuery<Document & T | null, Document & T>
+  | DocumentQuery<(Document & T)[] | null, Document & T>
+
+export class MongooseQueryBuilder<T = {}> extends QueryBuilder<T>
+  implements IBasicQueryGrammar<T>, IQueryFetchResult<T> {
+  mongooseModel: Model<Document & T>
+  mongooseQuery: MongooseQuery<T>
+  hasMongooseQuery: boolean
 
   constructor(modelName: string) {
     super()
@@ -24,11 +32,36 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder<T> implements IQu
     return <any>{}
   }
 
-  protected getQuery(): DocumentQuery<any, any> {
+  protected getQuery(isFindOne: boolean = false): MongooseQuery<T> {
+    if (!this.hasMongooseQuery) {
+      const conditions = new MongodbConditionConverter(this.getConditions()).convert()
+      this.mongooseQuery = isFindOne ? this.mongooseModel.findOne(conditions) : this.mongooseModel.find(conditions)
+
+      if (this.selectedFields) {
+        this.mongooseQuery.select(this.selectedFields.join(' '))
+      }
+      if (this.distinctFields) {
+        this.mongooseQuery.distinct(this.distinctFields.join(' '))
+      }
+      if (this.limitNumber) {
+        this.mongooseQuery.limit(this.limitNumber)
+      }
+      if (this.ordering && !isEmpty(this.ordering)) {
+        const sort: Object = Object.assign({}, this.ordering)
+        mapValues(sort, (val: string) => (val === 'asc' ? 1 : -1))
+        this.mongooseQuery.sort(sort)
+      }
+      this.hasMongooseQuery = true
+    }
     return this.mongooseQuery
   }
 
-  protected convertConditionsToMongodb(): Object {
+  native(handler: (native: Model<Document & T> | MongooseQuery<T>) => MongooseQuery<T>): IQueryFetchResult<T> {
+    this.mongooseQuery = handler.call(undefined, this.isUsed ? this.getQuery() : this.mongooseModel)
+    return this
+  }
+
+  toObject(): Object {
     return new MongodbConditionConverter(this.getConditions()).convert()
   }
 

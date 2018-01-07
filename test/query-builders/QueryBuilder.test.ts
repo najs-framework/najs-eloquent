@@ -6,7 +6,9 @@ describe('QueryBuilder', function() {
   describe('select()', function() {
     it('is chain-able', function() {
       const query = new QueryBuilder()
+      expect(query.isUsed).toBe(false)
       expect(query.select('a')).toEqual(query)
+      expect(query.isUsed).toBe(true)
     })
 
     it('calls _flatten_and_assign_to() and assign to "selectedFields"', function() {
@@ -29,7 +31,9 @@ describe('QueryBuilder', function() {
   describe('distinct()', function() {
     it('is chain-able', function() {
       const query = new QueryBuilder()
+      expect(query.isUsed).toBe(false)
       expect(query.distinct('a')).toEqual(query)
+      expect(query.isUsed).toBe(true)
     })
 
     it('calls _flatten_and_assign_to() and assign to "distinctFields"', function() {
@@ -43,7 +47,9 @@ describe('QueryBuilder', function() {
   describe('orderBy()', function() {
     it('is chain-able', function() {
       const query = new QueryBuilder()
+      expect(query.isUsed).toBe(false)
       expect(query.orderBy('a')).toEqual(query)
+      expect(query.isUsed).toBe(true)
     })
 
     it('has default direction is ASC', function() {
@@ -67,7 +73,9 @@ describe('QueryBuilder', function() {
   describe('orderByAsc()', function() {
     it('is chain-able', function() {
       const query = new QueryBuilder()
+      expect(query.isUsed).toBe(false)
       expect(query.orderByAsc('a')).toEqual(query)
+      expect(query.isUsed).toBe(true)
     })
 
     it('overrides if fields already exists', function() {
@@ -80,7 +88,9 @@ describe('QueryBuilder', function() {
   describe('orderByDesc()', function() {
     it('is chain-able', function() {
       const query = new QueryBuilder()
+      expect(query.isUsed).toBe(false)
       expect(query.orderByDesc('a')).toEqual(query)
+      expect(query.isUsed).toBe(true)
     })
 
     it('overrides if fields already exists', function() {
@@ -93,9 +103,11 @@ describe('QueryBuilder', function() {
   describe('limit()', function() {
     it('is chain-able, and has init value is undefined', function() {
       const query = new QueryBuilder()
+      expect(query.isUsed).toBe(false)
       expect(query.limitNumber).toBeUndefined()
       expect(query.limit(10)).toEqual(query)
       expect(query.limitNumber).toEqual(10)
+      expect(query.isUsed).toBe(true)
     })
   })
 
@@ -133,7 +145,9 @@ describe('QueryBuilder', function() {
   describe('where()', function() {
     it('is chain-able', function() {
       const query = new QueryBuilder()
+      expect(query.isUsed).toBe(false)
       expect(query.where('a', 0)).toEqual(query)
+      expect(query.isUsed).toBe(true)
     })
 
     it('adds new QueryCondition instance to conditions array with operator and', function() {
@@ -216,7 +230,9 @@ describe('QueryBuilder', function() {
   describe('orWhere()', function() {
     it('is chain-able', function() {
       const query = new QueryBuilder()
+      expect(query.isUsed).toBe(false)
       expect(query.orWhere('a', 0)).toEqual(query)
+      expect(query.isUsed).toBe(true)
     })
 
     it('adds new QueryCondition instance to conditions array with operator and', function() {
@@ -303,7 +319,9 @@ describe('QueryBuilder', function() {
   describe('whereIn()', function() {
     it('is chain-able', function() {
       const query = new QueryBuilder()
+      expect(query.isUsed).toBe(false)
       expect(query.whereIn('a', [0])).toEqual(query)
+      expect(query.isUsed).toBe(true)
     })
 
     it('calls where() with operator "in"', function() {
@@ -331,7 +349,9 @@ describe('QueryBuilder', function() {
   describe('whereNotIn()', function() {
     it('is chain-able', function() {
       const query = new QueryBuilder()
+      expect(query.isUsed).toBe(false)
       expect(query.whereNotIn('a', [0])).toEqual(query)
+      expect(query.isUsed).toBe(true)
     })
 
     it('calls where() with operator "not-in"', function() {
@@ -359,7 +379,9 @@ describe('QueryBuilder', function() {
   describe('orWhereIn()', function() {
     it('is chain-able', function() {
       const query = new QueryBuilder()
+      expect(query.isUsed).toBe(false)
       expect(query.orWhereIn('a', [0])).toEqual(query)
+      expect(query.isUsed).toBe(true)
     })
 
     it('calls orWhere() with operator "in"', function() {
@@ -387,7 +409,9 @@ describe('QueryBuilder', function() {
   describe('orWhereNotIn()', function() {
     it('is chain-able', function() {
       const query = new QueryBuilder()
+      expect(query.isUsed).toBe(false)
       expect(query.orWhereNotIn('a', [0])).toEqual(query)
+      expect(query.isUsed).toBe(true)
     })
 
     it('calls orWhere() with operator "not-in"', function() {
