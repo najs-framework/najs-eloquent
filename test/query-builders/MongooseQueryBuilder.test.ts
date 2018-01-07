@@ -264,7 +264,7 @@ describe('MongooseQueryBuilder', function() {
     })
   })
 
-  describe('Fetch Api', function() {
+  describe('Fetch Result Functions', function() {
     jest.setTimeout(10000)
 
     const dataset = [
@@ -307,20 +307,21 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
-    function expect_match_row(result: any, expected: any) {
+    function expect_match_user(result: any, expected: any) {
+      expect(result).toBeInstanceOf(User)
       for (const name in expected) {
         expect(result[name]).toEqual(expected[name])
       }
     }
 
     describe('get()', function() {
-      it('get all data of collection and return an instance of Collection<Eloquent<T>>', async function() {
+      it('gets all data of collection and return an instance of Collection<Eloquent<T>>', async function() {
         const query = new MongooseQueryBuilder('User')
-        const result = await query.all()
+        const result = await query.get()
         expect(result.count()).toEqual(7)
         const resultArray = result.all()
         for (let i = 0; i < 7; i++) {
-          expect_match_row(resultArray[i], dataset[i])
+          expect_match_user(resultArray[i], dataset[i])
         }
       })
 
@@ -328,27 +329,115 @@ describe('MongooseQueryBuilder', function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.where('age', 1000).get()
         expect(result.count()).toEqual(1)
-        expect_match_row(result.first(), dataset[3])
+        expect_match_user(result.first(), dataset[3])
       })
 
       it('can get data by query builder, case 2', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.where('age', 40).get()
         expect(result.count()).toEqual(2)
-        expect_match_row(result.items[0], dataset[2])
-        expect_match_row(result.items[1], dataset[5])
+        expect_match_user(result.items[0], dataset[2])
+        expect_match_user(result.items[1], dataset[5])
       })
 
       it('can get data by query builder, case 3', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query
           .where('age', 40)
+          .where('last_name', 'stark')
+          .get()
+        expect(result.count()).toEqual(1)
+        expect_match_user(result.items[0], dataset[2])
+      })
+
+      it('can get data by query builder, case 4', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .where('age', 40)
           .orWhere('first_name', 'peter')
           .get()
         expect(result.count()).toEqual(3)
-        expect_match_row(result.items[0], dataset[2])
-        expect_match_row(result.items[1], dataset[5])
-        expect_match_row(result.items[2], dataset[6])
+        expect_match_user(result.items[0], dataset[2])
+        expect_match_user(result.items[1], dataset[5])
+        expect_match_user(result.items[2], dataset[6])
+      })
+    })
+
+    describe('find()', function() {
+      it('finds first document of collection and return an instance of Eloquent<T>', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.find()
+        expect_match_user(result, dataset[0])
+      })
+
+      it('can find data by query builder, case 1', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.where('age', 1000).find()
+        expect_match_user(result, dataset[3])
+      })
+
+      it('can find data by query builder, case 2', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .where('age', 40)
+          .orWhere('first_name', 'jane')
+          .find()
+        expect_match_user(result, dataset[1])
+      })
+
+      it('can find data by query builder, case 3', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .where('first_name', 'tony')
+          .where('last_name', 'stewart')
+          .find()
+        expect_match_user(result, dataset[5])
+      })
+
+      it('can find data by native() before using query functions of query builder', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .native(function(model: any) {
+            return model.findOne({
+              first_name: 'tony'
+            })
+          })
+          .find()
+        expect_match_user(result, dataset[2])
+      })
+
+      it('can find data by native() after using query functions of query builder', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .where('age', 40)
+          .orWhere('age', 1000)
+          .native(function(nativeQuery: any) {
+            return nativeQuery.sort({ last_name: -1 })
+          })
+          .find()
+        expect_match_user(result, dataset[5])
+      })
+
+      it('can find data by native() and modified after using query functions of query builder', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .where('age', 40)
+          .orWhere('age', 1000)
+          .native(function(nativeQuery: any) {
+            return nativeQuery.findOne({
+              first_name: 'thor'
+            })
+          })
+          .find()
+        expect_match_user(result, dataset[3])
+      })
+    })
+
+    describe('pluck()', function() {
+      it('plucks all data of collection and returns an Object', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.pluck('first_name', '_id')
+        console.log(result)
       })
     })
   })

@@ -67,6 +67,7 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder implements IBasic
       undefined,
       this.isUsed ? this.passDataToMongooseQuery(this.getQuery()) : this.mongooseModel
     )
+    this.hasMongooseQuery = true
     return this
   }
 
@@ -90,25 +91,40 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder implements IBasic
   async get(): Promise<Collection<any>> {
     const query = this.passDataToMongooseQuery(this.getQuery()) as DocumentQuery<(Document & T)[] | null, Document & T>
     const result = await query.exec()
-    const eloquent = make<Eloquent<T>>(this.mongooseModel.modelName)
-    if (!result) {
-      return collect([])
+    if (result) {
+      const eloquent = make<Eloquent<T>>(this.mongooseModel.modelName)
+      return eloquent.newCollection(result)
     }
-    return eloquent.newCollection(result)
+    return collect([])
   }
 
-  // async get(): Promise<Collection<Eloquent<Document>>> {
-  //   return collect([])
-  // }
+  async find(): Promise<any | null> {
+    const query = this.passDataToMongooseQuery(this.getQuery(true))
+    // change mongoose query operator from find to findOne if needed
+    if (query['op'] === 'find') {
+      query.findOne()
+    }
 
-  // async find(): Promise<Eloquent<Document> | null> {
-  //   // tslint:disable-next-line
-  //   return null
-  // }
+    const result = await (query as DocumentQuery<(Document & T) | null, Document & T>).exec()
+    if (result) {
+      return make<Eloquent<T>>(this.mongooseModel.modelName).newInstance(result)
+    }
+    // tslint:disable-next-line
+    return null
+  }
 
-  // async pluck(): Promise<Object> {
-  //   return {}
-  // }
+  async pluck(value: string, key: string): Promise<Object> {
+    this.select(value, key)
+    const query = this.passDataToMongooseQuery(this.getQuery()) as DocumentQuery<(Document & T)[] | null, Document & T>
+    const result: Array<Document & T> | null = await query.exec()
+    if (result) {
+      return result.reduce(function(memo: Object, item: Document) {
+        memo[item[key]] = item[value]
+        return memo
+      }, {})
+    }
+    return {}
+  }
 
   // async update(): Promise<any> {}
   // async delete(): Promise<any> {}
