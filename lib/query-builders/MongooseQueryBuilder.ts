@@ -84,14 +84,14 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder implements IBasic
 
   // -------------------------------------------------------------------------------------------------------------------
 
-  async all(): Promise<Collection<any>> {
-    return this.get()
-  }
+  // async all(): Promise<Collection<any>> {
+  //   return this.get()
+  // }
 
   async get(): Promise<Collection<any>> {
     const query = this.passDataToMongooseQuery(this.getQuery()) as DocumentQuery<(Document & T)[] | null, Document & T>
     const result = await query.exec()
-    if (result) {
+    if (result && !isEmpty(result)) {
       const eloquent = make<Eloquent<T>>(this.mongooseModel.modelName)
       return eloquent.newCollection(result)
     }
@@ -113,11 +113,14 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder implements IBasic
     return null
   }
 
-  async pluck(value: string, key: string): Promise<Object> {
+  async pluck(value: string): Promise<Object>
+  async pluck(value: string, key: string): Promise<Object>
+  async pluck(value: string, key: string = '_id'): Promise<Object> {
+    this.selectedFields = []
     this.select(value, key)
     const query = this.passDataToMongooseQuery(this.getQuery()) as DocumentQuery<(Document & T)[] | null, Document & T>
     const result: Array<Document & T> | null = await query.exec()
-    if (result) {
+    if (result && !isEmpty(result)) {
       return result.reduce(function(memo: Object, item: Document) {
         memo[item[key]] = item[value]
         return memo

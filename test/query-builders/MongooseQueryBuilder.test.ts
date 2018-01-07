@@ -325,6 +325,12 @@ describe('MongooseQueryBuilder', function() {
         }
       })
 
+      it('returns an empty collection if no result', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.where('first_name', 'no-one').get()
+        expect(result.isEmpty()).toBe(true)
+      })
+
       it('can get data by query builder, case 1', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.where('age', 1000).get()
@@ -368,6 +374,12 @@ describe('MongooseQueryBuilder', function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.find()
         expect_match_user(result, dataset[0])
+      })
+
+      it('returns null if no result', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.where('first_name', 'no-one').find()
+        expect(result).toBeNull()
       })
 
       it('can find data by query builder, case 1', async function() {
@@ -437,7 +449,39 @@ describe('MongooseQueryBuilder', function() {
       it('plucks all data of collection and returns an Object', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.pluck('first_name', '_id')
-        console.log(result)
+        expect(Object.values(result)).toEqual(['john', 'jane', 'tony', 'thor', 'captain', 'tony', 'peter'])
+      })
+
+      it('returns an empty object if no result', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.where('first_name', 'no-one').pluck('first_name')
+        expect(result).toEqual({})
+      })
+
+      it('overrides select even .select was used', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.select('abc', 'def').pluck('first_name', '_id')
+        expect(query['selectedFields']).toEqual(['first_name', '_id'])
+        expect(Object.values(result)).toEqual(['john', 'jane', 'tony', 'thor', 'captain', 'tony', 'peter'])
+      })
+
+      it('can pluck data by query builder, case 1', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .where('age', 18)
+          .orWhere('first_name', 'tony')
+          .pluck('first_name')
+        expect(Object.values(result)).toEqual(['tony', 'tony'])
+      })
+
+      it('can pluck data by query builder, case 2', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .where('age', 1000)
+          .orWhere('first_name', 'captain')
+          .orderBy('last_name')
+          .pluck('last_name')
+        expect(Object.values(result)).toEqual(['american', 'god'])
       })
     })
   })
