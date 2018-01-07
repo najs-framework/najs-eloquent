@@ -3,7 +3,7 @@ import { isFunction } from 'lodash'
 
 export class QueryCondition implements IBasicQueryConditionGrammar {
   isSubQuery: boolean
-  bool: 'and' | 'or' | ''
+  bool: 'and' | 'or'
   operator: Operator
   field: string
   value: string
@@ -31,7 +31,7 @@ export class QueryCondition implements IBasicQueryConditionGrammar {
     return result
   }
 
-  private buildQuery(bool: 'and' | 'or' | '', arg0: string | SubCondition, arg1: Operator | any, arg2: any): this {
+  private buildQuery(bool: 'and' | 'or', arg0: string | SubCondition, arg1: Operator | any, arg2: any): this {
     let queryCondition
     if (this.isSubQuery) {
       queryCondition = new QueryCondition()

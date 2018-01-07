@@ -4,6 +4,7 @@ import { IQueryFetchResult } from '../interfaces/IQueryFetchResult'
 import { collect, Collection } from 'collect.js'
 import { Model, DocumentQuery, Mongoose } from 'mongoose'
 import { QueryBuilder } from './QueryBuilder'
+import { MongodbConditionConverter } from './MongodbConditionConverter'
 
 export class MongooseQueryBuilder<T = {}> extends QueryBuilder<T> implements IQueryFetchResult<T> {
   mongooseModel: Model<any>
@@ -25,6 +26,10 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder<T> implements IQu
 
   protected getQuery(): DocumentQuery<any, any> {
     return this.mongooseQuery
+  }
+
+  protected convertConditionsToMongodb(): Object {
+    return new MongodbConditionConverter(this.getConditions()).convert()
   }
 
   // -------------------------------------------------------------------------------------------------------------------
