@@ -8,12 +8,11 @@ import { Model, Document, DocumentQuery, Mongoose } from 'mongoose'
 import { QueryBuilder } from './QueryBuilder'
 import { MongodbConditionConverter } from './MongodbConditionConverter'
 
-type MongooseQuery<T> =
+export type MongooseQuery<T> =
   | DocumentQuery<Document & T | null, Document & T>
   | DocumentQuery<(Document & T)[] | null, Document & T>
 
-export class MongooseQueryBuilder<T = {}> extends QueryBuilder<T>
-  implements IBasicQueryGrammar<T>, IQueryFetchResult<T> {
+export class MongooseQueryBuilder<T = {}> extends QueryBuilder implements IBasicQueryGrammar<T>, IQueryFetchResult<T> {
   mongooseModel: Model<Document & T>
   mongooseQuery: MongooseQuery<T>
   hasMongooseQuery: boolean

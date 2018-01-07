@@ -5,7 +5,7 @@
     "experimentalDecorators": true,
     "sourceMap": true,
     "moduleResolution": "node",
-    "outDir": "dst",
+    "outDir": "dist",
     "types": [
       "node"
     ],

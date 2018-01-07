@@ -1,12 +1,13 @@
 {
   "name": "najs-eloquent",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "scripts": {
     "build": "npm run build-ts && npm run tslint",
     "build-ts": "tsc",
     "coverage": "jest --coverage --forceExit",
     "test": "jest --forceExit",
-    "tslint": "tslint -c tslint.json -p tsconfig.json"
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "prepublishOnly": "tsc -d -p ./ --outDir dist"
   },
   "jest": {
     "globals": {
@@ -32,7 +33,7 @@
   },
   "dependencies": {
     "@types/pluralize": "^0.0.28",
-    "collect.js": "https://github.com/nhat-phan/collect.js",
+    "collect.js": "^4.0.2",
     "coveralls": "^3.0.0",
     "lodash": "^4.17.4",
     "mongoose": "^5.0.0-rc0",

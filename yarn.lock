@@ -585,9 +585,13 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
-collect.js@^4.0.1, "collect.js@https://github.com/nhat-phan/collect.js":
+collect.js@^4.0.1:
   version "4.0.1"
   resolved "https://github.com/nhat-phan/collect.js#d432767a071019f477879564073cf38d1a125d9e"
+
+collect.js@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/collect.js/-/collect.js-4.0.2.tgz#477f75a58e1a85d2219a0982195f7513faa894c9"
 
 color-convert@^1.9.0:
   version "1.9.1"

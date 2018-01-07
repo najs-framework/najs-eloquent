@@ -62,3 +62,9 @@ dist
 
 dist/test
 dist/syntax
+.vscode
+lib
+test
+.travis.yml
+tsconfig.json
+tslint.json

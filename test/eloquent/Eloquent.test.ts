@@ -118,14 +118,15 @@ describe('Eloquent', function() {
     })
   })
 
-  // describe('newInstance(data)', function() {
-  //   it('create new instance of Eloquent based by passing data', function() {
-  //     const user = new User()
-  //     const instance: User = user.newInstance({ first_name: 'john' })
-  //     expect(instance).toBeInstanceOf(User)
-  //     expect(instance.toObject).toEqual({ first_name: 'john' })
-  //   })
-  // })
+  describe('newInstance(data)', function() {
+    it('create new instance of Eloquent based by passing data', function() {
+      const user = new User()
+      const instance: User = user.newInstance({ first_name: 'john' })
+      expect(instance).toBeInstanceOf(User)
+      expect(instance === user.newInstance()).toBe(false)
+      expect(instance.toObject()).toEqual({ first_name: 'john' })
+    })
+  })
 
   describe('getGuarded()', function() {
     it('returns ["*"] by default even the guarded property is not set', function() {

@@ -2,7 +2,7 @@ import { Schema } from 'mongoose'
 import { Eloquent } from '../lib/index'
 
 // Definition
-interface IParentVirtualAttribute {
+export interface IParentVirtualAttribute {
   parent_virtual_attribute: Date
 }
 

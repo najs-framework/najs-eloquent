@@ -34,7 +34,7 @@ export abstract class Eloquent<NativeRecord extends Object = {}> implements IElo
   constructor(data: NativeRecord)
   constructor(data?: NativeRecord | Object) {
     if (!ClassRegistry.has(this.getClassName())) {
-      register(Object.getPrototypeOf(this), this.getClassName(), false)
+      register(Object.getPrototypeOf(this).constructor, this.getClassName(), false)
     }
     return this.initialize(data)
   }

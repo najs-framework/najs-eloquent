@@ -2,7 +2,7 @@ import { QueryCondition } from './QueryConditionBuilder'
 import { OrderDirection, SubCondition, Operator } from '../interfaces/IBasicQueryGrammar'
 import { isString } from 'lodash'
 
-export class QueryBuilder<T> {
+export class QueryBuilder {
   selectedFields: string[]
   distinctFields: string[]
   ordering: Object
