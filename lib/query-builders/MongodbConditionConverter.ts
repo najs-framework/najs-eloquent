@@ -40,15 +40,15 @@ export class MongodbConditionConverter {
         conditions[i - 1].bool = 'or'
       }
     }
-    this.convertConditionsWithBool(result, '$and', <any>conditions.filter(item => item['bool'] === 'and'))
-    this.convertConditionsWithBool(result, '$or', <any>conditions.filter(item => item['bool'] === 'or'))
+    this.convertConditionsWithAnd(result, <any>conditions.filter(item => item['bool'] === 'and'))
+    this.convertConditionsWithOr(result, <any>conditions.filter(item => item['bool'] === 'or'))
     if (Object.keys(result).length === 1 && typeof result['$and'] !== 'undefined') {
       return result['$and']
     }
     return result
   }
 
-  protected convertConditionsWithBool(bucket: Object, bool: string, conditions: Condition[]) {
+  protected convertConditionsWithAnd(bucket: Object, conditions: Condition[]) {
     const result: Object = {}
     for (const condition of conditions) {
       const query = this.convertCondition(condition)
@@ -60,7 +60,19 @@ export class MongodbConditionConverter {
       Object.assign(bucket, result)
     }
     if (keysLength > 1) {
-      Object.assign(bucket, { [bool]: result })
+      Object.assign(bucket, { $and: result })
+    }
+  }
+
+  protected convertConditionsWithOr(bucket: Object, conditions: Condition[]) {
+    const result: Object[] = []
+    for (const condition of conditions) {
+      const query = this.convertCondition(condition)
+      result.push(Object.assign({}, query))
+    }
+
+    if (result.length > 1) {
+      Object.assign(bucket, { $or: result })
     }
   }
 
@@ -80,17 +92,23 @@ export class MongodbConditionConverter {
       return this.convertCondition(<Condition>condition.queries[0])
     }
 
-    const operator = condition.bool === 'and' ? '$and' : '$or'
     const result: Object = this.convertConditions(condition.queries)
 
     if (Object.keys(result).length === 0) {
       return {}
     }
 
-    if (Object.keys(result).length === 1) {
+    if (condition.bool === 'and') {
+      if (Object.keys(result).length === 1) {
+        return result
+      }
+      return { $and: result }
+    }
+
+    if (Object.keys(result).length === 1 && typeof result['$or'] !== 'undefined') {
       return result
     }
-    return { [operator]: result }
+    return { $or: [result] }
   }
 
   protected convertSimpleCondition(condition: SimpleCondition): Object {

@@ -114,7 +114,7 @@ describe('MongodbConditionConverter', function() {
             { bool: 'or', field: 'c', operator: '<', value: 3 }
           ]
         },
-        expected: { $or: { a: 1, b: { $not: 2 }, c: { $lt: 3 } } }
+        expected: { $or: [{ a: 1 }, { b: { $not: 2 } }, { c: { $lt: 3 } }] }
       },
       'multiple conditions case #3: result has only 1 key, no group by operator': {
         input: {
@@ -205,7 +205,7 @@ describe('MongodbConditionConverter', function() {
             }
           ]
         },
-        expected: { $or: { $or: { a: 1, b: 2 }, $and: { c: 3, d: 4 } } }
+        expected: { $or: [{ $or: [{ a: 1 }, { b: 2 }], $and: { c: 3, d: 4 } }] }
       },
       'multiple operators case #1': {
         input: {
@@ -217,7 +217,7 @@ describe('MongodbConditionConverter', function() {
             { bool: 'or', field: 'd', operator: '=', value: 4 }
           ]
         },
-        expected: { $or: { $and: { a: 1, b: 2 }, $or: { c: 3, d: 4 } } }
+        expected: { $or: [{ $and: { a: 1, b: 2 }, $or: [{ c: 3 }, { d: 4 }] }] }
       }
     }
 
@@ -237,6 +237,16 @@ describe('MongodbConditionConverter', function() {
           a: 1
         }
       },
+      'case "query.orWhere(a).where(b)': {
+        input: [
+          { bool: 'or', field: 'a', operator: '=', value: 1 },
+          { bool: 'and', field: 'b', operator: '=', value: 2 }
+        ],
+        expected: {
+          a: 1,
+          b: 2
+        }
+      },
       'case "query.where(a).where(b)': {
         input: [
           { bool: 'and', field: 'a', operator: '=', value: 1 },
@@ -253,10 +263,7 @@ describe('MongodbConditionConverter', function() {
           { bool: 'or', field: 'b', operator: '=', value: 2 }
         ],
         expected: {
-          $or: {
-            a: 1,
-            b: 2
-          }
+          $or: [{ a: 1 }, { b: 2 }]
         }
       },
       'case "query.where(a).where(b).where(c)"': {
@@ -278,11 +285,7 @@ describe('MongodbConditionConverter', function() {
           { bool: 'or', field: 'c', operator: '>', value: 3 }
         ],
         expected: {
-          $or: {
-            a: 1,
-            b: { $lt: 2 },
-            c: { $gt: 3 }
-          }
+          $or: [{ a: 1 }, { b: { $lt: 2 } }, { c: { $gt: 3 } }]
         }
       },
       'case "query.orWhere(a).where(b).where(c)"': {
@@ -305,10 +308,7 @@ describe('MongodbConditionConverter', function() {
         ],
         expected: {
           a: 1,
-          $or: {
-            c: { $gt: 3 },
-            b: { $lt: 2 }
-          }
+          $or: [{ b: { $lt: 2 } }, { c: { $gt: 3 } }]
         }
       },
       'case "query.where(a).where(b).orWhere(c).where(d)"': {
@@ -323,10 +323,7 @@ describe('MongodbConditionConverter', function() {
             a: 1,
             d: 4
           },
-          $or: {
-            b: 2,
-            c: 3
-          }
+          $or: [{ b: 2 }, { c: 3 }]
         }
       }
     }
@@ -352,10 +349,7 @@ describe('MongodbConditionConverter', function() {
           a: 1,
           d: 4
         },
-        $or: {
-          b: 2,
-          c: 3
-        }
+        $or: [{ b: 2 }, { c: 3 }]
       })
     })
   })

@@ -17,8 +17,8 @@
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-21.1.10.tgz#dcacb5217ddf997a090cc822bba219b4b2fd7984"
 
 "@types/lodash@^4.14.91":
-  version "4.14.91"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.91.tgz#794611b28056d16b5436059c6d800b39d573cd3a"
+  version "4.14.92"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.92.tgz#6e3cb0b71a1e12180a47a42a744e856c3ae99a57"
 
 "@types/mongodb@*":
   version "2.2.18"
@@ -37,8 +37,8 @@
     "@types/node" "*"
 
 "@types/node@*":
-  version "8.5.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.5.2.tgz#83b8103fa9a2c2e83d78f701a9aa7c9539739aa5"
+  version "8.5.7"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.5.7.tgz#9c498c35af354dcfbca3790fb2e81129e93cf0e2"
 
 "@types/pluralize@^0.0.28":
   version "0.0.28"
@@ -585,11 +585,7 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
-collect.js@^4.0.1:
-  version "4.0.1"
-  resolved "https://github.com/nhat-phan/collect.js#d432767a071019f477879564073cf38d1a125d9e"
-
-collect.js@^4.0.2:
+collect.js@^4.0.1, collect.js@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/collect.js/-/collect.js-4.0.2.tgz#477f75a58e1a85d2219a0982195f7513faa894c9"
 
@@ -2008,8 +2004,8 @@ mongoose-legacy-pluralize@1.0.1:
   resolved "https://registry.yarnpkg.com/mongoose-legacy-pluralize/-/mongoose-legacy-pluralize-1.0.1.tgz#31ae25db45c30f1448c0f93f52769e903367c701"
 
 mongoose@^5.0.0-rc0:
-  version "5.0.0-rc1"
-  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-5.0.0-rc1.tgz#50e946aefda73d71d376979a7c31e2f71f16a7aa"
+  version "5.0.0-rc2"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-5.0.0-rc2.tgz#4072845ff576af086c1ddfed9039c7887df55ef3"
   dependencies:
     async "2.1.4"
     bson "~1.0.4"
@@ -2041,8 +2037,8 @@ ms@2.0.0:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
 najs@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/najs/-/najs-0.1.1.tgz#6d87a67d8ac2c25a5aa7e000fd344f93e3786dad"
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/najs/-/najs-0.1.2.tgz#cdfaa258f51c965df33afff706f1a95b07455c7c"
   dependencies:
     collect.js "^4.0.1"
     coveralls "^3.0.0"
@@ -2223,14 +2219,20 @@ p-finally@^1.0.0:
   resolved "https://registry.yarnpkg.com/p-finally/-/p-finally-1.0.0.tgz#3fbcfb15b899a44123b34b6dcc18b724336a2cae"
 
 p-limit@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-1.1.0.tgz#b07ff2d9a5d88bec806035895a2bab66a27988bc"
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-1.2.0.tgz#0e92b6bedcb59f022c13d0f1949dc82d15909f1c"
+  dependencies:
+    p-try "^1.0.0"
 
 p-locate@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/p-locate/-/p-locate-2.0.0.tgz#20a0103b222a70c8fd39cc2e580680f3dde5ec43"
   dependencies:
     p-limit "^1.1.0"
+
+p-try@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/p-try/-/p-try-1.0.0.tgz#cbc79cdbaf8fd4228e13f621f2b1a237c1b207b3"
 
 parse-glob@^3.0.4:
   version "3.0.4"

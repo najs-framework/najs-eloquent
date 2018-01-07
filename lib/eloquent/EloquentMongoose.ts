@@ -1,7 +1,7 @@
 import { Eloquent } from './Eloquent'
 import { MongooseQueryBuilder } from '..//query-builders/MongooseQueryBuilder'
 import { Document, Schema } from 'mongoose'
-import { collect, Collection } from 'collect.js'
+import collect, { Collection } from 'collect.js'
 
 export abstract class EloquentMongoose<T> extends Eloquent<Document & T> {
   protected collection: string

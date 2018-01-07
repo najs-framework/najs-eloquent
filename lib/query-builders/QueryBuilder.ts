@@ -3,12 +3,12 @@ import { OrderDirection, SubCondition, Operator } from '../interfaces/IBasicQuer
 import { isString } from 'lodash'
 
 export class QueryBuilder {
-  selectedFields: string[]
-  distinctFields: string[]
-  ordering: Object
-  limitNumber: number
-  conditions: QueryCondition[]
-  isUsed: boolean
+  protected selectedFields: string[]
+  protected distinctFields: string[]
+  protected ordering: Object
+  protected limitNumber: number
+  protected conditions: QueryCondition[]
+  protected isUsed: boolean
 
   constructor() {
     this.selectedFields = []
