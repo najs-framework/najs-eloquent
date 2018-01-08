@@ -549,7 +549,7 @@ describe('MongooseQueryBuilder', function() {
         expect(result).toEqual({ n: 0, nModified: 0, ok: 1 })
       })
 
-      it('can find data by query builder, case 1', async function() {
+      it('can update data by query builder, case 1', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.where('age', 1000).update({ $set: { age: 1001 } })
         expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
@@ -557,7 +557,7 @@ describe('MongooseQueryBuilder', function() {
         expect_match_user(updatedResult, Object.assign({}, dataset[3], { age: 1001 }))
       })
 
-      it('can find data by query builder, case 2: multiple documents', async function() {
+      it('can update data by query builder, case 2: multiple documents', async function() {
         const query = new MongooseQueryBuilder('User')
         query.where('first_name', 'tony').orWhere('first_name', 'jane')
         const result = await query.update({ $inc: { age: 1 } })
@@ -571,19 +571,82 @@ describe('MongooseQueryBuilder', function() {
         expect_match_user(updatedResults.items[2], Object.assign({}, dataset[5], { age: 41 }))
       })
 
-      it('can find data by query builder, case 3', async function() {
+      it('can update data by query builder, case 3', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query
           .where('first_name', 'tony')
           .where('last_name', 'stewart')
           .update({ $inc: { age: 1 } })
         expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
-        console.log((await new MongooseQueryBuilder('User').all()).map(item => item.toJson()))
         const updatedResult = await new MongooseQueryBuilder('User')
           .where('first_name', 'tony')
           .where('last_name', 'stewart')
           .find()
         expect_match_user(updatedResult, Object.assign({}, dataset[5], { age: 42 }))
+      })
+    })
+
+    describe('delete()', function() {
+      it('can delete data of collection, returns delete result of mongoose', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.where('first_name', 'peter').delete()
+        expect(result).toEqual({ n: 1, ok: 1 })
+        const count = await new MongooseQueryBuilder('User').count()
+        expect(count).toEqual(6)
+      })
+
+      it('can delete data by query builder, case 1', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.where('age', 1001).delete()
+        expect(result).toEqual({ n: 1, ok: 1 })
+        const count = await new MongooseQueryBuilder('User').count()
+        expect(count).toEqual(5)
+      })
+
+      it('can delete data by query builder, case 2: multiple documents', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .where('first_name', 'tony')
+          .orWhere('first_name', 'jane')
+          .delete()
+        expect(result).toEqual({ n: 3, ok: 1 })
+        const count = await new MongooseQueryBuilder('User').count()
+        expect(count).toEqual(2)
+      })
+
+      it('can delete data by query builder, case 3', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .where('first_name', 'john')
+          .where('last_name', 'doe')
+          .delete()
+        expect(result).toEqual({ n: 1, ok: 1 })
+        const count = await new MongooseQueryBuilder('User').count()
+        expect(count).toEqual(1)
+      })
+
+      it('can not call delete without using any .where() statement', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.delete()
+        expect(result).toEqual({ n: 0, ok: 1 })
+      })
+
+      it('can not call delete if query is empty', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.select('any').delete()
+        expect(result).toEqual({ n: 0, ok: 1 })
+      })
+
+      it('can delete by native() function', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .native(function(model: any) {
+            return model.remove({})
+          })
+          .execute()
+        expect(result).toEqual({ n: 1, ok: 1 })
+        const count = await new MongooseQueryBuilder('User').count()
+        expect(count).toEqual(0)
       })
     })
   })

@@ -141,13 +141,28 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder
     return result
   }
 
-  async update(data: Object): Promise<any> {
+  async update(data: Object): Promise<Object> {
     const conditions = new MongodbConditionConverter(this.getConditions()).convert()
     const query = this.mongooseModel.update(conditions, data, {
       multi: true
     })
-    return query.exec()
+    return <Object>query.exec()
   }
 
-  // async delete(): Promise<any> {}
+  async delete(): Promise<Object> {
+    if (!this.isUsed) {
+      return { n: 0, ok: 1 }
+    }
+    const conditions = new MongodbConditionConverter(this.getConditions()).convert()
+    if (isEmpty(conditions)) {
+      return { n: 0, ok: 1 }
+    }
+
+    const query = this.mongooseModel.remove(conditions)
+    return <Object>query.exec()
+  }
+
+  async execute(): Promise<any> {
+    return (this.getQuery() as any).exec()
+  }
 }
