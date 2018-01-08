@@ -369,6 +369,15 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
+    describe('all()', function() {
+      it('just an alias of .get()', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const getSpy = Sinon.spy(query, 'get')
+        await query.all()
+        expect(getSpy.called).toBe(true)
+      })
+    })
+
     describe('find()', function() {
       it('finds first document of collection and return an instance of Eloquent<T>', async function() {
         const query = new MongooseQueryBuilder('User')
@@ -525,48 +534,57 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
-    // describe('update()', function() {
-    //   it('can update data of collection, returns update result of mongoose', async function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     const result = await query.where('first_name', 'peter').update({ $set: { age: 19 } })
-    //     expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
-    //     const updatedResult = await new MongooseQueryBuilder('User').where('first_name', 'peter').find()
-    //     expect_match_user(updatedResult, Object.assign({}, dataset[6], { age: 19 }))
-    //   })
+    describe('update()', function() {
+      it('can update data of collection, returns update result of mongoose', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.where('first_name', 'peter').update({ $set: { age: 19 } })
+        expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
+        const updatedResult = await new MongooseQueryBuilder('User').where('first_name', 'peter').find()
+        expect_match_user(updatedResult, Object.assign({}, dataset[6], { age: 19 }))
+      })
 
-    //   it('returns empty update result if no row matched', async function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     const result = await query.where('first_name', 'no-one').update({ $set: { age: 19 } })
-    //     expect(result).toEqual({ n: 0, nModified: 0, ok: 1 })
-    //   })
+      it('returns empty update result if no row matched', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.where('first_name', 'no-one').update({ $set: { age: 19 } })
+        expect(result).toEqual({ n: 0, nModified: 0, ok: 1 })
+      })
 
-    //   it('can find data by query builder, case 1', async function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     const result = await query.where('age', 1000).update({ $set: { age: 1001 } })
-    //     expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
-    //     const updatedResult = await new MongooseQueryBuilder('User').where('first_name', 'thor').find()
-    //     expect_match_user(updatedResult, Object.assign({}, dataset[3], { age: 1001 }))
-    //   })
+      it('can find data by query builder, case 1', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.where('age', 1000).update({ $set: { age: 1001 } })
+        expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
+        const updatedResult = await new MongooseQueryBuilder('User').where('first_name', 'thor').find()
+        expect_match_user(updatedResult, Object.assign({}, dataset[3], { age: 1001 }))
+      })
 
-    //   it('can find data by query builder, case 2', async function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     query.where('first_name', 'tony').orWhere('first_name', 'jane')
-    //     console.log(query.toObject().conditions)
-    //     const result = await query.update({ $inc: { age: 1 } })
-    //     console.log(result)
-    //     // expect(result).toEqual({ n: 3, nModified: 3, ok: 1 })
-    //     const updatedResults = await new MongooseQueryBuilder('User').get()
-    //     console.log(updatedResults.all().map(item => item.toJson()))
-    //     // expect_match_user(result, dataset[1])
-    //   })
+      it('can find data by query builder, case 2: multiple documents', async function() {
+        const query = new MongooseQueryBuilder('User')
+        query.where('first_name', 'tony').orWhere('first_name', 'jane')
+        const result = await query.update({ $inc: { age: 1 } })
+        expect(result).toEqual({ n: 3, nModified: 3, ok: 1 })
+        const updatedResults = await new MongooseQueryBuilder('User')
+          .where('first_name', 'tony')
+          .orWhere('first_name', 'jane')
+          .get()
+        expect_match_user(updatedResults.items[0], Object.assign({}, dataset[1], { age: 26 }))
+        expect_match_user(updatedResults.items[1], Object.assign({}, dataset[2], { age: 41 }))
+        expect_match_user(updatedResults.items[2], Object.assign({}, dataset[5], { age: 41 }))
+      })
 
-    //   it('can find data by query builder, case 3', async function() {})
-
-    //   it('can find data by native() before using query functions of query builder', async function() {})
-
-    //   it('can find data by native() after using query functions of query builder', async function() {})
-
-    //   it('can find data by native() and modified after using query functions of query builder', async function() {})
-    // })
+      it('can find data by query builder, case 3', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .where('first_name', 'tony')
+          .where('last_name', 'stewart')
+          .update({ $inc: { age: 1 } })
+        expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
+        console.log((await new MongooseQueryBuilder('User').all()).map(item => item.toJson()))
+        const updatedResult = await new MongooseQueryBuilder('User')
+          .where('first_name', 'tony')
+          .where('last_name', 'stewart')
+          .find()
+        expect_match_user(updatedResult, Object.assign({}, dataset[5], { age: 42 }))
+      })
+    })
   })
 })

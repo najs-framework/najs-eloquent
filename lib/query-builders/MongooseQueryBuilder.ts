@@ -14,13 +14,16 @@ export type MongooseQuery<T> =
   | DocumentQuery<Document & T | null, Document & T>
   | DocumentQuery<(Document & T)[] | null, Document & T>
 
-export class MongooseQueryBuilder<T = {}> extends QueryBuilder implements IBasicQueryGrammar<T>, IQueryFetchResult<T> {
+export class MongooseQueryBuilder<T = {}> extends QueryBuilder
+  implements IBasicQueryGrammar<T>, IQueryFetchResult<Document & T> {
   protected mongooseModel: Model<Document & T>
   protected mongooseQuery: MongooseQuery<T>
   protected hasMongooseQuery: boolean
+  protected primaryKey: string
 
-  constructor(modelName: string) {
+  constructor(modelName: string, primaryKey: string = '_id') {
     super()
+    this.primaryKey = primaryKey
     const mongoose: Mongoose = this.getMongoose()
     if (mongoose.modelNames().indexOf(modelName) === -1) {
       throw new Error('Model ' + modelName + ' Not Found')
@@ -84,10 +87,6 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder implements IBasic
 
   // -------------------------------------------------------------------------------------------------------------------
 
-  // async all(): Promise<Collection<any>> {
-  //   return this.get()
-  // }
-
   async get(): Promise<Collection<any>> {
     const query = this.passDataToMongooseQuery(this.getQuery()) as DocumentQuery<(Document & T)[] | null, Document & T>
     const result = await query.exec()
@@ -96,6 +95,10 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder implements IBasic
       return eloquent.newCollection(result)
     }
     return collect([])
+  }
+
+  async all(): Promise<Collection<any>> {
+    return this.get()
   }
 
   async find(): Promise<any | null> {
@@ -115,14 +118,15 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder implements IBasic
 
   async pluck(value: string): Promise<Object>
   async pluck(value: string, key: string): Promise<Object>
-  async pluck(value: string, key: string = '_id'): Promise<Object> {
+  async pluck(value: string, key?: string): Promise<Object> {
     this.selectedFields = []
-    this.select(value, key)
+    const keyName = key ? key : this.primaryKey
+    this.select(value, keyName)
     const query = this.passDataToMongooseQuery(this.getQuery()) as DocumentQuery<(Document & T)[] | null, Document & T>
     const result: Array<Document & T> | null = await query.exec()
     if (result && !isEmpty(result)) {
       return result.reduce(function(memo: Object, item: Document) {
-        memo[item[key]] = item[value]
+        memo[item[keyName]] = item[value]
         return memo
       }, {})
     }
@@ -131,16 +135,19 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder implements IBasic
 
   async count(): Promise<number> {
     this.selectedFields = []
-    this.select('_id')
+    this.select(this.primaryKey)
     const query = this.passDataToMongooseQuery(this.getQuery()) as DocumentQuery<(Document & T)[] | null, Document & T>
     const result = await query.count().exec()
     return result
   }
 
-  // async update(data: Object): Promise<any> {
-  //   const conditions = new MongodbConditionConverter(this.getConditions()).convert()
-  //   const query = this.mongooseModel.update(conditions, data)
-  //   return query.update(data).exec()
-  // }
+  async update(data: Object): Promise<any> {
+    const conditions = new MongodbConditionConverter(this.getConditions()).convert()
+    const query = this.mongooseModel.update(conditions, data, {
+      multi: true
+    })
+    return query.exec()
+  }
+
   // async delete(): Promise<any> {}
 }
