@@ -42,8 +42,8 @@ export class MongodbConditionConverter {
     }
     this.convertConditionsWithAnd(result, <any>conditions.filter(item => item['bool'] === 'and'))
     this.convertConditionsWithOr(result, <any>conditions.filter(item => item['bool'] === 'or'))
-    if (Object.keys(result).length === 1 && typeof result['$and'] !== 'undefined') {
-      return result['$and']
+    if (Object.keys(result).length === 1 && typeof result['$and'] !== 'undefined' && result['$and'].length === 1) {
+      return result['$and'][0]
     }
     return result
   }
@@ -60,7 +60,7 @@ export class MongodbConditionConverter {
       Object.assign(bucket, result)
     }
     if (keysLength > 1) {
-      Object.assign(bucket, { $and: result })
+      Object.assign(bucket, { $and: [result] })
     }
   }
 
@@ -102,7 +102,7 @@ export class MongodbConditionConverter {
       if (Object.keys(result).length === 1) {
         return result
       }
-      return { $and: result }
+      return { $and: [result] }
     }
 
     if (Object.keys(result).length === 1 && typeof result['$or'] !== 'undefined') {

@@ -103,7 +103,7 @@ describe('MongodbConditionConverter', function() {
             { bool: 'and', field: 'b', operator: '<>', value: 2 }
           ]
         },
-        expected: { $and: { a: 1, b: { $not: 2 } } }
+        expected: { $and: [{ a: 1, b: { $not: 2 } }] }
       },
       'multiple conditions case #2: the result has 3 keys then group by operator': {
         input: {
@@ -173,7 +173,7 @@ describe('MongodbConditionConverter', function() {
             }
           ]
         },
-        expected: { $and: { a: 1, b: 2 } }
+        expected: { $and: [{ a: 1, b: 2 }] }
       },
       'multiple levels case #4: group 2 keys but they are same after converted': {
         input: {
@@ -205,7 +205,7 @@ describe('MongodbConditionConverter', function() {
             }
           ]
         },
-        expected: { $or: [{ $or: [{ a: 1 }, { b: 2 }], $and: { c: 3, d: 4 } }] }
+        expected: { $or: [{ $or: [{ a: 1 }, { b: 2 }], $and: [{ c: 3, d: 4 }] }] }
       },
       'multiple operators case #1': {
         input: {
@@ -217,7 +217,7 @@ describe('MongodbConditionConverter', function() {
             { bool: 'or', field: 'd', operator: '=', value: 4 }
           ]
         },
-        expected: { $or: [{ $and: { a: 1, b: 2 }, $or: [{ c: 3 }, { d: 4 }] }] }
+        expected: { $or: [{ $and: [{ a: 1, b: 2 }], $or: [{ c: 3 }, { d: 4 }] }] }
       }
     }
 
@@ -319,10 +319,12 @@ describe('MongodbConditionConverter', function() {
           { bool: 'and', field: 'd', operator: '=', value: 4 }
         ],
         expected: {
-          $and: {
-            a: 1,
-            d: 4
-          },
+          $and: [
+            {
+              a: 1,
+              d: 4
+            }
+          ],
           $or: [{ b: 2 }, { c: 3 }]
         }
       }
@@ -345,10 +347,12 @@ describe('MongodbConditionConverter', function() {
         { bool: 'and', field: 'd', operator: '=', value: 4 }
       ])
       expect(converter.convert()).toEqual({
-        $and: {
-          a: 1,
-          d: 4
-        },
+        $and: [
+          {
+            a: 1,
+            d: 4
+          }
+        ],
         $or: [{ b: 2 }, { c: 3 }]
       })
     })
