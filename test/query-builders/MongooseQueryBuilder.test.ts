@@ -484,5 +484,89 @@ describe('MongooseQueryBuilder', function() {
         expect(Object.values(result)).toEqual(['american', 'god'])
       })
     })
+
+    describe('count()', function() {
+      it('counts all data of collection and returns a Number', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.count()
+        expect(result).toEqual(7)
+      })
+
+      it('returns 0 if no result', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.where('first_name', 'no-one').count()
+        expect(result).toEqual(0)
+      })
+
+      it('overrides select even .select was used', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.select('abc', 'def').count()
+        expect(query['selectedFields']).toEqual(['_id'])
+        expect(result).toEqual(7)
+      })
+
+      it('can count items by query builder, case 1', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .where('age', 18)
+          .orWhere('first_name', 'tony')
+          .count()
+        expect(result).toEqual(2)
+      })
+
+      it('can count items by query builder, case 2', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query
+          .where('age', 1000)
+          .orWhere('first_name', 'captain')
+          .orderBy('last_name')
+          .count()
+        expect(result).toEqual(2)
+      })
+    })
+
+    // describe('update()', function() {
+    //   it('can update data of collection, returns update result of mongoose', async function() {
+    //     const query = new MongooseQueryBuilder('User')
+    //     const result = await query.where('first_name', 'peter').update({ $set: { age: 19 } })
+    //     expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
+    //     const updatedResult = await new MongooseQueryBuilder('User').where('first_name', 'peter').find()
+    //     expect_match_user(updatedResult, Object.assign({}, dataset[6], { age: 19 }))
+    //   })
+
+    //   it('returns empty update result if no row matched', async function() {
+    //     const query = new MongooseQueryBuilder('User')
+    //     const result = await query.where('first_name', 'no-one').update({ $set: { age: 19 } })
+    //     expect(result).toEqual({ n: 0, nModified: 0, ok: 1 })
+    //   })
+
+    //   it('can find data by query builder, case 1', async function() {
+    //     const query = new MongooseQueryBuilder('User')
+    //     const result = await query.where('age', 1000).update({ $set: { age: 1001 } })
+    //     expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
+    //     const updatedResult = await new MongooseQueryBuilder('User').where('first_name', 'thor').find()
+    //     expect_match_user(updatedResult, Object.assign({}, dataset[3], { age: 1001 }))
+    //   })
+
+    //   it('can find data by query builder, case 2', async function() {
+    //     const query = new MongooseQueryBuilder('User')
+    //     query.where('first_name', 'tony').orWhere('first_name', 'jane')
+    //     console.log(query.toObject().conditions)
+    //     const result = await query.update({ $inc: { age: 1 } })
+    //     console.log(result)
+    //     // expect(result).toEqual({ n: 3, nModified: 3, ok: 1 })
+    //     const updatedResults = await new MongooseQueryBuilder('User').get()
+    //     console.log(updatedResults.all().map(item => item.toJson()))
+    //     // expect_match_user(result, dataset[1])
+    //   })
+
+    //   it('can find data by query builder, case 3', async function() {})
+
+    //   it('can find data by native() before using query functions of query builder', async function() {})
+
+    //   it('can find data by native() after using query functions of query builder', async function() {})
+
+    //   it('can find data by native() and modified after using query functions of query builder', async function() {})
+    // })
   })
 })

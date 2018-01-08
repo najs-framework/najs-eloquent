@@ -129,6 +129,18 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder implements IBasic
     return {}
   }
 
-  // async update(): Promise<any> {}
+  async count(): Promise<number> {
+    this.selectedFields = []
+    this.select('_id')
+    const query = this.passDataToMongooseQuery(this.getQuery()) as DocumentQuery<(Document & T)[] | null, Document & T>
+    const result = await query.count().exec()
+    return result
+  }
+
+  // async update(data: Object): Promise<any> {
+  //   const conditions = new MongodbConditionConverter(this.getConditions()).convert()
+  //   const query = this.mongooseModel.update(conditions, data)
+  //   return query.update(data).exec()
+  // }
   // async delete(): Promise<any> {}
 }
