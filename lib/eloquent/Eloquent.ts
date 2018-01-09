@@ -101,7 +101,7 @@ export abstract class Eloquent<NativeRecord extends Object = {}> implements IElo
 
   // -------------------------------------------------------------------------------------------------------------------
 
-  protected initialize(data: NativeRecord | Object | undefined) {
+  protected initialize(data: NativeRecord | Object | undefined): any {
     if (this.isNativeRecord(data)) {
       this.setAttributesByNativeRecord(<NativeRecord>data)
     } else {

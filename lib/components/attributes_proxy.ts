@@ -9,7 +9,7 @@ export function attributes_proxy() {
 
     set(target: any, key: string, value: any): boolean {
       if (typeof key !== 'symbol' && target['__knownAttributeList'].indexOf(key) === -1) {
-        return target.prototype['setAttribute'].call(target, key, value)
+        return target['setAttribute'].call(target, key, value)
       }
 
       target[key] = value

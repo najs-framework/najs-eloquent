@@ -1,4 +1,5 @@
 import { Schema } from 'mongoose'
+import { Collection } from 'collect.js'
 import { Parent } from './Parent'
 
 // Definition
@@ -81,6 +82,12 @@ async function test_eloquent() {
   use(date_parent)
 
   eloquent.save()
+
+  const data: Collection<IChildVirtualAttribute> = await Child.where('test', 1).get()
+  data.reduce(function() {}).all()
+
+  const result: Child = await Child.find(1)
+  result.parentMethod()
 }
 use(test_eloquent)
 
