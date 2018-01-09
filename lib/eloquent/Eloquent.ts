@@ -21,7 +21,7 @@ export abstract class Eloquent<NativeRecord extends Object = {}> implements IElo
   abstract save(): Promise<any>
   abstract delete(): Promise<any>
   abstract forceDelete(): Promise<any>
-  abstract fresh(): Promise<this | undefined>
+  abstract fresh(): Promise<this | undefined | null>
   abstract getAttribute(name: string): any
   abstract setAttribute(name: string, value: any): boolean
   protected abstract isNativeRecord(data: NativeRecord | Object | undefined): boolean

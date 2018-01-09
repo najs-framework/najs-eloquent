@@ -61,6 +61,12 @@ describe('MongooseQueryBuilder', function() {
       expect(query['mongooseModel'].modelName).toEqual('User')
     })
 
+    it('is created by modelName + primaryKey', function() {
+      const query = new MongooseQueryBuilder('User', 'test')
+      expect(query.getPrimaryKey()).toEqual('test')
+      expect(query['mongooseModel'].modelName).toEqual('User')
+    })
+
     it('throws exception if model not found', function() {
       try {
         new MongooseQueryBuilder('NotFound')

@@ -65,6 +65,10 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder
     return query
   }
 
+  getPrimaryKey(): string {
+    return this.primaryKey
+  }
+
   native(handler: (native: Model<Document & T> | MongooseQuery<T>) => MongooseQuery<T>): IQueryFetchResult<T> {
     this.mongooseQuery = handler.call(
       undefined,

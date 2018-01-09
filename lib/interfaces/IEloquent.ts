@@ -21,7 +21,7 @@ export interface IEloquent {
   save(): Promise<any>
   delete(): Promise<any>
   forceDelete(): Promise<any>
-  fresh(): Promise<this | undefined>
+  fresh(): Promise<this | undefined | null>
 
   is(model: IEloquent): boolean
 

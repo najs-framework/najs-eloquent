@@ -99,7 +99,7 @@ export abstract class EloquentMongoose<T> extends Eloquent<Document & T> {
     return result
   }
 
-  is(document: EloquentMongoose<Document & T>): boolean {
+  is(document: EloquentMongoose<T>): boolean {
     return this.attributes.equals(document.attributes)
   }
 
@@ -122,10 +122,16 @@ export abstract class EloquentMongoose<T> extends Eloquent<Document & T> {
     return this.attributes.remove()
   }
 
-  async fresh(): Promise<any> {}
+  async fresh(): Promise<this | undefined | null> {
+    if (this.attributes.isNew) {
+      // tslint:disable-next-line
+      return null
+    }
+    const query = this.newQuery()
+    return query.where(query.getPrimaryKey(), this.attributes._id).find()
+  }
 
   // -------------------------------------------------------------------------------------------------------------------
-
   static select(field: string): MongooseQueryBuilder
   static select(fields: string[]): MongooseQueryBuilder
   static select(...fields: Array<string | string[]>): MongooseQueryBuilder
@@ -203,7 +209,8 @@ export abstract class EloquentMongoose<T> extends Eloquent<Document & T> {
   static find(id: any): Promise<any>
   static find(id?: any): Promise<any> {
     if (typeof id !== 'undefined') {
-      return new MongooseQueryBuilder(this.prototype.getModelName()).where('id', id).find()
+      const query = new MongooseQueryBuilder(this.prototype.getModelName())
+      return query.where(query.getPrimaryKey(), id).find()
     }
     return new MongooseQueryBuilder(this.prototype.getModelName()).find()
   }
