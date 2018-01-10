@@ -3,9 +3,10 @@
 If you are Laravel Eloquent lover and want to use it in Node JS you will love Najs Eloquent. Najs Eloquent is Laravel
 Eloquent, written in Typescript (with some helpers you can use it with Javascript for sure).
 
-Current version - `0.1.3` - is targeted to Mongodb only (using Mongoose as backer ORM). Because MongoDB is not RDB then some
-features of Laravel Eloquent are cut off such as relationship, scope. In the way to `1.0.0` the `Najs Eloquent` will
-support full Eloquent feature with difference db like `MySql`, `PostgreSQL` or `SqlLite` (use `knex` as query builder).
+Current version - `0.1.3` - is targeted to Mongodb only (using Mongoose as backer ORM). Because MongoDB is not RDB then
+some features of Laravel Eloquent are cut off such as relationship, scope. In the way to `1.0.0`, the `Najs Eloquent`
+will support full Eloquent feature with difference db like `MySql`, `PostgreSQL` or `SqlLite` (use `knex` as query
+builder).
 
 # Versioning and Road map
 
@@ -351,51 +352,6 @@ class UserRepository {
 }
 ```
 
-# API References
-
-## EloquentBase
-
-This is an abstract class of all kind of Database. If you want to support new specific database you have to create class extends from this one.
-
-### Definition
-
-```typescript
-class EloquentBase<NativeRecord extends Object = {}> implements IEloquent, IAutoload {}
-```
-
-`NativeRecord` is type of `attributes` which wrapped by `EloquentBase`. For example, `EloquentMongoose` has NativeRecord
-is `Mongoose.Document`
-
-### Abstract members
-
-* `getClassName(): string` - returns class name of Model
-* `newQuery(): any` - returns native query builder
-* `toObject(): Object` - returns raw Object
-* `toJson(): Object` - returns JSON object of Model
-* `is(model: any): boolean` - returns true if the model has same type and id with current model
-* `fireEvent(event: string): this` - emit model event
-* `save(): Promise<any>` - ActiveRecord save implementation
-* `delete(): Promise<any>` - ActiveRecord delete implementation, does soft delete if model supported
-* `forceDelete(): Promise<any>` - ActiveRecord delete implementation, force delete even soft delete are supported
-* `fresh(): Promise<this | undefined | null>` - returns fresh instance from database
-* `abstract getAttribute(name: string): any` - Get an attribute from the model.
-* `abstract setAttribute(name: string, value: any): boolean` - Set a given attribute on the model.
-* `isNativeRecord(data: NativeRecord | Object | undefined): boolean`
-* `initializeAttributes(): void`
-* `setAttributesByObject(nativeRecord: Object): void`
-* `setAttributesByNativeRecord(nativeRecord: NativeRecord): void`
-
-### Protected members
-
-### Public members
-
-* `getAttribute(key: string)` - Get an attribute from the model.
-* `setAttribute(key: string, value: any)` - Set a given attribute on the model.
-
-## EloquentMongoose
-
-This is base class for all models which are use Mongoose. It extends from `EloquentBase`.
-
 # Contribute
 
 PRs are welcomed to this project, and help is needed in order to keep up with the changes of Laravel Eloquent. If you want to improve the library, add functionality or improve the docs please feel free to submit a PR.
@@ -404,7 +360,7 @@ PRs are welcomed to this project, and help is needed in order to keep up with th
 
 If you want to become a sponsor please [let me know](mailto:nhat@ntworld.net).
 
-You can buy me a beer via [Paypal](paypal.me/beerfornhat) or [Patreon](https://patreon.com/nhat).
+You can buy me a beer via [Paypal](https://paypal.me/beerfornhat) or [Patreon](https://patreon.com/nhat).
 
 Thanks in advance!
 
