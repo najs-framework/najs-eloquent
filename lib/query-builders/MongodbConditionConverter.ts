@@ -48,11 +48,35 @@ export class MongodbConditionConverter {
     return result
   }
 
+  protected hasAnyIntersectKey(a: Object, b: Object) {
+    const keyOfA: string[] = Object.keys(a)
+    const keyOfB: string[] = Object.keys(b)
+    for (const key of keyOfB) {
+      if (keyOfA.indexOf(key) !== -1) {
+        return true
+      }
+    }
+    return false
+  }
+
   protected convertConditionsWithAnd(bucket: Object, conditions: Condition[]) {
-    const result: Object = {}
+    let result: Object | Object[] = {}
     for (const condition of conditions) {
       const query = this.convertCondition(condition)
+      if (this.hasAnyIntersectKey(result, query) && !Array.isArray(result)) {
+        result = [result]
+      }
+
+      if (Array.isArray(result)) {
+        result.push(query)
+        continue
+      }
       Object.assign(result, query)
+    }
+
+    if (Array.isArray(result)) {
+      Object.assign(bucket, { $and: result })
+      return
     }
 
     const keysLength = Object.keys(result).length

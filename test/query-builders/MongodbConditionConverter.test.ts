@@ -116,7 +116,7 @@ describe('MongodbConditionConverter', function() {
         },
         expected: { $or: [{ a: 1 }, { b: { $not: 2 } }, { c: { $lt: 3 } }] }
       },
-      'multiple conditions case #3: result has only 1 key, no group by operator': {
+      'multiple conditions case #3: result same field difference operator, group by operator': {
         input: {
           bool: 'and',
           queries: [
@@ -124,7 +124,7 @@ describe('MongodbConditionConverter', function() {
             { bool: 'and', field: 'a', operator: '<>', value: 2 }
           ]
         },
-        expected: { a: { $not: 2 } }
+        expected: { $and: [{ a: 1 }, { a: { $not: 2 } }] }
       },
       'multiple conditions case #4: result has no key return {}': {
         input: {
@@ -188,7 +188,7 @@ describe('MongodbConditionConverter', function() {
             }
           ]
         },
-        expected: { a: 2 }
+        expected: { $and: [{ a: 1 }, { a: 2 }] }
       },
       'multiple levels case #5: group inside group': {
         input: {

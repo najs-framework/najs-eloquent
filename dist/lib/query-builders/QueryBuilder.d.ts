@@ -1,0 +1,36 @@
+import { QueryCondition } from './QueryConditionBuilder';
+import { OrderDirection, SubCondition, Operator } from '../interfaces/IBasicQueryGrammar';
+export declare class QueryBuilder {
+    protected name: string;
+    protected selectedFields: string[];
+    protected distinctFields: string[];
+    protected ordering: Object;
+    protected limitNumber: number;
+    protected conditions: QueryCondition[];
+    protected isUsed: boolean;
+    constructor();
+    protected _flatten_and_assign_to(name: string, fields: Array<string | string[]>): this;
+    protected getConditions(): Object[];
+    queryName(name: string): this;
+    select(field: string): this;
+    select(fields: string[]): this;
+    select(...fields: Array<string | string[]>): this;
+    distinct(field: string): this;
+    distinct(fields: string[]): this;
+    distinct(...fields: Array<string | string[]>): this;
+    orderBy(field: string): this;
+    orderBy(field: string, direction: OrderDirection): this;
+    orderByAsc(field: string): this;
+    orderByDesc(field: string): this;
+    limit(records: number): this;
+    where(conditionBuilder: SubCondition): this;
+    where(field: string, value: any): this;
+    where(field: string, operator: Operator, value: any): this;
+    orWhere(conditionBuilder: SubCondition): this;
+    orWhere(field: string, value: any): this;
+    orWhere(field: string, operator: Operator, value: any): this;
+    whereIn(field: string, values: Array<any>): this;
+    whereNotIn(field: string, values: Array<any>): this;
+    orWhereIn(field: string, values: Array<any>): this;
+    orWhereNotIn(field: string, values: Array<any>): this;
+}

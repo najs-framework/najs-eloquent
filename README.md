@@ -3,7 +3,7 @@
 If you are Laravel Eloquent lover and want to use it in Node JS you will love Najs Eloquent. Najs Eloquent is Laravel
 Eloquent, written in Typescript (with some helpers you can use it with Javascript for sure).
 
-Current version - `0.1.2` - is targeted to Mongodb only (using Mongoose as backer ORM). Because MongoDB is not RDB then some
+Current version - `0.1.3` - is targeted to Mongodb only (using Mongoose as backer ORM). Because MongoDB is not RDB then some
 features of Laravel Eloquent are cut off such as relationship, scope. In the way to `1.0.0` the `Najs Eloquent` will
 support full Eloquent feature with difference db like `MySql`, `PostgreSQL` or `SqlLite` (use `knex` as query builder).
 
@@ -229,11 +229,42 @@ User.where('first_name', 'tony')
 
 ### Creating A New Model
 
+```typescript
+// create model with data
+const user = new User({
+  first_name: 'tony',
+  last_name: 'stark'
+})
+await user.save()
+
+// create model without data
+const user = new User()
+user.first_name = 'tony'
+user.last_name: 'stark'
+await user.save()
+```
+
 ### Updating Models
+
+```typescript
+// create model without data
+const user = await User.orderBy('age').find()
+user.first_name = 'tony'
+user.last_name: 'stark'
+await user.save()
+```
 
 ### Deleting Models
 
+```typescript
+// create model without data
+const user = await User.orderBy('age').find()
+await user.delete()
+```
+
 ## IV. Accessors and Mutators
+
+_Not available util 0.2.x_
 
 ## IV. Inheritance
 

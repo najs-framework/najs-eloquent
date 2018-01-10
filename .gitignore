@@ -57,8 +57,5 @@ typings/
 # dotenv environment variables file
 .env
 
-# will be remove when release first version
-dist
-
 dist/test
 dist/syntax
