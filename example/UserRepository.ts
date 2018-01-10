@@ -1,7 +1,7 @@
 import { User } from './User'
 import { Collection } from 'collect.js'
 
-class UserRepository {
+export class UserRepository {
   async createUser(firstName: string, lastName: string): Promise<User> {
     const user = new User({
       first_name: firstName,

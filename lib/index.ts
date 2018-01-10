@@ -9,3 +9,6 @@ export const Eloquent = {
   }
 }
 export default Eloquent
+export { EloquentBase } from './eloquent/EloquentBase'
+export { IMongooseProvider } from './interfaces/IMongooseProvider'
+export { EloquentMongooseSpec } from './specs/EloquentMongooseSpec'

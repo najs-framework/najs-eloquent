@@ -1,4 +1,6 @@
+import { EloquentMongooseSpec } from '../lib'
 import { User } from './User'
+import { Schema } from 'mongoose'
 
 // This interface can be shared between Server-side and Client-side
 export interface IAdminUser {
@@ -6,7 +8,8 @@ export interface IAdminUser {
   is_admin: true
 }
 
-export class AdminUser extends User.Class<IAdminUser, User>() {
+export const AdminUserBase: EloquentMongooseSpec<IAdminUser, AdminUser> = User.Class<IAdminUser, AdminUser>()
+export class AdminUser extends AdminUserBase {
   static className: string = 'AdminUser'
 
   // using the same collection as User model
@@ -18,11 +21,10 @@ export class AdminUser extends User.Class<IAdminUser, User>() {
     return AdminUser.className
   }
 
-  getSchema() {
-    const schema = super.getSchema()
-    schema.add({
+  getSchema(): Schema {
+    this.schema.add({
       is_admin: { type: Boolean }
     })
-    return schema
+    return this.schema
   }
 }

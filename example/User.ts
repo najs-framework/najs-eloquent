@@ -1,5 +1,6 @@
-import Eloquent from '../lib'
 import { Schema } from 'mongoose'
+import { Collection } from 'collect.js'
+import Eloquent, { EloquentMongooseSpec } from '../lib'
 
 // This interface can be shared between Server-side and Client-side
 export interface IUser {
@@ -9,7 +10,8 @@ export interface IUser {
   full_name: string
 }
 
-export class User extends Eloquent.Mongoose<IUser, User>() {
+export const EloquentMongooseBase: EloquentMongooseSpec<IUser, User> = Eloquent.Mongoose<IUser, User>()
+export class User extends EloquentMongooseBase {
   static className: string = 'User'
 
   getClassName() {
@@ -28,7 +30,7 @@ export class User extends Eloquent.Mongoose<IUser, User>() {
   }
 
   // custom static function of User model
-  static getAllUsers() {
+  static getAllUsers(): Promise<Collection<User>> {
     return User.orderBy('last_name')
       .limit(10)
       .get()

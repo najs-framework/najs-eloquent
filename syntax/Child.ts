@@ -1,13 +1,18 @@
 import { Schema } from 'mongoose'
 import { Collection } from 'collect.js'
 import { Parent } from './Parent'
+import { EloquentMongooseSpec } from '../lib'
 
 // Definition
-interface IChildVirtualAttribute {
+export interface IChildVirtualAttribute {
   child_virtual_attribute: Date
 }
 
-class Child extends Parent.Class<IChildVirtualAttribute, Child>() {
+export const ChildBase: EloquentMongooseSpec<Parent & IChildVirtualAttribute, Parent & Child> = Parent.Class<
+  IChildVirtualAttribute,
+  Child
+>()
+export class Child extends ChildBase {
   static className: string = 'Child'
 
   getClassName() {

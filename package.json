@@ -1,6 +1,6 @@
 {
   "name": "najs-eloquent",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "scripts": {
     "build": "npm run build-ts && npm run tslint",
     "build-ts": "tsc -d",

@@ -26,6 +26,7 @@
   "include": [
     "./lib/**/*.ts",
     "./syntax/**/*.ts",
+    "./example/**/*.ts",
     "./test/**/*.ts"
   ],
   "exclude": [

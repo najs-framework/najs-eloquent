@@ -3,7 +3,7 @@
 If you are Laravel Eloquent lover and want to use it in Node JS you will love Najs Eloquent. Najs Eloquent is Laravel
 Eloquent, written in Typescript (with some helpers you can use it with Javascript for sure).
 
-Current version - `0.1.3` - is targeted to Mongodb only (using Mongoose as backer ORM). Because MongoDB is not RDB then
+Current version - `0.1.4` - is targeted to Mongodb only (using Mongoose as backer ORM). Because MongoDB is not RDB then
 some features of Laravel Eloquent are cut off such as relationship, scope. In the way to `1.0.0`, the `Najs Eloquent`
 will support full Eloquent feature with difference db like `MySql`, `PostgreSQL` or `SqlLite` (use `knex` as query
 builder).
@@ -20,6 +20,65 @@ builder).
 * `0.8.x` [Todo] - Introducing migration for RDB
 * `0.9.x` [Todo] - Support other kind of db which requested by community
 
+# Installation
+
+Add `najs`, `najs-eloquent` and `mongoose` to dependencies
+
+```bash
+yarn add najs najs-eloquent mongoose
+
+# or
+
+npm install najs najs-eloquent mongoose
+```
+
+Register `MongooseProvider`. WARNING: Class name is so important, it must be MongooseProvider
+
+```typescript
+// file: MongooseProvider.ts
+import { register } from 'najs'
+import { IMongooseProvider } from 'najs-eloquent'
+const mongoose = require('mongoose')
+
+@register() // register MongooseProvider with 'MongooseProvider' name
+class MongooseProvider implements IMongooseProvider {
+  static className: string = 'MongooseProvider'
+
+  getClassName() {
+    return MongooseProvider.className
+  }
+
+  getMongooseInstance() {
+    return mongoose
+  }
+}
+```
+
+You can use another class but is must be implements IMongooseProvider and register under "**MongooseProvider**" name,
+for example
+
+```typescript
+// file: CustomMongooseProviderName.ts
+import { register } from 'najs'
+import { IMongooseProvider } from 'najs-eloquent'
+const mongoose = require('mongoose')
+
+class CustomClass implements IMongooseProvider {
+  static className: string = 'CustomClass'
+
+  getClassName() {
+    return CustomClass.className
+  }
+
+  getMongooseInstance() {
+    return mongoose
+  }
+}
+
+// It must be registered under name "MongooseProvider"
+register(CustomClass, 'MongooseProvider')
+```
+
 # Usage
 
 ## I. Defining Models
@@ -28,7 +87,6 @@ builder).
 
 ```typescript
 // file: User.ts
-
 import Eloquent from 'najs-eloquent'
 import { Schema } from 'mongoose'
 
@@ -271,7 +329,6 @@ _Not available util 0.2.x_
 
 ```typescript
 // file: AdminUser.ts
-
 import { User } from 'najs-eloquent'
 
 // This interface can be shared between Server-side and Client-side
@@ -308,7 +365,6 @@ You can create Repository for models with very "najs" and clear syntax
 
 ```typescript
 // file: UserRepository.ts
-
 import { User } from './User'
 import { Collection } from 'collect.js'
 
