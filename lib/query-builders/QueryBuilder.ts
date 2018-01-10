@@ -3,6 +3,7 @@ import { OrderDirection, SubCondition, Operator } from '../interfaces/IBasicQuer
 import { isString } from 'lodash'
 
 export class QueryBuilder {
+  protected name: string
   protected selectedFields: string[]
   protected distinctFields: string[]
   protected ordering: Object
@@ -34,6 +35,11 @@ export class QueryBuilder {
 
   protected getConditions(): Object[] {
     return this.conditions.map(item => item.toObject())
+  }
+
+  queryName(name: string): this {
+    this.name = name
+    return this
   }
 
   select(field: string): this

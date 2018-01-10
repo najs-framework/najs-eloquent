@@ -81,6 +81,7 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder
   toObject(): Object {
     const conditions = new MongodbConditionConverter(this.getConditions()).convert()
     return {
+      name: this.name ? this.name : undefined,
       select: !isEmpty(this.selectedFields) ? this.selectedFields : undefined,
       distinct: !isEmpty(this.distinctFields) ? this.distinctFields : undefined,
       limit: this.limitNumber,

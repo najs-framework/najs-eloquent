@@ -9,6 +9,8 @@ export type EloquentMongooseSpec<Attr, Class> = {
 
   Class<ChildAttr, ChildClass>(): EloquentMongooseSpec<Class & ChildAttr, Class & ChildClass>
 
+  queryName(name: string): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>
+
   select(field: string): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>
   select(fields: string[]): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>
   select(...fields: Array<string | string[]>): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>

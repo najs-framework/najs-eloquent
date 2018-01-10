@@ -4,7 +4,7 @@ import collect, { Collection } from 'collect.js'
 import { IAutoload, ClassRegistry, register, make } from 'najs'
 import { pick } from 'lodash'
 
-export abstract class Eloquent<NativeRecord extends Object = {}> implements IEloquent, IAutoload {
+export abstract class EloquentBase<NativeRecord extends Object = {}> implements IEloquent, IAutoload {
   protected __knownAttributeList: string[]
   protected attributes: NativeRecord
   protected fillable?: string[]
@@ -43,7 +43,7 @@ export abstract class Eloquent<NativeRecord extends Object = {}> implements IElo
   newInstance(data: Object): any
   newInstance(data: NativeRecord): any
   newInstance(data?: NativeRecord | Object): any {
-    const instance = make<Eloquent<NativeRecord>>(this.getClassName())
+    const instance = make<EloquentBase<NativeRecord>>(this.getClassName())
     return instance.initialize(data)
   }
 
@@ -116,13 +116,13 @@ export abstract class Eloquent<NativeRecord extends Object = {}> implements IElo
       new Set(
         this.getReservedPropertiesList().concat(
           Object.getOwnPropertyNames(this),
-          Object.getOwnPropertyNames(Eloquent.prototype),
+          Object.getOwnPropertyNames(EloquentBase.prototype),
           Object.getOwnPropertyNames(Object.getPrototypeOf(this))
         )
       )
     )
 
-    const proxy: Eloquent<NativeRecord> = new Proxy(this, attributes_proxy())
+    const proxy: EloquentBase<NativeRecord> = new Proxy(this, attributes_proxy())
     return proxy
   }
 

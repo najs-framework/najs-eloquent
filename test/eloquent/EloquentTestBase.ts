@@ -1,7 +1,7 @@
-import { Eloquent } from '../../lib/eloquent/Eloquent'
+import { EloquentBase } from '../../lib/eloquent/EloquentBase'
 import { Record } from './Record'
 
-export abstract class EloquentTestBase<T> extends Eloquent<Record<T>> {
+export abstract class EloquentTestBase<T> extends EloquentBase<Record<T>> {
   protected getReservedPropertiesList() {
     return super.getReservedPropertiesList().concat(Object.getOwnPropertyNames(EloquentTestBase.prototype))
   }
