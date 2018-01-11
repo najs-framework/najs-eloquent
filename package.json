@@ -4,7 +4,7 @@
   "scripts": {
     "build": "npm run build-ts && npm run tslint",
     "build-ts": "tsc -d",
-    "coverage": "jest --coverage --forceExit",
+    "coverage": "jest ./dist/test --coverage --forceExit",
     "test": "jest --forceExit",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "prepublishOnly": "tsc -d -p ./ --outDir dist"
@@ -20,7 +20,7 @@
     "transform": {
       "^.+\\.(ts|tsx)$": "./node_modules/ts-jest/preprocessor.js"
     },
-    "testMatch": ["**/test/**/*.test.ts", "**/test/**/*Test.ts"],
+    "testMatch": ["**/test/**/*.test.ts", "**/test/**/*.test.js"],
     "testEnvironment": "node"
   },
   "files": ["dist/**/*"],
