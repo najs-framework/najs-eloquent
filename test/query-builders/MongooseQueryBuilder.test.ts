@@ -464,7 +464,8 @@ describe('MongooseQueryBuilder', function() {
       it('plucks all data of collection and returns an Object', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.pluck('first_name', '_id')
-        expect(Object.values(result)).toEqual(['john', 'jane', 'tony', 'thor', 'captain', 'tony', 'peter'])
+        const actual = Object.values ? Object.values(result) : Object.keys(result).map(key => result[key])
+        expect(actual).toEqual(['john', 'jane', 'tony', 'thor', 'captain', 'tony', 'peter'])
       })
 
       it('returns an empty object if no result', async function() {
@@ -477,7 +478,8 @@ describe('MongooseQueryBuilder', function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.select('abc', 'def').pluck('first_name', '_id')
         expect(query['selectedFields']).toEqual(['first_name', '_id'])
-        expect(Object.values(result)).toEqual(['john', 'jane', 'tony', 'thor', 'captain', 'tony', 'peter'])
+        const actual = Object.values ? Object.values(result) : Object.keys(result).map(key => result[key])
+        expect(actual).toEqual(['john', 'jane', 'tony', 'thor', 'captain', 'tony', 'peter'])
       })
 
       it('can pluck data by query builder, case 1', async function() {
@@ -486,7 +488,8 @@ describe('MongooseQueryBuilder', function() {
           .where('age', 18)
           .orWhere('first_name', 'tony')
           .pluck('first_name')
-        expect(Object.values(result)).toEqual(['tony', 'tony'])
+        const actual = Object.values ? Object.values(result) : Object.keys(result).map(key => result[key])
+        expect(actual).toEqual(['tony', 'tony'])
       })
 
       it('can pluck data by query builder, case 2', async function() {
@@ -496,7 +499,8 @@ describe('MongooseQueryBuilder', function() {
           .orWhere('first_name', 'captain')
           .orderBy('last_name')
           .pluck('last_name')
-        expect(Object.values(result)).toEqual(['american', 'god'])
+        const actual = Object.values ? Object.values(result) : Object.keys(result).map(key => result[key])
+        expect(actual).toEqual(['american', 'god'])
       })
     })
 

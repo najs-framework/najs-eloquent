@@ -89,4 +89,3 @@ class QueryBuilder {
     }
 }
 exports.QueryBuilder = QueryBuilder;
-//# sourceMappingURL=QueryBuilder.js.map

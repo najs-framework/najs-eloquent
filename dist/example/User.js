@@ -25,4 +25,3 @@ class User extends exports.EloquentMongooseBase {
 }
 User.className = 'User';
 exports.User = User;
-//# sourceMappingURL=User.js.map

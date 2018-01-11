@@ -17,11 +17,6 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     protected setAttributesByObject(data: Object): void;
     protected setAttributesByNativeRecord(nativeRecord: Document & T): void;
     protected getReservedPropertiesList(): string[];
-    protected isAccessor(name: string, descriptors?: PropertyDescriptor): boolean | undefined;
-    protected getAccessors(): string[];
-    protected isVirtualSetter(name: string, descriptors?: PropertyDescriptor): boolean | undefined;
-    protected getVirtualSetters(): string[];
-    protected getVirtualValues(): Object;
     getAttribute(name: string): any;
     setAttribute(name: string, value: any): boolean;
     newQuery(): any;

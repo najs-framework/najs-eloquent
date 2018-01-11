@@ -16,7 +16,29 @@ class User extends EloquentTestBase<IUser> {
   }
 
   get full_name(): string {
-    return 'full_name' // this.attributes['first_name'] + this.attributes['last_name']
+    return this.attributes['first_name'] + ' ' + this.attributes['last_name']
+  }
+
+  set full_name(value: string) {}
+
+  getFullNameAttribute() {
+    return (this.attributes['first_name'] + ' ' + this.attributes['last_name']).toUpperCase()
+  }
+
+  setFullNameAttribute(value: string) {}
+
+  getNickNameAttribute() {
+    return this.attributes['first_name'].toUpperCase()
+  }
+
+  setNickNameAttribute() {}
+
+  getSomething_wrong_formatAttribute() {
+    return 'something_wrong_format'
+  }
+
+  getSomethingAccessorWrong() {
+    return 'full_name'
   }
 }
 
@@ -110,8 +132,18 @@ describe('Eloquent', function() {
               'initialize',
               'getReservedPropertiesList'
             ],
+            // accessors
+            ['accessors', 'mutators', 'findAccessorsAndMutators', 'findGettersAndSetters', 'getAllValueOfAccessors'],
             // attributes from User
-            ['full_name']
+            [
+              'full_name',
+              'getFullNameAttribute',
+              'setFullNameAttribute',
+              'getNickNameAttribute',
+              'setNickNameAttribute',
+              'getSomethingAccessorWrong',
+              'getSomething_wrong_formatAttribute'
+            ]
           )
           .sort()
       )
@@ -125,6 +157,15 @@ describe('Eloquent', function() {
       expect(instance).toBeInstanceOf(User)
       expect(instance === user.newInstance()).toBe(false)
       expect(instance.toObject()).toEqual({ first_name: 'john' })
+    })
+  })
+
+  describe('newCollection(data)', function() {
+    it('create new instance of Eloquent based by passing data', function() {
+      const user = new User()
+      const collection = user.newCollection([{ first_name: 'john' }])
+      expect(collection.items[0]).toBeInstanceOf(User)
+      expect(collection.all().map(item => item.toObject())).toEqual([{ first_name: 'john' }])
     })
   })
 
@@ -244,6 +285,102 @@ describe('Eloquent', function() {
   })
 
   describe('fill()', function() {})
+
+  if (Object.getOwnPropertyDescriptors) {
+    describe('Accessors for node >= 8.7', function() {
+      it('supports getter since node >= 8.7', function() {
+        const user = new User()
+        expect(user['accessors']['full_name']).toEqual({
+          name: 'full_name',
+          type: 'getter'
+        })
+        expect(user['accessors']['nick_name']).toEqual({
+          name: 'nick_name',
+          type: 'function',
+          ref: 'getNickNameAttribute'
+        })
+        expect(user['accessors']['something_wrong_format']).toEqual({
+          name: 'something_wrong_format',
+          type: 'function',
+          ref: 'getSomething_wrong_formatAttribute'
+        })
+      })
+
+      it('skip function get...Attribute() if getter is defined', function() {
+        const user = new User({
+          first_name: 'tony',
+          last_name: 'stark'
+        })
+        expect(user.full_name).toEqual('tony stark')
+        expect(user['accessors']['full_name']).toEqual({
+          name: 'full_name',
+          type: 'getter'
+        })
+      })
+
+      it('has function to get all values of accessors', function() {
+        const user = new User({
+          first_name: 'tony',
+          last_name: 'stark'
+        })
+        expect(user['getAllValueOfAccessors']()).toEqual({
+          full_name: 'tony stark',
+          nick_name: 'TONY',
+          something_wrong_format: 'something_wrong_format'
+        })
+      })
+    })
+
+    describe('Mutators for node >= 8.7', function() {
+      it('supports setter since node >= 8.7', function() {
+        const user = new User()
+        expect(user['mutators']['full_name']).toEqual({
+          name: 'full_name',
+          type: 'setter'
+        })
+      })
+
+      it('skip function set...Attribute() if getter is defined', function() {
+        // const user = new User({
+        //   first_name: 'tony',
+        //   last_name: 'stark'
+        // })
+      })
+    })
+  } else {
+    describe('Accessors for node < 8.7', function() {
+      it('can find accessor type function', function() {
+        const user = new User()
+        expect(user['accessors']['full_name']).toEqual({
+          name: 'full_name',
+          type: 'function',
+          ref: 'getFullNameAttribute'
+        })
+        expect(user['accessors']['nick_name']).toEqual({
+          name: 'nick_name',
+          type: 'function',
+          ref: 'getNickNameAttribute'
+        })
+        expect(user['accessors']['something_wrong_format']).toEqual({
+          name: 'something_wrong_format',
+          type: 'function',
+          ref: 'getSomething_wrong_formatAttribute'
+        })
+      })
+
+      it('has function to get all values of accessors', function() {
+        const user = new User({
+          first_name: 'tony',
+          last_name: 'stark'
+        })
+        expect(user['getAllValueOfAccessors']()).toEqual({
+          full_name: 'TONY STARK',
+          nick_name: 'TONY',
+          something_wrong_format: 'something_wrong_format'
+        })
+      })
+    })
+  }
 
   describe('EloquentTestBase', function() {
     it('is fake test remove uncovered lines Helper Classes', async function() {

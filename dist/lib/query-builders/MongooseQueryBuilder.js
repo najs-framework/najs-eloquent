@@ -158,4 +158,3 @@ class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
     }
 }
 exports.MongooseQueryBuilder = MongooseQueryBuilder;
-//# sourceMappingURL=MongooseQueryBuilder.js.map

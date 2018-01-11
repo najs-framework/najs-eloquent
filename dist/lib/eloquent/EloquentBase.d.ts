@@ -1,6 +1,16 @@
 import { IEloquent } from '../interfaces/IEloquent';
 import { Collection } from 'collect.js';
 import { IAutoload } from 'najs';
+export declare type EloquentAccessor = {
+    name: string;
+    type: 'getter' | 'function';
+    ref?: string;
+};
+export declare type EloquentMutator = {
+    name: string;
+    type: 'setter' | 'function';
+    ref?: string;
+};
 export declare abstract class EloquentBase<NativeRecord extends Object = {}> implements IEloquent, IAutoload {
     protected __knownAttributeList: string[];
     protected attributes: NativeRecord;
@@ -8,6 +18,12 @@ export declare abstract class EloquentBase<NativeRecord extends Object = {}> imp
     protected guarded?: string[];
     protected softDeletes?: boolean;
     protected timestamps?: boolean;
+    protected accessors: {
+        [key in string]: EloquentAccessor;
+    };
+    protected mutators: {
+        [key in string]: EloquentMutator;
+    };
     abstract getClassName(): string;
     abstract newQuery(): any;
     abstract toObject(): Object;
@@ -39,6 +55,9 @@ export declare abstract class EloquentBase<NativeRecord extends Object = {}> imp
     getGuarded(): string[];
     isFillable(key: string): boolean;
     isGuarded(key: string): boolean;
+    protected findGettersAndSetters(): void;
+    protected findAccessorsAndMutators(): void;
+    protected getAllValueOfAccessors(): Object;
     protected initialize(data: NativeRecord | Object | undefined): any;
     protected getReservedPropertiesList(): Array<string>;
 }

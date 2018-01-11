@@ -2,7 +2,18 @@ import { IEloquent } from '../interfaces/IEloquent'
 import { attributes_proxy } from '../components/attributes_proxy'
 import collect, { Collection } from 'collect.js'
 import { IAutoload, ClassRegistry, register, make } from 'najs'
-import { pick } from 'lodash'
+import { pick, isFunction, snakeCase } from 'lodash'
+
+export type EloquentAccessor = {
+  name: string
+  type: 'getter' | 'function'
+  ref?: string
+}
+export type EloquentMutator = {
+  name: string
+  type: 'setter' | 'function'
+  ref?: string
+}
 
 export abstract class EloquentBase<NativeRecord extends Object = {}> implements IEloquent, IAutoload {
   protected __knownAttributeList: string[]
@@ -11,6 +22,8 @@ export abstract class EloquentBase<NativeRecord extends Object = {}> implements 
   protected guarded?: string[]
   protected softDeletes?: boolean
   protected timestamps?: boolean
+  protected accessors: { [key in string]: EloquentAccessor }
+  protected mutators: { [key in string]: EloquentMutator }
 
   abstract getClassName(): string
   abstract newQuery(): any
@@ -101,7 +114,83 @@ export abstract class EloquentBase<NativeRecord extends Object = {}> implements 
 
   // -------------------------------------------------------------------------------------------------------------------
 
+  protected findGettersAndSetters() {
+    // accessor by getter, only available for node >= 8.7
+    const descriptors: Object = Object.getOwnPropertyDescriptors(Object.getPrototypeOf(this))
+    for (const name in descriptors) {
+      if (isFunction(descriptors[name].get)) {
+        this.accessors[name] = {
+          name: name,
+          type: 'getter'
+        }
+      }
+      if (isFunction(descriptors[name].set)) {
+        this.mutators[name] = {
+          name: name,
+          type: 'setter'
+        }
+      }
+    }
+  }
+
+  protected findAccessorsAndMutators() {
+    const names = Object.getOwnPropertyNames(Object.getPrototypeOf(this))
+    const regex = new RegExp('^(get|set)([a-zA-z0-9_\\-]{1,})Attribute$', 'g')
+    for (const name of names) {
+      let match
+      while ((match = regex.exec(name)) != undefined) {
+        // javascript RegExp has a bug when the match has length 0
+        if (match.index === regex.lastIndex) {
+          ++regex.lastIndex
+        }
+
+        const property = snakeCase(match[2])
+
+        if (match[1] === 'get') {
+          if (typeof this.accessors[property] !== 'undefined') {
+            continue
+          }
+          this.accessors[property] = {
+            name: property,
+            type: 'function',
+            ref: match[0]
+          }
+        } else {
+          if (typeof this.mutators[property] !== 'undefined') {
+            continue
+          }
+          this.mutators[property] = {
+            name: property,
+            type: 'function',
+            ref: match[0]
+          }
+        }
+      }
+    }
+  }
+
+  protected getAllValueOfAccessors(): Object {
+    return Object.keys(this.accessors).reduce((memo, key) => {
+      const accessor: EloquentAccessor = this.accessors[key]
+      if (accessor.type === 'getter') {
+        memo[key] = this[key]
+      } else {
+        memo[key] = this[<string>accessor.ref].call(this)
+      }
+      return memo
+    }, {})
+  }
+
+  // -------------------------------------------------------------------------------------------------------------------
+
   protected initialize(data: NativeRecord | Object | undefined): any {
+    this.accessors = {}
+    this.mutators = {}
+    if (Object.getOwnPropertyDescriptors) {
+      this.findGettersAndSetters()
+    }
+    this.findAccessorsAndMutators()
+
     if (this.isNativeRecord(data)) {
       this.setAttributesByNativeRecord(<NativeRecord>data)
     } else {

@@ -35,6 +35,7 @@
     "email": "nhat@ntworld.net"
   },
   "license": "MIT",
+  "engines": { "node": ">=6.x" },
   "dependencies": {
     "@types/pluralize": "^0.0.28",
     "collect.js": "^4.0.2",

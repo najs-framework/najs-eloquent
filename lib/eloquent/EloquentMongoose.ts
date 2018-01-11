@@ -4,7 +4,6 @@ import { IMongooseProvider } from '../interfaces/IMongooseProvider'
 import { MongooseQueryBuilder } from '../query-builders/MongooseQueryBuilder'
 import { Document, Schema, Model, Mongoose, model } from 'mongoose'
 import { make } from 'najs'
-import { isFunction } from 'lodash'
 import collect, { Collection } from 'collect.js'
 
 export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
@@ -63,50 +62,6 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
       .concat(Object.getOwnPropertyNames(EloquentMongoose.prototype), ['collection', 'model', 'schema'])
   }
 
-  protected isAccessor(name: string, descriptors?: PropertyDescriptor) {
-    return descriptors && isFunction(descriptors.get)
-  }
-
-  protected getAccessors(): string[] {
-    if (!Object.getOwnPropertyDescriptors) {
-      return []
-    }
-    const descriptors: Object = Object.getOwnPropertyDescriptors(Object.getPrototypeOf(this))
-    const result = []
-    for (const name in descriptors) {
-      if (this.isAccessor(name, descriptors[name])) {
-        result.push(name)
-      }
-    }
-    return result
-  }
-
-  protected isVirtualSetter(name: string, descriptors?: PropertyDescriptor) {
-    return descriptors && isFunction(descriptors.set)
-  }
-
-  protected getVirtualSetters(): string[] {
-    if (!Object.getOwnPropertyDescriptors) {
-      return []
-    }
-    const descriptors: Object = Object.getOwnPropertyDescriptors(Object.getPrototypeOf(this))
-    const result = []
-    for (const name in descriptors) {
-      if (this.isVirtualSetter(name, descriptors[name])) {
-        result.push(name)
-      }
-    }
-    return result
-  }
-
-  protected getVirtualValues(): Object {
-    const virtualFields = this.getAccessors()
-    return virtualFields.reduce((memo, key) => {
-      memo[key] = this[key]
-      return memo
-    }, {})
-  }
-
   getAttribute(name: string): any {
     return this.attributes[name]
   }
@@ -130,7 +85,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
 
   toObject(): Object {
-    return Object.assign({}, this.attributes.toObject(), this.getVirtualValues())
+    return Object.assign({}, this.attributes.toObject(), this.getAllValueOfAccessors())
   }
 
   toJson(): Object {
@@ -141,7 +96,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
     })
     result['id'] = result['_id']
     delete result['_id']
-    return Object.assign(result, this.getVirtualValues())
+    return Object.assign(result, this.getAllValueOfAccessors())
   }
 
   is(document: EloquentMongoose<T>): boolean {

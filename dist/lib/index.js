@@ -10,4 +10,3 @@ exports.Eloquent = {
 exports.default = exports.Eloquent;
 var EloquentBase_1 = require("./eloquent/EloquentBase");
 exports.EloquentBase = EloquentBase_1.EloquentBase;
-//# sourceMappingURL=index.js.map

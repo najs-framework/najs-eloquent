@@ -12,7 +12,6 @@ const EloquentBase_1 = require("./EloquentBase");
 const MongooseQueryBuilder_1 = require("../query-builders/MongooseQueryBuilder");
 const mongoose_1 = require("mongoose");
 const najs_1 = require("najs");
-const lodash_1 = require("lodash");
 const collect_js_1 = require("collect.js");
 class EloquentMongoose extends EloquentBase_1.EloquentBase {
     static Class() {
@@ -55,45 +54,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
             .getReservedPropertiesList()
             .concat(Object.getOwnPropertyNames(EloquentMongoose.prototype), ['collection', 'model', 'schema']);
     }
-    isAccessor(name, descriptors) {
-        return descriptors && lodash_1.isFunction(descriptors.get);
-    }
-    getAccessors() {
-        if (!Object.getOwnPropertyDescriptors) {
-            return [];
-        }
-        const descriptors = Object.getOwnPropertyDescriptors(Object.getPrototypeOf(this));
-        const result = [];
-        for (const name in descriptors) {
-            if (this.isAccessor(name, descriptors[name])) {
-                result.push(name);
-            }
-        }
-        return result;
-    }
-    isVirtualSetter(name, descriptors) {
-        return descriptors && lodash_1.isFunction(descriptors.set);
-    }
-    getVirtualSetters() {
-        if (!Object.getOwnPropertyDescriptors) {
-            return [];
-        }
-        const descriptors = Object.getOwnPropertyDescriptors(Object.getPrototypeOf(this));
-        const result = [];
-        for (const name in descriptors) {
-            if (this.isVirtualSetter(name, descriptors[name])) {
-                result.push(name);
-            }
-        }
-        return result;
-    }
-    getVirtualValues() {
-        const virtualFields = this.getAccessors();
-        return virtualFields.reduce((memo, key) => {
-            memo[key] = this[key];
-            return memo;
-        }, {});
-    }
     getAttribute(name) {
         return this.attributes[name];
     }
@@ -112,7 +72,7 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         return collect_js_1.default(dataset.map(item => this.newInstance(item)));
     }
     toObject() {
-        return Object.assign({}, this.attributes.toObject(), this.getVirtualValues());
+        return Object.assign({}, this.attributes.toObject(), this.getAllValueOfAccessors());
     }
     toJson() {
         const result = this.attributes.toJSON({
@@ -122,7 +82,7 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         });
         result['id'] = result['_id'];
         delete result['_id'];
-        return Object.assign(result, this.getVirtualValues());
+        return Object.assign(result, this.getAllValueOfAccessors());
     }
     is(document) {
         return this.attributes.equals(document.attributes);
@@ -212,4 +172,3 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
 }
 exports.EloquentMongoose = EloquentMongoose;
-//# sourceMappingURL=EloquentMongoose.js.map

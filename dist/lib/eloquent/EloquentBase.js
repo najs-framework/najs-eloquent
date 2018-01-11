@@ -54,7 +54,78 @@ class EloquentBase {
         return (guarded.length === 1 && guarded[0] === '*') || guarded.indexOf(key) !== -1;
     }
     // -------------------------------------------------------------------------------------------------------------------
+    findGettersAndSetters() {
+        // accessor by getter, only available for node >= 8.7
+        const descriptors = Object.getOwnPropertyDescriptors(Object.getPrototypeOf(this));
+        for (const name in descriptors) {
+            if (lodash_1.isFunction(descriptors[name].get)) {
+                this.accessors[name] = {
+                    name: name,
+                    type: 'getter'
+                };
+            }
+            if (lodash_1.isFunction(descriptors[name].set)) {
+                this.mutators[name] = {
+                    name: name,
+                    type: 'setter'
+                };
+            }
+        }
+    }
+    findAccessorsAndMutators() {
+        const names = Object.getOwnPropertyNames(Object.getPrototypeOf(this));
+        const regex = new RegExp('^(get|set)([a-zA-z0-9_\\-]{1,})Attribute$', 'g');
+        for (const name of names) {
+            let match;
+            while ((match = regex.exec(name)) != undefined) {
+                // javascript RegExp has a bug when the match has length 0
+                if (match.index === regex.lastIndex) {
+                    ++regex.lastIndex;
+                }
+                const property = lodash_1.snakeCase(match[2]);
+                if (match[1] === 'get') {
+                    if (typeof this.accessors[property] !== 'undefined') {
+                        continue;
+                    }
+                    this.accessors[property] = {
+                        name: property,
+                        type: 'function',
+                        ref: match[0]
+                    };
+                }
+                else {
+                    if (typeof this.mutators[property] !== 'undefined') {
+                        continue;
+                    }
+                    this.mutators[property] = {
+                        name: property,
+                        type: 'function',
+                        ref: match[0]
+                    };
+                }
+            }
+        }
+    }
+    getAllValueOfAccessors() {
+        return Object.keys(this.accessors).reduce((memo, key) => {
+            const accessor = this.accessors[key];
+            if (accessor.type === 'getter') {
+                memo[key] = this[key];
+            }
+            else {
+                memo[key] = this[accessor.ref].call(this);
+            }
+            return memo;
+        }, {});
+    }
+    // -------------------------------------------------------------------------------------------------------------------
     initialize(data) {
+        this.accessors = {};
+        this.mutators = {};
+        if (Object.getOwnPropertyDescriptors) {
+            this.findGettersAndSetters();
+        }
+        this.findAccessorsAndMutators();
         if (this.isNativeRecord(data)) {
             this.setAttributesByNativeRecord(data);
         }
@@ -85,4 +156,3 @@ class EloquentBase {
     }
 }
 exports.EloquentBase = EloquentBase;
-//# sourceMappingURL=EloquentBase.js.map

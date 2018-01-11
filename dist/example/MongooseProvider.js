@@ -22,4 +22,3 @@ MongooseProvider = MongooseProvider_1 = __decorate([
 ], MongooseProvider);
 exports.MongooseProvider = MongooseProvider;
 var MongooseProvider_1;
-//# sourceMappingURL=MongooseProvider.js.map

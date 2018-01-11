@@ -37,16 +37,8 @@ class User extends Eloquent.Mongoose<IUser, User>() {
     return this.attributes.first_name + ' ' + this.attributes.last_name
   }
 
-  get first_name() {
-    return this.attributes.first_name
-  }
-
-  set first_name(value: string) {
-    if (value) {
-      this.attributes.first_name = value.substr(0, 1).toUpperCase() + value.substr(1)
-    } else {
-      this.attributes.first_name = value
-    }
+  getFullNameAttribute() {
+    return this.attributes.first_name + ' ' + this.attributes.last_name
   }
 
   getSchema(): Schema {
@@ -535,6 +527,7 @@ describe('EloquentMongoose', function() {
         expect(user.toObject()).toMatchObject({
           first_name: 'tony',
           last_name: 'stark',
+          full_name: 'tony stark',
           age: 40,
           __v: 0
         })
@@ -551,6 +544,7 @@ describe('EloquentMongoose', function() {
           id,
           first_name: 'tony',
           last_name: 'stark',
+          full_name: 'tony stark',
           age: 40
         })
         expect(

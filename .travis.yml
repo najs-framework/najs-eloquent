@@ -1,8 +1,6 @@
 language: node_js
 services: 
   - mongodb
-node_js:
-  - "lts/carbon"
 
 jobs:
   include:
@@ -10,18 +8,19 @@ jobs:
       node_js: "node"
       os: linux
       before_script: 
-        - npm run build || exit 1;
-        - sleep 15
+        - npm run build || exit 1
+        - sleep 5
       after_success: 
-        - npm run coverage;
+        - npm run coverage
         - 'cat ./coverage/lcov.info | coveralls'
+
     - stage: platform-test
       node_js: "lts/carbon"
       os: linux
-      before_script: sleep 15
+      before_script: sleep 5
 
 install:
-  - npm install
+  - yarn install
 
 script:
   - npm test

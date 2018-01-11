@@ -1,31 +1,22 @@
-# Najs Eloquent
+# <img src="https://raw.githubusercontent.com/najs-framework/najs-eloquent/master/najs-eloquent.png" alt="najs-eloquent">
+
+> ORM written in Typescript, inspired by Laravel Eloquent, supports Mongodb/Mongoose.
 
 [![Travis](https://img.shields.io/travis/najs-framework/najs-eloquent/master.svg?style=flat-square)](https://travis-ci.org/najs-framework/najs-eloquent/builds)
 [![Coverage Status](https://img.shields.io/coveralls/najs-framework/najs-eloquent/master.svg?style=flat-square)](https://coveralls.io/r/najs-framework/najs-eloquent?branch=master)
+[![node version](https://img.shields.io/node/v/najs-eloquent.svg?style=flat-square)](https://nodejs.org/en/download/)
 [![npm version](https://img.shields.io/npm/v/najs-eloquent.svg?style=flat-square)](http://badge.fury.io/js/najs-eloquent)
 [![npm downloads](https://img.shields.io/npm/dm/najs-eloquent.svg?style=flat-square)](http://badge.fury.io/js/najs-eloquent)
 [![npm license](https://img.shields.io/npm/l/najs-eloquent.svg?style=flat-square)](http://badge.fury.io/js/najs-eloquent)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-If you are Laravel Eloquent lover and want to use it in Node JS you will love Najs Eloquent. Najs Eloquent is Laravel
-Eloquent, written in Typescript (with some helpers you can use it with Javascript for sure).
+If you are Laravel Eloquent lover and want to use it in `Node JS` you will love `Najs Eloquent`. `Najs Eloquent` is
+Laravel Eloquent, written in `Typescript` (with some helpers you can use it in Javascript for sure).
 
-Current version - `0.1.5` - is targeted to Mongodb only (using Mongoose as backer ORM). Because MongoDB is not RDB then
-some features of Laravel Eloquent are cut off such as relationship, scope. In the way to `1.0.0`, the `Najs Eloquent`
-will support full Eloquent feature with difference db like `MySql`, `PostgreSQL` or `SqlLite` (use `knex` as query
-builder).
-
-# Versioning and Road map
-
-* `0.1.x` [Released] - Basic feature of Eloquent, targeted to mongodb only
-* `0.2.x` [In Progress] - Advance feature of Eloquent, accessor, mutator, `timestamps` and `soft-delete` queries
-* `0.3.x` [Todo] - Support full static helper functions of Eloquent such as `findOrFail`, `paginate`, `chunk`
-* `0.4.x` [Todo] - Introducing migration strategy for Mongodb
-* `0.5.x` [Todo] - Use knex as a query builder, targeted to RDB such as `MySQL`, `SqlLite` without transaction
-* `0.6.x` [Todo] - Introducing Eloquent scope and relationship
-* `0.7.x` [Todo] - Support RDB transactional query
-* `0.8.x` [Todo] - Introducing migration for RDB
-* `0.9.x` [Todo] - Support other kind of db which requested by community
+Current version - `0.1.6` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
+some features of Laravel Eloquent are removed such as relationship or scope. In the way to `1.0.0`, the `Najs Eloquent`
+will support full Eloquent's features with difference kinds of DB like `MySql`, `PostgreSQL` or `SqlLite`
+(use `knex` as a query builder).
 
 # Installation
 
@@ -61,7 +52,7 @@ class MongooseProvider implements IMongooseProvider {
 }
 ```
 
-You can use another class but is must be implements IMongooseProvider and register under "**MongooseProvider**" name,
+You can use another class but is must implement IMongooseProvider and register under "**MongooseProvider**" name,
 for example
 
 ```typescript
@@ -146,7 +137,7 @@ async function findByPrimaryKey() {
 }
 ```
 
-### Counting
+### Count
 
 ```typescript
 async function count() {
@@ -154,14 +145,14 @@ async function count() {
 }
 ```
 
-### Pluck-ing
+### Pluck
 
 ```typescript
 const data: Object = await User.pluck('first_name') // -> { [id]: first_name, ... }
 const hash: Object = await User.pluck('first_name', 'age') // -> { [age]: first_name, ... }
 ```
 
-### Selecting Specific Columns
+### Select Specific Columns
 
 ```typescript
 const data: number = await User.select('first_name').get() // -> Collection({ first_name: value }, ...)
@@ -330,7 +321,7 @@ await user.delete()
 
 ## IV. Accessors and Mutators
 
-_Not available util 0.2.x_
+_Not available until 0.2.x_
 
 ## IV. Inheritance
 
@@ -366,7 +357,7 @@ export class AdminUser extends User.Class<IAdminUser, User>() {
 }
 ```
 
-## V. Put it all together in Repository
+## V. Put them all together in Repository
 
 You can create Repository for models with very "najs" and clear syntax
 
@@ -414,6 +405,18 @@ class UserRepository {
   }
 }
 ```
+
+# Versioning and Road map
+
+* `0.1.x` [Released] - Basic feature of Eloquent, targeted to mongodb only
+* `0.2.x` [In Progress] - Advance feature of Eloquent, accessor, mutator, `timestamps` and `soft-delete` queries
+* `0.3.x` [Todo] - Support full static helper functions of Eloquent such as `findOrFail`, `paginate`, `chunk`
+* `0.4.x` [Todo] - Introducing migration strategy for Mongodb
+* `0.5.x` [Todo] - Use knex as a query builder, targeted to RDB such as `MySQL`, `SqlLite` without transaction
+* `0.6.x` [Todo] - Introducing Eloquent scope and relationship
+* `0.7.x` [Todo] - Support RDB transactional query
+* `0.8.x` [Todo] - Introducing migration for RDB
+* `0.9.x` [Todo] - Support other kinds of db requested by community
 
 # Contribute
 

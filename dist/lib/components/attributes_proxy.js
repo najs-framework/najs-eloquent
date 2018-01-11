@@ -18,4 +18,3 @@ function attributes_proxy() {
     };
 }
 exports.attributes_proxy = attributes_proxy;
-//# sourceMappingURL=attributes_proxy.js.map

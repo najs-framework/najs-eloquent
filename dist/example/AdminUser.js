@@ -19,4 +19,3 @@ class AdminUser extends exports.AdminUserBase {
 }
 AdminUser.className = 'AdminUser';
 exports.AdminUser = AdminUser;
-//# sourceMappingURL=AdminUser.js.map
