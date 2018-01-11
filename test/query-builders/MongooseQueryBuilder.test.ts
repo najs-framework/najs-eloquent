@@ -285,7 +285,7 @@ describe('MongooseQueryBuilder', function() {
 
     beforeAll(async function() {
       return new Promise(resolve => {
-        mongoose.connect('mongodb://localhost/najs_eloquent_test')
+        mongoose.connect('mongodb://localhost/najs_eloquent_test_1')
         mongoose.Promise = global.Promise
         mongoose.connection.once('open', () => {
           resolve(true)

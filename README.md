@@ -1,9 +1,16 @@
 # Najs Eloquent
 
+[![Travis](https://img.shields.io/travis/najs-framework/najs-eloquent/master.svg?style=flat-square)](https://travis-ci.org/najs-framework/najs-eloquent/builds)
+[![Coverage Status](https://img.shields.io/coveralls/najs-framework/najs-eloquent/master.svg?style=flat-square)](https://coveralls.io/r/najs-framework/najs-eloquent?branch=master)
+[![npm version](https://img.shields.io/npm/v/najs-eloquent.svg?style=flat-square)](http://badge.fury.io/js/najs-eloquent)
+[![npm downloads](https://img.shields.io/npm/dm/najs-eloquent.svg?style=flat-square)](http://badge.fury.io/js/najs-eloquent)
+[![npm license](https://img.shields.io/npm/l/najs-eloquent.svg?style=flat-square)](http://badge.fury.io/js/najs-eloquent)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
 If you are Laravel Eloquent lover and want to use it in Node JS you will love Najs Eloquent. Najs Eloquent is Laravel
 Eloquent, written in Typescript (with some helpers you can use it with Javascript for sure).
 
-Current version - `0.1.4` - is targeted to Mongodb only (using Mongoose as backer ORM). Because MongoDB is not RDB then
+Current version - `0.1.5` - is targeted to Mongodb only (using Mongoose as backer ORM). Because MongoDB is not RDB then
 some features of Laravel Eloquent are cut off such as relationship, scope. In the way to `1.0.0`, the `Najs Eloquent`
 will support full Eloquent feature with difference db like `MySql`, `PostgreSQL` or `SqlLite` (use `knex` as query
 builder).
