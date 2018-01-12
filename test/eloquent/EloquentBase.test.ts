@@ -267,7 +267,8 @@ describe('Eloquent', function() {
       user['fillable'] = ['first_name']
       user.fill({
         first_name: 'john',
-        last_name: 'doe'
+        last_name: 'doe',
+        not_fillable: 'anything'
       })
       expect(user.getAttribute('first_name')).toEqual('john')
       expect(user.toObject()).toEqual({ first_name: 'john' })

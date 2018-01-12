@@ -1,7 +1,10 @@
 /**
- * This file is copied from schema.timestamps.test.js of mongoose
+ * This file is copied from schema.timestamps.test.js v5.0.0-rc2 of mongoose, I change 2 things
+ *  - change before => beforeAll, after => afterAll and setup of mongoose
+ *  - reformat file (because prettier does it automatically, fuuuuu)
  *
- * original file: https://github.com/Automattic/mongoose/blob/master/test/schema.timestamps.test.js
+ * Source: https://github.com/Automattic/mongoose/blob/master/test/schema.timestamps.test.js
+ * NOTE: this file will not be included in coverage report.
  */
 
 /**

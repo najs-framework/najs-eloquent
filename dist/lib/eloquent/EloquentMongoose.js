@@ -11,8 +11,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const EloquentBase_1 = require("./EloquentBase");
 const MongooseQueryBuilder_1 = require("../query-builders/MongooseQueryBuilder");
 const mongoose_1 = require("mongoose");
-const najs_1 = require("najs");
 const collect_js_1 = require("collect.js");
+const najs_1 = require("najs");
+const NotFoundError_1 = require("../errors/NotFoundError");
 mongoose_1.Schema.prototype['setupTimestamp'] = require('./mongoose/setupTimestamp').setupTimestamp;
 const DEFAULT_TIMESTAMPS = {
     createdAt: 'created_at',
@@ -38,8 +39,8 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         if (mongoose.modelNames().indexOf(modelName) === -1) {
             const schema = this.getSchema();
             const timestampsSettings = Object.getPrototypeOf(this).constructor.timestamps;
-            if (timestampsSettings === true) {
-                schema.set('timestamps', DEFAULT_TIMESTAMPS);
+            if (timestampsSettings) {
+                schema.set('timestamps', timestampsSettings === true ? DEFAULT_TIMESTAMPS : timestampsSettings);
             }
             mongoose_1.model(this.getModelName(), schema);
         }
@@ -189,6 +190,18 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static pluck(value, key) {
         return this.prototype.newQuery().pluck(value, key);
+    }
+    static findById(id) {
+        return this.find(id);
+    }
+    static findOrFail(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const value = yield this.find(id);
+            if (!value) {
+                throw new NotFoundError_1.NotFoundError(this.prototype.getClassName());
+            }
+            return value;
+        });
     }
 }
 exports.EloquentMongoose = EloquentMongoose;

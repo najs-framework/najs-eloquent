@@ -41,4 +41,6 @@ export declare type EloquentMongooseSpec<Attr, Class> = {
     find(id: any): Promise<EloquentMongoose<Attr> & Attr & Class>;
     pluck(value: string): Promise<Object>;
     pluck(value: string, key: string): Promise<Object>;
+    findById(id: any): Promise<EloquentMongoose<Attr> & Attr & Class>;
+    findOrFail(id: any): Promise<EloquentMongoose<Attr> & Attr & Class>;
 };

@@ -26,7 +26,7 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     newCollection(dataset: Array<Document & T>): Collection<EloquentMongoose<T>>;
     toObject(): Object;
     toJson(): Object;
-    is(document: EloquentMongoose<T>): boolean;
+    is(document: this): boolean;
     fireEvent(event: string): this;
     save(): Promise<any>;
     delete(): Promise<any>;
@@ -62,4 +62,6 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     static find(id: any): Promise<any>;
     static pluck(value: string): Promise<Object>;
     static pluck(value: string, key: string): Promise<Object>;
+    static findById(id: any): Promise<any>;
+    static findOrFail(id: any): Promise<any>;
 }

@@ -16,6 +16,7 @@ const najs_1 = require("najs");
 const MongooseQueryBuilder_1 = require("../../lib/query-builders/MongooseQueryBuilder");
 const EloquentMongoose_1 = require("../../lib/eloquent/EloquentMongoose");
 const bson_1 = require("bson");
+const NotFoundError_1 = require("../../lib/errors/NotFoundError");
 const mongoose = require('mongoose');
 const Moment = require('moment');
 class MongooseProvider {
@@ -468,10 +469,50 @@ describe('EloquentMongoose', function () {
                 pluckSpy.restore();
             });
         });
+        describe('findById()', function () {
+            it('calls find() with id', function () {
+                const findSpy = Sinon.spy(User, 'find');
+                const id = new bson_1.ObjectId();
+                User.findById(id);
+                expect(findSpy.calledWith(id)).toBe(true);
+                findSpy.restore();
+            });
+        });
+        describe('findOrFail()', function () {
+            it('calls find() with id and return instance of Model if found', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const findSpy = Sinon.spy(User, 'find');
+                    const user = new User({
+                        first_name: 'john',
+                        last_name: 'doe'
+                    });
+                    yield user.save();
+                    const result = yield User.findOrFail(user.id);
+                    expect(result.is(user)).toBe(true);
+                    expect(findSpy.calledWith(user.id)).toBe(true);
+                    findSpy.restore();
+                });
+            });
+            it('throws NotFoundError if model not found', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const id = new bson_1.ObjectId();
+                    try {
+                        yield User.findOrFail(id);
+                    }
+                    catch (error) {
+                        expect(error).toBeInstanceOf(Error);
+                        expect(error).toBeInstanceOf(NotFoundError_1.NotFoundError);
+                        expect(error.model).toEqual(User.className);
+                        return;
+                    }
+                    expect('should not reach this line').toEqual('yeah');
+                });
+            });
+        });
     });
     describe('Eloquent method', function () {
         let id;
-        describe('id()', function () {
+        describe('setId()', function () {
             it('sets values to attributes[_id]', function () {
                 const user = new User();
                 const id = new bson_1.ObjectId();
@@ -693,6 +734,28 @@ describe('EloquentMongoose', function () {
                 yield TimestampModelDefault.whereIn('id', Object.keys(idList)).update({});
                 const documents = yield TimestampModelDefault.all();
                 expect(documents.map(item => item.updated_at).all()).toEqual([now, now, now]);
+            });
+        });
+        class CustomTimestampModel extends lib_1.Eloquent.Mongoose() {
+            getClassName() {
+                return 'CustomTimestampModel';
+            }
+            getSchema() {
+                return new mongoose_1.Schema({ name: String });
+            }
+        }
+        CustomTimestampModel.timestamps = {
+            createdAt: 'createdAt',
+            updatedAt: 'updatedAt'
+        };
+        it('works with custom name for createdAt and updatedAt', function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                const now = new Date(1988, 4, 16);
+                Moment.now = () => now;
+                const model = new CustomTimestampModel();
+                yield model.save();
+                expect(model['createdAt']).toEqual(now);
+                expect(model['updatedAt']).toEqual(now);
             });
         });
     });

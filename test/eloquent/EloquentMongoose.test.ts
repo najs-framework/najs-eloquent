@@ -7,6 +7,7 @@ import { IMongooseProvider } from '../../lib/interfaces/IMongooseProvider'
 import { MongooseQueryBuilder } from '../../lib/query-builders/MongooseQueryBuilder'
 import { EloquentMongoose } from '../../lib/eloquent/EloquentMongoose'
 import { ObjectId } from 'bson'
+import { NotFoundError } from '../../lib/errors/NotFoundError'
 
 const mongoose = require('mongoose')
 const Moment = require('moment')
@@ -520,6 +521,44 @@ describe('EloquentMongoose', function() {
         pluckSpy.restore()
       })
     })
+
+    describe('findById()', function() {
+      it('calls find() with id', function() {
+        const findSpy = Sinon.spy(User, 'find')
+        const id = new ObjectId()
+        User.findById(id)
+        expect(findSpy.calledWith(id)).toBe(true)
+        findSpy.restore()
+      })
+    })
+
+    describe('findOrFail()', function() {
+      it('calls find() with id and return instance of Model if found', async function() {
+        const findSpy = Sinon.spy(User, 'find')
+        const user = new User({
+          first_name: 'john',
+          last_name: 'doe'
+        })
+        await user.save()
+        const result = await User.findOrFail(user.id)
+        expect(result.is(user)).toBe(true)
+        expect(findSpy.calledWith(user.id)).toBe(true)
+        findSpy.restore()
+      })
+
+      it('throws NotFoundError if model not found', async function() {
+        const id = new ObjectId()
+        try {
+          await User.findOrFail(id)
+        } catch (error) {
+          expect(error).toBeInstanceOf(Error)
+          expect(error).toBeInstanceOf(NotFoundError)
+          expect(error.model).toEqual(User.className)
+          return
+        }
+        expect('should not reach this line').toEqual('yeah')
+      })
+    })
   })
 
   describe('Eloquent method', function() {
@@ -751,6 +790,30 @@ describe('EloquentMongoose', function() {
 
       const documents = await TimestampModelDefault.all()
       expect(documents.map(item => item.updated_at).all()).toEqual([now, now, now])
+    })
+
+    class CustomTimestampModel extends Eloquent.Mongoose<Timestamps, TimestampModelDefault>() {
+      static timestamps = {
+        createdAt: 'createdAt',
+        updatedAt: 'updatedAt'
+      }
+
+      getClassName() {
+        return 'CustomTimestampModel'
+      }
+
+      getSchema() {
+        return new Schema({ name: String })
+      }
+    }
+    it('works with custom name for createdAt and updatedAt', async function() {
+      const now = new Date(1988, 4, 16)
+      Moment.now = () => now
+
+      const model = new CustomTimestampModel()
+      await model.save()
+      expect(model['createdAt']).toEqual(now)
+      expect(model['updatedAt']).toEqual(now)
     })
   })
 })

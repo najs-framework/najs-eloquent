@@ -3,8 +3,9 @@ import { OrderDirection, SubCondition } from '../interfaces/IBasicQueryGrammar'
 import { IMongooseProvider } from '../interfaces/IMongooseProvider'
 import { MongooseQueryBuilder } from '../query-builders/MongooseQueryBuilder'
 import { Document, Schema, Model, Mongoose, model } from 'mongoose'
-import { make } from 'najs'
 import collect, { Collection } from 'collect.js'
+import { make } from 'najs'
+import { NotFoundError } from '../errors/NotFoundError'
 Schema.prototype['setupTimestamp'] = require('./mongoose/setupTimestamp').setupTimestamp
 
 const DEFAULT_TIMESTAMPS: EloquentTimestamps = {
@@ -42,9 +43,10 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
     if (mongoose.modelNames().indexOf(modelName) === -1) {
       const schema = this.getSchema()
       const timestampsSettings = Object.getPrototypeOf(this).constructor.timestamps
-      if (timestampsSettings === true) {
-        schema.set('timestamps', DEFAULT_TIMESTAMPS)
+      if (timestampsSettings) {
+        schema.set('timestamps', timestampsSettings === true ? DEFAULT_TIMESTAMPS : timestampsSettings)
       }
+
       model<Document & T>(this.getModelName(), schema)
     }
     this.model = mongoose.model(modelName)
@@ -116,7 +118,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
     return Object.assign(result, this.getAllValueOfAccessors())
   }
 
-  is(document: EloquentMongoose<T>): boolean {
+  is(document: this): boolean {
     return this.attributes.equals(document.attributes)
   }
 
@@ -243,5 +245,17 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   static pluck(value: string, key: string): Promise<Object>
   static pluck(value: string, key?: string): Promise<Object> {
     return this.prototype.newQuery().pluck(value, key)
+  }
+
+  static findById(id: any): Promise<any> {
+    return this.find(id)
+  }
+
+  static async findOrFail(id: any): Promise<any> {
+    const value = await this.find(id)
+    if (!value) {
+      throw new NotFoundError(this.prototype.getClassName())
+    }
+    return value
   }
 }
