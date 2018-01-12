@@ -72,6 +72,12 @@ class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
             conditions: !lodash_1.isEmpty(conditions) ? conditions : undefined
         };
     }
+    getFieldByName(name) {
+        if (name === 'id') {
+            return '_id';
+        }
+        return name;
+    }
     // -------------------------------------------------------------------------------------------------------------------
     get() {
         return __awaiter(this, void 0, void 0, function* () {

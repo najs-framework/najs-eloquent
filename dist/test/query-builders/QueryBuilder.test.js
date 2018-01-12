@@ -4,6 +4,14 @@ require("jest");
 const Sinon = require("sinon");
 const QueryBuilder_1 = require("../../lib/query-builders/QueryBuilder");
 describe('QueryBuilder', function () {
+    describe('queryName', function () {
+        it('is chain-able', function () {
+            const query = new QueryBuilder_1.QueryBuilder();
+            expect(query['isUsed']).toBe(false);
+            expect(query.queryName('test')).toEqual(query);
+            expect(query['isUsed']).toBe(false);
+        });
+    });
     describe('select()', function () {
         it('is chain-able', function () {
             const query = new QueryBuilder_1.QueryBuilder();

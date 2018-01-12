@@ -107,6 +107,67 @@ describe('MongooseQueryBuilder', function() {
     })
   })
 
+  describe('Auto convert id to _id', function() {
+    it('converts id to _id if using .select()', function() {
+      const query = new MongooseQueryBuilder('User')
+      expect(query.select('id').toObject()).toEqual({
+        select: ['_id']
+      })
+    })
+
+    it('converts id to _id if using .distinct()', function() {
+      const query = new MongooseQueryBuilder('User')
+      expect(query.distinct('id').toObject()).toEqual({
+        distinct: ['_id']
+      })
+    })
+
+    it('converts id to _id if using .orderBy()', function() {
+      const query = new MongooseQueryBuilder('User')
+      expect(query.orderBy('id').toObject()).toEqual({
+        orderBy: { _id: 'asc' }
+      })
+    })
+
+    it('converts id to _id if using .orderByAsc()', function() {
+      const query = new MongooseQueryBuilder('User')
+      expect(query.orderByAsc('id').toObject()).toEqual({
+        orderBy: { _id: 'asc' }
+      })
+    })
+
+    it('converts id to _id if using .orderByDesc()', function() {
+      const query = new MongooseQueryBuilder('User')
+      expect(query.orderByDesc('id').toObject()).toEqual({
+        orderBy: { _id: 'desc' }
+      })
+    })
+
+    it('converts id to _id if using .where', function() {
+      const query = new MongooseQueryBuilder('User')
+      expect(
+        query
+          .where('id', 1)
+          .where('id', '<>', 2)
+          .toObject()
+      ).toEqual({
+        conditions: { $and: [{ _id: 1 }, { _id: { $not: 2 } }] }
+      })
+    })
+
+    it('converts id to _id if using .orWhere', function() {
+      const query = new MongooseQueryBuilder('User')
+      expect(
+        query
+          .orWhere('id', 1)
+          .orWhereIn('id', [3, 4])
+          .toObject()
+      ).toEqual({
+        conditions: { $or: [{ _id: 1 }, { _id: { $in: [3, 4] } }] }
+      })
+    })
+  })
+
   describe('protected passDataToMongooseQuery()', function() {
     it('never passes to mongooseQuery.select if .select() was not used', function() {
       const nativeQuery = UserModel.find()

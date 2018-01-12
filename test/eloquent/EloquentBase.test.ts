@@ -1,5 +1,5 @@
 import 'jest'
-// import * as Sinon from 'sinon'
+import * as Sinon from 'sinon'
 import { EloquentTestBase } from './EloquentTestBase'
 import { Record } from './Record'
 import { ClassRegistry } from 'najs'
@@ -7,6 +7,7 @@ import { ClassRegistry } from 'najs'
 interface IUser {
   first_name: string
   last_name: string
+  nick_name: string
   password: string
 }
 
@@ -19,7 +20,11 @@ class User extends EloquentTestBase<IUser> {
     return this.attributes['first_name'] + ' ' + this.attributes['last_name']
   }
 
-  set full_name(value: string) {}
+  set full_name(value: string) {
+    const parts = value.split(' ')
+    this.attributes['first_name'] = parts[0]
+    this.attributes['last_name'] = parts[1]
+  }
 
   getFullNameAttribute() {
     return (this.attributes['first_name'] + ' ' + this.attributes['last_name']).toUpperCase()
@@ -31,7 +36,9 @@ class User extends EloquentTestBase<IUser> {
     return this.attributes['first_name'].toUpperCase()
   }
 
-  setNickNameAttribute() {}
+  setNickNameAttribute(value: string) {
+    this.attributes['first_name'] = value.toLowerCase()
+  }
 
   getSomething_wrong_formatAttribute() {
     return 'something_wrong_format'
@@ -101,6 +108,7 @@ describe('Eloquent', function() {
             ],
             // attributes from IEloquent
             [
+              'id',
               'getClassName',
               'fill',
               'forceFill',
@@ -122,7 +130,7 @@ describe('Eloquent', function() {
               'newInstance',
               'newCollection'
             ],
-            // attributes from Eloquent
+            // attributes from EloquentBase
             [
               'constructor',
               'isNativeRecord',
@@ -130,7 +138,9 @@ describe('Eloquent', function() {
               'setAttributesByObject',
               'setAttributesByNativeRecord',
               'initialize',
-              'getReservedPropertiesList'
+              'getReservedPropertiesList',
+              'getId',
+              'setId'
             ],
             // accessors
             ['accessors', 'mutators', 'findAccessorsAndMutators', 'findGettersAndSetters', 'getAllValueOfAccessors'],
@@ -147,6 +157,20 @@ describe('Eloquent', function() {
           )
           .sort()
       )
+    })
+  })
+
+  describe('id: any', function() {
+    it('calls getId() and setId() abstract functions', function() {
+      const user = new User()
+      const getIdSpy = Sinon.spy(user, 'getId')
+      const setIdSpy = Sinon.spy(user, 'setId')
+
+      user.id = 'anything'
+      const id = user.id
+      expect(id).toEqual('anything')
+      expect(getIdSpy.called).toBe(true)
+      expect(setIdSpy.calledWith('anything')).toBe(true)
     })
   })
 
@@ -329,6 +353,25 @@ describe('Eloquent', function() {
           something_wrong_format: 'something_wrong_format'
         })
       })
+
+      it('is not called getAttribute if there is a accessor for attribute', async function() {
+        const user: User = new User({
+          first_name: 'tony',
+          last_name: 'stark'
+        })
+        const getAttributeSpy = Sinon.spy(user, 'getAttribute')
+
+        // a little hack for cover case mutator is getter
+        const indexOfFullName = user['__knownAttributeList'].indexOf('full_name')
+        user['__knownAttributeList'].splice(indexOfFullName, 1)
+
+        const fullName = user.full_name
+        expect(getAttributeSpy.notCalled).toBe(true)
+        expect(fullName).toEqual('tony stark')
+        const nickName = user['nick_name']
+        expect(getAttributeSpy.notCalled).toBe(true)
+        expect(nickName).toEqual('TONY')
+      })
     })
 
     describe('Mutators for node >= 8.7', function() {
@@ -340,11 +383,16 @@ describe('Eloquent', function() {
         })
       })
 
-      it('skip function set...Attribute() if getter is defined', function() {
-        // const user = new User({
-        //   first_name: 'tony',
-        //   last_name: 'stark'
-        // })
+      it('is not called setAttribute if there is a mutator for attribute', async function() {
+        const user: User = new User()
+        const setAttributeSpy = Sinon.spy(user, 'setAttribute')
+        // a little hack for cover case mutator is setter
+        const indexOfFullName = user['__knownAttributeList'].indexOf('full_name')
+        user['__knownAttributeList'].splice(indexOfFullName, 1)
+        user['full_name'] = 'Test test'
+        expect(setAttributeSpy.notCalled).toBe(true)
+        user['nick_name'] = 'TEST'
+        expect(setAttributeSpy.notCalled).toBe(true)
       })
     })
   } else {
@@ -381,22 +429,4 @@ describe('Eloquent', function() {
       })
     })
   }
-
-  describe('EloquentTestBase', function() {
-    it('is fake test remove uncovered lines Helper Classes', async function() {
-      const user = new User()
-      user.newQuery()
-      user.forceDelete()
-      user.fresh()
-      user.is(user)
-      user.fireEvent('test')
-      user.delete()
-      await user.save()
-      user['attributes']['something'] = true
-      user['attributes']['data'] = <any>user['attributes']['something']
-      user.fill(user['attributes']['data'])
-      const record = Record.create({})
-      expect(record.data).toEqual({})
-    })
-  })
 })

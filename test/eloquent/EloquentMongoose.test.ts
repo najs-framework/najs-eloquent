@@ -6,7 +6,10 @@ import { register } from 'najs'
 import { IMongooseProvider } from '../../lib/interfaces/IMongooseProvider'
 import { MongooseQueryBuilder } from '../../lib/query-builders/MongooseQueryBuilder'
 import { EloquentMongoose } from '../../lib/eloquent/EloquentMongoose'
+import { ObjectId } from 'bson'
+
 const mongoose = require('mongoose')
+const Moment = require('moment')
 
 class MongooseProvider implements IMongooseProvider {
   static className: string = 'MongooseProvider'
@@ -21,9 +24,17 @@ class MongooseProvider implements IMongooseProvider {
 }
 register(MongooseProvider)
 
-interface IUser {
+interface Timestamps {
+  name: string
+  created_at: Date
+  updated_at: Date
+}
+
+interface IUser extends Timestamps {
   first_name: string
   last_name: string
+  full_name: string
+  nick_name: string
   age: number
 }
 class User extends Eloquent.Mongoose<IUser, User>() {
@@ -37,8 +48,24 @@ class User extends Eloquent.Mongoose<IUser, User>() {
     return this.attributes.first_name + ' ' + this.attributes.last_name
   }
 
+  set full_name(value: string) {}
+
   getFullNameAttribute() {
     return this.attributes.first_name + ' ' + this.attributes.last_name
+  }
+
+  setFullNameAttribute(value: string) {
+    const parts = value.split(' ')
+    this.attributes['first_name'] = parts[0]
+    this.attributes['last_name'] = parts[1]
+  }
+
+  getNickNameAttribute() {
+    return this.attributes.first_name.toUpperCase()
+  }
+
+  setNickNameAttribute(value: string) {
+    this.attributes['first_name'] = value.toLowerCase()
   }
 
   getSchema(): Schema {
@@ -48,7 +75,7 @@ class User extends Eloquent.Mongoose<IUser, User>() {
         last_name: { type: String, required: true },
         age: { type: Number, default: 0 }
       },
-      { collection: 'users' }
+      { collection: 'users', timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
     )
   }
 }
@@ -71,7 +98,9 @@ describe('EloquentMongoose', function() {
       try {
         if (mongoose.connection.collection('users')) {
           mongoose.connection.collection('users').drop(function() {
-            resolve(true)
+            mongoose.connection.collection('timestampmodeldefaults').drop(function() {
+              resolve(true)
+            })
           })
         } else {
           resolve(true)
@@ -99,6 +128,17 @@ describe('EloquentMongoose', function() {
         await user.save()
         const result: User = await User.where('first_name', 'tony').find()
         expect(result.toObject()).toMatchObject(user.toObject())
+      })
+
+      it('does not catch error from Mongoose', async function() {
+        const user = new User()
+        try {
+          await user.save()
+        } catch (error) {
+          expect(error.name).toEqual('ValidationError')
+          return
+        }
+        expect('it should not go to this line').toEqual('')
       })
     })
 
@@ -154,16 +194,32 @@ describe('EloquentMongoose', function() {
   describe('Static functions', function() {
     describe('Class', function() {
       it('is return EloquentMongoose.constructor, this is a part of syntax', function() {
-        expect(User.Class() === EloquentMongoose).toBe(true)
+        expect(<any>User.Class() === EloquentMongoose).toBe(true)
+      })
+    })
+
+    describe('queryName()', function() {
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'newQuery')
+        expect(User.queryName('Query')).toBeInstanceOf(MongooseQueryBuilder)
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
+      })
+
+      it('passes all params to MongooseQueryBuilder.select()', function() {
+        const queryNameSpy = Sinon.spy(MongooseQueryBuilder.prototype, 'queryName')
+        User.queryName('Query')
+        expect(queryNameSpy.calledWith('Query')).toBe(true)
+        queryNameSpy.restore()
       })
     })
 
     describe('select()', function() {
-      it('creates MongooseQueryBuilder with model from prototype.getModelName()', function() {
-        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'newQuery')
         expect(User.select('first_name')).toBeInstanceOf(MongooseQueryBuilder)
-        expect(getModelNameSpy.called).toBe(true)
-        getModelNameSpy.restore()
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.select()', function() {
@@ -181,11 +237,11 @@ describe('EloquentMongoose', function() {
     })
 
     describe('distinct()', function() {
-      it('creates MongooseQueryBuilder with model from prototype.getModelName()', function() {
-        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
         expect(User.distinct('first_name')).toBeInstanceOf(MongooseQueryBuilder)
-        expect(getModelNameSpy.called).toBe(true)
-        getModelNameSpy.restore()
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.distinct()', function() {
@@ -203,11 +259,11 @@ describe('EloquentMongoose', function() {
     })
 
     describe('orderBy()', function() {
-      it('creates MongooseQueryBuilder with model from prototype.getModelName()', function() {
-        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
         expect(User.orderBy('first_name')).toBeInstanceOf(MongooseQueryBuilder)
-        expect(getModelNameSpy.called).toBe(true)
-        getModelNameSpy.restore()
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.orderBy()', function() {
@@ -221,11 +277,11 @@ describe('EloquentMongoose', function() {
     })
 
     describe('orderByAsc()', function() {
-      it('creates MongooseQueryBuilder with model from prototype.getModelName()', function() {
-        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
         expect(User.orderByAsc('first_name')).toBeInstanceOf(MongooseQueryBuilder)
-        expect(getModelNameSpy.called).toBe(true)
-        getModelNameSpy.restore()
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.orderByAsc()', function() {
@@ -237,11 +293,11 @@ describe('EloquentMongoose', function() {
     })
 
     describe('orderByDesc()', function() {
-      it('creates MongooseQueryBuilder with model from prototype.getModelName()', function() {
-        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
         expect(User.orderByDesc('first_name')).toBeInstanceOf(MongooseQueryBuilder)
-        expect(getModelNameSpy.called).toBe(true)
-        getModelNameSpy.restore()
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.orderByDesc()', function() {
@@ -253,11 +309,11 @@ describe('EloquentMongoose', function() {
     })
 
     describe('limit()', function() {
-      it('creates MongooseQueryBuilder with model from prototype.getModelName()', function() {
-        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
         expect(User.limit(10)).toBeInstanceOf(MongooseQueryBuilder)
-        expect(getModelNameSpy.called).toBe(true)
-        getModelNameSpy.restore()
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.limit()', function() {
@@ -269,11 +325,11 @@ describe('EloquentMongoose', function() {
     })
 
     describe('where()', function() {
-      it('creates MongooseQueryBuilder with model from prototype.getModelName()', function() {
-        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
         expect(User.where('first_name', 'tony')).toBeInstanceOf(MongooseQueryBuilder)
-        expect(getModelNameSpy.called).toBe(true)
-        getModelNameSpy.restore()
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.where()', function() {
@@ -287,11 +343,11 @@ describe('EloquentMongoose', function() {
     })
 
     describe('orWhere()', function() {
-      it('creates MongooseQueryBuilder with model from prototype.getModelName()', function() {
-        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
         expect(User.orWhere('first_name', 'tony')).toBeInstanceOf(MongooseQueryBuilder)
-        expect(getModelNameSpy.called).toBe(true)
-        getModelNameSpy.restore()
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.orWhere()', function() {
@@ -305,11 +361,11 @@ describe('EloquentMongoose', function() {
     })
 
     describe('whereIn()', function() {
-      it('creates MongooseQueryBuilder with model from prototype.getModelName()', function() {
-        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
         expect(User.whereIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder)
-        expect(getModelNameSpy.called).toBe(true)
-        getModelNameSpy.restore()
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.whereIn()', function() {
@@ -321,11 +377,11 @@ describe('EloquentMongoose', function() {
     })
 
     describe('whereNotIn()', function() {
-      it('creates MongooseQueryBuilder with model from prototype.getModelName()', function() {
-        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
         expect(User.whereNotIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder)
-        expect(getModelNameSpy.called).toBe(true)
-        getModelNameSpy.restore()
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.whereNotIn()', function() {
@@ -337,11 +393,11 @@ describe('EloquentMongoose', function() {
     })
 
     describe('orWhereIn()', function() {
-      it('creates MongooseQueryBuilder with model from prototype.getModelName()', function() {
-        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
         expect(User.orWhereIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder)
-        expect(getModelNameSpy.called).toBe(true)
-        getModelNameSpy.restore()
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.orWhereIn()', function() {
@@ -353,11 +409,11 @@ describe('EloquentMongoose', function() {
     })
 
     describe('orWhereNotIn()', function() {
-      it('creates MongooseQueryBuilder with model from prototype.getModelName()', function() {
-        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
         expect(User.orWhereNotIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder)
-        expect(getModelNameSpy.called).toBe(true)
-        getModelNameSpy.restore()
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.orWhereNotIn()', function() {
@@ -446,10 +502,37 @@ describe('EloquentMongoose', function() {
         findSpy.restore()
       })
     })
+
+    describe('pluck()', function() {
+      it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .pluck()', function() {
+        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+        expect(User.pluck('id')).toBeInstanceOf(Promise)
+        expect(getModelNameSpy.called).toBe(true)
+        getModelNameSpy.restore()
+      })
+
+      it('passes all params to MongooseQueryBuilder.pluck()', function() {
+        const pluckSpy = Sinon.spy(MongooseQueryBuilder.prototype, 'pluck')
+        User.pluck('first_name')
+        expect(pluckSpy.calledWith('first_name')).toBe(true)
+        User.pluck('first_name', 'id')
+        expect(pluckSpy.calledWith('first_name', 'id')).toBe(true)
+        pluckSpy.restore()
+      })
+    })
   })
 
   describe('Eloquent method', function() {
     let id: string
+    describe('setId()', function() {
+      it('sets values to attributes[_id]', function() {
+        const user = new User()
+        const id = new ObjectId()
+        user.id = id
+        expect(user['attributes']['_id']).toEqual(id)
+      })
+    })
+
     describe('protected initialize()', function() {
       it('was called by constructor()', function() {
         const initializeSpy = Sinon.spy(User.prototype, <any>'initialize')
@@ -513,10 +596,9 @@ describe('EloquentMongoose', function() {
 
       it('is called if the name is not in __knownAttributeList', async function() {
         const user: User = await User.where('first_name', 'tony').find()
-        // const setAttributeSpy = Sinon.spy(user, 'setAttribute')
+        const setAttributeSpy = Sinon.spy(user, 'setAttribute')
         user.first_name = user.last_name
-        // TODO: it not call setAttribute anymore
-        // expect(setAttributeSpy.calledWith('first_name', user.last_name)).toBe(true)
+        expect(setAttributeSpy.calledWith('first_name', user.last_name)).toBe(true)
       })
     })
 
@@ -603,6 +685,72 @@ describe('EloquentMongoose', function() {
         expect(user.is(comparison)).toBe(false)
         expect(equalsSpy.calledWith(comparison['attributes'])).toBe(true)
       })
+    })
+  })
+
+  describe('Timestamps', function() {
+    class TimestampModelDefault extends Eloquent.Mongoose<Timestamps, TimestampModelDefault>() {
+      static timestamps: boolean = true
+
+      getClassName() {
+        return 'TimestampModelDefault'
+      }
+
+      getSchema() {
+        return new Schema({ name: String })
+      }
+    }
+
+    it('should use custom "setupTimestamp" which use Moment instead of native Date', async function() {
+      const now = new Date(1988, 4, 16)
+      Moment.now = () => now
+
+      const model = new TimestampModelDefault()
+      await model.save()
+      expect(model.created_at).toEqual(now)
+      expect(model.updated_at).toEqual(now)
+    })
+
+    it('works with ActiveRecord.save()', async function() {
+      const createdAt = new Date(1988, 4, 16)
+      Moment.now = () => createdAt
+
+      const model = new TimestampModelDefault()
+      await model.save()
+
+      const updatedAt = new Date(2000, 0, 1)
+      Moment.now = () => updatedAt
+
+      model.name = 'updated'
+      await model.save()
+
+      const updatedModel = await TimestampModelDefault.find(model.id)
+      expect(updatedModel.updated_at).toEqual(updatedAt)
+    })
+
+    it('works with QueryBuilder.update(), one document', async function() {
+      const createdAt = new Date(1988, 4, 16)
+      Moment.now = () => createdAt
+
+      const model = new TimestampModelDefault()
+      await model.save()
+
+      const updatedAt = new Date(2000, 0, 1)
+      Moment.now = () => updatedAt
+
+      await TimestampModelDefault.where('_id', model.id).update({})
+      const updatedModel = await TimestampModelDefault.find(model.id)
+      expect(updatedModel.updated_at).toEqual(updatedAt)
+    })
+
+    it('works with QueryBuilder.update(), multiple documents', async function() {
+      const now = new Date(2010, 0, 1)
+      Moment.now = () => now
+      const idList = await TimestampModelDefault.pluck('id')
+      await TimestampModelDefault.whereIn('id', Object.keys(idList)).update({})
+
+      const documents = await TimestampModelDefault.all()
+      expect(documents.map(item => item.updated_at).all()).toEqual([now, now, now])
     })
   })
 })

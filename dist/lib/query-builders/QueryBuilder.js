@@ -10,6 +10,9 @@ class QueryBuilder {
         this.conditions = [];
         this.isUsed = false;
     }
+    getFieldByName(name) {
+        return name;
+    }
     _flatten_and_assign_to(name, fields) {
         let result = [];
         for (let i = 0, l = fields.length; i < l; i++) {
@@ -19,7 +22,7 @@ class QueryBuilder {
             }
             result = result.concat(fields[i]);
         }
-        this[name] = Array.from(new Set(result));
+        this[name] = Array.from(new Set(result)).map(this.getFieldByName);
         return this;
     }
     getConditions() {
@@ -39,17 +42,17 @@ class QueryBuilder {
     }
     orderBy(field, direction = 'asc') {
         this.isUsed = true;
-        this.ordering[field] = direction;
+        this.ordering[this.getFieldByName(field)] = direction;
         return this;
     }
     orderByAsc(field) {
         this.isUsed = true;
-        this.ordering[field] = 'asc';
+        this.ordering[this.getFieldByName(field)] = 'asc';
         return this;
     }
     orderByDesc(field) {
         this.isUsed = true;
-        this.ordering[field] = 'desc';
+        this.ordering[this.getFieldByName(field)] = 'desc';
         return this;
     }
     limit(records) {
@@ -60,14 +63,14 @@ class QueryBuilder {
     where(arg0, arg1, arg2) {
         this.isUsed = true;
         const condition = new QueryConditionBuilder_1.QueryCondition();
-        condition.where(arg0, arg1, arg2);
+        condition.where(this.getFieldByName(arg0), arg1, arg2);
         this.conditions.push(condition);
         return this;
     }
     orWhere(arg0, arg1, arg2) {
         this.isUsed = true;
         const condition = new QueryConditionBuilder_1.QueryCondition();
-        condition.orWhere(arg0, arg1, arg2);
+        condition.orWhere(this.getFieldByName(arg0), arg1, arg2);
         this.conditions.push(condition);
         return this;
     }

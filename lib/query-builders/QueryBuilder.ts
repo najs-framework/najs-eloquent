@@ -19,6 +19,10 @@ export class QueryBuilder {
     this.isUsed = false
   }
 
+  protected getFieldByName(name: any) {
+    return name
+  }
+
   protected _flatten_and_assign_to(name: string, fields: Array<string | string[]>) {
     let result: string[] = []
     for (let i = 0, l = fields.length; i < l; i++) {
@@ -29,7 +33,7 @@ export class QueryBuilder {
 
       result = result.concat(<string[]>fields[i])
     }
-    this[name] = Array.from(new Set(result))
+    this[name] = Array.from(new Set(result)).map(this.getFieldByName)
     return this
   }
 
@@ -62,19 +66,19 @@ export class QueryBuilder {
   orderBy(field: string, direction: OrderDirection): this
   orderBy(field: string, direction: OrderDirection = 'asc'): this {
     this.isUsed = true
-    this.ordering[field] = direction
+    this.ordering[this.getFieldByName(field)] = direction
     return this
   }
 
   orderByAsc(field: string): this {
     this.isUsed = true
-    this.ordering[field] = 'asc'
+    this.ordering[this.getFieldByName(field)] = 'asc'
     return this
   }
 
   orderByDesc(field: string): this {
     this.isUsed = true
-    this.ordering[field] = 'desc'
+    this.ordering[this.getFieldByName(field)] = 'desc'
     return this
   }
 
@@ -90,7 +94,7 @@ export class QueryBuilder {
   where(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this {
     this.isUsed = true
     const condition = new QueryCondition()
-    condition.where(<any>arg0, arg1, arg2)
+    condition.where(<any>this.getFieldByName(arg0), arg1, arg2)
     this.conditions.push(condition)
     return this
   }
@@ -101,7 +105,7 @@ export class QueryBuilder {
   orWhere(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this {
     this.isUsed = true
     const condition = new QueryCondition()
-    condition.orWhere(<any>arg0, arg1, arg2)
+    condition.orWhere(<any>this.getFieldByName(arg0), arg1, arg2)
     this.conditions.push(condition)
     return this
   }

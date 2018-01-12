@@ -8,6 +8,8 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     protected schema: Schema;
     protected model: Model<Document & T>;
     abstract getSchema(): Schema;
+    getId(): any;
+    setId(value: any): any;
     static Class(): any;
     getModelName(): string;
     protected initialize(data: Document & T | Object | undefined): EloquentMongoose<T>;
@@ -58,4 +60,6 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     static get(fields: string[]): Promise<any>;
     static get(...fields: Array<string | string[]>): Promise<any>;
     static find(id: any): Promise<any>;
+    static pluck(value: string): Promise<Object>;
+    static pluck(value: string, key: string): Promise<Object>;
 }

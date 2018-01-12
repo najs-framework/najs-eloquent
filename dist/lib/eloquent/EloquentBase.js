@@ -11,6 +11,12 @@ class EloquentBase {
         }
         return this.initialize(data);
     }
+    get id() {
+        return this.getId();
+    }
+    set id(value) {
+        this.setId(value);
+    }
     newInstance(data) {
         const instance = najs_1.make(this.getClassName());
         return instance.initialize(data);
@@ -155,4 +161,6 @@ class EloquentBase {
         ];
     }
 }
+EloquentBase.timestamps = false;
+EloquentBase.softDeletes = false;
 exports.EloquentBase = EloquentBase;

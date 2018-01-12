@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
-// import * as Sinon from 'sinon'
+const Sinon = require("sinon");
 const EloquentTestBase_1 = require("./EloquentTestBase");
 const Record_1 = require("./Record");
 const najs_1 = require("najs");
@@ -20,7 +20,11 @@ class User extends EloquentTestBase_1.EloquentTestBase {
     get full_name() {
         return this.attributes['first_name'] + ' ' + this.attributes['last_name'];
     }
-    set full_name(value) { }
+    set full_name(value) {
+        const parts = value.split(' ');
+        this.attributes['first_name'] = parts[0];
+        this.attributes['last_name'] = parts[1];
+    }
     getFullNameAttribute() {
         return (this.attributes['first_name'] + ' ' + this.attributes['last_name']).toUpperCase();
     }
@@ -28,7 +32,9 @@ class User extends EloquentTestBase_1.EloquentTestBase {
     getNickNameAttribute() {
         return this.attributes['first_name'].toUpperCase();
     }
-    setNickNameAttribute() { }
+    setNickNameAttribute(value) {
+        this.attributes['first_name'] = value.toLowerCase();
+    }
     getSomething_wrong_formatAttribute() {
         return 'something_wrong_format';
     }
@@ -90,6 +96,7 @@ describe('Eloquent', function () {
             ], 
             // attributes from IEloquent
             [
+                'id',
                 'getClassName',
                 'fill',
                 'forceFill',
@@ -111,7 +118,7 @@ describe('Eloquent', function () {
                 'newInstance',
                 'newCollection'
             ], 
-            // attributes from Eloquent
+            // attributes from EloquentBase
             [
                 'constructor',
                 'isNativeRecord',
@@ -119,7 +126,9 @@ describe('Eloquent', function () {
                 'setAttributesByObject',
                 'setAttributesByNativeRecord',
                 'initialize',
-                'getReservedPropertiesList'
+                'getReservedPropertiesList',
+                'getId',
+                'setId'
             ], 
             // accessors
             ['accessors', 'mutators', 'findAccessorsAndMutators', 'findGettersAndSetters', 'getAllValueOfAccessors'], 
@@ -134,6 +143,18 @@ describe('Eloquent', function () {
                 'getSomething_wrong_formatAttribute'
             ])
                 .sort());
+        });
+    });
+    describe('id: any', function () {
+        it('calls getId() and setId() abstract functions', function () {
+            const user = new User();
+            const getIdSpy = Sinon.spy(user, 'getId');
+            const setIdSpy = Sinon.spy(user, 'setId');
+            user.id = 'anything';
+            const id = user.id;
+            expect(id).toEqual('anything');
+            expect(getIdSpy.called).toBe(true);
+            expect(setIdSpy.calledWith('anything')).toBe(true);
         });
     });
     describe('newInstance(data)', function () {
@@ -297,6 +318,24 @@ describe('Eloquent', function () {
                     something_wrong_format: 'something_wrong_format'
                 });
             });
+            it('is not called getAttribute if there is a accessor for attribute', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const user = new User({
+                        first_name: 'tony',
+                        last_name: 'stark'
+                    });
+                    const getAttributeSpy = Sinon.spy(user, 'getAttribute');
+                    // a little hack for cover case mutator is getter
+                    const indexOfFullName = user['__knownAttributeList'].indexOf('full_name');
+                    user['__knownAttributeList'].splice(indexOfFullName, 1);
+                    const fullName = user.full_name;
+                    expect(getAttributeSpy.notCalled).toBe(true);
+                    expect(fullName).toEqual('tony stark');
+                    const nickName = user['nick_name'];
+                    expect(getAttributeSpy.notCalled).toBe(true);
+                    expect(nickName).toEqual('TONY');
+                });
+            });
         });
         describe('Mutators for node >= 8.7', function () {
             it('supports setter since node >= 8.7', function () {
@@ -306,11 +345,18 @@ describe('Eloquent', function () {
                     type: 'setter'
                 });
             });
-            it('skip function set...Attribute() if getter is defined', function () {
-                // const user = new User({
-                //   first_name: 'tony',
-                //   last_name: 'stark'
-                // })
+            it('is not called setAttribute if there is a mutator for attribute', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const user = new User();
+                    const setAttributeSpy = Sinon.spy(user, 'setAttribute');
+                    // a little hack for cover case mutator is setter
+                    const indexOfFullName = user['__knownAttributeList'].indexOf('full_name');
+                    user['__knownAttributeList'].splice(indexOfFullName, 1);
+                    user['full_name'] = 'Test test';
+                    expect(setAttributeSpy.notCalled).toBe(true);
+                    user['nick_name'] = 'TEST';
+                    expect(setAttributeSpy.notCalled).toBe(true);
+                });
             });
         });
     }
@@ -347,23 +393,4 @@ describe('Eloquent', function () {
             });
         });
     }
-    describe('EloquentTestBase', function () {
-        it('is fake test remove uncovered lines Helper Classes', function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                const user = new User();
-                user.newQuery();
-                user.forceDelete();
-                user.fresh();
-                user.is(user);
-                user.fireEvent('test');
-                user.delete();
-                yield user.save();
-                user['attributes']['something'] = true;
-                user['attributes']['data'] = user['attributes']['something'];
-                user.fill(user['attributes']['data']);
-                const record = Record_1.Record.create({});
-                expect(record.data).toEqual({});
-            });
-        });
-    });
 });

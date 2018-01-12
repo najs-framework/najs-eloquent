@@ -13,7 +13,18 @@ const MongooseQueryBuilder_1 = require("../query-builders/MongooseQueryBuilder")
 const mongoose_1 = require("mongoose");
 const najs_1 = require("najs");
 const collect_js_1 = require("collect.js");
+mongoose_1.Schema.prototype['setupTimestamp'] = require('./mongoose/setupTimestamp').setupTimestamp;
+const DEFAULT_TIMESTAMPS = {
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
+};
 class EloquentMongoose extends EloquentBase_1.EloquentBase {
+    getId() {
+        return this.attributes._id;
+    }
+    setId(value) {
+        this.attributes._id = value;
+    }
     static Class() {
         return EloquentMongoose;
     }
@@ -22,15 +33,18 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     // -------------------------------------------------------------------------------------------------------------------
     initialize(data) {
-        if (!this.schema) {
-            this.schema = this.getSchema();
-        }
         const modelName = this.getModelName();
         const mongoose = this.getMongoose();
         if (mongoose.modelNames().indexOf(modelName) === -1) {
-            mongoose_1.model(this.getModelName(), this.schema);
+            const schema = this.getSchema();
+            const timestampsSettings = Object.getPrototypeOf(this).constructor.timestamps;
+            if (timestampsSettings === true) {
+                schema.set('timestamps', DEFAULT_TIMESTAMPS);
+            }
+            mongoose_1.model(this.getModelName(), schema);
         }
         this.model = mongoose.model(modelName);
+        this.schema = this.model.schema;
         return super.initialize(data);
     }
     getMongoose() {
@@ -119,56 +133,62 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     // -------------------------------------------------------------------------------------------------------------------
     static queryName(name) {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getClassName());
+        return this.prototype.newQuery().queryName(name);
     }
     static select(...fields) {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).select(...fields);
+        return this.prototype.newQuery().select(...fields);
     }
     static distinct(...fields) {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).distinct(...fields);
+        return this.prototype.newQuery().distinct(...fields);
     }
     static orderBy(field, direction = 'asc') {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).orderBy(field, direction);
+        return this.prototype.newQuery().orderBy(field, direction);
     }
     static orderByAsc(field) {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).orderByAsc(field);
+        return this.prototype.newQuery().orderByAsc(field);
     }
     static orderByDesc(field) {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).orderByDesc(field);
+        return this.prototype.newQuery().orderByDesc(field);
     }
     static limit(records) {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).limit(records);
+        return this.prototype.newQuery().limit(records);
     }
     static where(arg0, arg1, arg2) {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).where(arg0, arg1, arg2);
+        return this.prototype.newQuery().where(arg0, arg1, arg2);
     }
     static orWhere(arg0, arg1, arg2) {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).orWhere(arg0, arg1, arg2);
+        return this.prototype.newQuery().orWhere(arg0, arg1, arg2);
     }
     static whereIn(field, values) {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).whereIn(field, values);
+        return this.prototype.newQuery().whereIn(field, values);
     }
     static whereNotIn(field, values) {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).whereNotIn(field, values);
+        return this.prototype.newQuery().whereNotIn(field, values);
     }
     static orWhereIn(field, values) {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).orWhereIn(field, values);
+        return this.prototype.newQuery().orWhereIn(field, values);
     }
     static orWhereNotIn(field, values) {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).orWhereNotIn(field, values);
+        return this.prototype.newQuery().orWhereNotIn(field, values);
     }
     static all() {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).all();
+        return this.prototype.newQuery().all();
     }
     static get(...fields) {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).select(...fields).get();
+        return this.prototype
+            .newQuery()
+            .select(...fields)
+            .get();
     }
     static find(id) {
         if (typeof id !== 'undefined') {
-            const query = new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName());
+            const query = this.prototype.newQuery();
             return query.where(query.getPrimaryKey(), id).find();
         }
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.prototype.getModelName()).find();
+        return this.prototype.newQuery().find();
+    }
+    static pluck(value, key) {
+        return this.prototype.newQuery().pluck(value, key);
     }
 }
 exports.EloquentMongoose = EloquentMongoose;

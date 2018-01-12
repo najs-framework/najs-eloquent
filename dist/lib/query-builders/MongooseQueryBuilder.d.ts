@@ -17,6 +17,7 @@ export declare class MongooseQueryBuilder<T = {}> extends QueryBuilder implement
     getPrimaryKey(): string;
     native(handler: (native: Model<Document & T> | MongooseQuery<T>) => MongooseQuery<T>): IQueryFetchResult<T>;
     toObject(): Object;
+    protected getFieldByName(name: any): any;
     get(): Promise<Collection<any>>;
     all(): Promise<Collection<any>>;
     find(): Promise<any | null>;

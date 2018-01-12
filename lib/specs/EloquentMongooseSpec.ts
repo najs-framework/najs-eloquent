@@ -2,12 +2,17 @@ import { Collection } from 'collect.js'
 import { EloquentMongoose } from '../eloquent/EloquentMongoose'
 import { MongooseQueryBuilder } from '../query-builders/MongooseQueryBuilder'
 import { OrderDirection, SubCondition } from '../interfaces/IBasicQueryGrammar'
+import { Schema } from 'mongoose'
+
+export type AbstractImplemented = {
+  getSchema(): Schema
+}
 
 export type EloquentMongooseSpec<Attr, Class> = {
   new (): EloquentMongoose<Attr> & Attr
   new (data: Object): EloquentMongoose<Attr> & Attr
 
-  Class<ChildAttr, ChildClass>(): EloquentMongooseSpec<Class & ChildAttr, Class & ChildClass>
+  Class<ChildAttr, ChildClass>(): EloquentMongooseSpec<Class & ChildAttr & AbstractImplemented, Class & ChildClass>
 
   queryName(name: string): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>
 
@@ -53,4 +58,7 @@ export type EloquentMongooseSpec<Attr, Class> = {
 
   find(): Promise<EloquentMongoose<Attr> & Attr & Class>
   find(id: any): Promise<EloquentMongoose<Attr> & Attr & Class>
+
+  pluck(value: string): Promise<Object>
+  pluck(value: string, key: string): Promise<Object>
 }

@@ -9,6 +9,7 @@ export declare class QueryBuilder {
     protected conditions: QueryCondition[];
     protected isUsed: boolean;
     constructor();
+    protected getFieldByName(name: any): any;
     protected _flatten_and_assign_to(name: string, fields: Array<string | string[]>): this;
     protected getConditions(): Object[];
     queryName(name: string): this;

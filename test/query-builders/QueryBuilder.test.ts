@@ -3,6 +3,15 @@ import * as Sinon from 'sinon'
 import { QueryBuilder } from '../../lib/query-builders/QueryBuilder'
 
 describe('QueryBuilder', function() {
+  describe('queryName', function() {
+    it('is chain-able', function() {
+      const query = new QueryBuilder()
+      expect(query['isUsed']).toBe(false)
+      expect(query.queryName('test')).toEqual(query)
+      expect(query['isUsed']).toBe(false)
+    })
+  })
+
   describe('select()', function() {
     it('is chain-able', function() {
       const query = new QueryBuilder()

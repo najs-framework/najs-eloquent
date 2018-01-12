@@ -3,6 +3,8 @@ import { Record } from './Record';
 export declare abstract class EloquentTestBase<T> extends EloquentBase<Record<T>> {
     protected getReservedPropertiesList(): string[];
     abstract getClassName(): string;
+    getId(): any;
+    setId(value: any): void;
     newQuery(): any;
     toObject(): Object;
     toJson(): Object;

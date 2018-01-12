@@ -14,17 +14,22 @@ export type EloquentMutator = {
   type: 'setter' | 'function'
   ref?: string
 }
+export type EloquentTimestamps = { createdAt: string; updatedAt: string }
+export type EloquentSoftDelete = { deletedAt: string }
 
 export abstract class EloquentBase<NativeRecord extends Object = {}> implements IEloquent, IAutoload {
+  protected static timestamps: EloquentTimestamps | boolean = false
+  protected static softDeletes: EloquentSoftDelete | boolean = false
+
   protected __knownAttributeList: string[]
   protected attributes: NativeRecord
   protected fillable?: string[]
   protected guarded?: string[]
-  protected softDeletes?: boolean
-  protected timestamps?: boolean
   protected accessors: { [key in string]: EloquentAccessor }
   protected mutators: { [key in string]: EloquentMutator }
 
+  abstract getId(): any
+  abstract setId(value: any): void
   abstract getClassName(): string
   abstract newQuery(): any
   abstract toObject(): Object
@@ -50,6 +55,14 @@ export abstract class EloquentBase<NativeRecord extends Object = {}> implements 
       register(Object.getPrototypeOf(this).constructor, this.getClassName(), false)
     }
     return this.initialize(data)
+  }
+
+  public get id(): any {
+    return this.getId()
+  }
+
+  public set id(value: any) {
+    this.setId(value)
   }
 
   newInstance(): any

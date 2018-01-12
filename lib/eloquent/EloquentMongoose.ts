@@ -1,10 +1,16 @@
-import { EloquentBase } from './EloquentBase'
+import { EloquentBase, EloquentTimestamps } from './EloquentBase'
 import { OrderDirection, SubCondition } from '../interfaces/IBasicQueryGrammar'
 import { IMongooseProvider } from '../interfaces/IMongooseProvider'
 import { MongooseQueryBuilder } from '../query-builders/MongooseQueryBuilder'
 import { Document, Schema, Model, Mongoose, model } from 'mongoose'
 import { make } from 'najs'
 import collect, { Collection } from 'collect.js'
+Schema.prototype['setupTimestamp'] = require('./mongoose/setupTimestamp').setupTimestamp
+
+const DEFAULT_TIMESTAMPS: EloquentTimestamps = {
+  createdAt: 'created_at',
+  updatedAt: 'updated_at'
+}
 
 export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   protected collection: string
@@ -12,6 +18,14 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   protected model: Model<Document & T>
 
   abstract getSchema(): Schema
+
+  getId(): any {
+    return this.attributes._id
+  }
+
+  setId(value: any): any {
+    this.attributes._id = value
+  }
 
   static Class(): any {
     return <any>EloquentMongoose
@@ -23,15 +37,18 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
 
   // -------------------------------------------------------------------------------------------------------------------
   protected initialize(data: Document & T | Object | undefined): EloquentMongoose<T> {
-    if (!this.schema) {
-      this.schema = this.getSchema()
-    }
     const modelName: string = this.getModelName()
     const mongoose: Mongoose = this.getMongoose()
     if (mongoose.modelNames().indexOf(modelName) === -1) {
-      model<Document & T>(this.getModelName(), this.schema)
+      const schema = this.getSchema()
+      const timestampsSettings = Object.getPrototypeOf(this).constructor.timestamps
+      if (timestampsSettings === true) {
+        schema.set('timestamps', DEFAULT_TIMESTAMPS)
+      }
+      model<Document & T>(this.getModelName(), schema)
     }
     this.model = mongoose.model(modelName)
+    this.schema = this.model.schema
     return super.initialize(data)
   }
 
@@ -133,73 +150,73 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
 
   // -------------------------------------------------------------------------------------------------------------------
   static queryName(name: string): MongooseQueryBuilder {
-    return new MongooseQueryBuilder(this.prototype.getClassName())
+    return this.prototype.newQuery().queryName(name)
   }
 
   static select(field: string): MongooseQueryBuilder
   static select(fields: string[]): MongooseQueryBuilder
   static select(...fields: Array<string | string[]>): MongooseQueryBuilder
   static select(...fields: Array<string | string[]>): MongooseQueryBuilder {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).select(...fields)
+    return this.prototype.newQuery().select(...fields)
   }
 
   static distinct(field: string): MongooseQueryBuilder
   static distinct(fields: string[]): MongooseQueryBuilder
   static distinct(...fields: Array<string | string[]>): MongooseQueryBuilder
   static distinct(...fields: Array<string | string[]>): MongooseQueryBuilder {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).distinct(...fields)
+    return this.prototype.newQuery().distinct(...fields)
   }
 
   static orderBy(field: string): MongooseQueryBuilder
   static orderBy(field: string, direction: OrderDirection): MongooseQueryBuilder
   static orderBy(field: string, direction: OrderDirection = 'asc'): MongooseQueryBuilder {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).orderBy(field, direction)
+    return this.prototype.newQuery().orderBy(field, direction)
   }
 
   static orderByAsc(field: string): MongooseQueryBuilder {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).orderByAsc(field)
+    return this.prototype.newQuery().orderByAsc(field)
   }
 
   static orderByDesc(field: string): MongooseQueryBuilder {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).orderByDesc(field)
+    return this.prototype.newQuery().orderByDesc(field)
   }
 
   static limit(records: number): MongooseQueryBuilder {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).limit(records)
+    return this.prototype.newQuery().limit(records)
   }
 
   static where(conditionBuilder: SubCondition): MongooseQueryBuilder
   static where(field: string, value: any): MongooseQueryBuilder
   static where(field: string, operator: Operator, value: any): MongooseQueryBuilder
   static where(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): MongooseQueryBuilder {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).where(<any>arg0, arg1, arg2)
+    return this.prototype.newQuery().where(<any>arg0, arg1, arg2)
   }
 
   static orWhere(conditionBuilder: SubCondition): MongooseQueryBuilder
   static orWhere(field: string, value: any): MongooseQueryBuilder
   static orWhere(field: string, operator: Operator, value: any): MongooseQueryBuilder
   static orWhere(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): MongooseQueryBuilder {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).orWhere(<any>arg0, arg1, arg2)
+    return this.prototype.newQuery().orWhere(<any>arg0, arg1, arg2)
   }
 
   static whereIn(field: string, values: Array<any>): MongooseQueryBuilder {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).whereIn(field, values)
+    return this.prototype.newQuery().whereIn(field, values)
   }
 
   static whereNotIn(field: string, values: Array<any>): MongooseQueryBuilder {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).whereNotIn(field, values)
+    return this.prototype.newQuery().whereNotIn(field, values)
   }
 
   static orWhereIn(field: string, values: Array<any>): MongooseQueryBuilder {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).orWhereIn(field, values)
+    return this.prototype.newQuery().orWhereIn(field, values)
   }
 
   static orWhereNotIn(field: string, values: Array<any>): MongooseQueryBuilder {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).orWhereNotIn(field, values)
+    return this.prototype.newQuery().orWhereNotIn(field, values)
   }
 
   static all(): Promise<any> {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).all()
+    return this.prototype.newQuery().all()
   }
 
   static get(): Promise<any>
@@ -207,15 +224,24 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   static get(fields: string[]): Promise<any>
   static get(...fields: Array<string | string[]>): Promise<any>
   static get(...fields: Array<string | string[]>): Promise<any> {
-    return new MongooseQueryBuilder(this.prototype.getModelName()).select(...fields).get()
+    return this.prototype
+      .newQuery()
+      .select(...fields)
+      .get()
   }
 
   static find(id: any): Promise<any>
   static find(id?: any): Promise<any> {
     if (typeof id !== 'undefined') {
-      const query = new MongooseQueryBuilder(this.prototype.getModelName())
+      const query = this.prototype.newQuery()
       return query.where(query.getPrimaryKey(), id).find()
     }
-    return new MongooseQueryBuilder(this.prototype.getModelName()).find()
+    return this.prototype.newQuery().find()
+  }
+
+  static pluck(value: string): Promise<Object>
+  static pluck(value: string, key: string): Promise<Object>
+  static pluck(value: string, key?: string): Promise<Object> {
+    return this.prototype.newQuery().pluck(value, key)
   }
 }

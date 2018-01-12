@@ -8,7 +8,10 @@ export interface IAdminUser {
   is_admin: true
 }
 
-export const AdminUserBase: EloquentMongooseSpec<IAdminUser, AdminUser> = User.Class<IAdminUser, AdminUser>()
+export const AdminUserBase: EloquentMongooseSpec<IAdminUser & { getSchema(): Schema }, AdminUser> = User.Class<
+  IAdminUser,
+  AdminUser
+>()
 export class AdminUser extends AdminUserBase {
   static className: string = 'AdminUser'
 
@@ -22,7 +25,8 @@ export class AdminUser extends AdminUserBase {
   }
 
   getSchema(): Schema {
-    this.schema.add({
+    const schema = super.getSchema()
+    schema.add({
       is_admin: { type: Boolean }
     })
     return this.schema

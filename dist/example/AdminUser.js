@@ -11,7 +11,8 @@ class AdminUser extends exports.AdminUserBase {
         return AdminUser.className;
     }
     getSchema() {
-        this.schema.add({
+        const schema = super.getSchema();
+        schema.add({
             is_admin: { type: Boolean }
         });
         return this.schema;

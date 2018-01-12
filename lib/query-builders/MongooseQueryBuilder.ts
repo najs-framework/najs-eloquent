@@ -90,6 +90,13 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder
     }
   }
 
+  protected getFieldByName(name: any) {
+    if (name === 'id') {
+      return '_id'
+    }
+    return name
+  }
+
   // -------------------------------------------------------------------------------------------------------------------
 
   async get(): Promise<Collection<any>> {

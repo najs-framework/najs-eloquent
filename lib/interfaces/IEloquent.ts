@@ -1,6 +1,8 @@
 import { Collection } from 'collect.js'
 
 export interface IEloquent {
+  id: any
+
   getClassName(): string
 
   fill(data: Object): this

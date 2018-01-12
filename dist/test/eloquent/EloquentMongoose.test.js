@@ -15,7 +15,9 @@ const lib_1 = require("../../lib");
 const najs_1 = require("najs");
 const MongooseQueryBuilder_1 = require("../../lib/query-builders/MongooseQueryBuilder");
 const EloquentMongoose_1 = require("../../lib/eloquent/EloquentMongoose");
+const bson_1 = require("bson");
 const mongoose = require('mongoose');
+const Moment = require('moment');
 class MongooseProvider {
     getClassName() {
         return MongooseProvider.className;
@@ -33,15 +35,27 @@ class User extends lib_1.Eloquent.Mongoose() {
     get full_name() {
         return this.attributes.first_name + ' ' + this.attributes.last_name;
     }
+    set full_name(value) { }
     getFullNameAttribute() {
         return this.attributes.first_name + ' ' + this.attributes.last_name;
+    }
+    setFullNameAttribute(value) {
+        const parts = value.split(' ');
+        this.attributes['first_name'] = parts[0];
+        this.attributes['last_name'] = parts[1];
+    }
+    getNickNameAttribute() {
+        return this.attributes.first_name.toUpperCase();
+    }
+    setNickNameAttribute(value) {
+        this.attributes['first_name'] = value.toLowerCase();
     }
     getSchema() {
         return new mongoose_1.Schema({
             first_name: { type: String, required: true },
             last_name: { type: String, required: true },
             age: { type: Number, default: 0 }
-        }, { collection: 'users' });
+        }, { collection: 'users', timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
     }
 }
 User.className = 'User';
@@ -64,7 +78,9 @@ describe('EloquentMongoose', function () {
                 try {
                     if (mongoose.connection.collection('users')) {
                         mongoose.connection.collection('users').drop(function () {
-                            resolve(true);
+                            mongoose.connection.collection('timestampmodeldefaults').drop(function () {
+                                resolve(true);
+                            });
                         });
                     }
                     else {
@@ -96,6 +112,19 @@ describe('EloquentMongoose', function () {
                     yield user.save();
                     const result = yield User.where('first_name', 'tony').find();
                     expect(result.toObject()).toMatchObject(user.toObject());
+                });
+            });
+            it('does not catch error from Mongoose', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const user = new User();
+                    try {
+                        yield user.save();
+                    }
+                    catch (error) {
+                        expect(error.name).toEqual('ValidationError');
+                        return;
+                    }
+                    expect('it should not go to this line').toEqual('');
                 });
             });
         });
@@ -157,12 +186,26 @@ describe('EloquentMongoose', function () {
                 expect(User.Class() === EloquentMongoose_1.EloquentMongoose).toBe(true);
             });
         });
+        describe('queryName()', function () {
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'newQuery');
+                expect(User.queryName('Query')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
+            });
+            it('passes all params to MongooseQueryBuilder.select()', function () {
+                const queryNameSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'queryName');
+                User.queryName('Query');
+                expect(queryNameSpy.calledWith('Query')).toBe(true);
+                queryNameSpy.restore();
+            });
+        });
         describe('select()', function () {
-            it('creates MongooseQueryBuilder with model from prototype.getModelName()', function () {
-                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'newQuery');
                 expect(User.select('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
-                expect(getModelNameSpy.called).toBe(true);
-                getModelNameSpy.restore();
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.select()', function () {
                 const selectSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'select');
@@ -178,11 +221,11 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('distinct()', function () {
-            it('creates MongooseQueryBuilder with model from prototype.getModelName()', function () {
-                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.distinct('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
-                expect(getModelNameSpy.called).toBe(true);
-                getModelNameSpy.restore();
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.distinct()', function () {
                 const distinctSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'distinct');
@@ -198,11 +241,11 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('orderBy()', function () {
-            it('creates MongooseQueryBuilder with model from prototype.getModelName()', function () {
-                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orderBy('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
-                expect(getModelNameSpy.called).toBe(true);
-                getModelNameSpy.restore();
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.orderBy()', function () {
                 const orderBySpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orderBy');
@@ -214,11 +257,11 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('orderByAsc()', function () {
-            it('creates MongooseQueryBuilder with model from prototype.getModelName()', function () {
-                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orderByAsc('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
-                expect(getModelNameSpy.called).toBe(true);
-                getModelNameSpy.restore();
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.orderByAsc()', function () {
                 const orderByAscSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orderByAsc');
@@ -228,11 +271,11 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('orderByDesc()', function () {
-            it('creates MongooseQueryBuilder with model from prototype.getModelName()', function () {
-                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orderByDesc('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
-                expect(getModelNameSpy.called).toBe(true);
-                getModelNameSpy.restore();
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.orderByDesc()', function () {
                 const orderByDescSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orderByDesc');
@@ -242,11 +285,11 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('limit()', function () {
-            it('creates MongooseQueryBuilder with model from prototype.getModelName()', function () {
-                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.limit(10)).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
-                expect(getModelNameSpy.called).toBe(true);
-                getModelNameSpy.restore();
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.limit()', function () {
                 const limitSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'limit');
@@ -256,11 +299,11 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('where()', function () {
-            it('creates MongooseQueryBuilder with model from prototype.getModelName()', function () {
-                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.where('first_name', 'tony')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
-                expect(getModelNameSpy.called).toBe(true);
-                getModelNameSpy.restore();
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.where()', function () {
                 const whereSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'where');
@@ -272,11 +315,11 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('orWhere()', function () {
-            it('creates MongooseQueryBuilder with model from prototype.getModelName()', function () {
-                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orWhere('first_name', 'tony')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
-                expect(getModelNameSpy.called).toBe(true);
-                getModelNameSpy.restore();
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.orWhere()', function () {
                 const orWhereSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orWhere');
@@ -288,11 +331,11 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('whereIn()', function () {
-            it('creates MongooseQueryBuilder with model from prototype.getModelName()', function () {
-                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.whereIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
-                expect(getModelNameSpy.called).toBe(true);
-                getModelNameSpy.restore();
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.whereIn()', function () {
                 const whereInSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'whereIn');
@@ -302,11 +345,11 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('whereNotIn()', function () {
-            it('creates MongooseQueryBuilder with model from prototype.getModelName()', function () {
-                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.whereNotIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
-                expect(getModelNameSpy.called).toBe(true);
-                getModelNameSpy.restore();
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.whereNotIn()', function () {
                 const whereNotInSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'whereNotIn');
@@ -316,11 +359,11 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('orWhereIn()', function () {
-            it('creates MongooseQueryBuilder with model from prototype.getModelName()', function () {
-                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orWhereIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
-                expect(getModelNameSpy.called).toBe(true);
-                getModelNameSpy.restore();
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.orWhereIn()', function () {
                 const orWhereInSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orWhereIn');
@@ -330,11 +373,11 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('orWhereNotIn()', function () {
-            it('creates MongooseQueryBuilder with model from prototype.getModelName()', function () {
-                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orWhereNotIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
-                expect(getModelNameSpy.called).toBe(true);
-                getModelNameSpy.restore();
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.orWhereNotIn()', function () {
                 const orWhereNotInSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orWhereNotIn');
@@ -409,9 +452,33 @@ describe('EloquentMongoose', function () {
                 findSpy.restore();
             });
         });
+        describe('pluck()', function () {
+            it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .pluck()', function () {
+                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+                expect(User.pluck('id')).toBeInstanceOf(Promise);
+                expect(getModelNameSpy.called).toBe(true);
+                getModelNameSpy.restore();
+            });
+            it('passes all params to MongooseQueryBuilder.pluck()', function () {
+                const pluckSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'pluck');
+                User.pluck('first_name');
+                expect(pluckSpy.calledWith('first_name')).toBe(true);
+                User.pluck('first_name', 'id');
+                expect(pluckSpy.calledWith('first_name', 'id')).toBe(true);
+                pluckSpy.restore();
+            });
+        });
     });
     describe('Eloquent method', function () {
         let id;
+        describe('id()', function () {
+            it('sets values to attributes[_id]', function () {
+                const user = new User();
+                const id = new bson_1.ObjectId();
+                user.id = id;
+                expect(user['attributes']['_id']).toEqual(id);
+            });
+        });
         describe('protected initialize()', function () {
             it('was called by constructor()', function () {
                 const initializeSpy = Sinon.spy(User.prototype, 'initialize');
@@ -475,10 +542,9 @@ describe('EloquentMongoose', function () {
             it('is called if the name is not in __knownAttributeList', function () {
                 return __awaiter(this, void 0, void 0, function* () {
                     const user = yield User.where('first_name', 'tony').find();
-                    // const setAttributeSpy = Sinon.spy(user, 'setAttribute')
+                    const setAttributeSpy = Sinon.spy(user, 'setAttribute');
                     user.first_name = user.last_name;
-                    // TODO: it not call setAttribute anymore
-                    // expect(setAttributeSpy.calledWith('first_name', user.last_name)).toBe(true)
+                    expect(setAttributeSpy.calledWith('first_name', user.last_name)).toBe(true);
                 });
             });
         });
@@ -569,6 +635,64 @@ describe('EloquentMongoose', function () {
                     expect(user.is(comparison)).toBe(false);
                     expect(equalsSpy.calledWith(comparison['attributes'])).toBe(true);
                 });
+            });
+        });
+    });
+    describe('Timestamps', function () {
+        class TimestampModelDefault extends lib_1.Eloquent.Mongoose() {
+            getClassName() {
+                return 'TimestampModelDefault';
+            }
+            getSchema() {
+                return new mongoose_1.Schema({ name: String });
+            }
+        }
+        TimestampModelDefault.timestamps = true;
+        it('should use custom "setupTimestamp" which use Moment instead of native Date', function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                const now = new Date(1988, 4, 16);
+                Moment.now = () => now;
+                const model = new TimestampModelDefault();
+                yield model.save();
+                expect(model.created_at).toEqual(now);
+                expect(model.updated_at).toEqual(now);
+            });
+        });
+        it('works with ActiveRecord.save()', function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                const createdAt = new Date(1988, 4, 16);
+                Moment.now = () => createdAt;
+                const model = new TimestampModelDefault();
+                yield model.save();
+                const updatedAt = new Date(2000, 0, 1);
+                Moment.now = () => updatedAt;
+                model.name = 'updated';
+                yield model.save();
+                const updatedModel = yield TimestampModelDefault.find(model.id);
+                expect(updatedModel.updated_at).toEqual(updatedAt);
+            });
+        });
+        it('works with QueryBuilder.update(), one document', function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                const createdAt = new Date(1988, 4, 16);
+                Moment.now = () => createdAt;
+                const model = new TimestampModelDefault();
+                yield model.save();
+                const updatedAt = new Date(2000, 0, 1);
+                Moment.now = () => updatedAt;
+                yield TimestampModelDefault.where('_id', model.id).update({});
+                const updatedModel = yield TimestampModelDefault.find(model.id);
+                expect(updatedModel.updated_at).toEqual(updatedAt);
+            });
+        });
+        it('works with QueryBuilder.update(), multiple documents', function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                const now = new Date(2010, 0, 1);
+                Moment.now = () => now;
+                const idList = yield TimestampModelDefault.pluck('id');
+                yield TimestampModelDefault.whereIn('id', Object.keys(idList)).update({});
+                const documents = yield TimestampModelDefault.all();
+                expect(documents.map(item => item.updated_at).all()).toEqual([now, now, now]);
             });
         });
     });

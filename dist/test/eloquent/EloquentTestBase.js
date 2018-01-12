@@ -14,6 +14,12 @@ class EloquentTestBase extends EloquentBase_1.EloquentBase {
     getReservedPropertiesList() {
         return super.getReservedPropertiesList().concat(Object.getOwnPropertyNames(EloquentTestBase.prototype));
     }
+    getId() {
+        return this.attributes['id'];
+    }
+    setId(value) {
+        return (this.attributes['id'] = value);
+    }
     newQuery() { }
     toObject() {
         return this.attributes.data;

@@ -4,7 +4,9 @@ export interface IAdminUser {
     id?: string;
     is_admin: true;
 }
-export declare const AdminUserBase: EloquentMongooseSpec<IAdminUser, AdminUser>;
+export declare const AdminUserBase: EloquentMongooseSpec<IAdminUser & {
+    getSchema(): Schema;
+}, AdminUser>;
 export declare class AdminUser extends AdminUserBase {
     static className: string;
     getModelName(): string;

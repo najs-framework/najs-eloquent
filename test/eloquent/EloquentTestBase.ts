@@ -8,6 +8,14 @@ export abstract class EloquentTestBase<T> extends EloquentBase<Record<T>> {
 
   abstract getClassName(): string
 
+  getId(): any {
+    return this.attributes['id']
+  }
+
+  setId(value: any): void {
+    return (this.attributes['id'] = value)
+  }
+
   newQuery(): any {}
 
   toObject(): Object {

@@ -2,10 +2,14 @@ import { Collection } from 'collect.js';
 import { EloquentMongoose } from '../eloquent/EloquentMongoose';
 import { MongooseQueryBuilder } from '../query-builders/MongooseQueryBuilder';
 import { OrderDirection, SubCondition } from '../interfaces/IBasicQueryGrammar';
+import { Schema } from 'mongoose';
+export declare type AbstractImplemented = {
+    getSchema(): Schema;
+};
 export declare type EloquentMongooseSpec<Attr, Class> = {
     new (): EloquentMongoose<Attr> & Attr;
     new (data: Object): EloquentMongoose<Attr> & Attr;
-    Class<ChildAttr, ChildClass>(): EloquentMongooseSpec<Class & ChildAttr, Class & ChildClass>;
+    Class<ChildAttr, ChildClass>(): EloquentMongooseSpec<Class & ChildAttr & AbstractImplemented, Class & ChildClass>;
     queryName(name: string): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>;
     select(field: string): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>;
     select(fields: string[]): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>;
@@ -35,4 +39,6 @@ export declare type EloquentMongooseSpec<Attr, Class> = {
     get(...fields: Array<string | string[]>): Promise<Collection<EloquentMongoose<Attr> & Attr & Class>>;
     find(): Promise<EloquentMongoose<Attr> & Attr & Class>;
     find(id: any): Promise<EloquentMongoose<Attr> & Attr & Class>;
+    pluck(value: string): Promise<Object>;
+    pluck(value: string, key: string): Promise<Object>;
 };

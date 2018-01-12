@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class Record {
     constructor(data) {
-        this.data = data || {};
+        this.data = data;
     }
     static create(data) {
-        const record = new Record(data || {});
+        const record = new Record(data);
         const proxy = new Proxy(record, {
             get: function (target, key) {
                 if (key !== 'data') {
