@@ -33,7 +33,7 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         return this.getClassName();
     }
     // -------------------------------------------------------------------------------------------------------------------
-    initialize(data) {
+    initializeModelIfNeeded() {
         const modelName = this.getModelName();
         const mongoose = this.getMongoose();
         if (mongoose.modelNames().indexOf(modelName) === -1) {
@@ -42,9 +42,12 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
             if (timestampsSettings) {
                 schema.set('timestamps', timestampsSettings === true ? DEFAULT_TIMESTAMPS : timestampsSettings);
             }
-            mongoose_1.model(this.getModelName(), schema);
+            mongoose_1.model(modelName, schema);
         }
-        this.model = mongoose.model(modelName);
+    }
+    initialize(data) {
+        this.initializeModelIfNeeded();
+        this.model = this.getMongoose().model(this.getModelName());
         this.schema = this.model.schema;
         return super.initialize(data);
     }
@@ -77,6 +80,7 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         return true;
     }
     newQuery() {
+        this.initializeModelIfNeeded();
         return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.getModelName());
     }
     newInstance(document) {

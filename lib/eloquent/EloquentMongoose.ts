@@ -37,7 +37,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
 
   // -------------------------------------------------------------------------------------------------------------------
-  protected initialize(data: Document & T | Object | undefined): EloquentMongoose<T> {
+  protected initializeModelIfNeeded() {
     const modelName: string = this.getModelName()
     const mongoose: Mongoose = this.getMongoose()
     if (mongoose.modelNames().indexOf(modelName) === -1) {
@@ -47,9 +47,13 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
         schema.set('timestamps', timestampsSettings === true ? DEFAULT_TIMESTAMPS : timestampsSettings)
       }
 
-      model<Document & T>(this.getModelName(), schema)
+      model<Document & T>(modelName, schema)
     }
-    this.model = mongoose.model(modelName)
+  }
+
+  protected initialize(data: Document & T | Object | undefined): EloquentMongoose<T> {
+    this.initializeModelIfNeeded()
+    this.model = this.getMongoose().model(this.getModelName())
     this.schema = this.model.schema
     return super.initialize(data)
   }
@@ -91,6 +95,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
 
   newQuery(): any {
+    this.initializeModelIfNeeded()
     return new MongooseQueryBuilder(this.getModelName())
   }
 

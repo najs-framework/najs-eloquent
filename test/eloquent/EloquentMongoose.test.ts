@@ -100,7 +100,9 @@ describe('EloquentMongoose', function() {
         if (mongoose.connection.collection('users')) {
           mongoose.connection.collection('users').drop(function() {
             mongoose.connection.collection('timestampmodeldefaults').drop(function() {
-              resolve(true)
+              mongoose.connection.collection('customtimestampmodel').drop(function() {
+                resolve(true)
+              })
             })
           })
         } else {
@@ -108,6 +110,11 @@ describe('EloquentMongoose', function() {
         }
       } catch (error) {}
     })
+  })
+
+  it('can be initialized with static function', async function() {
+    const users = await User.all()
+    expect(users.count()).toEqual(0)
   })
 
   describe('ActiveRecord', function() {

@@ -12,6 +12,7 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     setId(value: any): any;
     static Class(): any;
     getModelName(): string;
+    protected initializeModelIfNeeded(): void;
     protected initialize(data: Document & T | Object | undefined): EloquentMongoose<T>;
     protected getMongoose(): Mongoose;
     protected isNativeRecord(data: Document & T | Object | undefined): boolean;

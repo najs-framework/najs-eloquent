@@ -15,7 +15,10 @@ export type EloquentMutator = {
   ref?: string
 }
 export type EloquentTimestamps = { createdAt: string; updatedAt: string }
-export type EloquentSoftDelete = { deletedAt: string }
+export type EloquentSoftDelete = {
+  deletedAt: string
+  overrideMethods: boolean | 'all' | string[]
+}
 
 export abstract class EloquentBase<NativeRecord extends Object = {}> implements IEloquent, IAutoload {
   protected static timestamps: EloquentTimestamps | boolean = false

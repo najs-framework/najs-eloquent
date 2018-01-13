@@ -80,7 +80,9 @@ describe('EloquentMongoose', function () {
                     if (mongoose.connection.collection('users')) {
                         mongoose.connection.collection('users').drop(function () {
                             mongoose.connection.collection('timestampmodeldefaults').drop(function () {
-                                resolve(true);
+                                mongoose.connection.collection('customtimestampmodel').drop(function () {
+                                    resolve(true);
+                                });
                             });
                         });
                     }
@@ -90,6 +92,12 @@ describe('EloquentMongoose', function () {
                 }
                 catch (error) { }
             });
+        });
+    });
+    it('can be initialized with static function', function () {
+        return __awaiter(this, void 0, void 0, function* () {
+            const users = yield User.all();
+            expect(users.count()).toEqual(0);
         });
     });
     describe('ActiveRecord', function () {

@@ -17,6 +17,7 @@ export declare type EloquentTimestamps = {
 };
 export declare type EloquentSoftDelete = {
     deletedAt: string;
+    overrideMethods: boolean | 'all' | string[];
 };
 export declare abstract class EloquentBase<NativeRecord extends Object = {}> implements IEloquent, IAutoload {
     protected static timestamps: EloquentTimestamps | boolean;
