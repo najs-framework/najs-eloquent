@@ -145,7 +145,7 @@ export class MongodbConditionConverter {
         return set({}, condition.field, condition.value)
       case '!=':
       case '<>':
-        return set({}, condition.field, { $not: condition.value })
+        return set({}, condition.field, { $ne: condition.value })
       case '<':
         return set({}, condition.field, { $lt: condition.value })
       case '<=':

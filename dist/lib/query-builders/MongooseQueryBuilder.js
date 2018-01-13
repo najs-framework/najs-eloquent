@@ -14,8 +14,8 @@ const najs_1 = require("najs");
 const lodash_1 = require("lodash");
 const collect_js_1 = require("collect.js");
 class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
-    constructor(modelName, primaryKey = '_id') {
-        super();
+    constructor(modelName, softDelete, primaryKey = '_id') {
+        super(softDelete);
         this.primaryKey = primaryKey;
         const mongoose = this.getMongoose();
         if (mongoose.modelNames().indexOf(modelName) === -1) {

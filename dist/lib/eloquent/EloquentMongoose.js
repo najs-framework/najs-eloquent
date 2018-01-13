@@ -14,10 +14,15 @@ const mongoose_1 = require("mongoose");
 const collect_js_1 = require("collect.js");
 const najs_1 = require("najs");
 const NotFoundError_1 = require("../errors/NotFoundError");
+const SoftDelete_1 = require("./mongoose/SoftDelete");
 mongoose_1.Schema.prototype['setupTimestamp'] = require('./mongoose/setupTimestamp').setupTimestamp;
 const DEFAULT_TIMESTAMPS = {
     createdAt: 'created_at',
     updatedAt: 'updated_at'
+};
+const DEFAULT_SOFT_DELETES = {
+    deletedAt: 'deleted_at',
+    overrideMethods: false
 };
 class EloquentMongoose extends EloquentBase_1.EloquentBase {
     getId() {
@@ -33,7 +38,7 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         return this.getClassName();
     }
     // -------------------------------------------------------------------------------------------------------------------
-    initializeModelIfNeeded() {
+    initializeModelIfNeeded(softDeletes) {
         const modelName = this.getModelName();
         const mongoose = this.getMongoose();
         if (mongoose.modelNames().indexOf(modelName) === -1) {
@@ -42,11 +47,14 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
             if (timestampsSettings) {
                 schema.set('timestamps', timestampsSettings === true ? DEFAULT_TIMESTAMPS : timestampsSettings);
             }
+            if (softDeletes) {
+                schema.plugin(SoftDelete_1.SoftDelete, softDeletes === true ? DEFAULT_SOFT_DELETES : softDeletes);
+            }
             mongoose_1.model(modelName, schema);
         }
     }
     initialize(data) {
-        this.initializeModelIfNeeded();
+        this.initializeModelIfNeeded(Object.getPrototypeOf(this).constructor.softDeletes);
         this.model = this.getMongoose().model(this.getModelName());
         this.schema = this.model.schema;
         return super.initialize(data);
@@ -79,9 +87,10 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         this.attributes[name] = value;
         return true;
     }
-    newQuery() {
-        this.initializeModelIfNeeded();
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.getModelName());
+    newQuery(softDeletes) {
+        const softDeleteSettings = softDeletes || Object.getPrototypeOf(this).constructor.softDeletes;
+        this.initializeModelIfNeeded(softDeleteSettings);
+        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.getModelName(), softDeleteSettings === true ? DEFAULT_SOFT_DELETES : softDeleteSettings);
     }
     newInstance(document) {
         const instance = najs_1.make(this.getClassName());
@@ -118,6 +127,9 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     delete() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (Object.getPrototypeOf(this).constructor.softDeletes) {
+                return this.attributes['delete']();
+            }
             return this.attributes.remove();
         });
     }
@@ -138,62 +150,86 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     // -------------------------------------------------------------------------------------------------------------------
     static queryName(name) {
-        return this.prototype.newQuery().queryName(name);
+        return this.prototype.newQuery(this.softDeletes).queryName(name);
     }
     static select(...fields) {
-        return this.prototype.newQuery().select(...fields);
+        return this.prototype.newQuery(this.softDeletes).select(...fields);
     }
     static distinct(...fields) {
-        return this.prototype.newQuery().distinct(...fields);
+        return this.prototype.newQuery(this.softDeletes).distinct(...fields);
     }
     static orderBy(field, direction = 'asc') {
-        return this.prototype.newQuery().orderBy(field, direction);
+        return this.prototype.newQuery(this.softDeletes).orderBy(field, direction);
     }
     static orderByAsc(field) {
-        return this.prototype.newQuery().orderByAsc(field);
+        return this.prototype.newQuery(this.softDeletes).orderByAsc(field);
     }
     static orderByDesc(field) {
-        return this.prototype.newQuery().orderByDesc(field);
+        return this.prototype.newQuery(this.softDeletes).orderByDesc(field);
     }
     static limit(records) {
-        return this.prototype.newQuery().limit(records);
+        return this.prototype.newQuery(this.softDeletes).limit(records);
     }
     static where(arg0, arg1, arg2) {
-        return this.prototype.newQuery().where(arg0, arg1, arg2);
+        return this.prototype.newQuery(this.softDeletes).where(arg0, arg1, arg2);
     }
     static orWhere(arg0, arg1, arg2) {
-        return this.prototype.newQuery().orWhere(arg0, arg1, arg2);
+        return this.prototype.newQuery(this.softDeletes).orWhere(arg0, arg1, arg2);
     }
     static whereIn(field, values) {
-        return this.prototype.newQuery().whereIn(field, values);
+        return this.prototype.newQuery(this.softDeletes).whereIn(field, values);
     }
     static whereNotIn(field, values) {
-        return this.prototype.newQuery().whereNotIn(field, values);
+        return this.prototype.newQuery(this.softDeletes).whereNotIn(field, values);
     }
     static orWhereIn(field, values) {
-        return this.prototype.newQuery().orWhereIn(field, values);
+        return this.prototype.newQuery(this.softDeletes).orWhereIn(field, values);
     }
     static orWhereNotIn(field, values) {
-        return this.prototype.newQuery().orWhereNotIn(field, values);
+        return this.prototype.newQuery(this.softDeletes).orWhereNotIn(field, values);
+    }
+    static whereNull(field) {
+        return this.prototype.newQuery(this.softDeletes).whereNull(field);
+    }
+    static whereNotNull(field) {
+        return this.prototype.newQuery(this.softDeletes).whereNotNull(field);
+    }
+    static orWhereNull(field) {
+        return this.prototype.newQuery(this.softDeletes).orWhereNull(field);
+    }
+    static orWhereNotNull(field) {
+        return this.prototype.newQuery(this.softDeletes).orWhereNotNull(field);
+    }
+    static withTrash() {
+        return this.prototype.newQuery(this.softDeletes).withTrash();
+    }
+    static onlyTrash() {
+        return this.prototype.newQuery(this.softDeletes).onlyTrash();
     }
     static all() {
-        return this.prototype.newQuery().all();
+        return this.prototype.newQuery(this.softDeletes).all();
     }
     static get(...fields) {
         return this.prototype
-            .newQuery()
+            .newQuery(this.softDeletes)
             .select(...fields)
             .get();
     }
     static find(id) {
         if (typeof id !== 'undefined') {
-            const query = this.prototype.newQuery();
+            const query = this.prototype.newQuery(this.softDeletes);
             return query.where(query.getPrimaryKey(), id).find();
         }
-        return this.prototype.newQuery().find();
+        return this.prototype.newQuery(this.softDeletes).find();
     }
     static pluck(value, key) {
-        return this.prototype.newQuery().pluck(value, key);
+        return this.prototype.newQuery(this.softDeletes).pluck(value, key);
+    }
+    static count() {
+        return this.prototype.newQuery(this.softDeletes).count();
+    }
+    static native(handler) {
+        return this.prototype.newQuery(this.softDeletes).native(handler);
     }
     static findById(id) {
         return this.find(id);

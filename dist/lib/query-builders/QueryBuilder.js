@@ -3,15 +3,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const QueryConditionBuilder_1 = require("./QueryConditionBuilder");
 const lodash_1 = require("lodash");
 class QueryBuilder {
-    constructor() {
+    constructor(softDelete) {
         this.selectedFields = [];
         this.distinctFields = [];
         this.ordering = {};
         this.conditions = [];
+        this.softDelete = softDelete;
         this.isUsed = false;
+        this.addSoftDeleteCondition = softDelete ? true : false;
     }
     getFieldByName(name) {
         return name;
+    }
+    getNullValue(name) {
+        // tslint:disable-next-line
+        return null;
     }
     _flatten_and_assign_to(name, fields) {
         let result = [];
@@ -26,6 +32,9 @@ class QueryBuilder {
         return this;
     }
     getConditions() {
+        if (this.softDelete && this.addSoftDeleteCondition) {
+            this.whereNull(this.softDelete.deletedAt);
+        }
         return this.conditions.map(item => item.toObject());
     }
     queryName(name) {
@@ -75,20 +84,43 @@ class QueryBuilder {
         return this;
     }
     whereIn(field, values) {
-        this.isUsed = true;
         return this.where(field, 'in', values);
     }
     whereNotIn(field, values) {
-        this.isUsed = true;
         return this.where(field, 'not-in', values);
     }
     orWhereIn(field, values) {
-        this.isUsed = true;
         return this.orWhere(field, 'in', values);
     }
     orWhereNotIn(field, values) {
-        this.isUsed = true;
         return this.orWhere(field, 'not-in', values);
+    }
+    whereNull(field) {
+        return this.where(field, this.getNullValue(field));
+    }
+    whereNotNull(field) {
+        return this.where(field, '<>', this.getNullValue(field));
+    }
+    orWhereNull(field) {
+        return this.orWhere(field, this.getNullValue(field));
+    }
+    orWhereNotNull(field) {
+        return this.orWhere(field, '<>', this.getNullValue(field));
+    }
+    withTrash() {
+        if (this.softDelete) {
+            this.addSoftDeleteCondition = false;
+            this.isUsed = true;
+        }
+        return this;
+    }
+    onlyTrash() {
+        if (this.softDelete) {
+            this.addSoftDeleteCondition = false;
+            this.whereNotNull(this.softDelete.deletedAt);
+            this.isUsed = true;
+        }
+        return this;
     }
 }
 exports.QueryBuilder = QueryBuilder;

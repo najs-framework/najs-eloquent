@@ -1,5 +1,8 @@
 import { QueryCondition } from './QueryConditionBuilder';
 import { OrderDirection, SubCondition, Operator } from '../interfaces/IBasicQueryGrammar';
+export declare type QueryBuilderSoftDelete = {
+    deletedAt: string;
+};
 export declare class QueryBuilder {
     protected name: string;
     protected selectedFields: string[];
@@ -8,8 +11,11 @@ export declare class QueryBuilder {
     protected limitNumber: number;
     protected conditions: QueryCondition[];
     protected isUsed: boolean;
-    constructor();
+    protected softDelete?: QueryBuilderSoftDelete;
+    protected addSoftDeleteCondition: boolean;
+    constructor(softDelete?: QueryBuilderSoftDelete);
     protected getFieldByName(name: any): any;
+    protected getNullValue(name: any): null;
     protected _flatten_and_assign_to(name: string, fields: Array<string | string[]>): this;
     protected getConditions(): Object[];
     queryName(name: string): this;
@@ -34,4 +40,10 @@ export declare class QueryBuilder {
     whereNotIn(field: string, values: Array<any>): this;
     orWhereIn(field: string, values: Array<any>): this;
     orWhereNotIn(field: string, values: Array<any>): this;
+    whereNull(field: string): this;
+    whereNotNull(field: string): this;
+    orWhereNull(field: string): this;
+    orWhereNotNull(field: string): this;
+    withTrash(): this;
+    onlyTrash(): this;
 }

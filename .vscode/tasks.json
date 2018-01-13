@@ -1,0 +1,25 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "label": "Build",
+      "type": "npm",
+      "group": "build",
+      "command": "build"
+    },
+    {
+      "label": "Test",
+      "type": "shell",
+      "group": "test",
+      "command": "npm run build && npm test"
+    },
+    {
+      "label": "Coverage",
+      "type": "shell",
+      "command": "npm run coverage"
+    }
+  ]
+}

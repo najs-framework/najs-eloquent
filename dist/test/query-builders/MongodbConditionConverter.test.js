@@ -57,7 +57,7 @@ describe('MongodbConditionConverter', function () {
                 });
             }
         }
-        test_for_operator('not-equals', '!=', '<>', '$not');
+        test_for_operator('not-equals', '!=', '<>', '$ne');
         test_for_operator('less than', '<', '<', '$lt');
         test_for_operator('less than or equal', '<=', '=<', '$lte');
         test_for_operator('great than', '>', '>', '$gt');
@@ -87,7 +87,7 @@ describe('MongodbConditionConverter', function () {
                     bool: 'or',
                     queries: [{ field: 'a', operator: '<>', value: 1 }]
                 },
-                expected: { a: { $not: 1 } }
+                expected: { a: { $ne: 1 } }
             },
             'multiple conditions case #1: the result has 2 keys then group by operator': {
                 input: {
@@ -97,7 +97,7 @@ describe('MongodbConditionConverter', function () {
                         { bool: 'and', field: 'b', operator: '<>', value: 2 }
                     ]
                 },
-                expected: { $and: [{ a: 1, b: { $not: 2 } }] }
+                expected: { $and: [{ a: 1, b: { $ne: 2 } }] }
             },
             'multiple conditions case #2: the result has 3 keys then group by operator': {
                 input: {
@@ -108,7 +108,7 @@ describe('MongodbConditionConverter', function () {
                         { bool: 'or', field: 'c', operator: '<', value: 3 }
                     ]
                 },
-                expected: { $or: [{ a: 1 }, { b: { $not: 2 } }, { c: { $lt: 3 } }] }
+                expected: { $or: [{ a: 1 }, { b: { $ne: 2 } }, { c: { $lt: 3 } }] }
             },
             'multiple conditions case #3: result same field difference operator, group by operator': {
                 input: {
@@ -118,7 +118,7 @@ describe('MongodbConditionConverter', function () {
                         { bool: 'and', field: 'a', operator: '<>', value: 2 }
                     ]
                 },
-                expected: { $and: [{ a: 1 }, { a: { $not: 2 } }] }
+                expected: { $and: [{ a: 1 }, { a: { $ne: 2 } }] }
             },
             'multiple conditions case #4: result has no key return {}': {
                 input: {

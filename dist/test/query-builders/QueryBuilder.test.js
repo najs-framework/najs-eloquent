@@ -403,4 +403,128 @@ describe('QueryBuilder', function () {
             ]);
         });
     });
+    describe('whereNull()', function () {
+        it('is chain-able', function () {
+            const query = new QueryBuilder_1.QueryBuilder();
+            expect(query['isUsed']).toBe(false);
+            expect(query.whereNull('a')).toEqual(query);
+            expect(query['isUsed']).toBe(true);
+        });
+        it('calls where() with operator "=" and value from "getNullValue()"', function () {
+            const query = new QueryBuilder_1.QueryBuilder();
+            const whereSpy = Sinon.spy(query, 'where');
+            const getNullValueSpy = Sinon.spy(query, 'getNullValue');
+            query.whereNull('a');
+            // tslint:disable-next-line
+            expect(whereSpy.calledWith('a', null)).toBe(true);
+            expect(getNullValueSpy.calledWith('a')).toBe(true);
+        });
+    });
+    describe('whereNotNull()', function () {
+        it('is chain-able', function () {
+            const query = new QueryBuilder_1.QueryBuilder();
+            expect(query['isUsed']).toBe(false);
+            expect(query.whereNotNull('a')).toEqual(query);
+            expect(query['isUsed']).toBe(true);
+        });
+        it('calls where() with operator "<>" and value from "getNullValue()"', function () {
+            const query = new QueryBuilder_1.QueryBuilder();
+            const whereSpy = Sinon.spy(query, 'where');
+            const getNullValueSpy = Sinon.spy(query, 'getNullValue');
+            query.whereNotNull('a');
+            // tslint:disable-next-line
+            expect(whereSpy.calledWith('a', '<>', null)).toBe(true);
+            expect(getNullValueSpy.calledWith('a')).toBe(true);
+        });
+    });
+    describe('orWhereNull()', function () {
+        it('is chain-able', function () {
+            const query = new QueryBuilder_1.QueryBuilder();
+            expect(query['isUsed']).toBe(false);
+            expect(query.orWhereNull('a')).toEqual(query);
+            expect(query['isUsed']).toBe(true);
+        });
+        it('calls orWhere() with operator "=" and value from "getNullValue()"', function () {
+            const query = new QueryBuilder_1.QueryBuilder();
+            const orWhereSpy = Sinon.spy(query, 'orWhere');
+            const getNullValueSpy = Sinon.spy(query, 'getNullValue');
+            query.orWhereNull('a');
+            // tslint:disable-next-line
+            expect(orWhereSpy.calledWith('a', null)).toBe(true);
+            expect(getNullValueSpy.calledWith('a')).toBe(true);
+        });
+    });
+    describe('orWhereNotNull()', function () {
+        it('is chain-able', function () {
+            const query = new QueryBuilder_1.QueryBuilder();
+            expect(query['isUsed']).toBe(false);
+            expect(query.orWhereNotNull('a')).toEqual(query);
+            expect(query['isUsed']).toBe(true);
+        });
+        it('calls orWhere() with operator "<>" and value from "getNullValue()"', function () {
+            const query = new QueryBuilder_1.QueryBuilder();
+            const orWhereSpy = Sinon.spy(query, 'orWhere');
+            const getNullValueSpy = Sinon.spy(query, 'getNullValue');
+            query.orWhereNotNull('a');
+            // tslint:disable-next-line
+            expect(orWhereSpy.calledWith('a', '<>', null)).toBe(true);
+            expect(getNullValueSpy.calledWith('a')).toBe(true);
+        });
+    });
+    describe('SoftDelete', function () {
+        it('has optional softDelete param in constructor', function () {
+            const queryNoSoftDelete = new QueryBuilder_1.QueryBuilder();
+            expect(queryNoSoftDelete['softDelete']).toBeUndefined();
+            expect(queryNoSoftDelete['addSoftDeleteCondition']).toBe(false);
+            const query = new QueryBuilder_1.QueryBuilder({ deletedAt: 'any' });
+            expect(query['softDelete']).toEqual({ deletedAt: 'any' });
+            expect(query['addSoftDeleteCondition']).toBe(true);
+        });
+        it('uses whereNull() in getConditions() function if SoftDelete is enabled', function () {
+            const query = new QueryBuilder_1.QueryBuilder({ deletedAt: 'any' });
+            const whereNullSpy = Sinon.spy(query, 'whereNull');
+            query['getConditions']();
+            expect(whereNullSpy.calledWith('any')).toBe(true);
+        });
+        it('does not call whereNull() in getConditions() function if SoftDelete is not used', function () {
+            const query = new QueryBuilder_1.QueryBuilder();
+            const whereNullSpy = Sinon.spy(query, 'whereNull');
+            query['getConditions']();
+            expect(whereNullSpy.notCalled).toBe(true);
+        });
+        describe('.withTrash()', function () {
+            it('does nothing if softDelete is not enabled', function () {
+                const query = new QueryBuilder_1.QueryBuilder();
+                expect(query['isUsed']).toBe(false);
+                query.withTrash();
+                expect(query['addSoftDeleteCondition']).toBe(false);
+                expect(query['isUsed']).toBe(false);
+            });
+            it('sets addSoftDeleteCondition to false if softDelete is enabled', function () {
+                const query = new QueryBuilder_1.QueryBuilder({ deletedAt: 'any' });
+                expect(query['isUsed']).toBe(false);
+                query.withTrash();
+                expect(query['addSoftDeleteCondition']).toBe(false);
+                expect(query['isUsed']).toBe(true);
+            });
+        });
+        describe('.onlyTrash()', function () {
+            it('does nothing if softDelete is not enabled', function () {
+                const query = new QueryBuilder_1.QueryBuilder();
+                expect(query['isUsed']).toBe(false);
+                query.onlyTrash();
+                expect(query['addSoftDeleteCondition']).toBe(false);
+                expect(query['isUsed']).toBe(false);
+            });
+            it('sets addSoftDeleteCondition to false and add .whereNotNull(field) if softDelete is enabled', function () {
+                const query = new QueryBuilder_1.QueryBuilder({ deletedAt: 'any' });
+                const whereNotNullSpy = Sinon.spy(query, 'whereNotNull');
+                expect(query['isUsed']).toBe(false);
+                query.onlyTrash();
+                expect(query['addSoftDeleteCondition']).toBe(false);
+                expect(query['isUsed']).toBe(true);
+                expect(whereNotNullSpy.calledWith('any')).toBe(true);
+            });
+        });
+    });
 });

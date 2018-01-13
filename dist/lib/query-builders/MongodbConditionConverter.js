@@ -110,7 +110,7 @@ class MongodbConditionConverter {
                 return lodash_1.set({}, condition.field, condition.value);
             case '!=':
             case '<>':
-                return lodash_1.set({}, condition.field, { $not: condition.value });
+                return lodash_1.set({}, condition.field, { $ne: condition.value });
             case '<':
                 return lodash_1.set({}, condition.field, { $lt: condition.value });
             case '<=':

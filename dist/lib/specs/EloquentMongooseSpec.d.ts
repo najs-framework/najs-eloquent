@@ -1,8 +1,8 @@
 import { Collection } from 'collect.js';
 import { EloquentMongoose } from '../eloquent/EloquentMongoose';
-import { MongooseQueryBuilder } from '../query-builders/MongooseQueryBuilder';
+import { MongooseQueryBuilder, MongooseQuery } from '../query-builders/MongooseQueryBuilder';
 import { OrderDirection, SubCondition } from '../interfaces/IBasicQueryGrammar';
-import { Schema } from 'mongoose';
+import { Schema, Model, Document } from 'mongoose';
 export declare type AbstractImplemented = {
     getSchema(): Schema;
 };
@@ -32,6 +32,12 @@ export declare type EloquentMongooseSpec<Attr, Class> = {
     whereNotIn(field: string, values: Array<any>): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>;
     orWhereIn(field: string, values: Array<any>): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>;
     orWhereNotIn(field: string, values: Array<any>): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>;
+    whereNull(field: string): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>;
+    whereNotNull(field: string): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>;
+    orWhereNull(field: string): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>;
+    orWhereNotNull(field: string): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>;
+    withTrash(): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>;
+    onlyTrash(): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>;
     all(): Promise<Collection<EloquentMongoose<Attr> & Attr & Class>>;
     get(): Promise<Collection<EloquentMongoose<Attr> & Attr & Class>>;
     get(field: string): Promise<Collection<EloquentMongoose<Attr> & Attr & Class>>;
@@ -41,6 +47,8 @@ export declare type EloquentMongooseSpec<Attr, Class> = {
     find(id: any): Promise<EloquentMongoose<Attr> & Attr & Class>;
     pluck(value: string): Promise<Object>;
     pluck(value: string, key: string): Promise<Object>;
+    count(): Promise<Number>;
+    native(handler: (native: Model<Document & EloquentMongoose<Attr> & Attr & Class> | MongooseQuery<EloquentMongoose<Attr> & Attr & Class>) => MongooseQuery<EloquentMongoose<Attr> & Attr & Class>): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>;
     findById(id: any): Promise<EloquentMongoose<Attr> & Attr & Class>;
     findOrFail(id: any): Promise<EloquentMongoose<Attr> & Attr & Class>;
 };

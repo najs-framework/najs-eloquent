@@ -1,5 +1,5 @@
 import { MongooseQuery } from './MongooseQueryBuilder'
-import { QueryBuilder } from './QueryBuilder'
+import { QueryBuilder, QueryBuilderSoftDelete } from './QueryBuilder'
 import { MongodbConditionConverter } from './MongodbConditionConverter'
 import { IBasicQueryGrammar } from '../interfaces/IBasicQueryGrammar'
 import { IQueryFetchResult } from '../interfaces/IQueryFetchResult'
@@ -21,8 +21,11 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder
   protected hasMongooseQuery: boolean
   protected primaryKey: string
 
-  constructor(modelName: string, primaryKey: string = '_id') {
-    super()
+  constructor(modelName: string)
+  constructor(modelName: string, softDelete: QueryBuilderSoftDelete)
+  constructor(modelName: string, softDelete: QueryBuilderSoftDelete | undefined, primaryKey: string)
+  constructor(modelName: string, softDelete?: QueryBuilderSoftDelete, primaryKey: string = '_id') {
+    super(softDelete)
     this.primaryKey = primaryKey
     const mongoose: Mongoose = this.getMongoose()
     if (mongoose.modelNames().indexOf(modelName) === -1) {

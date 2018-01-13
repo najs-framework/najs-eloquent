@@ -1,0 +1,31 @@
+{
+  "editor.tabSize": 2,
+  "editor.codeLens": false,
+  "editor.formatOnSave": true,
+  "editor.rulers": [
+    120
+  ],
+  "editor.tabCompletion": true,
+  "typescript.referencesCodeLens.enabled": true,
+  "tslint.ignoreDefinitionFiles": false,
+  "tslint.autoFixOnSave": true,
+  "tslint.exclude": "**/node_modules/**/*",
+  "emmet.showExpandedAbbreviation": "never",
+  "prettier.semi": false,
+  "prettier.singleQuote": true,
+  "prettier.tabWidth": 2,
+  "prettier.printWidth": 120,
+  "prettier.ignorePath": ".prettierignore",
+  "terminal.integrated.fontFamily": "Meslo LG M for Powerline",
+  "terminal.integrated.fontSize": 12,
+  "cSpell.words": [
+    "najs",
+    "autoload",
+    "overridable",
+    "Mailjet",
+    "Queueable",
+    "deserialize",
+    "timestamps",
+    "mutators"
+  ]
+}

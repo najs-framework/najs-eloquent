@@ -62,7 +62,7 @@ describe('MongooseQueryBuilder', function() {
     })
 
     it('is created by modelName + primaryKey', function() {
-      const query = new MongooseQueryBuilder('User', 'test')
+      const query = new MongooseQueryBuilder('User', undefined, 'test')
       expect(query.getPrimaryKey()).toEqual('test')
       expect(query['mongooseModel'].modelName).toEqual('User')
     })
@@ -151,7 +151,7 @@ describe('MongooseQueryBuilder', function() {
           .where('id', '<>', 2)
           .toObject()
       ).toEqual({
-        conditions: { $and: [{ _id: 1 }, { _id: { $not: 2 } }] }
+        conditions: { $and: [{ _id: 1 }, { _id: { $ne: 2 } }] }
       })
     })
 

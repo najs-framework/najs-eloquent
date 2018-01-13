@@ -60,7 +60,7 @@ describe('MongooseQueryBuilder', function () {
             expect(query['mongooseModel'].modelName).toEqual('User');
         });
         it('is created by modelName + primaryKey', function () {
-            const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('User', 'test');
+            const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('User', undefined, 'test');
             expect(query.getPrimaryKey()).toEqual('test');
             expect(query['mongooseModel'].modelName).toEqual('User');
         });
@@ -137,7 +137,7 @@ describe('MongooseQueryBuilder', function () {
                 .where('id', 1)
                 .where('id', '<>', 2)
                 .toObject()).toEqual({
-                conditions: { $and: [{ _id: 1 }, { _id: { $not: 2 } }] }
+                conditions: { $and: [{ _id: 1 }, { _id: { $ne: 2 } }] }
             });
         });
         it('converts id to _id if using .orWhere', function () {

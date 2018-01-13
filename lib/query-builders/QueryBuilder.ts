@@ -2,6 +2,10 @@ import { QueryCondition } from './QueryConditionBuilder'
 import { OrderDirection, SubCondition, Operator } from '../interfaces/IBasicQueryGrammar'
 import { isString } from 'lodash'
 
+export type QueryBuilderSoftDelete = {
+  deletedAt: string
+}
+
 export class QueryBuilder {
   protected name: string
   protected selectedFields: string[]
@@ -10,17 +14,26 @@ export class QueryBuilder {
   protected limitNumber: number
   protected conditions: QueryCondition[]
   protected isUsed: boolean
+  protected softDelete?: QueryBuilderSoftDelete
+  protected addSoftDeleteCondition: boolean
 
-  constructor() {
+  constructor(softDelete?: QueryBuilderSoftDelete) {
     this.selectedFields = []
     this.distinctFields = []
     this.ordering = {}
     this.conditions = []
+    this.softDelete = softDelete
     this.isUsed = false
+    this.addSoftDeleteCondition = softDelete ? true : false
   }
 
   protected getFieldByName(name: any) {
     return name
+  }
+
+  protected getNullValue(name: any) {
+    // tslint:disable-next-line
+    return null
   }
 
   protected _flatten_and_assign_to(name: string, fields: Array<string | string[]>) {
@@ -38,6 +51,9 @@ export class QueryBuilder {
   }
 
   protected getConditions(): Object[] {
+    if (this.softDelete && this.addSoftDeleteCondition) {
+      this.whereNull(this.softDelete.deletedAt)
+    }
     return this.conditions.map(item => item.toObject())
   }
 
@@ -111,22 +127,51 @@ export class QueryBuilder {
   }
 
   whereIn(field: string, values: Array<any>): this {
-    this.isUsed = true
     return this.where(field, 'in', values)
   }
 
   whereNotIn(field: string, values: Array<any>): this {
-    this.isUsed = true
     return this.where(field, 'not-in', values)
   }
 
   orWhereIn(field: string, values: Array<any>): this {
-    this.isUsed = true
     return this.orWhere(field, 'in', values)
   }
 
   orWhereNotIn(field: string, values: Array<any>): this {
-    this.isUsed = true
     return this.orWhere(field, 'not-in', values)
+  }
+
+  whereNull(field: string) {
+    return this.where(field, this.getNullValue(field))
+  }
+
+  whereNotNull(field: string) {
+    return this.where(field, '<>', this.getNullValue(field))
+  }
+
+  orWhereNull(field: string) {
+    return this.orWhere(field, this.getNullValue(field))
+  }
+
+  orWhereNotNull(field: string) {
+    return this.orWhere(field, '<>', this.getNullValue(field))
+  }
+
+  withTrash() {
+    if (this.softDelete) {
+      this.addSoftDeleteCondition = false
+      this.isUsed = true
+    }
+    return this
+  }
+
+  onlyTrash() {
+    if (this.softDelete) {
+      this.addSoftDeleteCondition = false
+      this.whereNotNull(this.softDelete.deletedAt)
+      this.isUsed = true
+    }
+    return this
   }
 }

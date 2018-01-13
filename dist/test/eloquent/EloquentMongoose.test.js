@@ -11,12 +11,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const Sinon = require("sinon");
 const mongoose_1 = require("mongoose");
-const lib_1 = require("../../lib");
 const najs_1 = require("najs");
+const bson_1 = require("bson");
+const lib_1 = require("../../lib");
 const MongooseQueryBuilder_1 = require("../../lib/query-builders/MongooseQueryBuilder");
 const EloquentMongoose_1 = require("../../lib/eloquent/EloquentMongoose");
-const bson_1 = require("bson");
 const NotFoundError_1 = require("../../lib/errors/NotFoundError");
+const util_1 = require("../util");
 const mongoose = require('mongoose');
 const Moment = require('moment');
 class MongooseProvider {
@@ -64,34 +65,17 @@ describe('EloquentMongoose', function () {
     jest.setTimeout(10000);
     beforeAll(function () {
         return __awaiter(this, void 0, void 0, function* () {
-            return new Promise(resolve => {
-                mongoose.connect('mongodb://localhost/najs_eloquent_test_0');
-                mongoose.Promise = global.Promise;
-                mongoose.connection.once('open', () => {
-                    resolve(true);
-                });
-            });
+            yield util_1.init_mongoose(mongoose);
         });
     });
     afterAll(function () {
         return __awaiter(this, void 0, void 0, function* () {
-            return new Promise(resolve => {
-                try {
-                    if (mongoose.connection.collection('users')) {
-                        mongoose.connection.collection('users').drop(function () {
-                            mongoose.connection.collection('timestampmodeldefaults').drop(function () {
-                                mongoose.connection.collection('customtimestampmodel').drop(function () {
-                                    resolve(true);
-                                });
-                            });
-                        });
-                    }
-                    else {
-                        resolve(true);
-                    }
-                }
-                catch (error) { }
-            });
+            yield util_1.delete_collection(mongoose, 'users');
+            yield util_1.delete_collection(mongoose, 'timestampmodeldefaults');
+            yield util_1.delete_collection(mongoose, 'customtimestampmodels');
+            yield util_1.delete_collection(mongoose, 'softdeletemodels');
+            yield util_1.delete_collection(mongoose, 'softdelete1s');
+            yield util_1.delete_collection(mongoose, 'softdelete2s');
         });
     });
     it('can be initialized with static function', function () {
@@ -393,6 +377,90 @@ describe('EloquentMongoose', function () {
                 User.orWhereNotIn('first_name', ['tony']);
                 expect(orWhereNotInSpy.calledWith('first_name', ['tony'])).toBe(true);
                 orWhereNotInSpy.restore();
+            });
+        });
+        describe('whereNull()', function () {
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
+                expect(User.whereNull('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
+            });
+            it('passes all params to MongooseQueryBuilder.whereNull()', function () {
+                const whereNullSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'whereNull');
+                User.whereNull('first_name');
+                expect(whereNullSpy.calledWith('first_name')).toBe(true);
+                whereNullSpy.restore();
+            });
+        });
+        describe('whereNotNull()', function () {
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
+                expect(User.whereNotNull('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
+            });
+            it('passes all params to MongooseQueryBuilder.whereNotNull()', function () {
+                const whereNotNullSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'whereNotNull');
+                User.whereNotNull('first_name');
+                expect(whereNotNullSpy.calledWith('first_name')).toBe(true);
+                whereNotNullSpy.restore();
+            });
+        });
+        describe('orWhereNull()', function () {
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
+                expect(User.orWhereNull('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
+            });
+            it('passes all params to MongooseQueryBuilder.orWhereNull()', function () {
+                const orWhereNullSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orWhereNull');
+                User.orWhereNull('first_name');
+                expect(orWhereNullSpy.calledWith('first_name')).toBe(true);
+                orWhereNullSpy.restore();
+            });
+        });
+        describe('orWhereNotNull()', function () {
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
+                expect(User.orWhereNotNull('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.calledWith()).toBe(true);
+                newQuerySpy.restore();
+            });
+            it('passes all params to MongooseQueryBuilder.orWhereNotNull()', function () {
+                const orWhereNotNullSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orWhereNotNull');
+                User.orWhereNotNull('first_name');
+                expect(orWhereNotNullSpy.calledWith('first_name')).toBe(true);
+                orWhereNotNullSpy.restore();
+            });
+        });
+        describe('withTrash()', function () {
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
+                expect(User.withTrash()).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.calledWith()).toBe(true);
+                newQuerySpy.restore();
+            });
+            it('passes all params to MongooseQueryBuilder.withTrash()', function () {
+                const withTrashSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'withTrash');
+                User.withTrash();
+                expect(withTrashSpy.called).toBe(true);
+                withTrashSpy.restore();
+            });
+        });
+        describe('onlyTrash()', function () {
+            it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
+                const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
+                expect(User.onlyTrash()).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
+                newQuerySpy.restore();
+            });
+            it('passes all params to MongooseQueryBuilder.onlyTrash()', function () {
+                const onlyTrashSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'onlyTrash');
+                User.onlyTrash();
+                expect(onlyTrashSpy.called).toBe(true);
+                onlyTrashSpy.restore();
             });
         });
         describe('all()', function () {
@@ -764,6 +832,117 @@ describe('EloquentMongoose', function () {
                 yield model.save();
                 expect(model['createdAt']).toEqual(now);
                 expect(model['updatedAt']).toEqual(now);
+            });
+        });
+    });
+    describe('SoftDeletes', function () {
+        class SoftDeleteModel extends lib_1.Eloquent.Mongoose() {
+            getClassName() {
+                return 'SoftDeleteModel';
+            }
+            getSchema() {
+                return new mongoose_1.Schema({ name: String });
+            }
+        }
+        SoftDeleteModel.softDeletes = true;
+        it('does not load plugin SoftDelete with deleted_at by default', function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                const model = new User();
+                expect(model['schema'].path('deleted_at')).toBeUndefined();
+                expect(model.newQuery()['softDelete']).toBe(false);
+            });
+        });
+        it('loads plugin SoftDelete with deleted_at by default', function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                class SoftDelete1 extends lib_1.Eloquent.Mongoose() {
+                    getClassName() {
+                        return 'SoftDelete1';
+                    }
+                    getSchema() {
+                        return new mongoose_1.Schema({ name: String });
+                    }
+                }
+                SoftDelete1.softDeletes = true;
+                const model = new SoftDelete1();
+                expect(model['schema'].path('deleted_at')['instance']).toEqual('Date');
+                expect(model['schema'].path('deleted_at')['defaultValue']).toBeDefined();
+                expect(model.newQuery()['softDelete']).toMatchObject({
+                    deletedAt: 'deleted_at'
+                });
+            });
+        });
+        it('has custom field for deletedAt', function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                class SoftDelete2 extends lib_1.Eloquent.Mongoose() {
+                    getClassName() {
+                        return 'SoftDelete2';
+                    }
+                    getSchema() {
+                        return new mongoose_1.Schema({ name: String });
+                    }
+                }
+                SoftDelete2.softDeletes = { deletedAt: 'any' };
+                const model = new SoftDelete2();
+                expect(model['schema'].path('any')['instance']).toEqual('Date');
+                expect(model['schema'].path('any')['defaultValue']).toBeDefined();
+                expect(model['schema'].path('deleted_at')).toBeUndefined();
+                expect(model.newQuery()['softDelete']).toMatchObject({
+                    deletedAt: 'any'
+                });
+            });
+        });
+        it('works with ActiveRecord and use Moment as Date source', function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                const now = new Date(1988, 4, 16);
+                Moment.now = () => now;
+                const model = new SoftDeleteModel({
+                    name: 'test'
+                });
+                yield model.delete();
+                expect(model.deleted_at).toEqual(now);
+                yield model.forceDelete();
+            });
+        });
+        it('works with static functions', function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                const now = new Date(1988, 4, 16);
+                Moment.now = () => now;
+                expect(yield SoftDeleteModel.count()).toEqual(0);
+                const notDeletedModel = new SoftDeleteModel({
+                    name: 'test'
+                });
+                yield notDeletedModel.save();
+                const deletedModel = new SoftDeleteModel({
+                    name: 'test'
+                });
+                yield deletedModel.delete();
+                expect(yield SoftDeleteModel.count()).toEqual(1);
+                expect(yield SoftDeleteModel.withTrash().count()).toEqual(2);
+                expect(yield SoftDeleteModel.onlyTrash().count()).toEqual(1);
+                yield notDeletedModel.forceDelete();
+                yield deletedModel.forceDelete();
+            });
+        });
+        it('does not override .find or .findOne when use .native()', function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                const now = new Date(1988, 4, 16);
+                Moment.now = () => now;
+                const notDeletedModel = new SoftDeleteModel({
+                    name: 'test'
+                });
+                yield notDeletedModel.save();
+                const deletedModel = new SoftDeleteModel({
+                    name: 'test'
+                });
+                yield deletedModel.delete();
+                expect(yield SoftDeleteModel.count()).toEqual(1);
+                expect(yield SoftDeleteModel.withTrash().count()).toEqual(2);
+                expect(yield SoftDeleteModel.onlyTrash().count()).toEqual(1);
+                expect(yield SoftDeleteModel.native(function (model) {
+                    return model.find();
+                }).count()).toEqual(2);
+                yield notDeletedModel.forceDelete();
+                yield deletedModel.forceDelete();
             });
         });
     });

@@ -1,13 +1,14 @@
 import 'jest'
 import * as Sinon from 'sinon'
 import { Schema } from 'mongoose'
-import { Eloquent } from '../../lib'
 import { register } from 'najs'
+import { ObjectId } from 'bson'
+import { Eloquent } from '../../lib'
 import { IMongooseProvider } from '../../lib/interfaces/IMongooseProvider'
 import { MongooseQueryBuilder } from '../../lib/query-builders/MongooseQueryBuilder'
 import { EloquentMongoose } from '../../lib/eloquent/EloquentMongoose'
-import { ObjectId } from 'bson'
 import { NotFoundError } from '../../lib/errors/NotFoundError'
+import { init_mongoose, delete_collection } from '../util'
 
 const mongoose = require('mongoose')
 const Moment = require('moment')
@@ -29,6 +30,11 @@ interface Timestamps {
   name: string
   created_at: Date
   updated_at: Date
+}
+
+interface SoftDelete {
+  name: string
+  deleted_at: Date | null
 }
 
 interface IUser extends Timestamps {
@@ -85,31 +91,16 @@ describe('EloquentMongoose', function() {
   jest.setTimeout(10000)
 
   beforeAll(async function() {
-    return new Promise(resolve => {
-      mongoose.connect('mongodb://localhost/najs_eloquent_test_0')
-      mongoose.Promise = global.Promise
-      mongoose.connection.once('open', () => {
-        resolve(true)
-      })
-    })
+    await init_mongoose(mongoose)
   })
 
   afterAll(async function() {
-    return new Promise(resolve => {
-      try {
-        if (mongoose.connection.collection('users')) {
-          mongoose.connection.collection('users').drop(function() {
-            mongoose.connection.collection('timestampmodeldefaults').drop(function() {
-              mongoose.connection.collection('customtimestampmodel').drop(function() {
-                resolve(true)
-              })
-            })
-          })
-        } else {
-          resolve(true)
-        }
-      } catch (error) {}
-    })
+    await delete_collection(mongoose, 'users')
+    await delete_collection(mongoose, 'timestampmodeldefaults')
+    await delete_collection(mongoose, 'customtimestampmodels')
+    await delete_collection(mongoose, 'softdeletemodels')
+    await delete_collection(mongoose, 'softdelete1s')
+    await delete_collection(mongoose, 'softdelete2s')
   })
 
   it('can be initialized with static function', async function() {
@@ -429,6 +420,102 @@ describe('EloquentMongoose', function() {
         User.orWhereNotIn('first_name', ['tony'])
         expect(orWhereNotInSpy.calledWith('first_name', ['tony'])).toBe(true)
         orWhereNotInSpy.restore()
+      })
+    })
+
+    describe('whereNull()', function() {
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
+        expect(User.whereNull('first_name')).toBeInstanceOf(MongooseQueryBuilder)
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
+      })
+
+      it('passes all params to MongooseQueryBuilder.whereNull()', function() {
+        const whereNullSpy = Sinon.spy(MongooseQueryBuilder.prototype, 'whereNull')
+        User.whereNull('first_name')
+        expect(whereNullSpy.calledWith('first_name')).toBe(true)
+        whereNullSpy.restore()
+      })
+    })
+
+    describe('whereNotNull()', function() {
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
+        expect(User.whereNotNull('first_name')).toBeInstanceOf(MongooseQueryBuilder)
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
+      })
+
+      it('passes all params to MongooseQueryBuilder.whereNotNull()', function() {
+        const whereNotNullSpy = Sinon.spy(MongooseQueryBuilder.prototype, 'whereNotNull')
+        User.whereNotNull('first_name')
+        expect(whereNotNullSpy.calledWith('first_name')).toBe(true)
+        whereNotNullSpy.restore()
+      })
+    })
+
+    describe('orWhereNull()', function() {
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
+        expect(User.orWhereNull('first_name')).toBeInstanceOf(MongooseQueryBuilder)
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
+      })
+
+      it('passes all params to MongooseQueryBuilder.orWhereNull()', function() {
+        const orWhereNullSpy = Sinon.spy(MongooseQueryBuilder.prototype, 'orWhereNull')
+        User.orWhereNull('first_name')
+        expect(orWhereNullSpy.calledWith('first_name')).toBe(true)
+        orWhereNullSpy.restore()
+      })
+    })
+
+    describe('orWhereNotNull()', function() {
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
+        expect(User.orWhereNotNull('first_name')).toBeInstanceOf(MongooseQueryBuilder)
+        expect(newQuerySpy.calledWith()).toBe(true)
+        newQuerySpy.restore()
+      })
+
+      it('passes all params to MongooseQueryBuilder.orWhereNotNull()', function() {
+        const orWhereNotNullSpy = Sinon.spy(MongooseQueryBuilder.prototype, 'orWhereNotNull')
+        User.orWhereNotNull('first_name')
+        expect(orWhereNotNullSpy.calledWith('first_name')).toBe(true)
+        orWhereNotNullSpy.restore()
+      })
+    })
+
+    describe('withTrash()', function() {
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
+        expect(User.withTrash()).toBeInstanceOf(MongooseQueryBuilder)
+        expect(newQuerySpy.calledWith()).toBe(true)
+        newQuerySpy.restore()
+      })
+
+      it('passes all params to MongooseQueryBuilder.withTrash()', function() {
+        const withTrashSpy = Sinon.spy(MongooseQueryBuilder.prototype, 'withTrash')
+        User.withTrash()
+        expect(withTrashSpy.called).toBe(true)
+        withTrashSpy.restore()
+      })
+    })
+
+    describe('onlyTrash()', function() {
+      it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
+        const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
+        expect(User.onlyTrash()).toBeInstanceOf(MongooseQueryBuilder)
+        expect(newQuerySpy.called).toBe(true)
+        newQuerySpy.restore()
+      })
+
+      it('passes all params to MongooseQueryBuilder.onlyTrash()', function() {
+        const onlyTrashSpy = Sinon.spy(MongooseQueryBuilder.prototype, 'onlyTrash')
+        User.onlyTrash()
+        expect(onlyTrashSpy.called).toBe(true)
+        onlyTrashSpy.restore()
       })
     })
 
@@ -821,6 +908,128 @@ describe('EloquentMongoose', function() {
       await model.save()
       expect(model['createdAt']).toEqual(now)
       expect(model['updatedAt']).toEqual(now)
+    })
+  })
+
+  describe('SoftDeletes', function() {
+    class SoftDeleteModel extends Eloquent.Mongoose<SoftDelete, SoftDeleteModel>() {
+      static softDeletes: boolean = true
+
+      getClassName() {
+        return 'SoftDeleteModel'
+      }
+
+      getSchema() {
+        return new Schema({ name: String })
+      }
+    }
+
+    it('does not load plugin SoftDelete with deleted_at by default', async function() {
+      const model = new User()
+      expect(model['schema'].path('deleted_at')).toBeUndefined()
+      expect(model.newQuery()['softDelete']).toBe(false)
+    })
+
+    it('loads plugin SoftDelete with deleted_at by default', async function() {
+      class SoftDelete1 extends Eloquent.Mongoose<SoftDelete, SoftDelete1>() {
+        static softDeletes: boolean = true
+
+        getClassName() {
+          return 'SoftDelete1'
+        }
+
+        getSchema() {
+          return new Schema({ name: String })
+        }
+      }
+
+      const model = new SoftDelete1()
+      expect(model['schema'].path('deleted_at')['instance']).toEqual('Date')
+      expect(model['schema'].path('deleted_at')['defaultValue']).toBeDefined()
+      expect(model.newQuery()['softDelete']).toMatchObject({
+        deletedAt: 'deleted_at'
+      })
+    })
+
+    it('has custom field for deletedAt', async function() {
+      class SoftDelete2 extends Eloquent.Mongoose<SoftDelete, SoftDelete2>() {
+        static softDeletes = { deletedAt: 'any' }
+
+        getClassName() {
+          return 'SoftDelete2'
+        }
+
+        getSchema() {
+          return new Schema({ name: String })
+        }
+      }
+
+      const model = new SoftDelete2()
+      expect(model['schema'].path('any')['instance']).toEqual('Date')
+      expect(model['schema'].path('any')['defaultValue']).toBeDefined()
+      expect(model['schema'].path('deleted_at')).toBeUndefined()
+      expect(model.newQuery()['softDelete']).toMatchObject({
+        deletedAt: 'any'
+      })
+    })
+
+    it('works with ActiveRecord and use Moment as Date source', async function() {
+      const now = new Date(1988, 4, 16)
+      Moment.now = () => now
+
+      const model = new SoftDeleteModel({
+        name: 'test'
+      })
+      await model.delete()
+      expect(model.deleted_at).toEqual(now)
+      await model.forceDelete()
+    })
+
+    it('works with static functions', async function() {
+      const now = new Date(1988, 4, 16)
+      Moment.now = () => now
+      expect(await SoftDeleteModel.count()).toEqual(0)
+      const notDeletedModel = new SoftDeleteModel({
+        name: 'test'
+      })
+      await notDeletedModel.save()
+
+      const deletedModel = new SoftDeleteModel({
+        name: 'test'
+      })
+      await deletedModel.delete()
+
+      expect(await SoftDeleteModel.count()).toEqual(1)
+      expect(await SoftDeleteModel.withTrash().count()).toEqual(2)
+      expect(await SoftDeleteModel.onlyTrash().count()).toEqual(1)
+      await notDeletedModel.forceDelete()
+      await deletedModel.forceDelete()
+    })
+
+    it('does not override .find or .findOne when use .native()', async function() {
+      const now = new Date(1988, 4, 16)
+      Moment.now = () => now
+
+      const notDeletedModel = new SoftDeleteModel({
+        name: 'test'
+      })
+      await notDeletedModel.save()
+
+      const deletedModel = new SoftDeleteModel({
+        name: 'test'
+      })
+      await deletedModel.delete()
+
+      expect(await SoftDeleteModel.count()).toEqual(1)
+      expect(await SoftDeleteModel.withTrash().count()).toEqual(2)
+      expect(await SoftDeleteModel.onlyTrash().count()).toEqual(1)
+      expect(
+        await SoftDeleteModel.native(function(model: any) {
+          return model.find()
+        }).count()
+      ).toEqual(2)
+      await notDeletedModel.forceDelete()
+      await deletedModel.forceDelete()
     })
   })
 })

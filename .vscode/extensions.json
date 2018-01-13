@@ -1,0 +1,17 @@
+{
+  "recommendations": [
+    "eg2.tslint",
+    "k--kato.intellij-idea-keybindings",
+    "steoates.autoimport",
+    "esbenp.prettier-vscode",
+    "streetsidesoftware.code-spell-checker",
+    "msjsdiag.debugger-for-chrome",
+    "PeterJausovec.vscode-docker",
+    "alefragnani.bookmarks",
+    "donjayamanne.githistory",
+    "xabikos.javascriptsnippets",
+    "Shan.code-settings-sync",
+    "robertohuertasm.vscode-icons",
+    "wayou.vscode-todo-highlight"
+  ]
+}

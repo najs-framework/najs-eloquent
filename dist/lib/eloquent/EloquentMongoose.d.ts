@@ -1,4 +1,4 @@
-import { EloquentBase } from './EloquentBase';
+import { EloquentBase, EloquentSoftDelete } from './EloquentBase';
 import { OrderDirection, SubCondition } from '../interfaces/IBasicQueryGrammar';
 import { MongooseQueryBuilder } from '../query-builders/MongooseQueryBuilder';
 import { Document, Schema, Model, Mongoose } from 'mongoose';
@@ -12,7 +12,7 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     setId(value: any): any;
     static Class(): any;
     getModelName(): string;
-    protected initializeModelIfNeeded(): void;
+    protected initializeModelIfNeeded(softDeletes: boolean | EloquentSoftDelete): void;
     protected initialize(data: Document & T | Object | undefined): EloquentMongoose<T>;
     protected getMongoose(): Mongoose;
     protected isNativeRecord(data: Document & T | Object | undefined): boolean;
@@ -22,7 +22,7 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     protected getReservedPropertiesList(): string[];
     getAttribute(name: string): any;
     setAttribute(name: string, value: any): boolean;
-    newQuery(): any;
+    newQuery(softDeletes?: boolean | EloquentSoftDelete): any;
     newInstance(document?: Document & T | Object): EloquentMongoose<T>;
     newCollection(dataset: Array<Document & T>): Collection<EloquentMongoose<T>>;
     toObject(): Object;
@@ -55,6 +55,12 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     static whereNotIn(field: string, values: Array<any>): MongooseQueryBuilder;
     static orWhereIn(field: string, values: Array<any>): MongooseQueryBuilder;
     static orWhereNotIn(field: string, values: Array<any>): MongooseQueryBuilder;
+    static whereNull(field: string): any;
+    static whereNotNull(field: string): any;
+    static orWhereNull(field: string): any;
+    static orWhereNotNull(field: string): any;
+    static withTrash(): any;
+    static onlyTrash(): any;
     static all(): Promise<any>;
     static get(): Promise<any>;
     static get(field: string): Promise<any>;
@@ -63,6 +69,8 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     static find(id: any): Promise<any>;
     static pluck(value: string): Promise<Object>;
     static pluck(value: string, key: string): Promise<Object>;
+    static count(): Promise<number>;
+    static native(handler: (native: any) => any): Promise<any>;
     static findById(id: any): Promise<any>;
     static findOrFail(id: any): Promise<any>;
 }

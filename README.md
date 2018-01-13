@@ -228,10 +228,10 @@ User.where('first_name', 'tony')
   .where('last_name', 'stark')
   .get() // -> { first_name: 'tony', last_name: 'stark' }
 
-// Using .where() with operator 'not-in'
+// Using .where() with operator 'not'
 await User.where('first_name', 'tony')
   .where('last_name', '!=', 'stark')
-  .get() // -> { first_name: 'tony', last_name: { $not: 'stark' } }
+  .get() // -> { first_name: 'tony', last_name: { $ne: 'stark' } }
 ```
 
 #### OR conditions

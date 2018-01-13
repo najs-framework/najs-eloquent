@@ -1,5 +1,5 @@
 import { MongooseQuery } from './MongooseQueryBuilder';
-import { QueryBuilder } from './QueryBuilder';
+import { QueryBuilder, QueryBuilderSoftDelete } from './QueryBuilder';
 import { IBasicQueryGrammar } from '../interfaces/IBasicQueryGrammar';
 import { IQueryFetchResult } from '../interfaces/IQueryFetchResult';
 import { Collection } from 'collect.js';
@@ -10,7 +10,9 @@ export declare class MongooseQueryBuilder<T = {}> extends QueryBuilder implement
     protected mongooseQuery: MongooseQuery<T>;
     protected hasMongooseQuery: boolean;
     protected primaryKey: string;
-    constructor(modelName: string, primaryKey?: string);
+    constructor(modelName: string);
+    constructor(modelName: string, softDelete: QueryBuilderSoftDelete);
+    constructor(modelName: string, softDelete: QueryBuilderSoftDelete | undefined, primaryKey: string);
     protected getMongoose(): Mongoose;
     protected getQuery(isFindOne?: boolean): MongooseQuery<T>;
     protected passDataToMongooseQuery(query: MongooseQuery<T>): MongooseQuery<T>;
