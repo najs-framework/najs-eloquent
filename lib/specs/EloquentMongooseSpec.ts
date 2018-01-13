@@ -57,9 +57,9 @@ export type EloquentMongooseSpec<Attr, Class> = {
 
   orWhereNotNull(field: string): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>
 
-  withTrash(): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>
+  withTrashed(): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>
 
-  onlyTrash(): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>
+  onlyTrashed(): MongooseQueryBuilder<EloquentMongoose<Attr> & Attr & Class>
 
   all(): Promise<Collection<EloquentMongoose<Attr> & Attr & Class>>
 

@@ -253,12 +253,12 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
     return this.prototype.newQuery(this.softDeletes).orWhereNotNull(field)
   }
 
-  static withTrash() {
-    return this.prototype.newQuery(this.softDeletes).withTrash()
+  static withTrashed() {
+    return this.prototype.newQuery(this.softDeletes).withTrashed()
   }
 
-  static onlyTrash() {
-    return this.prototype.newQuery(this.softDeletes).onlyTrash()
+  static onlyTrashed() {
+    return this.prototype.newQuery(this.softDeletes).onlyTrashed()
   }
 
   static all(): Promise<any> {

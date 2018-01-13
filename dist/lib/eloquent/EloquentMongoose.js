@@ -200,11 +200,11 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     static orWhereNotNull(field) {
         return this.prototype.newQuery(this.softDeletes).orWhereNotNull(field);
     }
-    static withTrash() {
-        return this.prototype.newQuery(this.softDeletes).withTrash();
+    static withTrashed() {
+        return this.prototype.newQuery(this.softDeletes).withTrashed();
     }
-    static onlyTrash() {
-        return this.prototype.newQuery(this.softDeletes).onlyTrash();
+    static onlyTrashed() {
+        return this.prototype.newQuery(this.softDeletes).onlyTrashed();
     }
     static all() {
         return this.prototype.newQuery(this.softDeletes).all();

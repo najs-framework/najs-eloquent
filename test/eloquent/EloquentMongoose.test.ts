@@ -487,33 +487,33 @@ describe('EloquentMongoose', function() {
       })
     })
 
-    describe('withTrash()', function() {
+    describe('withTrashed()', function() {
       it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
         const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
-        expect(User.withTrash()).toBeInstanceOf(MongooseQueryBuilder)
+        expect(User.withTrashed()).toBeInstanceOf(MongooseQueryBuilder)
         expect(newQuerySpy.calledWith()).toBe(true)
         newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.withTrash()', function() {
-        const withTrashSpy = Sinon.spy(MongooseQueryBuilder.prototype, 'withTrash')
-        User.withTrash()
+        const withTrashSpy = Sinon.spy(MongooseQueryBuilder.prototype, 'withTrashed')
+        User.withTrashed()
         expect(withTrashSpy.called).toBe(true)
         withTrashSpy.restore()
       })
     })
 
-    describe('onlyTrash()', function() {
+    describe('onlyTrashed()', function() {
       it('creates MongooseQueryBuilder with model from prototype.newQuery()', function() {
         const newQuerySpy = Sinon.spy(User.prototype, 'getModelName')
-        expect(User.onlyTrash()).toBeInstanceOf(MongooseQueryBuilder)
+        expect(User.onlyTrashed()).toBeInstanceOf(MongooseQueryBuilder)
         expect(newQuerySpy.called).toBe(true)
         newQuerySpy.restore()
       })
 
       it('passes all params to MongooseQueryBuilder.onlyTrash()', function() {
-        const onlyTrashSpy = Sinon.spy(MongooseQueryBuilder.prototype, 'onlyTrash')
-        User.onlyTrash()
+        const onlyTrashSpy = Sinon.spy(MongooseQueryBuilder.prototype, 'onlyTrashed')
+        User.onlyTrashed()
         expect(onlyTrashSpy.called).toBe(true)
         onlyTrashSpy.restore()
       })
@@ -1000,8 +1000,8 @@ describe('EloquentMongoose', function() {
       await deletedModel.delete()
 
       expect(await SoftDeleteModel.count()).toEqual(1)
-      expect(await SoftDeleteModel.withTrash().count()).toEqual(2)
-      expect(await SoftDeleteModel.onlyTrash().count()).toEqual(1)
+      expect(await SoftDeleteModel.withTrashed().count()).toEqual(2)
+      expect(await SoftDeleteModel.onlyTrashed().count()).toEqual(1)
       await notDeletedModel.forceDelete()
       await deletedModel.forceDelete()
     })
@@ -1021,8 +1021,8 @@ describe('EloquentMongoose', function() {
       await deletedModel.delete()
 
       expect(await SoftDeleteModel.count()).toEqual(1)
-      expect(await SoftDeleteModel.withTrash().count()).toEqual(2)
-      expect(await SoftDeleteModel.onlyTrash().count()).toEqual(1)
+      expect(await SoftDeleteModel.withTrashed().count()).toEqual(2)
+      expect(await SoftDeleteModel.onlyTrashed().count()).toEqual(1)
       expect(
         await SoftDeleteModel.native(function(model: any) {
           return model.find()

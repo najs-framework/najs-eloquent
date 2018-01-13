@@ -59,8 +59,8 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     static whereNotNull(field: string): any;
     static orWhereNull(field: string): any;
     static orWhereNotNull(field: string): any;
-    static withTrash(): any;
-    static onlyTrash(): any;
+    static withTrashed(): any;
+    static onlyTrashed(): any;
     static all(): Promise<any>;
     static get(): Promise<any>;
     static get(field: string): Promise<any>;

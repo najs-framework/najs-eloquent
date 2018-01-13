@@ -107,14 +107,14 @@ class QueryBuilder {
     orWhereNotNull(field) {
         return this.orWhere(field, '<>', this.getNullValue(field));
     }
-    withTrash() {
+    withTrashed() {
         if (this.softDelete) {
             this.addSoftDeleteCondition = false;
             this.isUsed = true;
         }
         return this;
     }
-    onlyTrash() {
+    onlyTrashed() {
         if (this.softDelete) {
             this.addSoftDeleteCondition = false;
             this.whereNotNull(this.softDelete.deletedAt);

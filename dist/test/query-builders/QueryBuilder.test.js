@@ -496,14 +496,14 @@ describe('QueryBuilder', function () {
             it('does nothing if softDelete is not enabled', function () {
                 const query = new QueryBuilder_1.QueryBuilder();
                 expect(query['isUsed']).toBe(false);
-                query.withTrash();
+                query.withTrashed();
                 expect(query['addSoftDeleteCondition']).toBe(false);
                 expect(query['isUsed']).toBe(false);
             });
             it('sets addSoftDeleteCondition to false if softDelete is enabled', function () {
                 const query = new QueryBuilder_1.QueryBuilder({ deletedAt: 'any' });
                 expect(query['isUsed']).toBe(false);
-                query.withTrash();
+                query.withTrashed();
                 expect(query['addSoftDeleteCondition']).toBe(false);
                 expect(query['isUsed']).toBe(true);
             });
@@ -512,7 +512,7 @@ describe('QueryBuilder', function () {
             it('does nothing if softDelete is not enabled', function () {
                 const query = new QueryBuilder_1.QueryBuilder();
                 expect(query['isUsed']).toBe(false);
-                query.onlyTrash();
+                query.onlyTrashed();
                 expect(query['addSoftDeleteCondition']).toBe(false);
                 expect(query['isUsed']).toBe(false);
             });
@@ -520,7 +520,7 @@ describe('QueryBuilder', function () {
                 const query = new QueryBuilder_1.QueryBuilder({ deletedAt: 'any' });
                 const whereNotNullSpy = Sinon.spy(query, 'whereNotNull');
                 expect(query['isUsed']).toBe(false);
-                query.onlyTrash();
+                query.onlyTrashed();
                 expect(query['addSoftDeleteCondition']).toBe(false);
                 expect(query['isUsed']).toBe(true);
                 expect(whereNotNullSpy.calledWith('any')).toBe(true);

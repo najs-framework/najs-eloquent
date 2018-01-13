@@ -435,30 +435,30 @@ describe('EloquentMongoose', function () {
                 orWhereNotNullSpy.restore();
             });
         });
-        describe('withTrash()', function () {
+        describe('withTrashed()', function () {
             it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
-                expect(User.withTrash()).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(User.withTrashed()).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.calledWith()).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.withTrash()', function () {
-                const withTrashSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'withTrash');
-                User.withTrash();
+                const withTrashSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'withTrashed');
+                User.withTrashed();
                 expect(withTrashSpy.called).toBe(true);
                 withTrashSpy.restore();
             });
         });
-        describe('onlyTrash()', function () {
+        describe('onlyTrashed()', function () {
             it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
-                expect(User.onlyTrash()).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(User.onlyTrashed()).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.onlyTrash()', function () {
-                const onlyTrashSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'onlyTrash');
-                User.onlyTrash();
+                const onlyTrashSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'onlyTrashed');
+                User.onlyTrashed();
                 expect(onlyTrashSpy.called).toBe(true);
                 onlyTrashSpy.restore();
             });
@@ -917,8 +917,8 @@ describe('EloquentMongoose', function () {
                 });
                 yield deletedModel.delete();
                 expect(yield SoftDeleteModel.count()).toEqual(1);
-                expect(yield SoftDeleteModel.withTrash().count()).toEqual(2);
-                expect(yield SoftDeleteModel.onlyTrash().count()).toEqual(1);
+                expect(yield SoftDeleteModel.withTrashed().count()).toEqual(2);
+                expect(yield SoftDeleteModel.onlyTrashed().count()).toEqual(1);
                 yield notDeletedModel.forceDelete();
                 yield deletedModel.forceDelete();
             });
@@ -936,8 +936,8 @@ describe('EloquentMongoose', function () {
                 });
                 yield deletedModel.delete();
                 expect(yield SoftDeleteModel.count()).toEqual(1);
-                expect(yield SoftDeleteModel.withTrash().count()).toEqual(2);
-                expect(yield SoftDeleteModel.onlyTrash().count()).toEqual(1);
+                expect(yield SoftDeleteModel.withTrashed().count()).toEqual(2);
+                expect(yield SoftDeleteModel.onlyTrashed().count()).toEqual(1);
                 expect(yield SoftDeleteModel.native(function (model) {
                     return model.find();
                 }).count()).toEqual(2);

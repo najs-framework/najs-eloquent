@@ -44,6 +44,6 @@ export declare class QueryBuilder {
     whereNotNull(field: string): this;
     orWhereNull(field: string): this;
     orWhereNotNull(field: string): this;
-    withTrash(): this;
-    onlyTrash(): this;
+    withTrashed(): this;
+    onlyTrashed(): this;
 }

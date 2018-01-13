@@ -13,7 +13,7 @@
 If you are Laravel Eloquent lover and want to use it in `Node JS` you will love `Najs Eloquent`. `Najs Eloquent` is
 Laravel Eloquent, written in `Typescript` (with some helpers you can use it in Javascript for sure).
 
-Current version - `0.1.7` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
+Current version - `0.2.1` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
 some features of Laravel Eloquent are removed such as relationship or scope. In the way to `1.0.0`, the `Najs Eloquent`
 will support full Eloquent's features with difference kinds of DB like `MySql`, `PostgreSQL` or `SqlLite`
 (use `knex` as a query builder).
@@ -321,9 +321,143 @@ await user.delete()
 
 ## IV. Accessors and Mutators
 
-_Not available until 0.2.x_
+### Accessor
 
-## IV. Inheritance
+You can define an accessor by `getter` of ES7, or a function like Laravel Eloquent
+
+```typescript
+// file: Accessor.ts
+export class User extends User.Class<IAdminUser, User>() {
+  // For `node > 8.7` or whatever supports `Object.getOwnPropertyDescriptor`
+  get full_name() {
+    return this.attributes['first_name'] + ' ' + this.attributes['last_name']
+  }
+
+  // Laravel Eloquent style, available for node > 6.x
+  // If you define this function AND getter, the getter will have higher priority
+  getFullNameAttribute() {
+    return this.attributes['first_name'] + ' ' + this.attributes['last_name']
+  }
+}
+```
+
+### Mutator
+
+You can define an mutator by `setter` of ES7, or a function like Laravel Eloquent
+
+```typescript
+// file: Mutator.ts
+export class User extends User.Class<IAdminUser, User>() {
+  // For `node > 8.7` or whatever supports `Object.getOwnPropertyDescriptor`
+  set full_name(value: any) {
+    // ...
+  }
+
+  // Laravel Eloquent style, available for node > 6.x
+  // If you define this function AND setter, the setter will have higher priority
+  getFullNameAttribute(value: any) {
+    // ...
+  }
+}
+```
+
+## IV. Timestamps
+
+You can simply defined timestamps for models by change static variable named `timestamps`
+
+```typescript
+// file: Timestamps.ts
+export class User extends User.Class<IAdminUser, User>() {
+  static timestamps = true
+}
+```
+
+By default, Najs will create 2 fields named `created_at` and `updated_at`, you can customer the fields' name:
+
+```typescript
+// file: Timestamps.ts
+export class User extends User.Class<IAdminUser, User>() {
+  static timestamps = { createdAt: 'created', updatedAt: 'updated' }
+}
+```
+
+Najs gets now value from `Moment` so if you can do this way to provide specific date in tests:
+
+```typescript
+// file: Test.ts
+const Model = require('moment')
+
+export class User extends User.Class<IAdminUser, User>() {
+  static timestamps = { createdAt: 'created', updatedAt: 'updated' }
+}
+
+describe('Custom now value', function() {
+  it('comes in handy', function() {
+    const now = new Date(1999, 0, 1)
+    Moment.now = () => now
+
+    const user = new User()
+    await user.save()
+
+    console.log(user.created_at) // -> 01/01/1999
+    console.log(user.updated_at) // -> 01/01/1999
+  })
+})
+```
+
+## V. Soft Delete
+
+You can simply defined soft delete for models by change static variable named `softDeletes`
+
+```typescript
+// file: SoftDelete.ts
+export class User extends User.Class<IAdminUser, User>() {
+  static softDeletes = true
+}
+```
+
+By default, Najs will create 1 fields named `deleted_at`. It's `null` by default and has `Date` when document is deleted
+. You can custom the field's name
+
+```typescript
+// file: SoftDelete.ts
+export class User extends User.Class<IAdminUser, User>() {
+  static softDeletes = { deletedAt: 'deleteAt' }
+}
+```
+
+You can query the trashed document just like laravel
+
+```typescript
+User.queryName('Select un-deleted document only')
+  .where('first_name', 'john')
+  .get() // -> return all john which are not deleted
+
+User.queryName('Select all documents, including deleted')
+  .withTrashed()
+  .where('first_name', 'john')
+  .get() // -> return all john including deleted ones
+
+User.queryName('Select deleted documents only')
+  .onlyTrashed()
+  .where('first_name', 'john')
+  .get() // -> return all john which are deleted
+```
+
+The `withTrashed` or `onlyTrashed` can be used after the `where` or any query statements, for example
+
+```typescript
+User.select('last_name')
+  .withTrashed()
+  .get()
+
+User.limit(10)
+  .where('age' > 10)
+  .onlyTrashed()
+  .find()
+```
+
+## VI. Inheritance
 
 ```typescript
 // file: AdminUser.ts
@@ -357,7 +491,7 @@ export class AdminUser extends User.Class<IAdminUser, User>() {
 }
 ```
 
-## V. Put them all together in Repository
+## VII. Put them all together in Repository
 
 You can create Repository for models with very "najs" and clear syntax
 
@@ -409,8 +543,8 @@ class UserRepository {
 # Versioning and Road map
 
 * `0.1.x` [Released] - Basic feature of Eloquent, targeted to mongodb only
-* `0.2.x` [In Progress] - Advance feature of Eloquent, accessor, mutator, `timestamps` and `soft-delete` queries
-* `0.3.x` [Todo] - Support full static helper functions of Eloquent such as `findOrFail`, `paginate`, `chunk`
+* `0.2.x` [Released] - Advance feature of Eloquent, accessor, mutator, `timestamps` and `soft-delete` queries
+* `0.3.x` [In Progress] - Support full static helper functions of Eloquent such as `findOrFail`, `paginate`, `chunk`
 * `0.4.x` [Todo] - Introducing migration strategy for Mongodb
 * `0.5.x` [Todo] - Use knex as a query builder, targeted to RDB such as `MySQL`, `SqlLite` without transaction
 * `0.6.x` [Todo] - Introducing Eloquent scope and relationship

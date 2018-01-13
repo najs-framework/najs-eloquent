@@ -158,7 +158,7 @@ export class QueryBuilder {
     return this.orWhere(field, '<>', this.getNullValue(field))
   }
 
-  withTrash() {
+  withTrashed() {
     if (this.softDelete) {
       this.addSoftDeleteCondition = false
       this.isUsed = true
@@ -166,7 +166,7 @@ export class QueryBuilder {
     return this
   }
 
-  onlyTrash() {
+  onlyTrashed() {
     if (this.softDelete) {
       this.addSoftDeleteCondition = false
       this.whereNotNull(this.softDelete.deletedAt)
