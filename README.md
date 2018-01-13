@@ -13,7 +13,7 @@
 If you are Laravel Eloquent lover and want to use it in `Node JS` you will love `Najs Eloquent`. `Najs Eloquent` is
 Laravel Eloquent, written in `Typescript` (with some helpers you can use it in Javascript for sure).
 
-Current version - `0.2.1` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
+Current version - `0.2.2` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
 some features of Laravel Eloquent are removed such as relationship or scope. In the way to `1.0.0`, the `Najs Eloquent`
 will support full Eloquent's features with difference kinds of DB like `MySql`, `PostgreSQL` or `SqlLite`
 (use `knex` as a query builder).
@@ -323,7 +323,7 @@ await user.delete()
 
 ### Accessor
 
-You can define an accessor by `getter` of ES7, or a function like Laravel Eloquent
+You can define an accessor by `getter` or a function like Laravel Eloquent
 
 ```typescript
 // file: Accessor.ts
@@ -334,7 +334,7 @@ export class User extends User.Class<IAdminUser, User>() {
   }
 
   // Laravel Eloquent style, available for node > 6.x
-  // If you define this function AND getter, the getter will have higher priority
+  // If you define this function AND getter, this function will be skipped
   getFullNameAttribute() {
     return this.attributes['first_name'] + ' ' + this.attributes['last_name']
   }
@@ -343,7 +343,7 @@ export class User extends User.Class<IAdminUser, User>() {
 
 ### Mutator
 
-You can define an mutator by `setter` of ES7, or a function like Laravel Eloquent
+You can define a mutator by `setter` or a function like Laravel Eloquent
 
 ```typescript
 // file: Mutator.ts
@@ -354,8 +354,8 @@ export class User extends User.Class<IAdminUser, User>() {
   }
 
   // Laravel Eloquent style, available for node > 6.x
-  // If you define this function AND setter, the setter will have higher priority
-  getFullNameAttribute(value: any) {
+  // If you define this function AND setter, this function will be skipped
+  setFullNameAttribute(value: any) {
     // ...
   }
 }
@@ -363,7 +363,7 @@ export class User extends User.Class<IAdminUser, User>() {
 
 ## IV. Timestamps
 
-You can simply defined timestamps for models by change static variable named `timestamps`
+You can simply define timestamps for models by changing static variable named `timestamps`
 
 ```typescript
 // file: Timestamps.ts
@@ -372,7 +372,7 @@ export class User extends User.Class<IAdminUser, User>() {
 }
 ```
 
-By default, Najs will create 2 fields named `created_at` and `updated_at`, you can customer the fields' name:
+By default, Najs will create 2 fields named `created_at` and `updated_at`, you can custom the fields' name:
 
 ```typescript
 // file: Timestamps.ts
@@ -405,9 +405,9 @@ describe('Custom now value', function() {
 })
 ```
 
-## V. Soft Delete
+## V. Soft Deletes
 
-You can simply defined soft delete for models by change static variable named `softDeletes`
+You can simply define soft deletes for models by changing static variable named `softDeletes`
 
 ```typescript
 // file: SoftDelete.ts
@@ -416,8 +416,7 @@ export class User extends User.Class<IAdminUser, User>() {
 }
 ```
 
-By default, Najs will create 1 fields named `deleted_at`. It's `null` by default and has `Date` when document is deleted
-. You can custom the field's name
+By default, Najs will create 1 field named `deleted_at` with value is `null` when document is not deleted and contains `Date` when it was deleted. You can custom the field's name
 
 ```typescript
 // file: SoftDelete.ts
@@ -426,7 +425,7 @@ export class User extends User.Class<IAdminUser, User>() {
 }
 ```
 
-You can query the trashed document just like laravel
+You can query the trashed documents just like laravel
 
 ```typescript
 User.queryName('Select un-deleted document only')
@@ -457,7 +456,40 @@ User.limit(10)
   .find()
 ```
 
+Like `timestamp` above, Najs gets now value from `Moment`
+
+```typescript
+// file: Test.ts
+const Model = require('moment')
+
+export class User extends User.Class<IAdminUser, User>() {
+  static timestamps = true
+  static softDeletes = true
+}
+
+describe('Custom now value', function() {
+  it('comes in handy', function() {
+    let now = new Date(1999, 0, 1)
+    Moment.now = () => now
+
+    const user = new User()
+    await user.save()
+
+    console.log(user.created_at) // -> 01/01/1999
+    console.log(user.updated_at) // -> 01/01/1999
+
+    now = new Date(2010, 0, 1)
+    Moment.now = () => now
+    await user.delete()
+
+    console.log(user.deleted_at) // -> 01/01/2010
+  })
+})
+```
+
 ## VI. Inheritance
+
+If you want to extend models, just use `[ParentModel].Class()` instead of `Eloquent.Mongoose()`
 
 ```typescript
 // file: AdminUser.ts
@@ -493,7 +525,7 @@ export class AdminUser extends User.Class<IAdminUser, User>() {
 
 ## VII. Put them all together in Repository
 
-You can create Repository for models with very "najs" and clear syntax
+You can create Repository for models with very _najs_ and clear syntax
 
 ```typescript
 // file: UserRepository.ts
@@ -542,14 +574,17 @@ class UserRepository {
 
 # Versioning and Road map
 
-* `0.1.x` [Released] - Basic feature of Eloquent, targeted to mongodb only
-* `0.2.x` [Released] - Advance feature of Eloquent, accessor, mutator, `timestamps` and `soft-delete` queries
+* `0.1.x` [Released] - Basic features of Eloquent, targeted to mongodb only
+* `0.2.x` [Released] - Advance features of Eloquent, accessor, mutator, `timestamps` and `soft-delete` queries
 * `0.3.x` [In Progress] - Support full static helper functions of Eloquent such as `findOrFail`, `paginate`, `chunk`
-* `0.4.x` [Todo] - Introducing migration strategy for Mongodb
+
+I'm gonna take a break and use `0.3.x` in real world. With node applications, the stuff below seems not so important, doesn't it?
+
+* `0.4.x` [Todo] - Introduce migration strategy for Mongodb. This is not so important
 * `0.5.x` [Todo] - Use knex as a query builder, targeted to RDB such as `MySQL`, `SqlLite` without transaction
-* `0.6.x` [Todo] - Introducing Eloquent scope and relationship
+* `0.6.x` [Todo] - Introduce Eloquent scope and relationship
 * `0.7.x` [Todo] - Support RDB transactional query
-* `0.8.x` [Todo] - Introducing migration for RDB
+* `0.8.x` [Todo] - Introduce migration for RDB
 * `0.9.x` [Todo] - Support other kinds of db requested by community
 
 # Contribute
