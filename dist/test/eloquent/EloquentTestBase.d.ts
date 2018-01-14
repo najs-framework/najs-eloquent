@@ -10,8 +10,10 @@ export declare abstract class EloquentTestBase<T> extends EloquentBase<Record<T>
     toJson(): Object;
     is(model: EloquentTestBase<T>): boolean;
     fireEvent(event: string): this;
+    touch(): void;
     save(): Promise<any>;
     delete(): Promise<any>;
+    restore(): Promise<any>;
     forceDelete(): Promise<any>;
     fresh(): Promise<this | undefined>;
     getAttribute(name: string): any;

@@ -120,7 +120,7 @@ function make_find_overridden_test(Model: any, isOverridden: boolean) {
 
 describe('SoftDelete', function() {
   beforeAll(async function() {
-    await init_mongoose(mongoose)
+    await init_mongoose(mongoose, 'soft_delete')
   })
 
   afterAll(async function() {

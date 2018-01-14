@@ -119,6 +119,13 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         this.model.emit(event, this);
         return this;
     }
+    touch() {
+        const timestampsSettings = Object.getPrototypeOf(this).constructor.timestamps;
+        if (timestampsSettings) {
+            const opts = timestampsSettings === true ? DEFAULT_TIMESTAMPS : timestampsSettings;
+            this.attributes.markModified(opts.updatedAt);
+        }
+    }
     // -------------------------------------------------------------------------------------------------------------------
     save() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -136,6 +143,13 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     forceDelete() {
         return __awaiter(this, void 0, void 0, function* () {
             return this.attributes.remove();
+        });
+    }
+    restore() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (Object.getPrototypeOf(this).constructor.softDeletes) {
+                return this.attributes['restore']();
+            }
         });
     }
     fresh() {

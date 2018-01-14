@@ -144,6 +144,14 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
     return this
   }
 
+  touch() {
+    const timestampsSettings = Object.getPrototypeOf(this).constructor.timestamps
+    if (timestampsSettings) {
+      const opts = timestampsSettings === true ? DEFAULT_TIMESTAMPS : timestampsSettings
+      this.attributes.markModified(opts.updatedAt)
+    }
+  }
+
   // -------------------------------------------------------------------------------------------------------------------
 
   async save(): Promise<any> {
@@ -159,6 +167,12 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
 
   async forceDelete(): Promise<any> {
     return this.attributes.remove()
+  }
+
+  async restore(): Promise<any> {
+    if (Object.getPrototypeOf(this).constructor.softDeletes) {
+      return this.attributes['restore']()
+    }
   }
 
   async fresh(): Promise<this | undefined | null> {

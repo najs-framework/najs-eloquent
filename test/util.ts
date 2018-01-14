@@ -1,9 +1,6 @@
-let currentDatabase: number = 0
-
-export function init_mongoose(mongoose: any, database?: number): Promise<any> {
+export function init_mongoose(mongoose: any, name: string): Promise<any> {
   return new Promise(resolve => {
-    mongoose.connect('mongodb://localhost/najs_eloquent_test_' + (database ? database : currentDatabase))
-    currentDatabase++
+    mongoose.connect('mongodb://localhost/najs_eloquent_test_' + name)
     mongoose.Promise = global.Promise
     mongoose.connection.once('open', () => {
       resolve(true)

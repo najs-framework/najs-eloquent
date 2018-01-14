@@ -28,5 +28,7 @@ export declare class MongooseQueryBuilder<T = {}> extends QueryBuilder implement
     count(): Promise<number>;
     update(data: Object): Promise<Object>;
     delete(): Promise<Object>;
+    restore(): Promise<Object>;
     execute(): Promise<any>;
+    private isNotUsedOrEmptyCondition();
 }

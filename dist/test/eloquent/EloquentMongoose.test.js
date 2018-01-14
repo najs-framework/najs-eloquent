@@ -65,7 +65,7 @@ describe('EloquentMongoose', function () {
     jest.setTimeout(10000);
     beforeAll(function () {
         return __awaiter(this, void 0, void 0, function* () {
-            yield util_1.init_mongoose(mongoose);
+            yield util_1.init_mongoose(mongoose, 'eloquent_mongoose');
         });
     });
     afterAll(function () {
@@ -149,6 +149,13 @@ describe('EloquentMongoose', function () {
                     expect(removeSpy.called).toBe(true);
                     expect(yield User.where('first_name', 'john').count()).toEqual(0);
                 });
+            });
+        });
+        describe('restore()', function () {
+            it('does nothing if soft deletes is not defined', function () {
+                const user = new User();
+                expect(user['attributes']['restore']).toBeUndefined();
+                user.restore();
             });
         });
         describe('fresh()', function () {
@@ -754,6 +761,14 @@ describe('EloquentMongoose', function () {
                 });
             });
         });
+        describe('touch()', function () {
+            it('has no effect if model do not support timestamps', function () {
+                const user = new User();
+                const markModifiedSpy = Sinon.spy(user['attributes'], 'markModified');
+                user.touch();
+                expect(markModifiedSpy.called).toBe(false);
+            });
+        });
     });
     describe('Timestamps', function () {
         class TimestampModelDefault extends lib_1.Eloquent.Mongoose() {
@@ -834,6 +849,24 @@ describe('EloquentMongoose', function () {
                 expect(model['updatedAt']).toEqual(now);
             });
         });
+        describe('touch()', function () {
+            it('updates timestamps by calling markModified', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    let now = new Date(1988, 4, 16);
+                    Moment.now = () => now;
+                    const model = new CustomTimestampModel();
+                    const markModifiedSpy = Sinon.spy(model['attributes'], 'markModified');
+                    yield model.save();
+                    expect(model['createdAt']).toEqual(now);
+                    expect(model['updatedAt']).toEqual(now);
+                    now = new Date(2000, 1, 1);
+                    model.touch();
+                    expect(markModifiedSpy.calledWith('updatedAt')).toBe(true);
+                    yield model.save();
+                    expect(model['updatedAt']).toEqual(now);
+                });
+            });
+        });
     });
     describe('SoftDeletes', function () {
         class SoftDeleteModel extends lib_1.Eloquent.Mongoose() {
@@ -900,6 +933,8 @@ describe('EloquentMongoose', function () {
                 });
                 yield model.delete();
                 expect(model.deleted_at).toEqual(now);
+                yield model.restore();
+                expect(model.deleted_at).toBeNull();
                 yield model.forceDelete();
             });
         });

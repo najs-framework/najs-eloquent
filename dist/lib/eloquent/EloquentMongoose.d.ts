@@ -29,9 +29,11 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     toJson(): Object;
     is(document: this): boolean;
     fireEvent(event: string): this;
+    touch(): void;
     save(): Promise<any>;
     delete(): Promise<any>;
     forceDelete(): Promise<any>;
+    restore(): Promise<any>;
     fresh(): Promise<this | undefined | null>;
     static queryName(name: string): MongooseQueryBuilder;
     static select(field: string): MongooseQueryBuilder;

@@ -34,10 +34,13 @@ export abstract class EloquentTestBase<T> extends EloquentBase<Record<T>> {
     return this
   }
 
+  touch(): void {}
+
   async save(): Promise<any> {
     await []
   }
   async delete(): Promise<any> {}
+  async restore(): Promise<any> {}
   async forceDelete(): Promise<any> {}
   async fresh(): Promise<this | undefined> {
     return this

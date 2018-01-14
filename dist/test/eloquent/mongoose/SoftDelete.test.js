@@ -128,7 +128,7 @@ function make_find_overridden_test(Model, isOverridden) {
 describe('SoftDelete', function () {
     beforeAll(function () {
         return __awaiter(this, void 0, void 0, function* () {
-            yield util_1.init_mongoose(mongoose);
+            yield util_1.init_mongoose(mongoose, 'soft_delete');
         });
     });
     afterAll(function () {

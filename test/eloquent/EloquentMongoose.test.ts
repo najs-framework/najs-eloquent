@@ -91,7 +91,7 @@ describe('EloquentMongoose', function() {
   jest.setTimeout(10000)
 
   beforeAll(async function() {
-    await init_mongoose(mongoose)
+    await init_mongoose(mongoose, 'eloquent_mongoose')
   })
 
   afterAll(async function() {
@@ -166,6 +166,14 @@ describe('EloquentMongoose', function() {
         await user.forceDelete()
         expect(removeSpy.called).toBe(true)
         expect(await User.where('first_name', 'john').count()).toEqual(0)
+      })
+    })
+
+    describe('restore()', function() {
+      it('does nothing if soft deletes is not defined', function() {
+        const user: User = new User()
+        expect(user['attributes']['restore']).toBeUndefined()
+        user.restore()
       })
     })
 
@@ -819,6 +827,15 @@ describe('EloquentMongoose', function() {
         expect(equalsSpy.calledWith(comparison['attributes'])).toBe(true)
       })
     })
+
+    describe('touch()', function() {
+      it('has no effect if model do not support timestamps', function() {
+        const user: User = new User()
+        const markModifiedSpy = Sinon.spy(user['attributes'], 'markModified')
+        user.touch()
+        expect(markModifiedSpy.called).toBe(false)
+      })
+    })
   })
 
   describe('Timestamps', function() {
@@ -909,6 +926,26 @@ describe('EloquentMongoose', function() {
       expect(model['createdAt']).toEqual(now)
       expect(model['updatedAt']).toEqual(now)
     })
+
+    describe('touch()', function() {
+      it('updates timestamps by calling markModified', async function() {
+        let now = new Date(1988, 4, 16)
+        Moment.now = () => now
+        const model: CustomTimestampModel = new CustomTimestampModel()
+        const markModifiedSpy = Sinon.spy(model['attributes'], 'markModified')
+        await model.save()
+
+        expect(model['createdAt']).toEqual(now)
+        expect(model['updatedAt']).toEqual(now)
+
+        now = new Date(2000, 1, 1)
+        model.touch()
+        expect(markModifiedSpy.calledWith('updatedAt')).toBe(true)
+
+        await model.save()
+        expect(model['updatedAt']).toEqual(now)
+      })
+    })
   })
 
   describe('SoftDeletes', function() {
@@ -982,6 +1019,10 @@ describe('EloquentMongoose', function() {
       })
       await model.delete()
       expect(model.deleted_at).toEqual(now)
+
+      await model.restore()
+      expect(model.deleted_at).toBeNull()
+
       await model.forceDelete()
     })
 

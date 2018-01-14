@@ -165,19 +165,44 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder
   }
 
   async delete(): Promise<Object> {
-    if (!this.isUsed) {
+    const conditions = this.isNotUsedOrEmptyCondition()
+    if (conditions === false) {
       return { n: 0, ok: 1 }
     }
-    const conditions = new MongodbConditionConverter(this.getConditions()).convert()
-    if (isEmpty(conditions)) {
-      return { n: 0, ok: 1 }
-    }
-
     const query = this.mongooseModel.remove(conditions)
+    return <Object>query.exec()
+  }
+
+  async restore(): Promise<Object> {
+    if (!this.softDelete) {
+      return { n: 0, nModified: 0, ok: 1 }
+    }
+    const conditions = this.isNotUsedOrEmptyCondition()
+    if (conditions === false) {
+      return { n: 0, nModified: 0, ok: 1 }
+    }
+    const query = this.mongooseModel.update(
+      conditions,
+      {
+        $set: { [this.softDelete.deletedAt]: this.getNullValue(this.softDelete.deletedAt) }
+      },
+      { multi: true }
+    )
     return <Object>query.exec()
   }
 
   async execute(): Promise<any> {
     return (this.getQuery() as any).exec()
+  }
+
+  private isNotUsedOrEmptyCondition(): false | Object {
+    if (!this.isUsed) {
+      return false
+    }
+    const conditions = new MongodbConditionConverter(this.getConditions()).convert()
+    if (isEmpty(conditions)) {
+      return false
+    }
+    return conditions
   }
 }

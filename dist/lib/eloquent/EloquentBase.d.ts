@@ -42,8 +42,10 @@ export declare abstract class EloquentBase<NativeRecord extends Object = {}> imp
     abstract fireEvent(event: string): this;
     abstract save(): Promise<any>;
     abstract delete(): Promise<any>;
+    abstract restore(): Promise<any>;
     abstract forceDelete(): Promise<any>;
     abstract fresh(): Promise<this | undefined | null>;
+    abstract touch(): void;
     abstract getAttribute(name: string): any;
     abstract setAttribute(name: string, value: any): boolean;
     protected abstract isNativeRecord(data: NativeRecord | Object | undefined): boolean;

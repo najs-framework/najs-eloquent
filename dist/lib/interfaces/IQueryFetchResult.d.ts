@@ -8,5 +8,6 @@ export interface IQueryFetchResult<T = {}> {
     pluck(value: string, key: string): Promise<Object>;
     update(data: Object): Promise<Object>;
     delete(): Promise<Object>;
+    restore(): Promise<Object>;
     execute(): Promise<any>;
 }

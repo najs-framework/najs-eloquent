@@ -3,6 +3,8 @@ import * as Sinon from 'sinon'
 import { EloquentTestBase } from '../eloquent/EloquentTestBase'
 import { IMongooseProvider } from '../../lib/interfaces/IMongooseProvider'
 import { MongooseQueryBuilder } from '../../lib/query-builders/MongooseQueryBuilder'
+import { SoftDelete } from '../../lib/eloquent/mongoose/SoftDelete'
+import { init_mongoose, delete_collection } from '../util'
 import { make, register } from 'najs'
 import { model, Schema, Mongoose } from 'mongoose'
 
@@ -33,6 +35,17 @@ const UserSchema: Schema = new Schema(
 )
 const UserModel = model('User', UserSchema)
 
+const RoleSchema: Schema = new Schema(
+  {
+    name: { type: String }
+  },
+  {
+    collection: 'roles'
+  }
+)
+RoleSchema.plugin(SoftDelete, { overrideMethods: true })
+const RoleModel = model('Role', RoleSchema)
+
 interface IUser {
   first_name: string
   last_name: string
@@ -45,6 +58,13 @@ class User extends EloquentTestBase<IUser> {
   }
 }
 register(User)
+
+class Role extends EloquentTestBase<IUser> {
+  getClassName() {
+    return 'Role'
+  }
+}
+register(Role)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -345,33 +365,22 @@ describe('MongooseQueryBuilder', function() {
     ]
 
     beforeAll(async function() {
-      return new Promise(resolve => {
-        mongoose.connect('mongodb://localhost/najs_eloquent_test_1')
-        mongoose.Promise = global.Promise
-        mongoose.connection.once('open', () => {
-          resolve(true)
-        })
-      }).then(async function() {
-        for (const data of dataset) {
-          const user = new UserModel()
-          user.set(data)
-          await user.save()
-        }
-      })
+      await init_mongoose(mongoose, 'mongoose_query_builder')
+      for (const data of dataset) {
+        const user = new UserModel()
+        user.set(data)
+        await user.save()
+      }
+      for (let i = 0; i < 10; i++) {
+        const role = new RoleModel()
+        role.set({ name: 'role-' + i })
+        await role['delete']()
+      }
     })
 
     afterAll(async function() {
-      return new Promise(resolve => {
-        try {
-          if (mongoose.connection.collection('users')) {
-            mongoose.connection.collection('users').drop(function() {
-              resolve(true)
-            })
-          } else {
-            resolve(true)
-          }
-        } catch (error) {}
-      })
+      delete_collection(mongoose, 'users')
+      delete_collection(mongoose, 'roles')
     })
 
     function expect_match_user(result: any, expected: any) {
@@ -718,6 +727,44 @@ describe('MongooseQueryBuilder', function() {
         expect(result).toEqual({ n: 1, ok: 1 })
         const count = await new MongooseQueryBuilder('User').count()
         expect(count).toEqual(0)
+      })
+    })
+
+    describe('restore()', function() {
+      it('does nothing if Model do not support SoftDeletes', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const result = await query.where('first_name', 'peter').restore()
+        expect(result).toEqual({ n: 0, nModified: 0, ok: 1 })
+      })
+
+      it('can not call restore if query is empty', async function() {
+        const query = new MongooseQueryBuilder('Role', { deletedAt: 'deleted_at' })
+        const result = await query.withTrashed().restore()
+        expect(result).toEqual({ n: 0, nModified: 0, ok: 1 })
+      })
+
+      it('can restore data by query builder, case 1', async function() {
+        const query = new MongooseQueryBuilder('Role', { deletedAt: 'deleted_at' })
+        const result = await query
+          .onlyTrashed()
+          .where('name', 'role-0')
+          .restore()
+        expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
+        const count = await new MongooseQueryBuilder('Role').count()
+        expect(count).toEqual(1)
+      })
+
+      it('can restore data by query builder, case 2: multiple documents', async function() {
+        const query = new MongooseQueryBuilder('Role', { deletedAt: 'deleted_at' })
+        const result = await query
+          .withTrashed()
+          .where('name', 'role-1')
+          .orWhere('name', 'role-2')
+          .orWhere('name', 'role-3')
+          .restore()
+        expect(result).toEqual({ n: 3, nModified: 3, ok: 1 })
+        const count = await new MongooseQueryBuilder('Role').count()
+        expect(count).toEqual(4)
       })
     })
   })

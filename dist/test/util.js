@@ -1,10 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-let currentDatabase = 0;
-function init_mongoose(mongoose, database) {
+function init_mongoose(mongoose, name) {
     return new Promise(resolve => {
-        mongoose.connect('mongodb://localhost/najs_eloquent_test_' + (database ? database : currentDatabase));
-        currentDatabase++;
+        mongoose.connect('mongodb://localhost/najs_eloquent_test_' + name);
         mongoose.Promise = global.Promise;
         mongoose.connection.once('open', () => {
             resolve(true);

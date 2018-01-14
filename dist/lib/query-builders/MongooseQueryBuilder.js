@@ -146,14 +146,26 @@ class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
     }
     delete() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.isUsed) {
-                return { n: 0, ok: 1 };
-            }
-            const conditions = new MongodbConditionConverter_1.MongodbConditionConverter(this.getConditions()).convert();
-            if (lodash_1.isEmpty(conditions)) {
+            const conditions = this.isNotUsedOrEmptyCondition();
+            if (conditions === false) {
                 return { n: 0, ok: 1 };
             }
             const query = this.mongooseModel.remove(conditions);
+            return query.exec();
+        });
+    }
+    restore() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.softDelete) {
+                return { n: 0, nModified: 0, ok: 1 };
+            }
+            const conditions = this.isNotUsedOrEmptyCondition();
+            if (conditions === false) {
+                return { n: 0, nModified: 0, ok: 1 };
+            }
+            const query = this.mongooseModel.update(conditions, {
+                $set: { [this.softDelete.deletedAt]: this.getNullValue(this.softDelete.deletedAt) }
+            }, { multi: true });
             return query.exec();
         });
     }
@@ -161,6 +173,16 @@ class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
         return __awaiter(this, void 0, void 0, function* () {
             return this.getQuery().exec();
         });
+    }
+    isNotUsedOrEmptyCondition() {
+        if (!this.isUsed) {
+            return false;
+        }
+        const conditions = new MongodbConditionConverter_1.MongodbConditionConverter(this.getConditions()).convert();
+        if (lodash_1.isEmpty(conditions)) {
+            return false;
+        }
+        return conditions;
     }
 }
 exports.MongooseQueryBuilder = MongooseQueryBuilder;

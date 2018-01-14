@@ -18,6 +18,8 @@ require("jest");
 const Sinon = require("sinon");
 const EloquentTestBase_1 = require("../eloquent/EloquentTestBase");
 const MongooseQueryBuilder_1 = require("../../lib/query-builders/MongooseQueryBuilder");
+const SoftDelete_1 = require("../../lib/eloquent/mongoose/SoftDelete");
+const util_1 = require("../util");
 const najs_1 = require("najs");
 const mongoose_1 = require("mongoose");
 const mongoose = require('mongoose');
@@ -41,12 +43,25 @@ const UserSchema = new mongoose_1.Schema({
     collection: 'users'
 });
 const UserModel = mongoose_1.model('User', UserSchema);
+const RoleSchema = new mongoose_1.Schema({
+    name: { type: String }
+}, {
+    collection: 'roles'
+});
+RoleSchema.plugin(SoftDelete_1.SoftDelete, { overrideMethods: true });
+const RoleModel = mongoose_1.model('Role', RoleSchema);
 class User extends EloquentTestBase_1.EloquentTestBase {
     getClassName() {
         return 'User';
     }
 }
 najs_1.register(User);
+class Role extends EloquentTestBase_1.EloquentTestBase {
+    getClassName() {
+        return 'Role';
+    }
+}
+najs_1.register(Role);
 // ---------------------------------------------------------------------------------------------------------------------
 describe('MongooseQueryBuilder', function () {
     describe('pre-configuration', function () {
@@ -313,38 +328,23 @@ describe('MongooseQueryBuilder', function () {
         ];
         beforeAll(function () {
             return __awaiter(this, void 0, void 0, function* () {
-                return new Promise(resolve => {
-                    mongoose.connect('mongodb://localhost/najs_eloquent_test_1');
-                    mongoose.Promise = global.Promise;
-                    mongoose.connection.once('open', () => {
-                        resolve(true);
-                    });
-                }).then(function () {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        for (const data of dataset) {
-                            const user = new UserModel();
-                            user.set(data);
-                            yield user.save();
-                        }
-                    });
-                });
+                yield util_1.init_mongoose(mongoose, 'mongoose_query_builder');
+                for (const data of dataset) {
+                    const user = new UserModel();
+                    user.set(data);
+                    yield user.save();
+                }
+                for (let i = 0; i < 10; i++) {
+                    const role = new RoleModel();
+                    role.set({ name: 'role-' + i });
+                    yield role['delete']();
+                }
             });
         });
         afterAll(function () {
             return __awaiter(this, void 0, void 0, function* () {
-                return new Promise(resolve => {
-                    try {
-                        if (mongoose.connection.collection('users')) {
-                            mongoose.connection.collection('users').drop(function () {
-                                resolve(true);
-                            });
-                        }
-                        else {
-                            resolve(true);
-                        }
-                    }
-                    catch (error) { }
-                });
+                util_1.delete_collection(mongoose, 'users');
+                util_1.delete_collection(mongoose, 'roles');
             });
         });
         function expect_match_user(result, expected) {
@@ -727,6 +727,48 @@ describe('MongooseQueryBuilder', function () {
                     expect(result).toEqual({ n: 1, ok: 1 });
                     const count = yield new MongooseQueryBuilder_1.MongooseQueryBuilder('User').count();
                     expect(count).toEqual(0);
+                });
+            });
+        });
+        describe('restore()', function () {
+            it('does nothing if Model do not support SoftDeletes', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
+                    const result = yield query.where('first_name', 'peter').restore();
+                    expect(result).toEqual({ n: 0, nModified: 0, ok: 1 });
+                });
+            });
+            it('can not call restore if query is empty', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('Role', { deletedAt: 'deleted_at' });
+                    const result = yield query.withTrashed().restore();
+                    expect(result).toEqual({ n: 0, nModified: 0, ok: 1 });
+                });
+            });
+            it('can restore data by query builder, case 1', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('Role', { deletedAt: 'deleted_at' });
+                    const result = yield query
+                        .onlyTrashed()
+                        .where('name', 'role-0')
+                        .restore();
+                    expect(result).toEqual({ n: 1, nModified: 1, ok: 1 });
+                    const count = yield new MongooseQueryBuilder_1.MongooseQueryBuilder('Role').count();
+                    expect(count).toEqual(1);
+                });
+            });
+            it('can restore data by query builder, case 2: multiple documents', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('Role', { deletedAt: 'deleted_at' });
+                    const result = yield query
+                        .withTrashed()
+                        .where('name', 'role-1')
+                        .orWhere('name', 'role-2')
+                        .orWhere('name', 'role-3')
+                        .restore();
+                    expect(result).toEqual({ n: 3, nModified: 3, ok: 1 });
+                    const count = yield new MongooseQueryBuilder_1.MongooseQueryBuilder('Role').count();
+                    expect(count).toEqual(4);
                 });
             });
         });

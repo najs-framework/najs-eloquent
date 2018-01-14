@@ -11,6 +11,7 @@ export interface IQueryFetchResult<T = {}> {
 
   update(data: Object): Promise<Object>
   delete(): Promise<Object>
+  restore(): Promise<Object>
 
   execute(): Promise<any>
 }

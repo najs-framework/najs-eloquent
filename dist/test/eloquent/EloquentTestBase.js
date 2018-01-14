@@ -33,12 +33,16 @@ class EloquentTestBase extends EloquentBase_1.EloquentBase {
     fireEvent(event) {
         return this;
     }
+    touch() { }
     save() {
         return __awaiter(this, void 0, void 0, function* () {
             yield [];
         });
     }
     delete() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    restore() {
         return __awaiter(this, void 0, void 0, function* () { });
     }
     forceDelete() {
