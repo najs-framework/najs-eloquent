@@ -86,7 +86,8 @@ export abstract class EloquentBase<NativeRecord extends Object = {}> implements 
   }
 
   fill(data: Object): this {
-    const fillableAttributes = pick(data, this.getFillable())
+    const fillable = this.getFillable()
+    const fillableAttributes = fillable.length > 0 ? pick(data, fillable) : data
     for (const key in fillableAttributes) {
       if (this.isFillable(key)) {
         this.setAttribute(key, fillableAttributes[key])

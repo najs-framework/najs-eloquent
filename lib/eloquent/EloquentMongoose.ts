@@ -299,6 +299,10 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
     return this.prototype.newQuery(this.softDeletes).find()
   }
 
+  static first(): Promise<any> {
+    return this.prototype.newQuery(this.softDeletes).first()
+  }
+
   static pluck(value: string): Promise<Object>
   static pluck(value: string, key: string): Promise<Object>
   static pluck(value: string, key?: string): Promise<Object> {

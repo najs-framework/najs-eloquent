@@ -45,6 +45,7 @@ export declare type EloquentMongooseSpec<Attr, Class> = {
     get(...fields: Array<string | string[]>): Promise<Collection<EloquentMongoose<Attr> & Attr & Class>>;
     find(): Promise<EloquentMongoose<Attr> & Attr & Class>;
     find(id: any): Promise<EloquentMongoose<Attr> & Attr & Class>;
+    first(): Promise<EloquentMongoose<Attr> & Attr & Class>;
     pluck(value: string): Promise<Object>;
     pluck(value: string, key: string): Promise<Object>;
     count(): Promise<Number>;

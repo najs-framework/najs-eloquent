@@ -256,6 +256,15 @@ describe('Eloquent', function () {
             });
             expect(user.toJson()).toEqual({ first_name: 'john' });
         });
+        it('could fill any attributes by default except start with _', function () {
+            const user = new User();
+            user['guarded'] = [];
+            user.fill({
+                not_config: 'filled',
+                _test: 'will not filled'
+            });
+            expect(user.toJson()).toEqual({ not_config: 'filled' });
+        });
     });
     describe('forceFill()', function () {
         it('fills data even they are not fillable', function () {

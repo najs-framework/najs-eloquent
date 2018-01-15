@@ -530,6 +530,15 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
+    describe('first()', function() {
+      it('just an alias of find', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const findSpy = Sinon.spy(query, 'find')
+        await query.first()
+        expect(findSpy.called).toBe(true)
+      })
+    })
+
     describe('pluck()', function() {
       it('plucks all data of collection and returns an Object', async function() {
         const query = new MongooseQueryBuilder('User')

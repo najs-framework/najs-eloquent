@@ -25,7 +25,8 @@ class EloquentBase {
         return collect_js_1.default(dataset.map(item => this.newInstance(item)));
     }
     fill(data) {
-        const fillableAttributes = lodash_1.pick(data, this.getFillable());
+        const fillable = this.getFillable();
+        const fillableAttributes = fillable.length > 0 ? lodash_1.pick(data, fillable) : data;
         for (const key in fillableAttributes) {
             if (this.isFillable(key)) {
                 this.setAttribute(key, fillableAttributes[key]);

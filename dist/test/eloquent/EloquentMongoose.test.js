@@ -78,10 +78,22 @@ describe('EloquentMongoose', function () {
             yield util_1.delete_collection(mongoose, 'softdelete2s');
         });
     });
-    it('can be initialized with static function', function () {
+    it('can be initialized with static function .all()', function () {
         return __awaiter(this, void 0, void 0, function* () {
             const users = yield User.all();
             expect(users.count()).toEqual(0);
+        });
+    });
+    it('can be initialized with static function .find()', function () {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield User.find();
+            expect(user).toBeNull();
+        });
+    });
+    it('can be initialized with static function .first()', function () {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield User.first();
+            expect(user).toBeNull();
         });
     });
     describe('ActiveRecord', function () {
@@ -534,6 +546,20 @@ describe('EloquentMongoose', function () {
                 expect(findSpy.calledWith()).toBe(true);
                 whereSpy.restore();
                 findSpy.restore();
+            });
+        });
+        describe('first()', function () {
+            it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .first()', function () {
+                const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
+                expect(User.first()).toBeInstanceOf(Promise);
+                expect(getModelNameSpy.called).toBe(true);
+                getModelNameSpy.restore();
+            });
+            it('passes all params to MongooseQueryBuilder.first()', function () {
+                const firstSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'first');
+                User.first();
+                expect(firstSpy.calledWith()).toBe(true);
+                firstSpy.restore();
             });
         });
         describe('pluck()', function () {

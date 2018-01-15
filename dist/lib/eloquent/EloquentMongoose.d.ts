@@ -69,6 +69,7 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     static get(fields: string[]): Promise<any>;
     static get(...fields: Array<string | string[]>): Promise<any>;
     static find(id: any): Promise<any>;
+    static first(): Promise<any>;
     static pluck(value: string): Promise<Object>;
     static pluck(value: string, key: string): Promise<Object>;
     static count(): Promise<number>;

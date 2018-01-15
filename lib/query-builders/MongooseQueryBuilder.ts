@@ -131,6 +131,10 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder
     return null
   }
 
+  async first(): Promise<any | null> {
+    return this.find()
+  }
+
   async pluck(value: string): Promise<Object>
   async pluck(value: string, key: string): Promise<Object>
   async pluck(value: string, key?: string): Promise<Object> {

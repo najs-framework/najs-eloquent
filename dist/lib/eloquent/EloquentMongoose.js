@@ -236,6 +236,9 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         }
         return this.prototype.newQuery(this.softDeletes).find();
     }
+    static first() {
+        return this.prototype.newQuery(this.softDeletes).first();
+    }
     static pluck(value, key) {
         return this.prototype.newQuery(this.softDeletes).pluck(value, key);
     }

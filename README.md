@@ -13,12 +13,12 @@
 If you are Laravel Eloquent lover and want to use it in `Node JS` you will love `Najs Eloquent`. `Najs Eloquent` is
 Laravel Eloquent, written in `Typescript` (with some helpers you can use it in Javascript for sure).
 
-Current version - `0.2.3` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
+Current version - `0.2.4` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
 some features of Laravel Eloquent are removed such as relationship or scope. In the way to `1.0.0`, the `Najs Eloquent`
 will support full Eloquent's features with difference kinds of DB like `MySql`, `PostgreSQL` or `SqlLite`
 (use `knex` as a query builder).
 
-You can take a look on fully setup example in [najs-eloquent-example](https://github.com/najs-framework/najs-eloquent-example) repository.
+You can take a look on fully setup example in [najs-eloquent-example](https://github.com/najs-framework/najs-eloquent-example) repository or try it in [Playground](http://35.196.114.98/ide.html).
 
 # Installation
 
@@ -81,7 +81,7 @@ register(CustomClass, 'MongooseProvider')
 
 # Example
 
-Please checkout fully setup example in [najs-eloquent-example](https://github.com/najs-framework/najs-eloquent-example) repository.
+Please checkout fully setup example in [najs-eloquent-example](https://github.com/najs-framework/najs-eloquent-example) repository or try it in [Playground](http://35.196.114.98/ide.html).
 
 # Usage
 

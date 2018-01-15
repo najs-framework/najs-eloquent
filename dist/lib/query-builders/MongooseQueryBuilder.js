@@ -110,6 +110,11 @@ class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
             return null;
         });
     }
+    first() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.find();
+        });
+    }
     pluck(value, key) {
         return __awaiter(this, void 0, void 0, function* () {
             this.selectedFields = [];

@@ -508,6 +508,16 @@ describe('MongooseQueryBuilder', function () {
                 });
             });
         });
+        describe('first()', function () {
+            it('just an alias of find', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
+                    const findSpy = Sinon.spy(query, 'find');
+                    yield query.first();
+                    expect(findSpy.called).toBe(true);
+                });
+            });
+        });
         describe('pluck()', function () {
             it('plucks all data of collection and returns an Object', function () {
                 return __awaiter(this, void 0, void 0, function* () {

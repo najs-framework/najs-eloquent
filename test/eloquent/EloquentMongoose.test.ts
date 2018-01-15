@@ -103,9 +103,19 @@ describe('EloquentMongoose', function() {
     await delete_collection(mongoose, 'softdelete2s')
   })
 
-  it('can be initialized with static function', async function() {
+  it('can be initialized with static function .all()', async function() {
     const users = await User.all()
     expect(users.count()).toEqual(0)
+  })
+
+  it('can be initialized with static function .find()', async function() {
+    const user = await User.find()
+    expect(user).toBeNull()
+  })
+
+  it('can be initialized with static function .first()', async function() {
+    const user = await User.first()
+    expect(user).toBeNull()
   })
 
   describe('ActiveRecord', function() {
@@ -603,6 +613,22 @@ describe('EloquentMongoose', function() {
         expect(findSpy.calledWith()).toBe(true)
         whereSpy.restore()
         findSpy.restore()
+      })
+    })
+
+    describe('first()', function() {
+      it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .first()', function() {
+        const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
+        expect(User.first()).toBeInstanceOf(Promise)
+        expect(getModelNameSpy.called).toBe(true)
+        getModelNameSpy.restore()
+      })
+
+      it('passes all params to MongooseQueryBuilder.first()', function() {
+        const firstSpy = Sinon.spy(MongooseQueryBuilder.prototype, 'first')
+        User.first()
+        expect(firstSpy.calledWith()).toBe(true)
+        firstSpy.restore()
       })
     })
 
