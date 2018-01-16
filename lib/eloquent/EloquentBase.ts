@@ -75,6 +75,8 @@ export abstract class EloquentBase<NativeRecord extends Object = {}> implements 
   newInstance(data: NativeRecord): any
   newInstance(data?: NativeRecord | Object): any {
     const instance = make<EloquentBase<NativeRecord>>(this.getClassName())
+    instance.fillable = this.fillable
+    instance.guarded = this.guarded
     return instance.initialize(data)
   }
 

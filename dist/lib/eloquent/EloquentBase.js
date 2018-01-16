@@ -19,6 +19,8 @@ class EloquentBase {
     }
     newInstance(data) {
         const instance = najs_1.make(this.getClassName());
+        instance.fillable = this.fillable;
+        instance.guarded = this.guarded;
         return instance.initialize(data);
     }
     newCollection(dataset) {

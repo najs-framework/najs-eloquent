@@ -160,12 +160,19 @@ describe('Eloquent', function () {
         });
     });
     describe('newInstance(data)', function () {
-        it('create new instance of Eloquent based by passing data', function () {
+        it('creates new instance of Eloquent based by passing data', function () {
             const user = new User();
             const instance = user.newInstance({ first_name: 'john' });
             expect(instance).toBeInstanceOf(User);
             expect(instance === user.newInstance()).toBe(false);
             expect(instance.toObject()).toEqual({ first_name: 'john' });
+        });
+        it('should copy fillable, guarded to every single instance', function () {
+            const origin = new User();
+            origin['fillable'] = ['test'];
+            const copy = origin.newInstance();
+            expect(copy['fillable'] === origin['fillable']).toBe(true);
+            expect(copy['guard'] === origin['guard']).toBe(true);
         });
     });
     describe('newCollection(data)', function () {
