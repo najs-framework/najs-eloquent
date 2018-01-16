@@ -13,6 +13,7 @@ const MongodbConditionConverter_1 = require("./MongodbConditionConverter");
 const najs_1 = require("najs");
 const lodash_1 = require("lodash");
 const collect_js_1 = require("collect.js");
+const NotFoundError_1 = require("../errors/NotFoundError");
 class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
     constructor(modelName, softDelete, primaryKey = '_id') {
         super(softDelete);
@@ -108,6 +109,20 @@ class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
             }
             // tslint:disable-next-line
             return null;
+        });
+    }
+    findOrFail() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const value = yield this.find();
+            if (!value) {
+                throw new NotFoundError_1.NotFoundError(this.mongooseModel.modelName);
+            }
+            return value;
+        });
+    }
+    firstOrFail() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.findOrFail();
         });
     }
     first() {

@@ -1,6 +1,6 @@
 {
   "name": "najs-eloquent",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "scripts": {
     "build": "npm run build-ts && npm run tslint && npm run copy-js-files",
     "copy-js-files": "chmod u+x ./script/copy-js-files.sh && ./script/copy-js-files.sh",

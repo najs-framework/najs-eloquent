@@ -23,6 +23,8 @@ export declare class MongooseQueryBuilder<T = {}> extends QueryBuilder implement
     get(): Promise<Collection<any>>;
     all(): Promise<Collection<any>>;
     find(): Promise<any | null>;
+    findOrFail(): Promise<any>;
+    firstOrFail(): Promise<any>;
     first(): Promise<any | null>;
     pluck(value: string): Promise<Object>;
     pluck(value: string, key: string): Promise<Object>;

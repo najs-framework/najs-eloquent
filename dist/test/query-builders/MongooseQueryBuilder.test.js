@@ -22,6 +22,8 @@ const SoftDelete_1 = require("../../lib/eloquent/mongoose/SoftDelete");
 const util_1 = require("../util");
 const najs_1 = require("najs");
 const mongoose_1 = require("mongoose");
+const NotFoundError_1 = require("../../lib/errors/NotFoundError");
+const bson_1 = require("bson");
 const mongoose = require('mongoose');
 let MongooseProvider = MongooseProvider_1 = class MongooseProvider {
     getClassName() {
@@ -515,6 +517,45 @@ describe('MongooseQueryBuilder', function () {
                     const findSpy = Sinon.spy(query, 'find');
                     yield query.first();
                     expect(findSpy.called).toBe(true);
+                });
+            });
+        });
+        describe('findOrFail', function () {
+            it('calls find() and returns instance of Model if found', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
+                    const findSpy = Sinon.spy(query, 'find');
+                    const user = yield query.first();
+                    const result = yield query.where('id', user.id).findOrFail();
+                    expect(result.id).toEqual(user.id);
+                    expect(findSpy.called).toBe(true);
+                    findSpy.restore();
+                });
+            });
+            it('throws NotFoundError if model not found', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
+                    const id = new bson_1.ObjectId();
+                    try {
+                        yield query.where('id', id).findOrFail();
+                    }
+                    catch (error) {
+                        expect(error).toBeInstanceOf(Error);
+                        expect(error).toBeInstanceOf(NotFoundError_1.NotFoundError);
+                        expect(error.model).toEqual('User');
+                        return;
+                    }
+                    expect('should not reach this line').toEqual('yeah');
+                });
+            });
+        });
+        describe('firstOrFail()', function () {
+            it('just an alias of firstOrFail', function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
+                    const firstOrFailSpy = Sinon.spy(query, 'firstOrFail');
+                    yield query.firstOrFail();
+                    expect(firstOrFailSpy.called).toBe(true);
                 });
             });
         });

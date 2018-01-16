@@ -7,6 +7,8 @@ import { SoftDelete } from '../../lib/eloquent/mongoose/SoftDelete'
 import { init_mongoose, delete_collection } from '../util'
 import { make, register } from 'najs'
 import { model, Schema, Mongoose } from 'mongoose'
+import { NotFoundError } from '../../lib/errors/NotFoundError'
+import { ObjectId } from 'bson'
 
 const mongoose = require('mongoose')
 
@@ -536,6 +538,41 @@ describe('MongooseQueryBuilder', function() {
         const findSpy = Sinon.spy(query, 'find')
         await query.first()
         expect(findSpy.called).toBe(true)
+      })
+    })
+
+    describe('findOrFail', function() {
+      it('calls find() and returns instance of Model if found', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const findSpy = Sinon.spy(query, 'find')
+        const user = await query.first()
+        const result = await query.where('id', user.id).findOrFail()
+        expect(result.id).toEqual(user.id)
+        expect(findSpy.called).toBe(true)
+        findSpy.restore()
+      })
+
+      it('throws NotFoundError if model not found', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const id = new ObjectId()
+        try {
+          await query.where('id', id).findOrFail()
+        } catch (error) {
+          expect(error).toBeInstanceOf(Error)
+          expect(error).toBeInstanceOf(NotFoundError)
+          expect(error.model).toEqual('User')
+          return
+        }
+        expect('should not reach this line').toEqual('yeah')
+      })
+    })
+
+    describe('firstOrFail()', function() {
+      it('just an alias of firstOrFail', async function() {
+        const query = new MongooseQueryBuilder('User')
+        const firstOrFailSpy = Sinon.spy(query, 'firstOrFail')
+        await query.firstOrFail()
+        expect(firstOrFailSpy.called).toBe(true)
       })
     })
 

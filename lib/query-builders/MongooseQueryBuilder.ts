@@ -9,6 +9,7 @@ import { make } from 'najs'
 import { isEmpty } from 'lodash'
 import collect, { Collection } from 'collect.js'
 import { Model, Document, DocumentQuery, Mongoose } from 'mongoose'
+import { NotFoundError } from '../errors/NotFoundError'
 
 export type MongooseQuery<T> =
   | DocumentQuery<Document & T | null, Document & T>
@@ -129,6 +130,18 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder
     }
     // tslint:disable-next-line
     return null
+  }
+
+  async findOrFail(): Promise<any> {
+    const value = await this.find()
+    if (!value) {
+      throw new NotFoundError(this.mongooseModel.modelName)
+    }
+    return value
+  }
+
+  async firstOrFail(): Promise<any> {
+    return this.findOrFail()
   }
 
   async first(): Promise<any | null> {
