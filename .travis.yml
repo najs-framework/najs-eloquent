@@ -19,11 +19,6 @@ jobs:
       os: linux
       before_script: sleep 5
 
-    - stage: platform-test
-      node_js: "lts/boron"
-      os: linux
-      before_script: sleep 5
-
 install:
   - yarn install
 

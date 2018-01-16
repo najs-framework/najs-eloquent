@@ -304,6 +304,7 @@ describe('MongooseQueryBuilder', function() {
     it('returns signature object of the query, conditions is translated to mongodb query', function() {
       const query = new MongooseQueryBuilder('User')
       query
+        .queryName('Test')
         .select('first_name')
         .distinct('last_name')
         .limit(10)
@@ -312,6 +313,7 @@ describe('MongooseQueryBuilder', function() {
         .where('last_name', 'any')
         .orWhere('age', 10)
       expect(query.toObject()).toEqual({
+        name: 'Test',
         select: ['first_name'],
         distinct: ['last_name'],
         limit: 10,

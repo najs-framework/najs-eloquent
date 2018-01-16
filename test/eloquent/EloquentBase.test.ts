@@ -331,123 +331,88 @@ describe('Eloquent', function() {
 
   describe('fill()', function() {})
 
-  if (Object.getOwnPropertyDescriptors) {
-    describe('Accessors for node >= 8.7', function() {
-      it('supports getter since node >= 8.7', function() {
-        const user = new User()
-        expect(user['accessors']['full_name']).toEqual({
-          name: 'full_name',
-          type: 'getter'
-        })
-        expect(user['accessors']['nick_name']).toEqual({
-          name: 'nick_name',
-          type: 'function',
-          ref: 'getNickNameAttribute'
-        })
-        expect(user['accessors']['something_wrong_format']).toEqual({
-          name: 'something_wrong_format',
-          type: 'function',
-          ref: 'getSomething_wrong_formatAttribute'
-        })
+  describe('Accessors for node >= 8.7', function() {
+    it('supports getter since node >= 8.7', function() {
+      const user = new User()
+      expect(user['accessors']['full_name']).toEqual({
+        name: 'full_name',
+        type: 'getter'
       })
-
-      it('skip function get...Attribute() if getter is defined', function() {
-        const user = new User({
-          first_name: 'tony',
-          last_name: 'stark'
-        })
-        expect(user.full_name).toEqual('tony stark')
-        expect(user['accessors']['full_name']).toEqual({
-          name: 'full_name',
-          type: 'getter'
-        })
+      expect(user['accessors']['nick_name']).toEqual({
+        name: 'nick_name',
+        type: 'function',
+        ref: 'getNickNameAttribute'
       })
-
-      it('has function to get all values of accessors', function() {
-        const user = new User({
-          first_name: 'tony',
-          last_name: 'stark'
-        })
-        expect(user['getAllValueOfAccessors']()).toEqual({
-          full_name: 'tony stark',
-          nick_name: 'TONY',
-          something_wrong_format: 'something_wrong_format'
-        })
-      })
-
-      it('is not called getAttribute if there is a accessor for attribute', async function() {
-        const user: User = new User({
-          first_name: 'tony',
-          last_name: 'stark'
-        })
-        const getAttributeSpy = Sinon.spy(user, 'getAttribute')
-
-        // a little hack for cover case mutator is getter
-        const indexOfFullName = user['__knownAttributeList'].indexOf('full_name')
-        user['__knownAttributeList'].splice(indexOfFullName, 1)
-
-        const fullName = user.full_name
-        expect(getAttributeSpy.notCalled).toBe(true)
-        expect(fullName).toEqual('tony stark')
-        const nickName = user['nick_name']
-        expect(getAttributeSpy.notCalled).toBe(true)
-        expect(nickName).toEqual('TONY')
+      expect(user['accessors']['something_wrong_format']).toEqual({
+        name: 'something_wrong_format',
+        type: 'function',
+        ref: 'getSomething_wrong_formatAttribute'
       })
     })
 
-    describe('Mutators for node >= 8.7', function() {
-      it('supports setter since node >= 8.7', function() {
-        const user = new User()
-        expect(user['mutators']['full_name']).toEqual({
-          name: 'full_name',
-          type: 'setter'
-        })
+    it('skip function get...Attribute() if getter is defined', function() {
+      const user = new User({
+        first_name: 'tony',
+        last_name: 'stark'
       })
-
-      it('is not called setAttribute if there is a mutator for attribute', async function() {
-        const user: User = new User()
-        const setAttributeSpy = Sinon.spy(user, 'setAttribute')
-        // a little hack for cover case mutator is setter
-        const indexOfFullName = user['__knownAttributeList'].indexOf('full_name')
-        user['__knownAttributeList'].splice(indexOfFullName, 1)
-        user['full_name'] = 'Test test'
-        expect(setAttributeSpy.notCalled).toBe(true)
-        user['nick_name'] = 'TEST'
-        expect(setAttributeSpy.notCalled).toBe(true)
+      expect(user.full_name).toEqual('tony stark')
+      expect(user['accessors']['full_name']).toEqual({
+        name: 'full_name',
+        type: 'getter'
       })
     })
-  } else {
-    describe('Accessors for node < 8.7', function() {
-      it('can find accessor type function', function() {
-        const user = new User()
-        expect(user['accessors']['full_name']).toEqual({
-          name: 'full_name',
-          type: 'function',
-          ref: 'getFullNameAttribute'
-        })
-        expect(user['accessors']['nick_name']).toEqual({
-          name: 'nick_name',
-          type: 'function',
-          ref: 'getNickNameAttribute'
-        })
-        expect(user['accessors']['something_wrong_format']).toEqual({
-          name: 'something_wrong_format',
-          type: 'function',
-          ref: 'getSomething_wrong_formatAttribute'
-        })
-      })
 
-      it('has function to get all values of accessors', function() {
-        const user = new User({
-          first_name: 'tony',
-          last_name: 'stark'
-        })
-        expect(user['getAllValueOfAccessors']()).toEqual({
-          full_name: 'TONY STARK',
-          nick_name: 'TONY',
-          something_wrong_format: 'something_wrong_format'
-        })
+    it('has function to get all values of accessors', function() {
+      const user = new User({
+        first_name: 'tony',
+        last_name: 'stark'
+      })
+      expect(user['getAllValueOfAccessors']()).toEqual({
+        full_name: 'tony stark',
+        nick_name: 'TONY',
+        something_wrong_format: 'something_wrong_format'
       })
     })
-  }
+
+    it('is not called getAttribute if there is a accessor for attribute', async function() {
+      const user: User = new User({
+        first_name: 'tony',
+        last_name: 'stark'
+      })
+      const getAttributeSpy = Sinon.spy(user, 'getAttribute')
+
+      // a little hack for cover case mutator is getter
+      const indexOfFullName = user['__knownAttributeList'].indexOf('full_name')
+      user['__knownAttributeList'].splice(indexOfFullName, 1)
+
+      const fullName = user.full_name
+      expect(getAttributeSpy.notCalled).toBe(true)
+      expect(fullName).toEqual('tony stark')
+      const nickName = user['nick_name']
+      expect(getAttributeSpy.notCalled).toBe(true)
+      expect(nickName).toEqual('TONY')
+    })
+  })
+
+  describe('Mutators for node >= 8.7', function() {
+    it('supports setter since node >= 8.7', function() {
+      const user = new User()
+      expect(user['mutators']['full_name']).toEqual({
+        name: 'full_name',
+        type: 'setter'
+      })
+    })
+
+    it('is not called setAttribute if there is a mutator for attribute', async function() {
+      const user: User = new User()
+      const setAttributeSpy = Sinon.spy(user, 'setAttribute')
+      // a little hack for cover case mutator is setter
+      const indexOfFullName = user['__knownAttributeList'].indexOf('full_name')
+      user['__knownAttributeList'].splice(indexOfFullName, 1)
+      user['full_name'] = 'Test test'
+      expect(setAttributeSpy.notCalled).toBe(true)
+      user['nick_name'] = 'TEST'
+      expect(setAttributeSpy.notCalled).toBe(true)
+    })
+  })
 })

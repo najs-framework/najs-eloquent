@@ -1,12 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const Sinon = require("sinon");
@@ -63,104 +55,84 @@ class User extends lib_1.Eloquent.Mongoose() {
 User.className = 'User';
 describe('EloquentMongoose', function () {
     jest.setTimeout(10000);
-    beforeAll(function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield util_1.init_mongoose(mongoose, 'eloquent_mongoose');
-        });
+    beforeAll(async function () {
+        await util_1.init_mongoose(mongoose, 'eloquent_mongoose');
     });
-    afterAll(function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield util_1.delete_collection(mongoose, 'users');
-            yield util_1.delete_collection(mongoose, 'timestampmodeldefaults');
-            yield util_1.delete_collection(mongoose, 'customtimestampmodels');
-            yield util_1.delete_collection(mongoose, 'softdeletemodels');
-            yield util_1.delete_collection(mongoose, 'softdelete1s');
-            yield util_1.delete_collection(mongoose, 'softdelete2s');
-        });
+    afterAll(async function () {
+        await util_1.delete_collection(mongoose, 'users');
+        await util_1.delete_collection(mongoose, 'timestampmodeldefaults');
+        await util_1.delete_collection(mongoose, 'customtimestampmodels');
+        await util_1.delete_collection(mongoose, 'softdeletemodels');
+        await util_1.delete_collection(mongoose, 'softdelete1s');
+        await util_1.delete_collection(mongoose, 'softdelete2s');
     });
-    it('can be initialized with static function .all()', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const users = yield User.all();
-            expect(users.count()).toEqual(0);
-        });
+    it('can be initialized with static function .all()', async function () {
+        const users = await User.all();
+        expect(users.count()).toEqual(0);
     });
-    it('can be initialized with static function .find()', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const user = yield User.find();
-            expect(user).toBeNull();
-        });
+    it('can be initialized with static function .find()', async function () {
+        const user = await User.find();
+        expect(user).toBeNull();
     });
-    it('can be initialized with static function .first()', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const user = yield User.first();
-            expect(user).toBeNull();
-        });
+    it('can be initialized with static function .first()', async function () {
+        const user = await User.first();
+        expect(user).toBeNull();
     });
     describe('ActiveRecord', function () {
         describe('save()', function () {
-            it('can create a document', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = new User({
-                        first_name: 'tony',
-                        last_name: 'stark',
-                        age: 45
-                    });
-                    yield user.save();
-                    const result = yield User.where('first_name', 'tony').find();
-                    expect(result.toObject()).toMatchObject(user.toObject());
+            it('can create a document', async function () {
+                const user = new User({
+                    first_name: 'tony',
+                    last_name: 'stark',
+                    age: 45
                 });
+                await user.save();
+                const result = await User.where('first_name', 'tony').find();
+                expect(result.toObject()).toMatchObject(user.toObject());
             });
-            it('can update a document', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = yield User.where('first_name', 'tony').find();
-                    user.age = 40;
-                    yield user.save();
-                    const result = yield User.where('first_name', 'tony').find();
-                    expect(result.toObject()).toMatchObject(user.toObject());
-                });
+            it('can update a document', async function () {
+                const user = await User.where('first_name', 'tony').find();
+                user.age = 40;
+                await user.save();
+                const result = await User.where('first_name', 'tony').find();
+                expect(result.toObject()).toMatchObject(user.toObject());
             });
-            it('does not catch error from Mongoose', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = new User();
-                    try {
-                        yield user.save();
-                    }
-                    catch (error) {
-                        expect(error.name).toEqual('ValidationError');
-                        return;
-                    }
-                    expect('it should not go to this line').toEqual('');
-                });
+            it('does not catch error from Mongoose', async function () {
+                const user = new User();
+                try {
+                    await user.save();
+                }
+                catch (error) {
+                    expect(error.name).toEqual('ValidationError');
+                    return;
+                }
+                expect('it should not go to this line').toEqual('');
             });
         });
         describe('delete()', function () {
-            it('calls MongooseDocument.remove()', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = new User();
-                    user.first_name = 'john';
-                    user.last_name = 'doe';
-                    user.age = 20;
-                    yield user.save();
-                    const removeSpy = Sinon.spy(user['attributes'], 'remove');
-                    yield user.delete();
-                    expect(removeSpy.called).toBe(true);
-                    expect(yield User.where('first_name', 'john').count()).toEqual(0);
-                });
+            it('calls MongooseDocument.remove()', async function () {
+                const user = new User();
+                user.first_name = 'john';
+                user.last_name = 'doe';
+                user.age = 20;
+                await user.save();
+                const removeSpy = Sinon.spy(user['attributes'], 'remove');
+                await user.delete();
+                expect(removeSpy.called).toBe(true);
+                expect(await User.where('first_name', 'john').count()).toEqual(0);
             });
         });
         describe('forceDelete()', function () {
-            it('calls MongooseDocument.remove()', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = new User();
-                    user.first_name = 'john';
-                    user.last_name = 'doe';
-                    user.age = 20;
-                    yield user.save();
-                    const removeSpy = Sinon.spy(user['attributes'], 'remove');
-                    yield user.forceDelete();
-                    expect(removeSpy.called).toBe(true);
-                    expect(yield User.where('first_name', 'john').count()).toEqual(0);
-                });
+            it('calls MongooseDocument.remove()', async function () {
+                const user = new User();
+                user.first_name = 'john';
+                user.last_name = 'doe';
+                user.age = 20;
+                await user.save();
+                const removeSpy = Sinon.spy(user['attributes'], 'remove');
+                await user.forceDelete();
+                expect(removeSpy.called).toBe(true);
+                expect(await User.where('first_name', 'john').count()).toEqual(0);
             });
         });
         describe('restore()', function () {
@@ -171,23 +143,19 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('fresh()', function () {
-            it('always returns null if attribute._id is not found', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = new User();
-                    expect(yield user.fresh()).toBeNull();
-                });
+            it('always returns null if attribute._id is not found', async function () {
+                const user = new User();
+                expect(await user.fresh()).toBeNull();
             });
-            it('returns "fresh" version in db if attribute._id exists', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = yield User.where('first_name', 'tony').find();
-                    user.age = 4000000;
-                    const fresh = yield user.fresh();
-                    expect(fresh.toJson()).toMatchObject({
-                        first_name: 'tony',
-                        last_name: 'stark',
-                        full_name: 'tony stark',
-                        age: 40
-                    });
+            it('returns "fresh" version in db if attribute._id exists', async function () {
+                const user = await User.where('first_name', 'tony').find();
+                user.age = 4000000;
+                const fresh = await user.fresh();
+                expect(fresh.toJson()).toMatchObject({
+                    first_name: 'tony',
+                    last_name: 'stark',
+                    full_name: 'tony stark',
+                    age: 40
                 });
             });
         });
@@ -485,7 +453,7 @@ describe('EloquentMongoose', function () {
         describe('all()', function () {
             it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .all()', function () {
                 const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
-                expect(User.all()).toBeInstanceOf(Promise);
+                expect(typeof User.all().then).toEqual('function');
                 expect(getModelNameSpy.called).toBe(true);
                 getModelNameSpy.restore();
             });
@@ -499,7 +467,7 @@ describe('EloquentMongoose', function () {
         describe('get()', function () {
             it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .get()', function () {
                 const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
-                expect(User.get()).toBeInstanceOf(Promise);
+                expect(typeof User.get().then).toEqual('function');
                 expect(getModelNameSpy.called).toBe(true);
                 getModelNameSpy.restore();
             });
@@ -528,7 +496,7 @@ describe('EloquentMongoose', function () {
         describe('find()', function () {
             it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .find()', function () {
                 const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
-                expect(User.find()).toBeInstanceOf(Promise);
+                expect(typeof User.find().then).toEqual('function');
                 expect(getModelNameSpy.called).toBe(true);
                 getModelNameSpy.restore();
             });
@@ -551,7 +519,7 @@ describe('EloquentMongoose', function () {
         describe('first()', function () {
             it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .first()', function () {
                 const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
-                expect(User.first()).toBeInstanceOf(Promise);
+                expect(typeof User.first().then).toEqual('function');
                 expect(getModelNameSpy.called).toBe(true);
                 getModelNameSpy.restore();
             });
@@ -565,7 +533,7 @@ describe('EloquentMongoose', function () {
         describe('pluck()', function () {
             it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .pluck()', function () {
                 const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
-                expect(User.pluck('id')).toBeInstanceOf(Promise);
+                expect(typeof User.pluck('id').then).toEqual('function');
                 expect(getModelNameSpy.called).toBe(true);
                 getModelNameSpy.restore();
             });
@@ -588,34 +556,30 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('findOrFail()', function () {
-            it('calls find() with id and return instance of Model if found', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const findSpy = Sinon.spy(User, 'find');
-                    const user = new User({
-                        first_name: 'john',
-                        last_name: 'doe'
-                    });
-                    yield user.save();
-                    const result = yield User.findOrFail(user.id);
-                    expect(result.is(user)).toBe(true);
-                    expect(findSpy.calledWith(user.id)).toBe(true);
-                    findSpy.restore();
+            it('calls find() with id and return instance of Model if found', async function () {
+                const findSpy = Sinon.spy(User, 'find');
+                const user = new User({
+                    first_name: 'john',
+                    last_name: 'doe'
                 });
+                await user.save();
+                const result = await User.findOrFail(user.id);
+                expect(result.is(user)).toBe(true);
+                expect(findSpy.calledWith(user.id)).toBe(true);
+                findSpy.restore();
             });
-            it('throws NotFoundError if model not found', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const id = new bson_1.ObjectId();
-                    try {
-                        yield User.findOrFail(id);
-                    }
-                    catch (error) {
-                        expect(error).toBeInstanceOf(Error);
-                        expect(error).toBeInstanceOf(NotFoundError_1.NotFoundError);
-                        expect(error.model).toEqual(User.className);
-                        return;
-                    }
-                    expect('should not reach this line').toEqual('yeah');
-                });
+            it('throws NotFoundError if model not found', async function () {
+                const id = new bson_1.ObjectId();
+                try {
+                    await User.findOrFail(id);
+                }
+                catch (error) {
+                    expect(error).toBeInstanceOf(Error);
+                    expect(error).toBeInstanceOf(NotFoundError_1.NotFoundError);
+                    expect(error.model).toEqual(User.className);
+                    return;
+                }
+                expect('should not reach this line').toEqual('yeah');
             });
         });
     });
@@ -666,100 +630,82 @@ describe('EloquentMongoose', function () {
             });
         });
         describe('getAttribute(name)', function () {
-            it('returns this.attributes[name]', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = yield User.where('first_name', 'tony').find();
-                    expect(user.getAttribute('first_name')).toEqual('tony');
-                });
+            it('returns this.attributes[name]', async function () {
+                const user = await User.where('first_name', 'tony').find();
+                expect(user.getAttribute('first_name')).toEqual('tony');
             });
-            it('is called if the name is not in __knownAttributeList', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = yield User.where('first_name', 'tony').find();
-                    const getAttributeSpy = Sinon.spy(user, 'getAttribute');
-                    user.first_name = user.last_name;
-                    expect(getAttributeSpy.calledWith('last_name')).toBe(true);
-                });
+            it('is called if the name is not in __knownAttributeList', async function () {
+                const user = await User.where('first_name', 'tony').find();
+                const getAttributeSpy = Sinon.spy(user, 'getAttribute');
+                user.first_name = user.last_name;
+                expect(getAttributeSpy.calledWith('last_name')).toBe(true);
             });
         });
         describe('setAttribute(name, value)', function () {
-            it('assigns value to this.attributes[name]', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = yield User.where('first_name', 'tony').find();
-                    user.setAttribute('first_name', 'test');
-                    expect(user.first_name).toEqual('test');
-                });
+            it('assigns value to this.attributes[name]', async function () {
+                const user = await User.where('first_name', 'tony').find();
+                user.setAttribute('first_name', 'test');
+                expect(user.first_name).toEqual('test');
             });
-            it('is called if the name is not in __knownAttributeList', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = yield User.where('first_name', 'tony').find();
-                    const setAttributeSpy = Sinon.spy(user, 'setAttribute');
-                    user.first_name = user.last_name;
-                    expect(setAttributeSpy.calledWith('first_name', user.last_name)).toBe(true);
-                });
+            it('is called if the name is not in __knownAttributeList', async function () {
+                const user = await User.where('first_name', 'tony').find();
+                const setAttributeSpy = Sinon.spy(user, 'setAttribute');
+                user.first_name = user.last_name;
+                expect(setAttributeSpy.calledWith('first_name', user.last_name)).toBe(true);
             });
         });
         describe('toObject()', function () {
-            it('calls MongooseDocument.toObject()', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = yield User.where('first_name', 'tony').find();
-                    const toObjectSpy = Sinon.spy(user['attributes'], 'toObject');
-                    expect(user.toObject()).toMatchObject({
-                        first_name: 'tony',
-                        last_name: 'stark',
-                        full_name: 'tony stark',
-                        age: 40,
-                        __v: 0
-                    });
-                    expect(toObjectSpy.called).toBe(true);
-                    id = user['_id'];
+            it('calls MongooseDocument.toObject()', async function () {
+                const user = await User.where('first_name', 'tony').find();
+                const toObjectSpy = Sinon.spy(user['attributes'], 'toObject');
+                expect(user.toObject()).toMatchObject({
+                    first_name: 'tony',
+                    last_name: 'stark',
+                    full_name: 'tony stark',
+                    age: 40,
+                    __v: 0
                 });
+                expect(toObjectSpy.called).toBe(true);
+                id = user['_id'];
             });
         });
         describe('toJson()', function () {
-            it('calls MongooseDocument.toJSON(), strips __v, changes _id to "id"', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = yield User.where('first_name', 'tony').find();
-                    const toJSONSpy = Sinon.spy(user['attributes'], 'toJSON');
-                    expect(user.toJson()).toMatchObject({
-                        id,
-                        first_name: 'tony',
-                        last_name: 'stark',
-                        full_name: 'tony stark',
-                        age: 40
-                    });
-                    expect(toJSONSpy.calledWith({
-                        getters: true,
-                        virtuals: true,
-                        versionKey: false
-                    })).toBe(true);
+            it('calls MongooseDocument.toJSON(), strips __v, changes _id to "id"', async function () {
+                const user = await User.where('first_name', 'tony').find();
+                const toJSONSpy = Sinon.spy(user['attributes'], 'toJSON');
+                expect(user.toJson()).toMatchObject({
+                    id,
+                    first_name: 'tony',
+                    last_name: 'stark',
+                    full_name: 'tony stark',
+                    age: 40
                 });
+                expect(toJSONSpy.calledWith({
+                    getters: true,
+                    virtuals: true,
+                    versionKey: false
+                })).toBe(true);
             });
         });
         describe('newInstance()', function () {
-            it('works exactly like Eloquent.newInstance()', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = new User();
-                    expect(user.newInstance()).toBeInstanceOf(User);
-                    expect(user.newInstance({})).toBeInstanceOf(User);
-                });
+            it('works exactly like Eloquent.newInstance()', async function () {
+                const user = new User();
+                expect(user.newInstance()).toBeInstanceOf(User);
+                expect(user.newInstance({})).toBeInstanceOf(User);
             });
         });
         describe('newCollection()', function () {
-            it('works exactly like Eloquent.newCollection()', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = new User();
-                    expect(user.newCollection([]).items).toEqual([]);
-                });
+            it('works exactly like Eloquent.newCollection()', async function () {
+                const user = new User();
+                expect(user.newCollection([]).items).toEqual([]);
             });
         });
         describe('newQuery()', function () {
-            it('creates new MongooseQueryBuilder with model name is getModelName()', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = new User();
-                    const getModelNameSpy = Sinon.spy(user, 'getModelName');
-                    expect(user.newQuery()).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
-                    expect(getModelNameSpy.called).toBe(true);
-                });
+            it('creates new MongooseQueryBuilder with model name is getModelName()', async function () {
+                const user = new User();
+                const getModelNameSpy = Sinon.spy(user, 'getModelName');
+                expect(user.newQuery()).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(getModelNameSpy.called).toBe(true);
             });
         });
         describe('fireEvent(event)', function () {
@@ -767,24 +713,20 @@ describe('EloquentMongoose', function () {
                 const user = new User();
                 expect(user.fireEvent('any') === user).toBe(true);
             });
-            it('triggers event by using MongooseDocument.emit() with this value', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = new User();
-                    const emitSpy = Sinon.spy(user['model'], 'emit');
-                    user.fireEvent('any');
-                    expect(emitSpy.calledWith('any', user)).toBe(true);
-                });
+            it('triggers event by using MongooseDocument.emit() with this value', async function () {
+                const user = new User();
+                const emitSpy = Sinon.spy(user['model'], 'emit');
+                user.fireEvent('any');
+                expect(emitSpy.calledWith('any', user)).toBe(true);
             });
         });
         describe('is()', function () {
-            it('calls MongooseDocument.equals()', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const user = yield User.where('first_name', 'tony').find();
-                    const comparison = new User();
-                    const equalsSpy = Sinon.spy(user['attributes'], 'equals');
-                    expect(user.is(comparison)).toBe(false);
-                    expect(equalsSpy.calledWith(comparison['attributes'])).toBe(true);
-                });
+            it('calls MongooseDocument.equals()', async function () {
+                const user = await User.where('first_name', 'tony').find();
+                const comparison = new User();
+                const equalsSpy = Sinon.spy(user['attributes'], 'equals');
+                expect(user.is(comparison)).toBe(false);
+                expect(equalsSpy.calledWith(comparison['attributes'])).toBe(true);
             });
         });
         describe('touch()', function () {
@@ -806,52 +748,44 @@ describe('EloquentMongoose', function () {
             }
         }
         TimestampModelDefault.timestamps = true;
-        it('should use custom "setupTimestamp" which use Moment instead of native Date', function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                const now = new Date(1988, 4, 16);
-                Moment.now = () => now;
-                const model = new TimestampModelDefault();
-                yield model.save();
-                expect(model.created_at).toEqual(now);
-                expect(model.updated_at).toEqual(now);
-            });
+        it('should use custom "setupTimestamp" which use Moment instead of native Date', async function () {
+            const now = new Date(1988, 4, 16);
+            Moment.now = () => now;
+            const model = new TimestampModelDefault();
+            await model.save();
+            expect(model.created_at).toEqual(now);
+            expect(model.updated_at).toEqual(now);
         });
-        it('works with ActiveRecord.save()', function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                const createdAt = new Date(1988, 4, 16);
-                Moment.now = () => createdAt;
-                const model = new TimestampModelDefault();
-                yield model.save();
-                const updatedAt = new Date(2000, 0, 1);
-                Moment.now = () => updatedAt;
-                model.name = 'updated';
-                yield model.save();
-                const updatedModel = yield TimestampModelDefault.find(model.id);
-                expect(updatedModel.updated_at).toEqual(updatedAt);
-            });
+        it('works with ActiveRecord.save()', async function () {
+            const createdAt = new Date(1988, 4, 16);
+            Moment.now = () => createdAt;
+            const model = new TimestampModelDefault();
+            await model.save();
+            const updatedAt = new Date(2000, 0, 1);
+            Moment.now = () => updatedAt;
+            model.name = 'updated';
+            await model.save();
+            const updatedModel = await TimestampModelDefault.find(model.id);
+            expect(updatedModel.updated_at).toEqual(updatedAt);
         });
-        it('works with QueryBuilder.update(), one document', function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                const createdAt = new Date(1988, 4, 16);
-                Moment.now = () => createdAt;
-                const model = new TimestampModelDefault();
-                yield model.save();
-                const updatedAt = new Date(2000, 0, 1);
-                Moment.now = () => updatedAt;
-                yield TimestampModelDefault.where('_id', model.id).update({});
-                const updatedModel = yield TimestampModelDefault.find(model.id);
-                expect(updatedModel.updated_at).toEqual(updatedAt);
-            });
+        it('works with QueryBuilder.update(), one document', async function () {
+            const createdAt = new Date(1988, 4, 16);
+            Moment.now = () => createdAt;
+            const model = new TimestampModelDefault();
+            await model.save();
+            const updatedAt = new Date(2000, 0, 1);
+            Moment.now = () => updatedAt;
+            await TimestampModelDefault.where('_id', model.id).update({});
+            const updatedModel = await TimestampModelDefault.find(model.id);
+            expect(updatedModel.updated_at).toEqual(updatedAt);
         });
-        it('works with QueryBuilder.update(), multiple documents', function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                const now = new Date(2010, 0, 1);
-                Moment.now = () => now;
-                const idList = yield TimestampModelDefault.pluck('id');
-                yield TimestampModelDefault.whereIn('id', Object.keys(idList)).update({});
-                const documents = yield TimestampModelDefault.all();
-                expect(documents.map(item => item.updated_at).all()).toEqual([now, now, now]);
-            });
+        it('works with QueryBuilder.update(), multiple documents', async function () {
+            const now = new Date(2010, 0, 1);
+            Moment.now = () => now;
+            const idList = await TimestampModelDefault.pluck('id');
+            await TimestampModelDefault.whereIn('id', Object.keys(idList)).update({});
+            const documents = await TimestampModelDefault.all();
+            expect(documents.map(item => item.updated_at).all()).toEqual([now, now, now]);
         });
         class CustomTimestampModel extends lib_1.Eloquent.Mongoose() {
             getClassName() {
@@ -865,32 +799,39 @@ describe('EloquentMongoose', function () {
             createdAt: 'createdAt',
             updatedAt: 'updatedAt'
         };
-        it('works with custom name for createdAt and updatedAt', function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                const now = new Date(1988, 4, 16);
-                Moment.now = () => now;
-                const model = new CustomTimestampModel();
-                yield model.save();
-                expect(model['createdAt']).toEqual(now);
-                expect(model['updatedAt']).toEqual(now);
-            });
+        it('works with custom name for createdAt and updatedAt', async function () {
+            const now = new Date(1988, 4, 16);
+            Moment.now = () => now;
+            const model = new CustomTimestampModel();
+            await model.save();
+            expect(model['createdAt']).toEqual(now);
+            expect(model['updatedAt']).toEqual(now);
         });
         describe('touch()', function () {
-            it('updates timestamps by calling markModified', function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    let now = new Date(1988, 4, 16);
-                    Moment.now = () => now;
-                    const model = new CustomTimestampModel();
-                    const markModifiedSpy = Sinon.spy(model['attributes'], 'markModified');
-                    yield model.save();
-                    expect(model['createdAt']).toEqual(now);
-                    expect(model['updatedAt']).toEqual(now);
-                    now = new Date(2000, 1, 1);
-                    model.touch();
-                    expect(markModifiedSpy.calledWith('updatedAt')).toBe(true);
-                    yield model.save();
-                    expect(model['updatedAt']).toEqual(now);
-                });
+            it('does nothing with not supported Timestamp Model', async function () {
+                const user = new User();
+                const markModifiedSpy = Sinon.spy(user['attributes'], 'markModified');
+                user.touch();
+                expect(markModifiedSpy.called).toBe(false);
+            });
+            it('updates timestamps by calling markModified', async function () {
+                let now = new Date(1988, 4, 16);
+                Moment.now = () => now;
+                const defaultSettings = new TimestampModelDefault();
+                await defaultSettings.save();
+                defaultSettings.touch();
+                expect(defaultSettings.created_at).toEqual(now);
+                expect(defaultSettings.updated_at).toEqual(now);
+                const model = new CustomTimestampModel();
+                const markModifiedSpy = Sinon.spy(model['attributes'], 'markModified');
+                await model.save();
+                expect(model['createdAt']).toEqual(now);
+                expect(model['updatedAt']).toEqual(now);
+                now = new Date(2000, 1, 1);
+                model.touch();
+                expect(markModifiedSpy.calledWith('updatedAt')).toBe(true);
+                await model.save();
+                expect(model['updatedAt']).toEqual(now);
             });
         });
     });
@@ -904,107 +845,95 @@ describe('EloquentMongoose', function () {
             }
         }
         SoftDeleteModel.softDeletes = true;
-        it('does not load plugin SoftDelete with deleted_at by default', function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                const model = new User();
-                expect(model['schema'].path('deleted_at')).toBeUndefined();
-                expect(model.newQuery()['softDelete']).toBe(false);
-            });
+        it('does not load plugin SoftDelete with deleted_at by default', async function () {
+            const model = new User();
+            expect(model['schema'].path('deleted_at')).toBeUndefined();
+            expect(model.newQuery()['softDelete']).toBe(false);
         });
-        it('loads plugin SoftDelete with deleted_at by default', function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                class SoftDelete1 extends lib_1.Eloquent.Mongoose() {
-                    getClassName() {
-                        return 'SoftDelete1';
-                    }
-                    getSchema() {
-                        return new mongoose_1.Schema({ name: String });
-                    }
+        it('loads plugin SoftDelete with deleted_at by default', async function () {
+            class SoftDelete1 extends lib_1.Eloquent.Mongoose() {
+                getClassName() {
+                    return 'SoftDelete1';
                 }
-                SoftDelete1.softDeletes = true;
-                const model = new SoftDelete1();
-                expect(model['schema'].path('deleted_at')['instance']).toEqual('Date');
-                expect(model['schema'].path('deleted_at')['defaultValue']).toBeDefined();
-                expect(model.newQuery()['softDelete']).toMatchObject({
-                    deletedAt: 'deleted_at'
-                });
-            });
-        });
-        it('has custom field for deletedAt', function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                class SoftDelete2 extends lib_1.Eloquent.Mongoose() {
-                    getClassName() {
-                        return 'SoftDelete2';
-                    }
-                    getSchema() {
-                        return new mongoose_1.Schema({ name: String });
-                    }
+                getSchema() {
+                    return new mongoose_1.Schema({ name: String });
                 }
-                SoftDelete2.softDeletes = { deletedAt: 'any' };
-                const model = new SoftDelete2();
-                expect(model['schema'].path('any')['instance']).toEqual('Date');
-                expect(model['schema'].path('any')['defaultValue']).toBeDefined();
-                expect(model['schema'].path('deleted_at')).toBeUndefined();
-                expect(model.newQuery()['softDelete']).toMatchObject({
-                    deletedAt: 'any'
-                });
+            }
+            SoftDelete1.softDeletes = true;
+            const model = new SoftDelete1();
+            expect(model['schema'].path('deleted_at')['instance']).toEqual('Date');
+            expect(model['schema'].path('deleted_at')['defaultValue']).toBeDefined();
+            expect(model.newQuery()['softDelete']).toMatchObject({
+                deletedAt: 'deleted_at'
             });
         });
-        it('works with ActiveRecord and use Moment as Date source', function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                const now = new Date(1988, 4, 16);
-                Moment.now = () => now;
-                const model = new SoftDeleteModel({
-                    name: 'test'
-                });
-                yield model.delete();
-                expect(model.deleted_at).toEqual(now);
-                yield model.restore();
-                expect(model.deleted_at).toBeNull();
-                yield model.forceDelete();
+        it('has custom field for deletedAt', async function () {
+            class SoftDelete2 extends lib_1.Eloquent.Mongoose() {
+                getClassName() {
+                    return 'SoftDelete2';
+                }
+                getSchema() {
+                    return new mongoose_1.Schema({ name: String });
+                }
+            }
+            SoftDelete2.softDeletes = { deletedAt: 'any' };
+            const model = new SoftDelete2();
+            expect(model['schema'].path('any')['instance']).toEqual('Date');
+            expect(model['schema'].path('any')['defaultValue']).toBeDefined();
+            expect(model['schema'].path('deleted_at')).toBeUndefined();
+            expect(model.newQuery()['softDelete']).toMatchObject({
+                deletedAt: 'any'
             });
         });
-        it('works with static functions', function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                const now = new Date(1988, 4, 16);
-                Moment.now = () => now;
-                expect(yield SoftDeleteModel.count()).toEqual(0);
-                const notDeletedModel = new SoftDeleteModel({
-                    name: 'test'
-                });
-                yield notDeletedModel.save();
-                const deletedModel = new SoftDeleteModel({
-                    name: 'test'
-                });
-                yield deletedModel.delete();
-                expect(yield SoftDeleteModel.count()).toEqual(1);
-                expect(yield SoftDeleteModel.withTrashed().count()).toEqual(2);
-                expect(yield SoftDeleteModel.onlyTrashed().count()).toEqual(1);
-                yield notDeletedModel.forceDelete();
-                yield deletedModel.forceDelete();
+        it('works with ActiveRecord and use Moment as Date source', async function () {
+            const now = new Date(1988, 4, 16);
+            Moment.now = () => now;
+            const model = new SoftDeleteModel({
+                name: 'test'
             });
+            await model.delete();
+            expect(model.deleted_at).toEqual(now);
+            await model.restore();
+            expect(model.deleted_at).toBeNull();
+            await model.forceDelete();
         });
-        it('does not override .find or .findOne when use .native()', function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                const now = new Date(1988, 4, 16);
-                Moment.now = () => now;
-                const notDeletedModel = new SoftDeleteModel({
-                    name: 'test'
-                });
-                yield notDeletedModel.save();
-                const deletedModel = new SoftDeleteModel({
-                    name: 'test'
-                });
-                yield deletedModel.delete();
-                expect(yield SoftDeleteModel.count()).toEqual(1);
-                expect(yield SoftDeleteModel.withTrashed().count()).toEqual(2);
-                expect(yield SoftDeleteModel.onlyTrashed().count()).toEqual(1);
-                expect(yield SoftDeleteModel.native(function (model) {
-                    return model.find();
-                }).count()).toEqual(2);
-                yield notDeletedModel.forceDelete();
-                yield deletedModel.forceDelete();
+        it('works with static functions', async function () {
+            const now = new Date(1988, 4, 16);
+            Moment.now = () => now;
+            expect(await SoftDeleteModel.count()).toEqual(0);
+            const notDeletedModel = new SoftDeleteModel({
+                name: 'test'
             });
+            await notDeletedModel.save();
+            const deletedModel = new SoftDeleteModel({
+                name: 'test'
+            });
+            await deletedModel.delete();
+            expect(await SoftDeleteModel.count()).toEqual(1);
+            expect(await SoftDeleteModel.withTrashed().count()).toEqual(2);
+            expect(await SoftDeleteModel.onlyTrashed().count()).toEqual(1);
+            await notDeletedModel.forceDelete();
+            await deletedModel.forceDelete();
+        });
+        it('does not override .find or .findOne when use .native()', async function () {
+            const now = new Date(1988, 4, 16);
+            Moment.now = () => now;
+            const notDeletedModel = new SoftDeleteModel({
+                name: 'test'
+            });
+            await notDeletedModel.save();
+            const deletedModel = new SoftDeleteModel({
+                name: 'test'
+            });
+            await deletedModel.delete();
+            expect(await SoftDeleteModel.count()).toEqual(1);
+            expect(await SoftDeleteModel.withTrashed().count()).toEqual(2);
+            expect(await SoftDeleteModel.onlyTrashed().count()).toEqual(1);
+            expect(await SoftDeleteModel.native(function (model) {
+                return model.find();
+            }).count()).toEqual(2);
+            await notDeletedModel.forceDelete();
+            await deletedModel.forceDelete();
         });
     });
 });

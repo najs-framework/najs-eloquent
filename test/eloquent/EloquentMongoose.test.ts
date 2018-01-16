@@ -540,7 +540,7 @@ describe('EloquentMongoose', function() {
     describe('all()', function() {
       it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .all()', function() {
         const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
-        expect(User.all()).toBeInstanceOf(Promise)
+        expect(typeof User.all().then).toEqual('function')
         expect(getModelNameSpy.called).toBe(true)
         getModelNameSpy.restore()
       })
@@ -556,7 +556,7 @@ describe('EloquentMongoose', function() {
     describe('get()', function() {
       it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .get()', function() {
         const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
-        expect(User.get()).toBeInstanceOf(Promise)
+        expect(typeof User.get().then).toEqual('function')
         expect(getModelNameSpy.called).toBe(true)
         getModelNameSpy.restore()
       })
@@ -593,7 +593,7 @@ describe('EloquentMongoose', function() {
     describe('find()', function() {
       it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .find()', function() {
         const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
-        expect(User.find()).toBeInstanceOf(Promise)
+        expect(typeof User.find().then).toEqual('function')
         expect(getModelNameSpy.called).toBe(true)
         getModelNameSpy.restore()
       })
@@ -619,7 +619,7 @@ describe('EloquentMongoose', function() {
     describe('first()', function() {
       it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .first()', function() {
         const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
-        expect(User.first()).toBeInstanceOf(Promise)
+        expect(typeof User.first().then).toEqual('function')
         expect(getModelNameSpy.called).toBe(true)
         getModelNameSpy.restore()
       })
@@ -635,7 +635,7 @@ describe('EloquentMongoose', function() {
     describe('pluck()', function() {
       it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .pluck()', function() {
         const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName')
-        expect(User.pluck('id')).toBeInstanceOf(Promise)
+        expect(typeof User.pluck('id').then).toEqual('function')
         expect(getModelNameSpy.called).toBe(true)
         getModelNameSpy.restore()
       })
@@ -954,9 +954,23 @@ describe('EloquentMongoose', function() {
     })
 
     describe('touch()', function() {
+      it('does nothing with not supported Timestamp Model', async function() {
+        const user = new User()
+        const markModifiedSpy = Sinon.spy(user['attributes'], 'markModified')
+        user.touch()
+        expect(markModifiedSpy.called).toBe(false)
+      })
+
       it('updates timestamps by calling markModified', async function() {
         let now = new Date(1988, 4, 16)
         Moment.now = () => now
+
+        const defaultSettings: TimestampModelDefault = new TimestampModelDefault()
+        await defaultSettings.save()
+        defaultSettings.touch()
+        expect(defaultSettings.created_at).toEqual(now)
+        expect(defaultSettings.updated_at).toEqual(now)
+
         const model: CustomTimestampModel = new CustomTimestampModel()
         const markModifiedSpy = Sinon.spy(model['attributes'], 'markModified')
         await model.save()

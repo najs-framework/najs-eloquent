@@ -1,12 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const util_1 = require("../../util");
@@ -24,119 +16,103 @@ function create_model(options) {
     return mongoose_1.model('SoftDelete' + count, schema);
 }
 function make_deletedAt_tests(Model, fieldName) {
-    it('always add deleted_at = null when document is created', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const document = new Model({
-                name: 'test'
-            });
-            yield document.save();
-            expect(document[fieldName]).toBeNull();
+    it('always add deleted_at = null when document is created', async function () {
+        const document = new Model({
+            name: 'test'
         });
+        await document.save();
+        expect(document[fieldName]).toBeNull();
     });
-    it('defines new method called `delete()` and updates deleted_at = now', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const now = new Date(1988, 4, 16);
-            Moment.now = () => now;
-            const document = yield Model.findOne({ name: 'test' });
-            yield document.delete();
-            expect(document[fieldName]).toEqual(now);
-        });
+    it('defines new method called `delete()` and updates deleted_at = now', async function () {
+        const now = new Date(1988, 4, 16);
+        Moment.now = () => now;
+        const document = await Model.findOne({ name: 'test' });
+        await document.delete();
+        expect(document[fieldName]).toEqual(now);
     });
-    it('defines new method called `restore()` and updates deleted_at = null', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const now = new Date(2000, 0, 1);
-            Moment.now = () => now;
-            const document = yield Model.findOne({ name: 'test' });
-            yield document.restore();
-            expect(document[fieldName]).toBeNull();
-        });
+    it('defines new method called `restore()` and updates deleted_at = null', async function () {
+        const now = new Date(2000, 0, 1);
+        Moment.now = () => now;
+        const document = await Model.findOne({ name: 'test' });
+        await document.restore();
+        expect(document[fieldName]).toBeNull();
     });
 }
 function make_count_overridden_test(Model, isOverridden) {
-    it('override count()', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const notDeleted = yield new Model({ name: 'test' }).save();
-            const deleted = yield new Model({ name: 'test' });
-            yield deleted.delete();
-            if (isOverridden) {
-                expect(yield Model.count({ name: 'test' })).toEqual(1);
-                expect(yield Model.countOnlyDeleted({ name: 'test' })).toEqual(1);
-                expect(yield Model.countWithDeleted({ name: 'test' })).toEqual(2);
-            }
-            else {
-                expect(yield Model.count({ name: 'test' })).toEqual(2);
-                expect(Model.countOnlyDeleted).toBeUndefined();
-                expect(Model.countWithDeleted).toBeUndefined();
-            }
-            yield notDeleted.remove();
-            yield deleted.remove();
-        });
+    it('override count()', async function () {
+        const notDeleted = await new Model({ name: 'test' }).save();
+        const deleted = await new Model({ name: 'test' });
+        await deleted.delete();
+        if (isOverridden) {
+            expect(await Model.count({ name: 'test' })).toEqual(1);
+            expect(await Model.countOnlyDeleted({ name: 'test' })).toEqual(1);
+            expect(await Model.countWithDeleted({ name: 'test' })).toEqual(2);
+        }
+        else {
+            expect(await Model.count({ name: 'test' })).toEqual(2);
+            expect(Model.countOnlyDeleted).toBeUndefined();
+            expect(Model.countWithDeleted).toBeUndefined();
+        }
+        await notDeleted.remove();
+        await deleted.remove();
     });
 }
 function make_findOne_overridden_test(Model, isOverridden) {
-    it('override fineOne()', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const notDeleted = new Model({ name: 'test' });
-            yield notDeleted.save();
-            const deleted = yield new Model({ name: 'test' });
-            yield deleted.delete();
-            if (isOverridden) {
-                expect((yield Model.findOne({ name: 'test' })).toObject()).toEqual(notDeleted.toObject());
-                expect((yield Model.findOneOnlyDeleted({ name: 'test' })).toObject()).toEqual(deleted.toObject());
-                expect((yield Model.findOneWithDeleted({ name: 'test' })).toObject()).toEqual(notDeleted.toObject());
-            }
-            else {
-                expect((yield Model.findOne({ name: 'test' })).toObject()).toEqual(notDeleted.toObject());
-                expect(Model.findOneOnlyDeleted).toBeUndefined();
-                expect(Model.findOneWithDeleted).toBeUndefined();
-            }
-            yield notDeleted.remove();
-            yield deleted.remove();
-        });
+    it('override fineOne()', async function () {
+        const notDeleted = new Model({ name: 'test' });
+        await notDeleted.save();
+        const deleted = await new Model({ name: 'test' });
+        await deleted.delete();
+        if (isOverridden) {
+            expect((await Model.findOne({ name: 'test' })).toObject()).toEqual(notDeleted.toObject());
+            expect((await Model.findOneOnlyDeleted({ name: 'test' })).toObject()).toEqual(deleted.toObject());
+            expect((await Model.findOneWithDeleted({ name: 'test' })).toObject()).toEqual(notDeleted.toObject());
+        }
+        else {
+            expect((await Model.findOne({ name: 'test' })).toObject()).toEqual(notDeleted.toObject());
+            expect(Model.findOneOnlyDeleted).toBeUndefined();
+            expect(Model.findOneWithDeleted).toBeUndefined();
+        }
+        await notDeleted.remove();
+        await deleted.remove();
     });
 }
 function make_find_overridden_test(Model, isOverridden) {
-    it('override fine()', function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const notDeleted = new Model({ name: 'test' });
-            yield notDeleted.save();
-            const deleted = yield new Model({ name: 'test' });
-            yield deleted.delete();
-            if (isOverridden) {
-                expect((yield Model.find({ name: 'test' })).map((item) => item.toObject())).toEqual([notDeleted.toObject()]);
-                expect((yield Model.findOnlyDeleted({ name: 'test' })).map((item) => item.toObject())).toEqual([
-                    deleted.toObject()
-                ]);
-                expect((yield Model.findWithDeleted({ name: 'test' })).map((item) => item.toObject())).toEqual([
-                    notDeleted.toObject(),
-                    deleted.toObject()
-                ]);
-            }
-            else {
-                expect((yield Model.find({ name: 'test' })).map((item) => item.toObject())).toEqual([
-                    notDeleted.toObject(),
-                    deleted.toObject()
-                ]);
-                expect(Model.findOnlyDeleted).toBeUndefined();
-                expect(Model.findWithDeleted).toBeUndefined();
-            }
-            yield notDeleted.remove();
-            yield deleted.remove();
-        });
+    it('override fine()', async function () {
+        const notDeleted = new Model({ name: 'test' });
+        await notDeleted.save();
+        const deleted = await new Model({ name: 'test' });
+        await deleted.delete();
+        if (isOverridden) {
+            expect((await Model.find({ name: 'test' })).map((item) => item.toObject())).toEqual([notDeleted.toObject()]);
+            expect((await Model.findOnlyDeleted({ name: 'test' })).map((item) => item.toObject())).toEqual([
+                deleted.toObject()
+            ]);
+            expect((await Model.findWithDeleted({ name: 'test' })).map((item) => item.toObject())).toEqual([
+                notDeleted.toObject(),
+                deleted.toObject()
+            ]);
+        }
+        else {
+            expect((await Model.find({ name: 'test' })).map((item) => item.toObject())).toEqual([
+                notDeleted.toObject(),
+                deleted.toObject()
+            ]);
+            expect(Model.findOnlyDeleted).toBeUndefined();
+            expect(Model.findWithDeleted).toBeUndefined();
+        }
+        await notDeleted.remove();
+        await deleted.remove();
     });
 }
 describe('SoftDelete', function () {
-    beforeAll(function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield util_1.init_mongoose(mongoose, 'soft_delete');
-        });
+    beforeAll(async function () {
+        await util_1.init_mongoose(mongoose, 'soft_delete');
     });
-    afterAll(function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            for (let i = 0; i < count; i++) {
-                yield util_1.delete_collection(mongoose, 'soft_deletes_' + i);
-            }
-        });
+    afterAll(async function () {
+        for (let i = 0; i < count; i++) {
+            await util_1.delete_collection(mongoose, 'soft_deletes_' + i);
+        }
     });
     describe('Default Options', function () {
         make_deletedAt_tests(create_model(), 'deleted_at');

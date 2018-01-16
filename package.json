@@ -1,6 +1,6 @@
 {
   "name": "najs-eloquent",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "scripts": {
     "build": "npm run build-ts && npm run tslint && npm run copy-js-files",
     "copy-js-files": "chmod u+x ./script/copy-js-files.sh && ./script/copy-js-files.sh",
@@ -43,14 +43,14 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=6.x"
+    "node": ">=8.7"
   },
   "dependencies": {
     "collect.js": "^4.0.2",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
     "mongoose": "^5.0.0-rc0",
-    "najs": "^0.1.3",
+    "najs": "^0.1.6",
     "pluralize": "^7.0.0",
     "sinon": "^4.1.3"
   },

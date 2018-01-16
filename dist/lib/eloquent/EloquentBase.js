@@ -131,9 +131,7 @@ class EloquentBase {
     initialize(data) {
         this.accessors = {};
         this.mutators = {};
-        if (Object.getOwnPropertyDescriptors) {
-            this.findGettersAndSetters();
-        }
+        this.findGettersAndSetters();
         this.findAccessorsAndMutators();
         if (this.isNativeRecord(data)) {
             this.setAttributesByNativeRecord(data);

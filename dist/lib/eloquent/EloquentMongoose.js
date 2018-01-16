@@ -1,12 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const EloquentBase_1 = require("./EloquentBase");
 const MongooseQueryBuilder_1 = require("../query-builders/MongooseQueryBuilder");
@@ -127,40 +119,30 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         }
     }
     // -------------------------------------------------------------------------------------------------------------------
-    save() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.attributes.save();
-        });
+    async save() {
+        return this.attributes.save();
     }
-    delete() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (Object.getPrototypeOf(this).constructor.softDeletes) {
-                return this.attributes['delete']();
-            }
-            return this.attributes.remove();
-        });
+    async delete() {
+        if (Object.getPrototypeOf(this).constructor.softDeletes) {
+            return this.attributes['delete']();
+        }
+        return this.attributes.remove();
     }
-    forceDelete() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.attributes.remove();
-        });
+    async forceDelete() {
+        return this.attributes.remove();
     }
-    restore() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (Object.getPrototypeOf(this).constructor.softDeletes) {
-                return this.attributes['restore']();
-            }
-        });
+    async restore() {
+        if (Object.getPrototypeOf(this).constructor.softDeletes) {
+            return this.attributes['restore']();
+        }
     }
-    fresh() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.attributes.isNew) {
-                // tslint:disable-next-line
-                return null;
-            }
-            const query = this.newQuery();
-            return query.where(query.getPrimaryKey(), this.attributes._id).find();
-        });
+    async fresh() {
+        if (this.attributes.isNew) {
+            // tslint:disable-next-line
+            return null;
+        }
+        const query = this.newQuery();
+        return query.where(query.getPrimaryKey(), this.attributes._id).find();
     }
     // -------------------------------------------------------------------------------------------------------------------
     static queryName(name) {
@@ -251,14 +233,12 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     static findById(id) {
         return this.find(id);
     }
-    static findOrFail(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const value = yield this.find(id);
-            if (!value) {
-                throw new NotFoundError_1.NotFoundError(this.prototype.getClassName());
-            }
-            return value;
-        });
+    static async findOrFail(id) {
+        const value = await this.find(id);
+        if (!value) {
+            throw new NotFoundError_1.NotFoundError(this.prototype.getClassName());
+        }
+        return value;
     }
 }
 exports.EloquentMongoose = EloquentMongoose;

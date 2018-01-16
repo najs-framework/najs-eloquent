@@ -207,9 +207,7 @@ export abstract class EloquentBase<NativeRecord extends Object = {}> implements 
   protected initialize(data: NativeRecord | Object | undefined): any {
     this.accessors = {}
     this.mutators = {}
-    if (Object.getOwnPropertyDescriptors) {
-      this.findGettersAndSetters()
-    }
+    this.findGettersAndSetters()
     this.findAccessorsAndMutators()
 
     if (this.isNativeRecord(data)) {
