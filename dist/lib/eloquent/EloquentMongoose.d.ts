@@ -1,7 +1,8 @@
 import { EloquentBase, EloquentSoftDelete } from './EloquentBase';
 import { OrderDirection, SubCondition } from '../interfaces/IBasicQueryGrammar';
+import { IMongooseProvider } from '../interfaces/IMongooseProvider';
 import { MongooseQueryBuilder } from '../query-builders/MongooseQueryBuilder';
-import { Document, Schema, Model, Mongoose } from 'mongoose';
+import { Document, Schema, Model } from 'mongoose';
 import { Collection } from 'collect.js';
 export declare abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
     protected collection: string;
@@ -14,7 +15,7 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     getModelName(): string;
     protected initializeModelIfNeeded(softDeletes: boolean | EloquentSoftDelete): void;
     protected initialize(data: Document & T | Object | undefined): EloquentMongoose<T>;
-    protected getMongoose(): Mongoose;
+    protected getMongooseProvider(): IMongooseProvider;
     protected isNativeRecord(data: Document & T | Object | undefined): boolean;
     protected initializeAttributes(): void;
     protected setAttributesByObject(data: Object): void;

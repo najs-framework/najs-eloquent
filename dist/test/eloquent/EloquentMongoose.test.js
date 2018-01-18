@@ -19,6 +19,9 @@ class MongooseProvider {
     getMongooseInstance() {
         return mongoose;
     }
+    createModelFromSchema(modelName, schema) {
+        return mongoose_1.model(modelName, schema);
+    }
 }
 MongooseProvider.className = 'MongooseProvider';
 najs_1.register(MongooseProvider);
@@ -606,10 +609,10 @@ describe('EloquentMongoose', function () {
                 expect(user['model'].modelName).toEqual('User');
             });
         });
-        describe('protected getMongoose()', function () {
+        describe('protected getMongooseProvider()', function () {
             it('uses make("MongooseProvider") to get an instance of mongoose', function () {
                 const user = new User();
-                expect(user['getMongoose']() === mongoose).toBe(true);
+                expect(user['getMongooseProvider']().getMongooseInstance() === mongoose).toBe(true);
             });
         });
         describe('protected isNativeRecord(document)', function () {

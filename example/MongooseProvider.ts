@@ -1,5 +1,6 @@
 import { register } from 'najs'
 import { IMongooseProvider } from '../lib'
+import { Schema, Document, Model, model } from 'mongoose'
 const mongoose = require('mongoose')
 
 @register() // register MongooseProvider with 'MongooseProvider' name
@@ -12,5 +13,9 @@ export class MongooseProvider implements IMongooseProvider {
 
   getMongooseInstance() {
     return mongoose
+  }
+
+  createModelFromSchema<T extends Document>(modelName: string, schema: Schema): Model<T> {
+    return model<T>(modelName, schema)
   }
 }

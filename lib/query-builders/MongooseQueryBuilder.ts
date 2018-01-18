@@ -28,7 +28,7 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder
   constructor(modelName: string, softDelete?: QueryBuilderSoftDelete, primaryKey: string = '_id') {
     super(softDelete)
     this.primaryKey = primaryKey
-    const mongoose: Mongoose = this.getMongoose()
+    const mongoose: Mongoose = this.getMongooseProvider().getMongooseInstance()
     if (mongoose.modelNames().indexOf(modelName) === -1) {
       throw new Error('Model ' + modelName + ' Not Found')
     }
@@ -36,8 +36,8 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder
     this.mongooseModel = mongoose.model(modelName)
   }
 
-  protected getMongoose(): Mongoose {
-    return make<IMongooseProvider>('MongooseProvider').getMongooseInstance()
+  protected getMongooseProvider(): IMongooseProvider {
+    return make<IMongooseProvider>('MongooseProvider')
   }
 
   protected getQuery(isFindOne: boolean = false): MongooseQuery<T> {

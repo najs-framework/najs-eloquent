@@ -2,7 +2,7 @@ import { EloquentBase, EloquentTimestamps, EloquentSoftDelete } from './Eloquent
 import { OrderDirection, SubCondition } from '../interfaces/IBasicQueryGrammar'
 import { IMongooseProvider } from '../interfaces/IMongooseProvider'
 import { MongooseQueryBuilder } from '../query-builders/MongooseQueryBuilder'
-import { Document, Schema, Model, Mongoose, model } from 'mongoose'
+import { Document, Schema, Model } from 'mongoose'
 import collect, { Collection } from 'collect.js'
 import { make } from 'najs'
 import { NotFoundError } from '../errors/NotFoundError'
@@ -45,8 +45,13 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   // -------------------------------------------------------------------------------------------------------------------
   protected initializeModelIfNeeded(softDeletes: boolean | EloquentSoftDelete) {
     const modelName: string = this.getModelName()
-    const mongoose: Mongoose = this.getMongoose()
-    if (mongoose.modelNames().indexOf(modelName) === -1) {
+    const mongooseProvider: IMongooseProvider = this.getMongooseProvider()
+    if (
+      mongooseProvider
+        .getMongooseInstance()
+        .modelNames()
+        .indexOf(modelName) === -1
+    ) {
       const schema = this.getSchema()
       const timestampsSettings = Object.getPrototypeOf(this).constructor.timestamps
       if (timestampsSettings) {
@@ -55,19 +60,21 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
       if (softDeletes) {
         schema.plugin(SoftDelete, softDeletes === true ? DEFAULT_SOFT_DELETES : softDeletes)
       }
-      model<Document & T>(modelName, schema)
+      mongooseProvider.createModelFromSchema<Document & T>(modelName, schema)
     }
   }
 
   protected initialize(data: Document & T | Object | undefined): EloquentMongoose<T> {
     this.initializeModelIfNeeded(Object.getPrototypeOf(this).constructor.softDeletes)
-    this.model = this.getMongoose().model(this.getModelName())
+    this.model = this.getMongooseProvider()
+      .getMongooseInstance()
+      .model(this.getModelName())
     this.schema = this.model.schema
     return super.initialize(data)
   }
 
-  protected getMongoose(): Mongoose {
-    return make<IMongooseProvider>('MongooseProvider').getMongooseInstance()
+  protected getMongooseProvider(): IMongooseProvider {
+    return make<IMongooseProvider>('MongooseProvider')
   }
 
   protected isNativeRecord(data: Document & T | Object | undefined): boolean {

@@ -10,14 +10,14 @@ class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
     constructor(modelName, softDelete, primaryKey = '_id') {
         super(softDelete);
         this.primaryKey = primaryKey;
-        const mongoose = this.getMongoose();
+        const mongoose = this.getMongooseProvider().getMongooseInstance();
         if (mongoose.modelNames().indexOf(modelName) === -1) {
             throw new Error('Model ' + modelName + ' Not Found');
         }
         this.mongooseModel = mongoose.model(modelName);
     }
-    getMongoose() {
-        return najs_1.make('MongooseProvider').getMongooseInstance();
+    getMongooseProvider() {
+        return najs_1.make('MongooseProvider');
     }
     getQuery(isFindOne = false) {
         if (!this.hasMongooseQuery) {

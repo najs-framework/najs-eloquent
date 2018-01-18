@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_1 = require("najs");
+const mongoose_1 = require("mongoose");
 const mongoose = require('mongoose');
 let MongooseProvider = MongooseProvider_1 = class MongooseProvider {
     getClassName() {
@@ -14,6 +15,9 @@ let MongooseProvider = MongooseProvider_1 = class MongooseProvider {
     }
     getMongooseInstance() {
         return mongoose;
+    }
+    createModelFromSchema(modelName, schema) {
+        return mongoose_1.model(modelName, schema);
     }
 };
 MongooseProvider.className = 'MongooseProvider';

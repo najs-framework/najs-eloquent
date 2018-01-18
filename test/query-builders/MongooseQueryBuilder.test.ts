@@ -6,7 +6,7 @@ import { MongooseQueryBuilder } from '../../lib/query-builders/MongooseQueryBuil
 import { SoftDelete } from '../../lib/eloquent/mongoose/SoftDelete'
 import { init_mongoose, delete_collection } from '../util'
 import { make, register } from 'najs'
-import { model, Schema, Mongoose } from 'mongoose'
+import { model, Schema, Mongoose, Model, Document } from 'mongoose'
 import { NotFoundError } from '../../lib/errors/NotFoundError'
 import { ObjectId } from 'bson'
 
@@ -22,6 +22,10 @@ class MongooseProvider implements IMongooseProvider {
 
   getMongooseInstance() {
     return mongoose
+  }
+
+  createModelFromSchema<T extends Document>(modelName: string, schema: Schema): Model<T> {
+    return model<T>(modelName, schema)
   }
 }
 
@@ -100,10 +104,10 @@ describe('MongooseQueryBuilder', function() {
     })
   })
 
-  describe('protected getMongoose()', function() {
+  describe('protected getMongooseProvider()', function() {
     it('uses make("MongooseProvider") to get an instance of mongoose', function() {
       const query = new MongooseQueryBuilder('User')
-      expect(query['getMongoose']() === mongoose).toBe(true)
+      expect(query['getMongooseProvider']().getMongooseInstance() === mongoose).toBe(true)
     })
   })
 

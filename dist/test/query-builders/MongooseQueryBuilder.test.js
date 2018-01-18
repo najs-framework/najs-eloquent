@@ -24,6 +24,9 @@ let MongooseProvider = MongooseProvider_1 = class MongooseProvider {
     getMongooseInstance() {
         return mongoose;
     }
+    createModelFromSchema(modelName, schema) {
+        return mongoose_1.model(modelName, schema);
+    }
 };
 MongooseProvider.className = 'MongooseProvider';
 MongooseProvider = MongooseProvider_1 = __decorate([
@@ -84,10 +87,10 @@ describe('MongooseQueryBuilder', function () {
             expect('it').toEqual('should throw exception');
         });
     });
-    describe('protected getMongoose()', function () {
+    describe('protected getMongooseProvider()', function () {
         it('uses make("MongooseProvider") to get an instance of mongoose', function () {
             const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
-            expect(query['getMongoose']() === mongoose).toBe(true);
+            expect(query['getMongooseProvider']().getMongooseInstance() === mongoose).toBe(true);
         });
     });
     describe('protected getQuery()', function () {

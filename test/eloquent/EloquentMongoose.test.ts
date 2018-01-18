@@ -1,6 +1,6 @@
 import 'jest'
 import * as Sinon from 'sinon'
-import { Schema } from 'mongoose'
+import { Schema, Document, model } from 'mongoose'
 import { register } from 'najs'
 import { ObjectId } from 'bson'
 import { Eloquent } from '../../lib'
@@ -22,6 +22,10 @@ class MongooseProvider implements IMongooseProvider {
 
   getMongooseInstance() {
     return mongoose
+  }
+
+  createModelFromSchema<T extends Document>(modelName: string, schema: Schema) {
+    return model<T>(modelName, schema)
   }
 }
 register(MongooseProvider)
@@ -714,10 +718,10 @@ describe('EloquentMongoose', function() {
       })
     })
 
-    describe('protected getMongoose()', function() {
+    describe('protected getMongooseProvider()', function() {
       it('uses make("MongooseProvider") to get an instance of mongoose', function() {
         const user = new User()
-        expect(user['getMongoose']() === mongoose).toBe(true)
+        expect(user['getMongooseProvider']().getMongooseInstance() === mongoose).toBe(true)
       })
     })
 

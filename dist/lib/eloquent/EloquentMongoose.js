@@ -32,8 +32,11 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     // -------------------------------------------------------------------------------------------------------------------
     initializeModelIfNeeded(softDeletes) {
         const modelName = this.getModelName();
-        const mongoose = this.getMongoose();
-        if (mongoose.modelNames().indexOf(modelName) === -1) {
+        const mongooseProvider = this.getMongooseProvider();
+        if (mongooseProvider
+            .getMongooseInstance()
+            .modelNames()
+            .indexOf(modelName) === -1) {
             const schema = this.getSchema();
             const timestampsSettings = Object.getPrototypeOf(this).constructor.timestamps;
             if (timestampsSettings) {
@@ -42,17 +45,19 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
             if (softDeletes) {
                 schema.plugin(SoftDelete_1.SoftDelete, softDeletes === true ? DEFAULT_SOFT_DELETES : softDeletes);
             }
-            mongoose_1.model(modelName, schema);
+            mongooseProvider.createModelFromSchema(modelName, schema);
         }
     }
     initialize(data) {
         this.initializeModelIfNeeded(Object.getPrototypeOf(this).constructor.softDeletes);
-        this.model = this.getMongoose().model(this.getModelName());
+        this.model = this.getMongooseProvider()
+            .getMongooseInstance()
+            .model(this.getModelName());
         this.schema = this.model.schema;
         return super.initialize(data);
     }
-    getMongoose() {
-        return najs_1.make('MongooseProvider').getMongooseInstance();
+    getMongooseProvider() {
+        return najs_1.make('MongooseProvider');
     }
     isNativeRecord(data) {
         return data instanceof this.model;
