@@ -13,7 +13,7 @@
 If you are Laravel Eloquent lover and want to use it in `Node JS` you will love `Najs Eloquent`. `Najs Eloquent` is
 Laravel Eloquent, written in `Typescript` (with some helpers you can use it in Javascript for sure).
 
-Current version - `0.2.7` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
+Current version - `0.2.8` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
 some features of Laravel Eloquent are removed such as relationship or scope. In the way to `1.0.0`, the `Najs Eloquent`
 will support full Eloquent's features with difference kinds of DB like `MySql`, `PostgreSQL` or `SqlLite`
 (use `knex` as a query builder).
@@ -66,6 +66,7 @@ for example
 // file: CustomClass.ts
 import { register } from 'najs'
 import { IMongooseProvider } from 'najs-eloquent'
+import { Schema, Document, Model, model } from 'mongoose'
 const mongoose = require('mongoose')
 
 class CustomClass implements IMongooseProvider {
@@ -77,6 +78,10 @@ class CustomClass implements IMongooseProvider {
 
   getMongooseInstance() {
     return mongoose
+  }
+
+  createModelFromSchema<T extends Document>(modelName: string, schema: Schema): Model<T> {
+    return model<T>(modelName, schema)
   }
 }
 
@@ -135,45 +140,43 @@ async function getAll() {
 ### Find one model
 
 ```typescript
-async function findByPrimaryKey() {
-  const users: User = await User.orderBy('age', 'desc').find()
-}
+const users: User = await User.orderBy('age', 'desc').find()
 ```
 
 ### Find a model by primary key
 
 ```typescript
-async function findByPrimaryKey() {
-  const users: User = await User.find('0000000000000000000000000000')
-}
+const users: User = await User.find('0000000000000000000000000000')
 ```
 
 ### Count
 
 ```typescript
-async function count() {
-  const count: number = await User.count()
-}
+const count: number = await User.count()
 ```
 
 ### Pluck
 
 ```typescript
-const data: Object = await User.pluck('first_name') // -> { [id]: first_name, ... }
-const hash: Object = await User.pluck('first_name', 'age') // -> { [age]: first_name, ... }
+const data: Object = await User.pluck('first_name')
+// -> { [id]: first_name, ... }
+
+const hash: Object = await User.pluck('first_name', 'age')
+// -> { [age]: first_name, ... }
 ```
 
 ### Select Specific Columns
 
 ```typescript
-const data: number = await User.select('first_name').get() // -> Collection({ first_name: value }, ...)
+const data: number = await User.select('first_name').get()
+// -> Collection({ first_name: value }, ...)
 ```
 
 ### Query Builder
 
 ```typescript
 async function customQuery() {
-  return await User.queryName('Your custom query')
+  return await User.queryName('Your custom query name')
     .where('first_name', 'tony')
     .where('age', '>', 10)
     .get()
@@ -185,51 +188,60 @@ async function customQuery() {
 ##### Not Equal: `!=` or `<>`
 
 ```typescript
-await User.where('first_name', '!=', 'tony').get() // -> { first_name: { $ne: 'tony' } }
+await User.where('first_name', '!=', 'tony').get()
+// -> { first_name: { $ne: 'tony' } }
 ```
 
 ##### Less than: `<`
 
 ```typescript
-await User.where('age', '<', 20).get() // -> { age: { $lt: 20 } }
+await User.where('age', '<', 20).get()
+// -> { age: { $lt: 20 } }
 ```
 
 ##### Less than or equal: `<=` or `=<`
 
 ```typescript
-await User.where('age', '<=', 20).get() // -> { age: { $lte: 20 } }
+await User.where('age', '<=', 20).get()
+// -> { age: { $lte: 20 } }
 ```
 
 ##### Greater than or equal: `>=` or `=>`
 
 ```typescript
-await User.where('age', '>=', 20).get() // -> { age: { $gte: 20 } }
+await User.where('age', '>=', 20).get()
+// -> { age: { $gte: 20 } }
 ```
 
 ##### Greater than: `>`
 
 ```typescript
-await User.where('age', '>', 20).get() // -> { age: { $gt: 20 } }
+await User.where('age', '>', 20).get()
+// -> { age: { $gt: 20 } }
 ```
 
 ##### Finding a value in an array
 
 ```typescript
 // Using .whereIn()
-return await User.whereIn('first_name', ['tony']).get() // -> { first_name: { $in: ['tony'] } }
+return await User.whereIn('first_name', ['tony']).get()
+// -> { first_name: { $in: ['tony'] } }
 
 // Using .where() with operator 'in'
-return await User.where('first_name', 'in', ['tony']).get() // -> { first_name: { $in: ['tony'] } }
+return await User.where('first_name', 'in', ['tony']).get()
+// -> { first_name: { $in: ['tony'] } }
 ```
 
 ##### Finding a value NOT in an array
 
 ```typescript
 // Using .whereIn()
-await User.whereNotIn('first_name', ['tony']).get() // -> { first_name: { $nin: ['tony'] } }
+await User.whereNotIn('first_name', ['tony']).get()
+// -> { first_name: { $nin: ['tony'] } }
 
 // Using .where() with operator 'not-in'
-await User.where('first_name', 'not-in', ['tony']).get() // -> { first_name: { $nin: ['tony'] } }
+await User.where('first_name', 'not-in', ['tony']).get()
+// -> { first_name: { $nin: ['tony'] } }
 ```
 
 #### AND conditions
@@ -237,12 +249,14 @@ await User.where('first_name', 'not-in', ['tony']).get() // -> { first_name: { $
 ```typescript
 User.where('first_name', 'tony')
   .where('last_name', 'stark')
-  .get() // -> { first_name: 'tony', last_name: 'stark' }
+  .get()
+// -> { first_name: 'tony', last_name: 'stark' }
 
 // Using .where() with operator 'not'
 await User.where('first_name', 'tony')
   .where('last_name', '!=', 'stark')
-  .get() // -> { first_name: 'tony', last_name: { $ne: 'stark' } }
+  .get()
+// -> { first_name: 'tony', last_name: { $ne: 'stark' } }
 ```
 
 #### OR conditions
@@ -250,13 +264,14 @@ await User.where('first_name', 'tony')
 ```typescript
 User.where('first_name', 'tony')
   .orWhere('last_name', 'stark')
-  .get() // -> { $or: [ { first_name: 'tony' }, { last_name: 'stark' }] }
+  .get()
+// -> { $or: [ { first_name: 'tony' }, { last_name: 'stark' }] }
 
-// Using .where() with operator 'not-in'
 await User.where('first_name', 'tony')
   .where('last_name', 'stark')
   .orWhere('age', 40)
-  .get() // -> { first_name: 'tony', $or: [ { last_name: 'stark' }, { age: 40 }] }
+  .get()
+// -> { first_name: 'tony', $or: [ { last_name: 'stark' }, { age: 40 }] }
 
 await User.queryName('(A and B) or (C and D)')
   .where(function(query) {
@@ -339,7 +354,6 @@ You can define an accessor by `getter` or a function like Laravel Eloquent
 ```typescript
 // file: Accessor.ts
 export class User extends User.Class<IAdminUser, User>() {
-  // For `node > 8.7` or whatever supports `Object.getOwnPropertyDescriptor`
   get full_name() {
     return this.attributes['first_name'] + ' ' + this.attributes['last_name']
   }
@@ -359,7 +373,6 @@ You can define a mutator by `setter` or a function like Laravel Eloquent
 ```typescript
 // file: Mutator.ts
 export class User extends User.Class<IAdminUser, User>() {
-  // For `node > 8.7` or whatever supports `Object.getOwnPropertyDescriptor`
   set full_name(value: any) {
     // ...
   }
