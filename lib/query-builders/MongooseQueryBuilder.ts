@@ -125,6 +125,7 @@ export class MongooseQueryBuilder<T = {}> extends QueryBuilder
     }
 
     const result = await (query as DocumentQuery<(Document & T) | null, Document & T>).exec()
+    // console.log(this.mongooseModel.modelName)
     if (result) {
       return make<Eloquent<T>>(this.mongooseModel.modelName).newInstance(result)
     }

@@ -63,6 +63,7 @@ describe('EloquentMongoose', function () {
     });
     afterAll(async function () {
         await util_1.delete_collection(mongoose, 'users');
+        await util_1.delete_collection(mongoose, 'models');
         await util_1.delete_collection(mongoose, 'timestampmodeldefaults');
         await util_1.delete_collection(mongoose, 'customtimestampmodels');
         await util_1.delete_collection(mongoose, 'softdeletemodels');
@@ -77,9 +78,24 @@ describe('EloquentMongoose', function () {
         const user = await User.find();
         expect(user).toBeNull();
     });
-    it('can be initialized with static function .first()', async function () {
-        const user = await User.first();
-        expect(user).toBeNull();
+    it('can be registered and initialized with static function .first()', async function () {
+        const user = new User({
+            first_name: 'tony',
+            last_name: 'stark',
+            age: 45
+        });
+        await user.save();
+        class Model extends lib_1.Eloquent.Mongoose() {
+            getClassName() {
+                return Model.className;
+            }
+            getSchema() {
+                return new mongoose_1.Schema({}, { collection: 'users' });
+            }
+        }
+        Model.className = 'Model';
+        const model = await Model.first();
+        await model.delete();
     });
     describe('ActiveRecord', function () {
         describe('save()', function () {

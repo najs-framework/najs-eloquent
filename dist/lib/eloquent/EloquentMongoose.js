@@ -86,6 +86,7 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     newQuery(softDeletes) {
         const softDeleteSettings = softDeletes || Object.getPrototypeOf(this).constructor.softDeletes;
+        this.registerIfNeeded();
         this.initializeModelIfNeeded(softDeleteSettings);
         return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.getModelName(), softDeleteSettings === true ? DEFAULT_SOFT_DELETES : softDeleteSettings);
     }
@@ -151,67 +152,107 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     // -------------------------------------------------------------------------------------------------------------------
     static queryName(name) {
-        return this.prototype.newQuery(this.softDeletes).queryName(name);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .queryName(name);
     }
     static select(...fields) {
-        return this.prototype.newQuery(this.softDeletes).select(...fields);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .select(...fields);
     }
     static distinct(...fields) {
-        return this.prototype.newQuery(this.softDeletes).distinct(...fields);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .distinct(...fields);
     }
     static orderBy(field, direction = 'asc') {
-        return this.prototype.newQuery(this.softDeletes).orderBy(field, direction);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .orderBy(field, direction);
     }
     static orderByAsc(field) {
-        return this.prototype.newQuery(this.softDeletes).orderByAsc(field);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .orderByAsc(field);
     }
     static orderByDesc(field) {
-        return this.prototype.newQuery(this.softDeletes).orderByDesc(field);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .orderByDesc(field);
     }
     static limit(records) {
-        return this.prototype.newQuery(this.softDeletes).limit(records);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .limit(records);
     }
     static where(arg0, arg1, arg2) {
-        return this.prototype.newQuery(this.softDeletes).where(arg0, arg1, arg2);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .where(arg0, arg1, arg2);
     }
     static orWhere(arg0, arg1, arg2) {
-        return this.prototype.newQuery(this.softDeletes).orWhere(arg0, arg1, arg2);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .orWhere(arg0, arg1, arg2);
     }
     static whereIn(field, values) {
-        return this.prototype.newQuery(this.softDeletes).whereIn(field, values);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .whereIn(field, values);
     }
     static whereNotIn(field, values) {
-        return this.prototype.newQuery(this.softDeletes).whereNotIn(field, values);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .whereNotIn(field, values);
     }
     static orWhereIn(field, values) {
-        return this.prototype.newQuery(this.softDeletes).orWhereIn(field, values);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .orWhereIn(field, values);
     }
     static orWhereNotIn(field, values) {
-        return this.prototype.newQuery(this.softDeletes).orWhereNotIn(field, values);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .orWhereNotIn(field, values);
     }
     static whereNull(field) {
-        return this.prototype.newQuery(this.softDeletes).whereNull(field);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .whereNull(field);
     }
     static whereNotNull(field) {
-        return this.prototype.newQuery(this.softDeletes).whereNotNull(field);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .whereNotNull(field);
     }
     static orWhereNull(field) {
-        return this.prototype.newQuery(this.softDeletes).orWhereNull(field);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .orWhereNull(field);
     }
     static orWhereNotNull(field) {
-        return this.prototype.newQuery(this.softDeletes).orWhereNotNull(field);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .orWhereNotNull(field);
     }
     static withTrashed() {
-        return this.prototype.newQuery(this.softDeletes).withTrashed();
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .withTrashed();
     }
     static onlyTrashed() {
-        return this.prototype.newQuery(this.softDeletes).onlyTrashed();
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .onlyTrashed();
     }
     static all() {
-        return this.prototype.newQuery(this.softDeletes).all();
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .all();
     }
     static get(...fields) {
-        return this.prototype
+        return Reflect.construct(this, [])
             .newQuery(this.softDeletes)
             .select(...fields)
             .get();
@@ -221,19 +262,29 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
             const query = this.prototype.newQuery(this.softDeletes);
             return query.where(query.getPrimaryKey(), id).find();
         }
-        return this.prototype.newQuery(this.softDeletes).find();
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .find();
     }
     static first() {
-        return this.prototype.newQuery(this.softDeletes).first();
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .first();
     }
     static pluck(value, key) {
-        return this.prototype.newQuery(this.softDeletes).pluck(value, key);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .pluck(value, key);
     }
     static count() {
-        return this.prototype.newQuery(this.softDeletes).count();
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .count();
     }
     static native(handler) {
-        return this.prototype.newQuery(this.softDeletes).native(handler);
+        return Reflect.construct(this, [])
+            .newQuery(this.softDeletes)
+            .native(handler);
     }
     static findById(id) {
         return this.find(id);

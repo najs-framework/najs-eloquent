@@ -91,6 +91,7 @@ class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
             query.findOne();
         }
         const result = await query.exec();
+        // console.log(this.mongooseModel.modelName)
         if (result) {
             return najs_1.make(this.mongooseModel.modelName).newInstance(result);
         }

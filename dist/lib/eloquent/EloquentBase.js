@@ -6,9 +6,7 @@ const najs_1 = require("najs");
 const lodash_1 = require("lodash");
 class EloquentBase {
     constructor(data) {
-        if (!najs_1.ClassRegistry.has(this.getClassName())) {
-            najs_1.register(Object.getPrototypeOf(this).constructor, this.getClassName(), false);
-        }
+        this.registerIfNeeded();
         return this.initialize(data);
     }
     get id() {
@@ -16,6 +14,11 @@ class EloquentBase {
     }
     set id(value) {
         this.setId(value);
+    }
+    registerIfNeeded() {
+        if (!najs_1.ClassRegistry.has(this.getClassName())) {
+            najs_1.register(Object.getPrototypeOf(this).constructor, this.getClassName(), false);
+        }
     }
     newInstance(data) {
         const instance = najs_1.make(this.getClassName());

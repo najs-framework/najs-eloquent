@@ -56,6 +56,7 @@ export declare abstract class EloquentBase<NativeRecord extends Object = {}> imp
     constructor(data: Object);
     constructor(data: NativeRecord);
     id: any;
+    protected registerIfNeeded(): void;
     newInstance(): any;
     newInstance(data: Object): any;
     newInstance(data: NativeRecord): any;

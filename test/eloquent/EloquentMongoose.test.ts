@@ -100,6 +100,7 @@ describe('EloquentMongoose', function() {
 
   afterAll(async function() {
     await delete_collection(mongoose, 'users')
+    await delete_collection(mongoose, 'models')
     await delete_collection(mongoose, 'timestampmodeldefaults')
     await delete_collection(mongoose, 'customtimestampmodels')
     await delete_collection(mongoose, 'softdeletemodels')
@@ -117,9 +118,27 @@ describe('EloquentMongoose', function() {
     expect(user).toBeNull()
   })
 
-  it('can be initialized with static function .first()', async function() {
-    const user = await User.first()
-    expect(user).toBeNull()
+  it('can be registered and initialized with static function .first()', async function() {
+    const user = new User({
+      first_name: 'tony',
+      last_name: 'stark',
+      age: 45
+    })
+    await user.save()
+    class Model extends Eloquent.Mongoose<{}, Model>() {
+      static className: string = 'Model'
+
+      getClassName() {
+        return Model.className
+      }
+
+      getSchema(): Schema {
+        return new Schema({}, { collection: 'users' })
+      }
+    }
+
+    const model = await Model.first()
+    await model.delete()
   })
 
   describe('ActiveRecord', function() {

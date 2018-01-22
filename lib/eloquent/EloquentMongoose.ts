@@ -111,6 +111,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
 
   newQuery(softDeletes?: boolean | EloquentSoftDelete): any {
     const softDeleteSettings = softDeletes || Object.getPrototypeOf(this).constructor.softDeletes
+    this.registerIfNeeded()
     this.initializeModelIfNeeded(softDeleteSettings)
     return new MongooseQueryBuilder(
       this.getModelName(),
@@ -193,97 +194,137 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
 
   // -------------------------------------------------------------------------------------------------------------------
   static queryName(name: string): MongooseQueryBuilder {
-    return this.prototype.newQuery(this.softDeletes).queryName(name)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .queryName(name)
   }
 
   static select(field: string): MongooseQueryBuilder
   static select(fields: string[]): MongooseQueryBuilder
   static select(...fields: Array<string | string[]>): MongooseQueryBuilder
   static select(...fields: Array<string | string[]>): MongooseQueryBuilder {
-    return this.prototype.newQuery(this.softDeletes).select(...fields)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .select(...fields)
   }
 
   static distinct(field: string): MongooseQueryBuilder
   static distinct(fields: string[]): MongooseQueryBuilder
   static distinct(...fields: Array<string | string[]>): MongooseQueryBuilder
   static distinct(...fields: Array<string | string[]>): MongooseQueryBuilder {
-    return this.prototype.newQuery(this.softDeletes).distinct(...fields)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .distinct(...fields)
   }
 
   static orderBy(field: string): MongooseQueryBuilder
   static orderBy(field: string, direction: OrderDirection): MongooseQueryBuilder
   static orderBy(field: string, direction: OrderDirection = 'asc'): MongooseQueryBuilder {
-    return this.prototype.newQuery(this.softDeletes).orderBy(field, direction)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .orderBy(field, direction)
   }
 
   static orderByAsc(field: string): MongooseQueryBuilder {
-    return this.prototype.newQuery(this.softDeletes).orderByAsc(field)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .orderByAsc(field)
   }
 
   static orderByDesc(field: string): MongooseQueryBuilder {
-    return this.prototype.newQuery(this.softDeletes).orderByDesc(field)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .orderByDesc(field)
   }
 
   static limit(records: number): MongooseQueryBuilder {
-    return this.prototype.newQuery(this.softDeletes).limit(records)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .limit(records)
   }
 
   static where(conditionBuilder: SubCondition): MongooseQueryBuilder
   static where(field: string, value: any): MongooseQueryBuilder
   static where(field: string, operator: Operator, value: any): MongooseQueryBuilder
   static where(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): MongooseQueryBuilder {
-    return this.prototype.newQuery(this.softDeletes).where(<any>arg0, arg1, arg2)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .where(<any>arg0, arg1, arg2)
   }
 
   static orWhere(conditionBuilder: SubCondition): MongooseQueryBuilder
   static orWhere(field: string, value: any): MongooseQueryBuilder
   static orWhere(field: string, operator: Operator, value: any): MongooseQueryBuilder
   static orWhere(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): MongooseQueryBuilder {
-    return this.prototype.newQuery(this.softDeletes).orWhere(<any>arg0, arg1, arg2)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .orWhere(<any>arg0, arg1, arg2)
   }
 
   static whereIn(field: string, values: Array<any>): MongooseQueryBuilder {
-    return this.prototype.newQuery(this.softDeletes).whereIn(field, values)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .whereIn(field, values)
   }
 
   static whereNotIn(field: string, values: Array<any>): MongooseQueryBuilder {
-    return this.prototype.newQuery(this.softDeletes).whereNotIn(field, values)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .whereNotIn(field, values)
   }
 
   static orWhereIn(field: string, values: Array<any>): MongooseQueryBuilder {
-    return this.prototype.newQuery(this.softDeletes).orWhereIn(field, values)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .orWhereIn(field, values)
   }
 
   static orWhereNotIn(field: string, values: Array<any>): MongooseQueryBuilder {
-    return this.prototype.newQuery(this.softDeletes).orWhereNotIn(field, values)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .orWhereNotIn(field, values)
   }
 
   static whereNull(field: string) {
-    return this.prototype.newQuery(this.softDeletes).whereNull(field)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .whereNull(field)
   }
 
   static whereNotNull(field: string) {
-    return this.prototype.newQuery(this.softDeletes).whereNotNull(field)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .whereNotNull(field)
   }
 
   static orWhereNull(field: string) {
-    return this.prototype.newQuery(this.softDeletes).orWhereNull(field)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .orWhereNull(field)
   }
 
   static orWhereNotNull(field: string) {
-    return this.prototype.newQuery(this.softDeletes).orWhereNotNull(field)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .orWhereNotNull(field)
   }
 
   static withTrashed() {
-    return this.prototype.newQuery(this.softDeletes).withTrashed()
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .withTrashed()
   }
 
   static onlyTrashed() {
-    return this.prototype.newQuery(this.softDeletes).onlyTrashed()
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .onlyTrashed()
   }
 
   static all(): Promise<any> {
-    return this.prototype.newQuery(this.softDeletes).all()
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .all()
   }
 
   static get(): Promise<any>
@@ -291,7 +332,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   static get(fields: string[]): Promise<any>
   static get(...fields: Array<string | string[]>): Promise<any>
   static get(...fields: Array<string | string[]>): Promise<any> {
-    return this.prototype
+    return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .select(...fields)
       .get()
@@ -303,25 +344,35 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
       const query = this.prototype.newQuery(this.softDeletes)
       return query.where(query.getPrimaryKey(), id).find()
     }
-    return this.prototype.newQuery(this.softDeletes).find()
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .find()
   }
 
   static first(): Promise<any> {
-    return this.prototype.newQuery(this.softDeletes).first()
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .first()
   }
 
   static pluck(value: string): Promise<Object>
   static pluck(value: string, key: string): Promise<Object>
   static pluck(value: string, key?: string): Promise<Object> {
-    return this.prototype.newQuery(this.softDeletes).pluck(value, key)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .pluck(value, key)
   }
 
   static count(): Promise<number> {
-    return this.prototype.newQuery(this.softDeletes).count()
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .count()
   }
 
   static native(handler: (native: any) => any): Promise<any> {
-    return this.prototype.newQuery(this.softDeletes).native(handler)
+    return Reflect.construct(this, [])
+      .newQuery(this.softDeletes)
+      .native(handler)
   }
 
   static findById(id: any): Promise<any> {

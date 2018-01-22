@@ -56,9 +56,7 @@ export abstract class EloquentBase<NativeRecord extends Object = {}> implements 
   constructor(data: Object)
   constructor(data: NativeRecord)
   constructor(data?: NativeRecord | Object) {
-    if (!ClassRegistry.has(this.getClassName())) {
-      register(Object.getPrototypeOf(this).constructor, this.getClassName(), false)
-    }
+    this.registerIfNeeded()
     return this.initialize(data)
   }
 
@@ -68,6 +66,12 @@ export abstract class EloquentBase<NativeRecord extends Object = {}> implements 
 
   public set id(value: any) {
     this.setId(value)
+  }
+
+  protected registerIfNeeded() {
+    if (!ClassRegistry.has(this.getClassName())) {
+      register(Object.getPrototypeOf(this).constructor, this.getClassName(), false)
+    }
   }
 
   newInstance(): any

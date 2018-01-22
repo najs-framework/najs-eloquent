@@ -121,6 +121,7 @@ describe('Eloquent', function () {
                 'setAttributesByNativeRecord',
                 'initialize',
                 'getReservedPropertiesList',
+                'registerIfNeeded',
                 'getId',
                 'setId'
             ], 
@@ -163,8 +164,8 @@ describe('Eloquent', function () {
             const origin = new User();
             origin['fillable'] = ['test'];
             const copy = origin.newInstance();
-            expect(copy['fillable'] === origin['fillable']).toBe(true);
-            expect(copy['guard'] === origin['guard']).toBe(true);
+            expect(copy['fillable']).toEqual(origin['fillable']);
+            expect(copy['guard']).toEqual(origin['guard']);
         });
     });
     describe('newCollection(data)', function () {
