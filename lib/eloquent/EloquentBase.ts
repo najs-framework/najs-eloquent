@@ -165,9 +165,9 @@ export abstract class EloquentBase<NativeRecord extends Object = {}> implements 
       let match
       while ((match = regex.exec(name)) != undefined) {
         // javascript RegExp has a bug when the match has length 0
-        if (match.index === regex.lastIndex) {
-          ++regex.lastIndex
-        }
+        // if (match.index === regex.lastIndex) {
+        //   ++regex.lastIndex
+        // }
 
         const property = snakeCase(match[2])
 

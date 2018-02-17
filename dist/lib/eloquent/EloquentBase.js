@@ -91,9 +91,9 @@ class EloquentBase {
             let match;
             while ((match = regex.exec(name)) != undefined) {
                 // javascript RegExp has a bug when the match has length 0
-                if (match.index === regex.lastIndex) {
-                    ++regex.lastIndex;
-                }
+                // if (match.index === regex.lastIndex) {
+                //   ++regex.lastIndex
+                // }
                 const property = lodash_1.snakeCase(match[2]);
                 if (match[1] === 'get') {
                     if (typeof this.accessors[property] !== 'undefined') {
