@@ -193,12 +193,21 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
 
   // -------------------------------------------------------------------------------------------------------------------
+  queryName(name: string): MongooseQueryBuilder {
+    return this.newQuery().queryName(name)
+  }
   static queryName(name: string): MongooseQueryBuilder {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .queryName(name)
   }
 
+  select(field: string): MongooseQueryBuilder
+  select(fields: string[]): MongooseQueryBuilder
+  select(...fields: Array<string | string[]>): MongooseQueryBuilder
+  select(...fields: Array<string | string[]>): MongooseQueryBuilder {
+    return this.newQuery().select(...fields)
+  }
   static select(field: string): MongooseQueryBuilder
   static select(fields: string[]): MongooseQueryBuilder
   static select(...fields: Array<string | string[]>): MongooseQueryBuilder
@@ -208,6 +217,12 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
       .select(...fields)
   }
 
+  distinct(field: string): MongooseQueryBuilder
+  distinct(fields: string[]): MongooseQueryBuilder
+  distinct(...fields: Array<string | string[]>): MongooseQueryBuilder
+  distinct(...fields: Array<string | string[]>): MongooseQueryBuilder {
+    return this.newQuery().distinct(...fields)
+  }
   static distinct(field: string): MongooseQueryBuilder
   static distinct(fields: string[]): MongooseQueryBuilder
   static distinct(...fields: Array<string | string[]>): MongooseQueryBuilder
@@ -217,6 +232,11 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
       .distinct(...fields)
   }
 
+  orderBy(field: string): MongooseQueryBuilder
+  orderBy(field: string, direction: OrderDirection): MongooseQueryBuilder
+  orderBy(field: string, direction: OrderDirection = 'asc'): MongooseQueryBuilder {
+    return this.newQuery().orderBy(field, direction)
+  }
   static orderBy(field: string): MongooseQueryBuilder
   static orderBy(field: string, direction: OrderDirection): MongooseQueryBuilder
   static orderBy(field: string, direction: OrderDirection = 'asc'): MongooseQueryBuilder {
@@ -225,24 +245,39 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
       .orderBy(field, direction)
   }
 
+  orderByAsc(field: string): MongooseQueryBuilder {
+    return this.newQuery().orderByAsc(field)
+  }
   static orderByAsc(field: string): MongooseQueryBuilder {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .orderByAsc(field)
   }
 
+  orderByDesc(field: string): MongooseQueryBuilder {
+    return this.newQuery().orderByDesc(field)
+  }
   static orderByDesc(field: string): MongooseQueryBuilder {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .orderByDesc(field)
   }
 
+  limit(records: number): MongooseQueryBuilder {
+    return this.newQuery().limit(records)
+  }
   static limit(records: number): MongooseQueryBuilder {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .limit(records)
   }
 
+  where(conditionBuilder: SubCondition): MongooseQueryBuilder
+  where(field: string, value: any): MongooseQueryBuilder
+  where(field: string, operator: Operator, value: any): MongooseQueryBuilder
+  where(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): MongooseQueryBuilder {
+    return this.newQuery().where(<any>arg0, arg1, arg2)
+  }
   static where(conditionBuilder: SubCondition): MongooseQueryBuilder
   static where(field: string, value: any): MongooseQueryBuilder
   static where(field: string, operator: Operator, value: any): MongooseQueryBuilder
@@ -252,6 +287,12 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
       .where(<any>arg0, arg1, arg2)
   }
 
+  orWhere(conditionBuilder: SubCondition): MongooseQueryBuilder
+  orWhere(field: string, value: any): MongooseQueryBuilder
+  orWhere(field: string, operator: Operator, value: any): MongooseQueryBuilder
+  orWhere(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): MongooseQueryBuilder {
+    return this.newQuery().orWhere(<any>arg0, arg1, arg2)
+  }
   static orWhere(conditionBuilder: SubCondition): MongooseQueryBuilder
   static orWhere(field: string, value: any): MongooseQueryBuilder
   static orWhere(field: string, operator: Operator, value: any): MongooseQueryBuilder
@@ -261,85 +302,136 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
       .orWhere(<any>arg0, arg1, arg2)
   }
 
+  whereIn(field: string, values: Array<any>): MongooseQueryBuilder {
+    return this.newQuery().whereIn(field, values)
+  }
   static whereIn(field: string, values: Array<any>): MongooseQueryBuilder {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .whereIn(field, values)
   }
 
+  whereNotIn(field: string, values: Array<any>): MongooseQueryBuilder {
+    return this.newQuery().whereNotIn(field, values)
+  }
   static whereNotIn(field: string, values: Array<any>): MongooseQueryBuilder {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .whereNotIn(field, values)
   }
 
+  orWhereIn(field: string, values: Array<any>): MongooseQueryBuilder {
+    return this.newQuery().orWhereIn(field, values)
+  }
   static orWhereIn(field: string, values: Array<any>): MongooseQueryBuilder {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .orWhereIn(field, values)
   }
 
+  orWhereNotIn(field: string, values: Array<any>): MongooseQueryBuilder {
+    return this.newQuery().orWhereNotIn(field, values)
+  }
   static orWhereNotIn(field: string, values: Array<any>): MongooseQueryBuilder {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .orWhereNotIn(field, values)
   }
 
+  whereNull(field: string) {
+    return this.newQuery().whereNull(field)
+  }
   static whereNull(field: string) {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .whereNull(field)
   }
 
+  whereNotNull(field: string) {
+    return this.newQuery().whereNotNull(field)
+  }
   static whereNotNull(field: string) {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .whereNotNull(field)
   }
 
+  orWhereNull(field: string) {
+    return this.newQuery().orWhereNull(field)
+  }
   static orWhereNull(field: string) {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .orWhereNull(field)
   }
 
+  orWhereNotNull(field: string) {
+    return this.newQuery().orWhereNotNull(field)
+  }
   static orWhereNotNull(field: string) {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .orWhereNotNull(field)
   }
 
+  withTrashed() {
+    return this.newQuery().withTrashed()
+  }
   static withTrashed() {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .withTrashed()
   }
 
+  onlyTrashed() {
+    return this.newQuery().onlyTrashed()
+  }
   static onlyTrashed() {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .onlyTrashed()
   }
 
-  static all(): Promise<any> {
+  async all(): Promise<any> {
+    return this.newQuery().all()
+  }
+  static async all(): Promise<any> {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .all()
   }
 
-  static get(): Promise<any>
-  static get(field: string): Promise<any>
-  static get(fields: string[]): Promise<any>
-  static get(...fields: Array<string | string[]>): Promise<any>
-  static get(...fields: Array<string | string[]>): Promise<any> {
+  async get(): Promise<any>
+  async get(field: string): Promise<any>
+  async get(fields: string[]): Promise<any>
+  async get(...fields: Array<string | string[]>): Promise<any>
+  async get(...fields: Array<string | string[]>): Promise<any> {
+    return this.newQuery()
+      .select(...fields)
+      .get()
+  }
+  static async get(): Promise<any>
+  static async get(field: string): Promise<any>
+  static async get(fields: string[]): Promise<any>
+  static async get(...fields: Array<string | string[]>): Promise<any>
+  static async get(...fields: Array<string | string[]>): Promise<any> {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .select(...fields)
       .get()
   }
 
-  static find(id: any): Promise<any>
-  static find(id?: any): Promise<any> {
+  async find(): Promise<any>
+  async find(id: any): Promise<any>
+  async find(id?: any): Promise<any> {
+    if (typeof id !== 'undefined') {
+      const query = this.newQuery()
+      return query.where(query.getPrimaryKey(), id).find()
+    }
+    return this.newQuery().find()
+  }
+  static async find(id: any): Promise<any>
+  static async find(id?: any): Promise<any> {
     if (typeof id !== 'undefined') {
       const query = this.prototype.newQuery(this.softDeletes)
       return query.where(query.getPrimaryKey(), id).find()
@@ -349,36 +441,60 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
       .find()
   }
 
-  static first(): Promise<any> {
+  async first(): Promise<any> {
+    return this.newQuery().first()
+  }
+  static async first(): Promise<any> {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .first()
   }
 
-  static pluck(value: string): Promise<Object>
-  static pluck(value: string, key: string): Promise<Object>
-  static pluck(value: string, key?: string): Promise<Object> {
+  pluck(value: string): Promise<Object>
+  pluck(value: string, key: string): Promise<Object>
+  pluck(value: string, key?: string): Promise<Object> {
+    return this.newQuery().pluck(value, key)
+  }
+  static async pluck(value: string): Promise<Object>
+  static async pluck(value: string, key: string): Promise<Object>
+  static async pluck(value: string, key?: string): Promise<Object> {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .pluck(value, key)
   }
 
-  static count(): Promise<number> {
+  async count(): Promise<number> {
+    return this.newQuery().count()
+  }
+  static async count(): Promise<number> {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .count()
   }
 
+  native(handler: (native: any) => any): Promise<any> {
+    return this.newQuery().native(handler)
+  }
   static native(handler: (native: any) => any): Promise<any> {
     return Reflect.construct(this, [])
       .newQuery(this.softDeletes)
       .native(handler)
   }
 
-  static findById(id: any): Promise<any> {
+  async findById(id: any): Promise<any> {
+    return this.find(id)
+  }
+  static async findById(id: any): Promise<any> {
     return this.find(id)
   }
 
+  async findOrFail(id: any): Promise<any> {
+    const value = await this.find(id)
+    if (!value) {
+      throw new NotFoundError(this.getClassName())
+    }
+    return value
+  }
   static async findOrFail(id: any): Promise<any> {
     const value = await this.find(id)
     if (!value) {

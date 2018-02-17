@@ -179,7 +179,7 @@ describe('EloquentMongoose', function () {
             });
         });
     });
-    describe('Static functions', function () {
+    describe('Static/Query functions', function () {
         describe('Class', function () {
             it('is return EloquentMongoose.constructor, this is a part of syntax', function () {
                 expect(User.Class() === EloquentMongoose_1.EloquentMongoose).toBe(true);
@@ -190,11 +190,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'newQuery');
                 expect(User.queryName('Query')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().queryName('Query')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.select()', function () {
                 const queryNameSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'queryName');
                 User.queryName('Query');
+                expect(queryNameSpy.calledWith('Query')).toBe(true);
+                new User().queryName('Query');
                 expect(queryNameSpy.calledWith('Query')).toBe(true);
                 queryNameSpy.restore();
             });
@@ -203,6 +207,8 @@ describe('EloquentMongoose', function () {
             it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'newQuery');
                 expect(User.select('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
+                expect(new User().select('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
@@ -216,6 +222,14 @@ describe('EloquentMongoose', function () {
                 expect(selectSpy.calledWith(['first_name', 'last_name', 'age'])).toBe(true);
                 User.select('first_name', ['last_name', 'age']);
                 expect(selectSpy.calledWith('first_name', ['last_name', 'age'])).toBe(true);
+                new User().select('first_name');
+                expect(selectSpy.calledWith('first_name')).toBe(true);
+                new User().select('first_name', 'last_name', 'age');
+                expect(selectSpy.calledWith('first_name', 'last_name', 'age')).toBe(true);
+                new User().select(['first_name', 'last_name', 'age']);
+                expect(selectSpy.calledWith(['first_name', 'last_name', 'age'])).toBe(true);
+                new User().select('first_name', ['last_name', 'age']);
+                expect(selectSpy.calledWith('first_name', ['last_name', 'age'])).toBe(true);
                 selectSpy.restore();
             });
         });
@@ -223,6 +237,8 @@ describe('EloquentMongoose', function () {
             it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.distinct('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
+                expect(new User().distinct('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
@@ -236,6 +252,14 @@ describe('EloquentMongoose', function () {
                 expect(distinctSpy.calledWith(['first_name', 'last_name', 'age'])).toBe(true);
                 User.distinct('first_name', ['last_name', 'age']);
                 expect(distinctSpy.calledWith('first_name', ['last_name', 'age'])).toBe(true);
+                new User().distinct('first_name');
+                expect(distinctSpy.calledWith('first_name')).toBe(true);
+                new User().distinct('first_name', 'last_name', 'age');
+                expect(distinctSpy.calledWith('first_name', 'last_name', 'age')).toBe(true);
+                new User().distinct(['first_name', 'last_name', 'age']);
+                expect(distinctSpy.calledWith(['first_name', 'last_name', 'age'])).toBe(true);
+                new User().distinct('first_name', ['last_name', 'age']);
+                expect(distinctSpy.calledWith('first_name', ['last_name', 'age'])).toBe(true);
                 distinctSpy.restore();
             });
         });
@@ -243,6 +267,8 @@ describe('EloquentMongoose', function () {
             it('creates MongooseQueryBuilder with model from prototype.newQuery()', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orderBy('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
+                expect(new User().orderBy('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
@@ -252,6 +278,10 @@ describe('EloquentMongoose', function () {
                 expect(orderBySpy.calledWith('first_name', 'asc')).toBe(true);
                 User.orderBy('first_name', 'desc');
                 expect(orderBySpy.calledWith('first_name', 'desc')).toBe(true);
+                new User().orderBy('first_name');
+                expect(orderBySpy.calledWith('first_name', 'asc')).toBe(true);
+                new User().orderBy('first_name', 'desc');
+                expect(orderBySpy.calledWith('first_name', 'desc')).toBe(true);
                 orderBySpy.restore();
             });
         });
@@ -260,11 +290,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orderByAsc('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().orderByAsc('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.orderByAsc()', function () {
                 const orderByAscSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orderByAsc');
                 User.orderByAsc('first_name');
+                expect(orderByAscSpy.calledWith('first_name')).toBe(true);
+                new User().orderByAsc('first_name');
                 expect(orderByAscSpy.calledWith('first_name')).toBe(true);
                 orderByAscSpy.restore();
             });
@@ -274,11 +308,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orderByDesc('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().orderByDesc('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.orderByDesc()', function () {
                 const orderByDescSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orderByDesc');
                 User.orderByDesc('first_name');
+                expect(orderByDescSpy.calledWith('first_name')).toBe(true);
+                new User().orderByDesc('first_name');
                 expect(orderByDescSpy.calledWith('first_name')).toBe(true);
                 orderByDescSpy.restore();
             });
@@ -288,11 +326,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.limit(10)).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().limit(10)).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.limit()', function () {
                 const limitSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'limit');
                 User.limit(10);
+                expect(limitSpy.calledWith(10)).toBe(true);
+                new User().limit(10);
                 expect(limitSpy.calledWith(10)).toBe(true);
                 limitSpy.restore();
             });
@@ -302,6 +344,8 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.where('first_name', 'tony')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().where('first_name', 'tony')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.where()', function () {
@@ -309,6 +353,10 @@ describe('EloquentMongoose', function () {
                 User.where('first_name', 'tony');
                 expect(whereSpy.calledWith('first_name', 'tony')).toBe(true);
                 User.where('first_name', '<>', 'tony');
+                expect(whereSpy.calledWith('first_name', '<>', 'tony')).toBe(true);
+                new User().where('first_name', 'tony');
+                expect(whereSpy.calledWith('first_name', 'tony')).toBe(true);
+                new User().where('first_name', '<>', 'tony');
                 expect(whereSpy.calledWith('first_name', '<>', 'tony')).toBe(true);
                 whereSpy.restore();
             });
@@ -318,6 +366,8 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orWhere('first_name', 'tony')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().orWhere('first_name', 'tony')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.orWhere()', function () {
@@ -325,6 +375,10 @@ describe('EloquentMongoose', function () {
                 User.orWhere('first_name', 'tony');
                 expect(orWhereSpy.calledWith('first_name', 'tony')).toBe(true);
                 User.orWhere('first_name', '<>', 'tony');
+                expect(orWhereSpy.calledWith('first_name', '<>', 'tony')).toBe(true);
+                new User().orWhere('first_name', 'tony');
+                expect(orWhereSpy.calledWith('first_name', 'tony')).toBe(true);
+                new User().orWhere('first_name', '<>', 'tony');
                 expect(orWhereSpy.calledWith('first_name', '<>', 'tony')).toBe(true);
                 orWhereSpy.restore();
             });
@@ -334,11 +388,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.whereIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().whereIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.whereIn()', function () {
                 const whereInSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'whereIn');
                 User.whereIn('first_name', ['tony']);
+                expect(whereInSpy.calledWith('first_name', ['tony'])).toBe(true);
+                new User().whereIn('first_name', ['tony']);
                 expect(whereInSpy.calledWith('first_name', ['tony'])).toBe(true);
                 whereInSpy.restore();
             });
@@ -348,11 +406,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.whereNotIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().whereNotIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.whereNotIn()', function () {
                 const whereNotInSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'whereNotIn');
                 User.whereNotIn('first_name', ['tony']);
+                expect(whereNotInSpy.calledWith('first_name', ['tony'])).toBe(true);
+                new User().whereNotIn('first_name', ['tony']);
                 expect(whereNotInSpy.calledWith('first_name', ['tony'])).toBe(true);
                 whereNotInSpy.restore();
             });
@@ -362,11 +424,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orWhereIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().orWhereIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.orWhereIn()', function () {
                 const orWhereInSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orWhereIn');
                 User.orWhereIn('first_name', ['tony']);
+                expect(orWhereInSpy.calledWith('first_name', ['tony'])).toBe(true);
+                new User().orWhereIn('first_name', ['tony']);
                 expect(orWhereInSpy.calledWith('first_name', ['tony'])).toBe(true);
                 orWhereInSpy.restore();
             });
@@ -376,11 +442,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orWhereNotIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().orWhereNotIn('first_name', ['tony'])).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.orWhereNotIn()', function () {
                 const orWhereNotInSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orWhereNotIn');
                 User.orWhereNotIn('first_name', ['tony']);
+                expect(orWhereNotInSpy.calledWith('first_name', ['tony'])).toBe(true);
+                new User().orWhereNotIn('first_name', ['tony']);
                 expect(orWhereNotInSpy.calledWith('first_name', ['tony'])).toBe(true);
                 orWhereNotInSpy.restore();
             });
@@ -390,11 +460,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.whereNull('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().whereNull('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.whereNull()', function () {
                 const whereNullSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'whereNull');
                 User.whereNull('first_name');
+                expect(whereNullSpy.calledWith('first_name')).toBe(true);
+                new User().whereNull('first_name');
                 expect(whereNullSpy.calledWith('first_name')).toBe(true);
                 whereNullSpy.restore();
             });
@@ -404,11 +478,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.whereNotNull('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().whereNotNull('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.whereNotNull()', function () {
                 const whereNotNullSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'whereNotNull');
                 User.whereNotNull('first_name');
+                expect(whereNotNullSpy.calledWith('first_name')).toBe(true);
+                new User().whereNotNull('first_name');
                 expect(whereNotNullSpy.calledWith('first_name')).toBe(true);
                 whereNotNullSpy.restore();
             });
@@ -418,11 +496,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orWhereNull('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().orWhereNull('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.orWhereNull()', function () {
                 const orWhereNullSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orWhereNull');
                 User.orWhereNull('first_name');
+                expect(orWhereNullSpy.calledWith('first_name')).toBe(true);
+                new User().orWhereNull('first_name');
                 expect(orWhereNullSpy.calledWith('first_name')).toBe(true);
                 orWhereNullSpy.restore();
             });
@@ -432,11 +514,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.orWhereNotNull('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.calledWith()).toBe(true);
+                expect(new User().orWhereNotNull('first_name')).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.calledWith()).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.orWhereNotNull()', function () {
                 const orWhereNotNullSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'orWhereNotNull');
                 User.orWhereNotNull('first_name');
+                expect(orWhereNotNullSpy.calledWith('first_name')).toBe(true);
+                new User().orWhereNotNull('first_name');
                 expect(orWhereNotNullSpy.calledWith('first_name')).toBe(true);
                 orWhereNotNullSpy.restore();
             });
@@ -446,11 +532,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.withTrashed()).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.calledWith()).toBe(true);
+                expect(new User().withTrashed()).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.calledWith()).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.withTrash()', function () {
                 const withTrashSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'withTrashed');
                 User.withTrashed();
+                expect(withTrashSpy.called).toBe(true);
+                new User().withTrashed();
                 expect(withTrashSpy.called).toBe(true);
                 withTrashSpy.restore();
             });
@@ -460,11 +550,15 @@ describe('EloquentMongoose', function () {
                 const newQuerySpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(User.onlyTrashed()).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
                 expect(newQuerySpy.called).toBe(true);
+                expect(new User().onlyTrashed()).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
+                expect(newQuerySpy.called).toBe(true);
                 newQuerySpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.onlyTrash()', function () {
                 const onlyTrashSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'onlyTrashed');
                 User.onlyTrashed();
+                expect(onlyTrashSpy.called).toBe(true);
+                new User().onlyTrashed();
                 expect(onlyTrashSpy.called).toBe(true);
                 onlyTrashSpy.restore();
             });
@@ -474,11 +568,15 @@ describe('EloquentMongoose', function () {
                 const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(typeof User.all().then).toEqual('function');
                 expect(getModelNameSpy.called).toBe(true);
+                expect(typeof new User().all().then).toEqual('function');
+                expect(getModelNameSpy.called).toBe(true);
                 getModelNameSpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.all()', function () {
                 const allSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'all');
                 User.all();
+                expect(allSpy.calledWith()).toBe(true);
+                new User().all();
                 expect(allSpy.calledWith()).toBe(true);
                 allSpy.restore();
             });
@@ -487,6 +585,8 @@ describe('EloquentMongoose', function () {
             it('creates MongooseQueryBuilder with model from prototype.getModelName(), and calls .get()', function () {
                 const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(typeof User.get().then).toEqual('function');
+                expect(getModelNameSpy.called).toBe(true);
+                expect(typeof new User().get().then).toEqual('function');
                 expect(getModelNameSpy.called).toBe(true);
                 getModelNameSpy.restore();
             });
@@ -508,6 +608,21 @@ describe('EloquentMongoose', function () {
                 User.get('first_name', ['last_name', 'age']);
                 expect(selectSpy.calledWith('first_name', ['last_name', 'age'])).toBe(true);
                 expect(getSpy.calledWith()).toBe(true);
+                new User().get();
+                expect(selectSpy.calledWith()).toBe(true);
+                expect(getSpy.calledWith()).toBe(true);
+                new User().get('first_name');
+                expect(selectSpy.calledWith('first_name')).toBe(true);
+                expect(getSpy.calledWith()).toBe(true);
+                new User().get('first_name', 'last_name', 'age');
+                expect(selectSpy.calledWith('first_name', 'last_name', 'age')).toBe(true);
+                expect(getSpy.calledWith()).toBe(true);
+                new User().get(['first_name', 'last_name', 'age']);
+                expect(selectSpy.calledWith(['first_name', 'last_name', 'age'])).toBe(true);
+                expect(getSpy.calledWith()).toBe(true);
+                new User().get('first_name', ['last_name', 'age']);
+                expect(selectSpy.calledWith('first_name', ['last_name', 'age'])).toBe(true);
+                expect(getSpy.calledWith()).toBe(true);
                 selectSpy.restore();
                 getSpy.restore();
             });
@@ -517,15 +632,32 @@ describe('EloquentMongoose', function () {
                 const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(typeof User.find().then).toEqual('function');
                 expect(getModelNameSpy.called).toBe(true);
+                expect(typeof new User().find().then).toEqual('function');
+                expect(getModelNameSpy.called).toBe(true);
                 getModelNameSpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.find()', function () {
+                const findSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'find');
+                new User().find();
+                expect(findSpy.calledWith()).toBe(true);
+                findSpy.restore();
+            });
+            it('passes all params to MongooseQueryBuilder.find() - static', function () {
                 const findSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'find');
                 User.find();
                 expect(findSpy.calledWith()).toBe(true);
                 findSpy.restore();
             });
             it('calls where("_id" ) before passing params to MongooseQueryBuilder.find() if id is provided', function () {
+                const whereSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'where');
+                const findSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'find');
+                new User().find('000000000000000000000000');
+                expect(whereSpy.calledWith('_id', '000000000000000000000000')).toBe(true);
+                expect(findSpy.calledWith()).toBe(true);
+                whereSpy.restore();
+                findSpy.restore();
+            });
+            it('calls where("_id" ) before passing params to MongooseQueryBuilder.find() if id is provided - static', function () {
                 const whereSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'where');
                 const findSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'find');
                 User.find('000000000000000000000000');
@@ -540,11 +672,15 @@ describe('EloquentMongoose', function () {
                 const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(typeof User.first().then).toEqual('function');
                 expect(getModelNameSpy.called).toBe(true);
+                expect(typeof new User().first().then).toEqual('function');
+                expect(getModelNameSpy.called).toBe(true);
                 getModelNameSpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.first()', function () {
                 const firstSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'first');
                 User.first();
+                expect(firstSpy.calledWith()).toBe(true);
+                new User().first();
                 expect(firstSpy.calledWith()).toBe(true);
                 firstSpy.restore();
             });
@@ -554,6 +690,8 @@ describe('EloquentMongoose', function () {
                 const getModelNameSpy = Sinon.spy(User.prototype, 'getModelName');
                 expect(typeof User.pluck('id').then).toEqual('function');
                 expect(getModelNameSpy.called).toBe(true);
+                expect(typeof new User().pluck('id').then).toEqual('function');
+                expect(getModelNameSpy.called).toBe(true);
                 getModelNameSpy.restore();
             });
             it('passes all params to MongooseQueryBuilder.pluck()', function () {
@@ -561,6 +699,10 @@ describe('EloquentMongoose', function () {
                 User.pluck('first_name');
                 expect(pluckSpy.calledWith('first_name')).toBe(true);
                 User.pluck('first_name', 'id');
+                expect(pluckSpy.calledWith('first_name', 'id')).toBe(true);
+                new User().pluck('first_name');
+                expect(pluckSpy.calledWith('first_name')).toBe(true);
+                new User().pluck('first_name', 'id');
                 expect(pluckSpy.calledWith('first_name', 'id')).toBe(true);
                 pluckSpy.restore();
             });
@@ -571,7 +713,30 @@ describe('EloquentMongoose', function () {
                 const id = new bson_1.ObjectId();
                 User.findById(id);
                 expect(findSpy.calledWith(id)).toBe(true);
+                new User().findById(id);
+                expect(findSpy.calledWith(id)).toBe(true);
                 findSpy.restore();
+            });
+        });
+        describe('count()', function () {
+            it('passes all params to MongooseQueryBuilder.count()', function () {
+                const countSpy = Sinon.spy(MongooseQueryBuilder_1.MongooseQueryBuilder.prototype, 'count');
+                User.count();
+                expect(countSpy.calledWith()).toBe(true);
+                new User().count();
+                expect(countSpy.calledWith()).toBe(true);
+                countSpy.restore();
+            });
+        });
+        describe('native()', function () {
+            it('passes all params to MongooseQueryBuilder.native()', function () {
+                const handler = () => { };
+                const nativeSpy = Sinon.spy(User, 'native');
+                User.native(handler);
+                expect(nativeSpy.calledWith(handler)).toBe(true);
+                new User().native(handler);
+                expect(nativeSpy.calledWith(handler)).toBe(true);
+                nativeSpy.restore();
             });
         });
         describe('findOrFail()', function () {
@@ -582,12 +747,28 @@ describe('EloquentMongoose', function () {
                     last_name: 'doe'
                 });
                 await user.save();
-                const result = await User.findOrFail(user.id);
+                let result = await User.findOrFail(user.id);
+                expect(result.is(user)).toBe(true);
+                expect(findSpy.calledWith(user.id)).toBe(true);
+                result = await new User().findOrFail(user.id);
                 expect(result.is(user)).toBe(true);
                 expect(findSpy.calledWith(user.id)).toBe(true);
                 findSpy.restore();
             });
-            it('throws NotFoundError if model not found', async function () {
+            it('throws NotFoundError if model not found - member', async function () {
+                const id = new bson_1.ObjectId();
+                try {
+                    await new User().findOrFail(id);
+                }
+                catch (error) {
+                    expect(error).toBeInstanceOf(Error);
+                    expect(error).toBeInstanceOf(NotFoundError_1.NotFoundError);
+                    expect(error.model).toEqual(User.className);
+                    return;
+                }
+                expect('should not reach this line').toEqual('yeah');
+            });
+            it('throws NotFoundError if model not found - static', async function () {
                 const id = new bson_1.ObjectId();
                 try {
                     await User.findOrFail(id);
