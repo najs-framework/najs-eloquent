@@ -37,6 +37,10 @@ class QueryBuilder {
         }
         return this.conditions.map(item => item.toObject());
     }
+    setQueryLogGroup(group) {
+        this.queryLogGroup = group;
+        return this;
+    }
     queryName(name) {
         this.name = name;
         return this;

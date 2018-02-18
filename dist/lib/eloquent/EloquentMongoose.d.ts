@@ -24,6 +24,7 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     getAttribute(name: string): any;
     setAttribute(name: string, value: any): boolean;
     newQuery(softDeletes?: boolean | EloquentSoftDelete): any;
+    protected getQueryLogGroup(): string;
     newInstance(document?: Document & T | Object): EloquentMongoose<T>;
     newCollection(dataset: Array<Document & T>): Collection<EloquentMongoose<T>>;
     toObject(): Object;

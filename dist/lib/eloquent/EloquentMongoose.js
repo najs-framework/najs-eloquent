@@ -88,7 +88,10 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         const softDeleteSettings = softDeletes || Object.getPrototypeOf(this).constructor.softDeletes;
         this.registerIfNeeded();
         this.initializeModelIfNeeded(softDeleteSettings);
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.getModelName(), softDeleteSettings === true ? DEFAULT_SOFT_DELETES : softDeleteSettings);
+        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.getModelName(), softDeleteSettings === true ? DEFAULT_SOFT_DELETES : softDeleteSettings).setQueryLogGroup(this.getQueryLogGroup());
+    }
+    getQueryLogGroup() {
+        return 'all';
     }
     newInstance(document) {
         const instance = najs_1.make(this.getClassName());

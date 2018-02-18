@@ -7,6 +7,7 @@ import { Collection } from 'collect.js';
 import { Model, Document, DocumentQuery } from 'mongoose';
 export declare type MongooseQuery<T> = DocumentQuery<Document & T | null, Document & T> | DocumentQuery<(Document & T)[] | null, Document & T>;
 export declare class MongooseQueryBuilder<T = {}> extends QueryBuilder implements IBasicQueryGrammar<T>, IQueryFetchResult<Document & T> {
+    static className: string;
     protected mongooseModel: Model<Document & T>;
     protected mongooseQuery: MongooseQuery<T>;
     protected hasMongooseQuery: boolean;
@@ -15,11 +16,12 @@ export declare class MongooseQueryBuilder<T = {}> extends QueryBuilder implement
     constructor(modelName: string, softDelete: QueryBuilderSoftDelete);
     constructor(modelName: string, softDelete: QueryBuilderSoftDelete | undefined, primaryKey: string);
     protected getMongooseProvider(): IMongooseProvider;
-    protected getQuery(isFindOne?: boolean): MongooseQuery<T>;
-    protected passDataToMongooseQuery(query: MongooseQuery<T>): MongooseQuery<T>;
+    protected getQuery(isFindOne?: boolean, rawLogs?: string[]): MongooseQuery<T>;
+    protected passDataToMongooseQuery(query: MongooseQuery<T>, rawLogs?: string[]): MongooseQuery<T>;
     getPrimaryKey(): string;
     native(handler: (native: Model<Document & T> | MongooseQuery<T>) => MongooseQuery<T>): IQueryFetchResult<T>;
     toObject(): Object;
+    protected logQuery(action: string, raw: string): void;
     protected getFieldByName(name: any): any;
     get(): Promise<Collection<any>>;
     all(): Promise<Collection<any>>;

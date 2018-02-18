@@ -16,6 +16,7 @@ export class QueryBuilder {
   protected isUsed: boolean
   protected softDelete?: QueryBuilderSoftDelete
   protected addSoftDeleteCondition: boolean
+  protected queryLogGroup: string
 
   constructor(softDelete?: QueryBuilderSoftDelete) {
     this.selectedFields = []
@@ -55,6 +56,11 @@ export class QueryBuilder {
       this.whereNull(this.softDelete.deletedAt)
     }
     return this.conditions.map(item => item.toObject())
+  }
+
+  setQueryLogGroup(group: string): this {
+    this.queryLogGroup = group
+    return this
   }
 
   queryName(name: string): this {

@@ -13,11 +13,13 @@ export declare class QueryBuilder {
     protected isUsed: boolean;
     protected softDelete?: QueryBuilderSoftDelete;
     protected addSoftDeleteCondition: boolean;
+    protected queryLogGroup: string;
     constructor(softDelete?: QueryBuilderSoftDelete);
     protected getFieldByName(name: any): any;
     protected getNullValue(name: any): null;
     protected _flatten_and_assign_to(name: string, fields: Array<string | string[]>): this;
     protected getConditions(): Object[];
+    setQueryLogGroup(group: string): this;
     queryName(name: string): this;
     select(field: string): this;
     select(fields: string[]): this;

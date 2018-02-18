@@ -116,7 +116,11 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
     return new MongooseQueryBuilder(
       this.getModelName(),
       softDeleteSettings === true ? DEFAULT_SOFT_DELETES : softDeleteSettings
-    )
+    ).setQueryLogGroup(this.getQueryLogGroup())
+  }
+
+  protected getQueryLogGroup(): string {
+    return 'all'
   }
 
   newInstance(document?: Document & T | Object): EloquentMongoose<T> {
