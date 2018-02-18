@@ -1,6 +1,7 @@
 language: node_js
-services: 
+services:
   - mongodb
+  - redis
 
 jobs:
   include:

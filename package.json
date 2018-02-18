@@ -1,12 +1,12 @@
 {
   "name": "najs-eloquent",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "scripts": {
     "build": "npm run build-ts && npm run tslint && npm run copy-js-files",
     "copy-js-files": "chmod u+x ./script/copy-js-files.sh && ./script/copy-js-files.sh",
     "build-ts": "tsc -d",
-    "coverage": "npm run build && jest ./dist/test --coverage --forceExit",
-    "test": "jest ./dist/test --forceExit",
+    "coverage": "export SUPPRESS_NO_CONFIG_WARNING=0 && npm run build && jest ./dist/test --coverage --forceExit",
+    "test": "export SUPPRESS_NO_CONFIG_WARNING=0 && jest ./dist/test --forceExit",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "prepublishOnly": "tsc -d -p ./ --outDir dist"
   },
@@ -46,19 +46,15 @@
     "node": ">=8.7"
   },
   "peerDependencies": {
-    "najs": "^0.2.5"
+    "najs": "^0.3.3",
+    "collect.js": "^4.0.11"
   },
   "dependencies": {
-    "collect.js": "^4.0.2",
-    "config": "^1.29.2",
-    "express": "^4.16.2",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
     "mongoose": "^5.0.0-rc0",
-    "najs": "^0.2.5",
-    "pluralize": "^7.0.0",
-    "sinon": "^4.1.3",
-    "winston": "^2.4.0"
+    "najs": "^0.3.3",
+    "pluralize": "^7.0.0"
   },
   "devDependencies": {
     "@types/jest": "^21.1.8",
@@ -67,11 +63,24 @@
     "@types/mongoose": "^4.7.31",
     "@types/pluralize": "^0.0.28",
     "@types/sinon": "^4.1.2",
+    "ajv": "^6.1.1",
+    "body-parser": "^1.18.2",
+    "collect.js": "^4.0.11",
+    "config": "^1.29.2",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
     "coveralls": "^3.0.0",
+    "csurf": "^1.9.0",
+    "express": "^4.16.2",
+    "express-handlebars": "^3.0.0",
+    "handlebars": "^4.0.11",
     "jest": "^21.2.1",
     "power-assert": "^1.4.4",
+    "redis": "^2.8.0",
+    "sinon": "^4.1.3",
     "ts-jest": "^21.2.3",
     "tslint": "^5.8.0",
-    "typescript": "^2.6.2"
+    "typescript": "^2.6.2",
+    "winston": "^2.4.0"
   }
 }
