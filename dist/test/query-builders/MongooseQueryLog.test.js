@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const QueryLog_1 = require("../../lib/query-builders/QueryLog");
 const MongooseQueryBuilder_1 = require("../../lib/query-builders/MongooseQueryBuilder");
-const najs_1 = require("najs");
+const najs_binding_1 = require("najs-binding");
 const mongoose_1 = require("mongoose");
 const mongoose = require('mongoose');
 class MongooseProvider {
@@ -18,7 +18,7 @@ class MongooseProvider {
     }
 }
 MongooseProvider.className = 'MongooseProvider';
-najs_1.register(MongooseProvider);
+najs_binding_1.register(MongooseProvider);
 const UserSchema = new mongoose_1.Schema({
     first_name: { type: String },
     last_name: { type: String },

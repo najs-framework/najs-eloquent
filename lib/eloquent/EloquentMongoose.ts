@@ -4,7 +4,7 @@ import { IMongooseProvider } from '../interfaces/IMongooseProvider'
 import { MongooseQueryBuilder } from '../query-builders/MongooseQueryBuilder'
 import { Document, Schema, Model } from 'mongoose'
 import collect, { Collection } from 'collect.js'
-import { make } from 'najs'
+import { make } from 'najs-binding'
 import { NotFoundError } from '../errors/NotFoundError'
 import { SoftDelete } from './mongoose/SoftDelete'
 Schema.prototype['setupTimestamp'] = require('./mongoose/setupTimestamp').setupTimestamp

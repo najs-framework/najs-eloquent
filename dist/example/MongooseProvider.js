@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const najs_1 = require("najs");
+const najs_binding_1 = require("najs-binding");
 const mongoose_1 = require("mongoose");
 const mongoose = require('mongoose');
 let MongooseProvider = MongooseProvider_1 = class MongooseProvider {
@@ -22,7 +22,7 @@ let MongooseProvider = MongooseProvider_1 = class MongooseProvider {
 };
 MongooseProvider.className = 'MongooseProvider';
 MongooseProvider = MongooseProvider_1 = __decorate([
-    najs_1.register() // register MongooseProvider with 'MongooseProvider' name
+    najs_binding_1.register() // register MongooseProvider with 'MongooseProvider' name
 ], MongooseProvider);
 exports.MongooseProvider = MongooseProvider;
 var MongooseProvider_1;

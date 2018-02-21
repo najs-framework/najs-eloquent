@@ -1,7 +1,7 @@
 import 'jest'
 import { QueryLog } from '../../lib/query-builders/QueryLog'
 import { MongooseQueryBuilder } from '../../lib/query-builders/MongooseQueryBuilder'
-import { register } from 'najs'
+import { register } from 'najs-binding'
 import { IMongooseProvider } from '../../lib/interfaces/IMongooseProvider'
 import { model, Schema, Model, Document } from 'mongoose'
 

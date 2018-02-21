@@ -2,7 +2,7 @@ import 'jest'
 import * as Sinon from 'sinon'
 import { EloquentTestBase } from './EloquentTestBase'
 import { Record } from './Record'
-import { ClassRegistry } from 'najs'
+import { ClassRegistry } from 'najs-binding'
 
 interface IUser {
   first_name: string

@@ -9,6 +9,7 @@ export const Eloquent = {
   }
 }
 export default Eloquent
+export { QueryLog } from './query-builders/QueryLog'
 export { EloquentBase } from './eloquent/EloquentBase'
 export { IMongooseProvider } from './interfaces/IMongooseProvider'
 export { EloquentMongooseSpec } from './specs/EloquentMongooseSpec'

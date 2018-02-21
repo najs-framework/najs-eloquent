@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const attributes_proxy_1 = require("../components/attributes_proxy");
 const collect_js_1 = require("collect.js");
-const najs_1 = require("najs");
+const najs_binding_1 = require("najs-binding");
 const lodash_1 = require("lodash");
 class EloquentBase {
     constructor(data) {
@@ -16,12 +16,12 @@ class EloquentBase {
         this.setId(value);
     }
     registerIfNeeded() {
-        if (!najs_1.ClassRegistry.has(this.getClassName())) {
-            najs_1.register(Object.getPrototypeOf(this).constructor, this.getClassName(), false);
+        if (!najs_binding_1.ClassRegistry.has(this.getClassName())) {
+            najs_binding_1.register(Object.getPrototypeOf(this).constructor, this.getClassName(), false);
         }
     }
     newInstance(data) {
-        const instance = najs_1.make(this.getClassName());
+        const instance = najs_binding_1.make(this.getClassName());
         instance.fillable = this.fillable;
         instance.guarded = this.guarded;
         return instance.initialize(data);

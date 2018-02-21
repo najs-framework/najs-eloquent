@@ -12,7 +12,7 @@ const EloquentTestBase_1 = require("../eloquent/EloquentTestBase");
 const MongooseQueryBuilder_1 = require("../../lib/query-builders/MongooseQueryBuilder");
 const SoftDelete_1 = require("../../lib/eloquent/mongoose/SoftDelete");
 const util_1 = require("../util");
-const najs_1 = require("najs");
+const najs_binding_1 = require("najs-binding");
 const mongoose_1 = require("mongoose");
 const NotFoundError_1 = require("../../lib/errors/NotFoundError");
 const bson_1 = require("bson");
@@ -30,7 +30,7 @@ let MongooseProvider = MongooseProvider_1 = class MongooseProvider {
 };
 MongooseProvider.className = 'MongooseProvider';
 MongooseProvider = MongooseProvider_1 = __decorate([
-    najs_1.register()
+    najs_binding_1.register()
 ], MongooseProvider);
 const UserSchema = new mongoose_1.Schema({
     first_name: { type: String },
@@ -52,18 +52,18 @@ class User extends EloquentTestBase_1.EloquentTestBase {
         return 'User';
     }
 }
-najs_1.register(User);
+najs_binding_1.register(User);
 class Role extends EloquentTestBase_1.EloquentTestBase {
     getClassName() {
         return 'Role';
     }
 }
-najs_1.register(Role);
+najs_binding_1.register(Role);
 // ---------------------------------------------------------------------------------------------------------------------
 describe('MongooseQueryBuilder', function () {
     describe('pre-configuration', function () {
         it('must register MongooseProvider before using MongooseQueryBuilder', function () {
-            expect(najs_1.make(MongooseProvider.className).getMongooseInstance()).toBeInstanceOf(mongoose_1.Mongoose);
+            expect(najs_binding_1.make(MongooseProvider.className).getMongooseInstance()).toBeInstanceOf(mongoose_1.Mongoose);
         });
     });
     describe('constructor()', function () {

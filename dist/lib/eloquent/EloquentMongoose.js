@@ -4,7 +4,7 @@ const EloquentBase_1 = require("./EloquentBase");
 const MongooseQueryBuilder_1 = require("../query-builders/MongooseQueryBuilder");
 const mongoose_1 = require("mongoose");
 const collect_js_1 = require("collect.js");
-const najs_1 = require("najs");
+const najs_binding_1 = require("najs-binding");
 const NotFoundError_1 = require("../errors/NotFoundError");
 const SoftDelete_1 = require("./mongoose/SoftDelete");
 mongoose_1.Schema.prototype['setupTimestamp'] = require('./mongoose/setupTimestamp').setupTimestamp;
@@ -57,7 +57,7 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         return super.initialize(data);
     }
     getMongooseProvider() {
-        return najs_1.make('MongooseProvider');
+        return najs_binding_1.make('MongooseProvider');
     }
     isNativeRecord(data) {
         return data instanceof this.model;
@@ -94,7 +94,7 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         return 'all';
     }
     newInstance(document) {
-        const instance = najs_1.make(this.getClassName());
+        const instance = najs_binding_1.make(this.getClassName());
         return instance.initialize(document);
     }
     newCollection(dataset) {

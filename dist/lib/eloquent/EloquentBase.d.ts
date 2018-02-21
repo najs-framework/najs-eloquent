@@ -1,6 +1,6 @@
 import { IEloquent } from '../interfaces/IEloquent';
 import { Collection } from 'collect.js';
-import { IAutoload } from 'najs';
+import { IAutoload } from 'najs-binding';
 export declare type EloquentAccessor = {
     name: string;
     type: 'getter' | 'function';

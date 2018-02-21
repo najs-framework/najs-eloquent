@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const QueryLog_1 = require("./QueryLog");
 const QueryBuilder_1 = require("./QueryBuilder");
 const MongodbConditionConverter_1 = require("./MongodbConditionConverter");
-const najs_1 = require("najs");
+const najs_binding_1 = require("najs-binding");
 const lodash_1 = require("lodash");
 const collect_js_1 = require("collect.js");
 const NotFoundError_1 = require("../errors/NotFoundError");
@@ -18,7 +18,7 @@ class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
         this.mongooseModel = mongoose.model(modelName);
     }
     getMongooseProvider() {
-        return najs_1.make('MongooseProvider');
+        return najs_binding_1.make('MongooseProvider');
     }
     getQuery(isFindOne = false, rawLogs = []) {
         if (!this.hasMongooseQuery) {
@@ -101,7 +101,7 @@ class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
         this.logQuery('get', rawLogs.join(''));
         const result = await query.exec();
         if (result && !lodash_1.isEmpty(result)) {
-            const eloquent = najs_1.make(this.mongooseModel.modelName);
+            const eloquent = najs_binding_1.make(this.mongooseModel.modelName);
             return eloquent.newCollection(result);
         }
         return collect_js_1.default([]);
@@ -121,7 +121,7 @@ class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
         this.logQuery('find', rawLogs.join(''));
         const result = await query.exec();
         if (result) {
-            return najs_1.make(this.mongooseModel.modelName).newInstance(result);
+            return najs_binding_1.make(this.mongooseModel.modelName).newInstance(result);
         }
         // tslint:disable-next-line
         return null;

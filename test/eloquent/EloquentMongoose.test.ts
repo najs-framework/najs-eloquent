@@ -1,7 +1,7 @@
 import 'jest'
 import * as Sinon from 'sinon'
 import { Schema, Document, model } from 'mongoose'
-import { register } from 'najs'
+import { register } from 'najs-binding'
 import { ObjectId } from 'bson'
 import { Eloquent } from '../../lib'
 import { IMongooseProvider } from '../../lib/interfaces/IMongooseProvider'

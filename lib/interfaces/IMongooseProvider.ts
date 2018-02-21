@@ -1,5 +1,5 @@
 import { Mongoose, Model, Schema, Document } from 'mongoose'
-import { IAutoload } from 'najs'
+import { IAutoload } from 'najs-binding'
 
 export interface IMongooseProvider extends IAutoload {
   getMongooseInstance(): Mongoose

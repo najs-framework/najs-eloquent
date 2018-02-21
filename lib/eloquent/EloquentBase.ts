@@ -1,7 +1,7 @@
 import { IEloquent } from '../interfaces/IEloquent'
 import { attributes_proxy } from '../components/attributes_proxy'
 import collect, { Collection } from 'collect.js'
-import { IAutoload, ClassRegistry, register, make } from 'najs'
+import { IAutoload, ClassRegistry, register, make } from 'najs-binding'
 import { pick, isFunction, snakeCase } from 'lodash'
 
 export type EloquentAccessor = {

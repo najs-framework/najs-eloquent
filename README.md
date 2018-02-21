@@ -1,7 +1,5 @@
 # <img src="https://raw.githubusercontent.com/najs-framework/najs-eloquent/master/najs-eloquent.png" alt="najs-eloquent">
 
-> ORM written in Typescript, inspired by Laravel Eloquent, supports Mongodb/Mongoose.
-
 [![Travis](https://img.shields.io/travis/najs-framework/najs-eloquent/master.svg?style=flat-square)](https://travis-ci.org/najs-framework/najs-eloquent/builds)
 [![Coverage Status](https://img.shields.io/coveralls/najs-framework/najs-eloquent/master.svg?style=flat-square)](https://coveralls.io/r/najs-framework/najs-eloquent?branch=master)
 [![node version](https://img.shields.io/node/v/najs-eloquent.svg?style=flat-square)](https://nodejs.org/en/download/)
@@ -10,15 +8,17 @@
 [![npm license](https://img.shields.io/npm/l/najs-eloquent.svg?style=flat-square)](http://badge.fury.io/js/najs-eloquent)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
+> ORM written in Typescript, inspired by Laravel Eloquent, supports Mongodb/Mongoose.
+
 If you are Laravel Eloquent lover and want to use it in `Node JS` you will love `Najs Eloquent`. `Najs Eloquent` is
 Laravel Eloquent, written in `Typescript` (with some helpers you can use it in Javascript for sure).
 
-Current version - `0.2.9` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
+Current version - `0.2.13` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
 some features of Laravel Eloquent are removed such as relationship or scope. In the way to `1.0.0`, the `Najs Eloquent`
 will support full Eloquent's features with difference kinds of DB like `MySql`, `PostgreSQL` or `SqlLite`
 (use `knex` as a query builder).
 
-You can take a look on fully setup example in [najs-eloquent-example](https://github.com/najs-framework/najs-eloquent-example) repository or try it in [Playground](http://35.196.114.98/ide.html).
+You can take a look on fully setup example in [najs-eloquent-example](https://github.com/najs-framework/najs-eloquent-example) repository.
 
 # Installation
 
@@ -36,7 +36,7 @@ Register `MongooseProvider`. WARNING: Class name is so important, it must be Mon
 
 ```typescript
 // file: MongooseProvider.ts
-import { register } from 'najs'
+import { register } from 'najs-binding'
 import { IMongooseProvider } from 'najs-eloquent'
 import { Schema, Document, Model, model } from 'mongoose'
 const mongoose = require('mongoose')
@@ -64,7 +64,7 @@ for example
 
 ```typescript
 // file: CustomClass.ts
-import { register } from 'najs'
+import { register } from 'najs-binding'
 import { IMongooseProvider } from 'najs-eloquent'
 import { Schema, Document, Model, model } from 'mongoose'
 const mongoose = require('mongoose')
@@ -91,7 +91,7 @@ register(CustomClass, 'MongooseProvider')
 
 # Example
 
-Please checkout fully setup example in [najs-eloquent-example](https://github.com/najs-framework/najs-eloquent-example) repository or try it in [Playground](http://35.196.114.98/ide.html).
+Please checkout fully setup example in [najs-eloquent-example](https://github.com/najs-framework/najs-eloquent-example) repository.
 
 # Usage
 

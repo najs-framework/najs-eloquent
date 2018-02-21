@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const Sinon = require("sinon");
 const mongoose_1 = require("mongoose");
-const najs_1 = require("najs");
+const najs_binding_1 = require("najs-binding");
 const bson_1 = require("bson");
 const lib_1 = require("../../lib");
 const MongooseQueryBuilder_1 = require("../../lib/query-builders/MongooseQueryBuilder");
@@ -24,7 +24,7 @@ class MongooseProvider {
     }
 }
 MongooseProvider.className = 'MongooseProvider';
-najs_1.register(MongooseProvider);
+najs_binding_1.register(MongooseProvider);
 class User extends lib_1.Eloquent.Mongoose() {
     getClassName() {
         return User.className;

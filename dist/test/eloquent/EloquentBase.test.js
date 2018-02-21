@@ -4,7 +4,7 @@ require("jest");
 const Sinon = require("sinon");
 const EloquentTestBase_1 = require("./EloquentTestBase");
 const Record_1 = require("./Record");
-const najs_1 = require("najs");
+const najs_binding_1 = require("najs-binding");
 class User extends EloquentTestBase_1.EloquentTestBase {
     getClassName() {
         return 'User';
@@ -37,9 +37,9 @@ class User extends EloquentTestBase_1.EloquentTestBase {
 describe('Eloquent', function () {
     describe('constructor()', function () {
         it('always returns a proxy, and register to Najs.ClassRegistry if needed', function () {
-            expect(najs_1.ClassRegistry.has('User')).toBe(false);
+            expect(najs_binding_1.ClassRegistry.has('User')).toBe(false);
             new User();
-            expect(najs_1.ClassRegistry.has('User')).toBe(true);
+            expect(najs_binding_1.ClassRegistry.has('User')).toBe(true);
         });
         it('can create new object with value', function () {
             const user = new User({ first_name: 'test' });

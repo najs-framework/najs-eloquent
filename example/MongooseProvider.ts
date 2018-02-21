@@ -1,4 +1,4 @@
-import { register } from 'najs'
+import { register } from 'najs-binding'
 import { IMongooseProvider } from '../lib'
 import { Schema, Document, Model, model } from 'mongoose'
 const mongoose = require('mongoose')
