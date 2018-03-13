@@ -12,3 +12,5 @@ var QueryLog_1 = require("./query-builders/QueryLog");
 exports.QueryLog = QueryLog_1.QueryLog;
 var EloquentBase_1 = require("./eloquent/EloquentBase");
 exports.EloquentBase = EloquentBase_1.EloquentBase;
+var EloquentMetadata_1 = require("./eloquent/EloquentMetadata");
+exports.EloquentMetadata = EloquentMetadata_1.EloquentMetadata;

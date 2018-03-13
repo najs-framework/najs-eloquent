@@ -1,4 +1,4 @@
-import { IBasicQueryConditionGrammar, SubCondition, Operator } from './../interfaces/IBasicQueryGrammar';
+import { IBasicQueryConditionGrammar, SubCondition, Operator } from '../interfaces/IBasicQueryGrammar';
 export declare class QueryCondition implements IBasicQueryConditionGrammar {
     isSubQuery: boolean;
     bool: 'and' | 'or';

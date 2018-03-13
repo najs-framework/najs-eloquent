@@ -1,4 +1,4 @@
-import { IBasicQueryConditionGrammar, SubCondition, Operator } from './../interfaces/IBasicQueryGrammar'
+import { IBasicQueryConditionGrammar, SubCondition, Operator } from '../interfaces/IBasicQueryGrammar'
 import { isFunction } from 'lodash'
 
 export class QueryCondition implements IBasicQueryConditionGrammar {

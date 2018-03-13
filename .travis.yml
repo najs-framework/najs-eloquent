@@ -1,3 +1,6 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=f4c6979c40052fdc70c9ec712fe23f6c0a1fd0c52f2373a5b84334e92e25ddbd
 language: node_js
 services:
   - mongodb
@@ -8,11 +11,14 @@ jobs:
       node_js: "node"
       os: linux
       before_script: 
+        - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+        - chmod +x ./cc-test-reporter
         - npm run build || exit 1
         - sleep 5
+        - ./cc-test-reporter before-build
       after_success: 
-        - npm run coverage
         - 'cat ./coverage/lcov.info | coveralls'
+        - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 
     - stage: platform-test
       node_js: "lts/carbon"
@@ -23,4 +29,4 @@ install:
   - yarn install
 
 script:
-  - npm test
+  - npm run coverage
