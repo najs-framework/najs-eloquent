@@ -1,4 +1,4 @@
-import { EloquentSoftDelete } from '../EloquentBase'
+import { EloquentSoftDelete } from '../EloquentMetadata'
 import { Schema, Model } from 'mongoose'
 import { isObject } from 'lodash'
 import * as Moment from 'moment'

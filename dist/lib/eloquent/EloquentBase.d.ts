@@ -1,3 +1,4 @@
+import { EloquentTimestamps, EloquentSoftDelete } from './EloquentMetadata';
 import { IEloquent } from '../interfaces/IEloquent';
 import { Collection } from 'collect.js';
 import { IAutoload } from 'najs-binding';
@@ -11,14 +12,6 @@ export declare type EloquentMutator = {
     type: 'setter' | 'function';
     ref?: string;
 };
-export declare type EloquentTimestamps = {
-    createdAt: string;
-    updatedAt: string;
-};
-export declare type EloquentSoftDelete = {
-    deletedAt: string;
-    overrideMethods: boolean | 'all' | string[];
-};
 export declare abstract class EloquentBase<NativeRecord extends Object = {}> implements IEloquent, IAutoload {
     protected static timestamps: EloquentTimestamps | boolean;
     protected static softDeletes: EloquentSoftDelete | boolean;
@@ -26,6 +19,8 @@ export declare abstract class EloquentBase<NativeRecord extends Object = {}> imp
     protected attributes: NativeRecord;
     protected fillable?: string[];
     protected guarded?: string[];
+    protected timestamps?: EloquentTimestamps | boolean;
+    protected softDeletes?: EloquentSoftDelete | boolean;
     protected accessors: {
         [key in string]: EloquentAccessor;
     };

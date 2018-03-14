@@ -1,3 +1,4 @@
+import { EloquentMetadata, EloquentTimestamps, EloquentSoftDelete } from './EloquentMetadata'
 import { IEloquent } from '../interfaces/IEloquent'
 import { attributes_proxy } from '../components/attributes_proxy'
 import collect, { Collection } from 'collect.js'
@@ -14,11 +15,6 @@ export type EloquentMutator = {
   type: 'setter' | 'function'
   ref?: string
 }
-export type EloquentTimestamps = { createdAt: string; updatedAt: string }
-export type EloquentSoftDelete = {
-  deletedAt: string
-  overrideMethods: boolean | 'all' | string[]
-}
 
 export abstract class EloquentBase<NativeRecord extends Object = {}> implements IEloquent, IAutoload {
   protected static timestamps: EloquentTimestamps | boolean = false
@@ -28,6 +24,8 @@ export abstract class EloquentBase<NativeRecord extends Object = {}> implements 
   protected attributes: NativeRecord
   protected fillable?: string[]
   protected guarded?: string[]
+  protected timestamps?: EloquentTimestamps | boolean = false
+  protected softDeletes?: EloquentSoftDelete | boolean = false
   protected accessors: { [key in string]: EloquentAccessor }
   protected mutators: { [key in string]: EloquentMutator }
 
@@ -111,11 +109,11 @@ export abstract class EloquentBase<NativeRecord extends Object = {}> implements 
   }
 
   getFillable(): string[] {
-    return this.fillable || []
+    return EloquentMetadata.fillable(this)
   }
 
   getGuarded(): string[] {
-    return this.guarded || ['*']
+    return EloquentMetadata.guarded(this)
   }
 
   isFillable(key: string): boolean {

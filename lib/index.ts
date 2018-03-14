@@ -12,10 +12,9 @@ export default Eloquent
 export { QueryLog } from './query-builders/QueryLog'
 
 export { EloquentBase } from './eloquent/EloquentBase'
-export { EloquentMetadata } from './eloquent/EloquentMetadata'
+export { EloquentMetadata, EloquentTimestamps, EloquentSoftDelete } from './eloquent/EloquentMetadata'
 
 export { IMongooseProvider } from './interfaces/IMongooseProvider'
-export { IEloquentMetadata } from './interfaces/IEloquentMetadata'
 export { IBasicQueryConditionGrammar, IBasicQueryGrammar } from './interfaces/IBasicQueryGrammar'
 export { IEloquent } from './interfaces/IEloquent'
 export { IQueryFetchResult } from './interfaces/IQueryFetchResult'

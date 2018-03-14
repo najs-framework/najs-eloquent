@@ -7,6 +7,7 @@ const collect_js_1 = require("collect.js");
 const najs_binding_1 = require("najs-binding");
 const NotFoundError_1 = require("../errors/NotFoundError");
 const SoftDelete_1 = require("./mongoose/SoftDelete");
+const EloquentMetadata_1 = require("./EloquentMetadata");
 mongoose_1.Schema.prototype['setupTimestamp'] = require('./mongoose/setupTimestamp').setupTimestamp;
 const DEFAULT_TIMESTAMPS = {
     createdAt: 'created_at',
@@ -38,9 +39,8 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
             .modelNames()
             .indexOf(modelName) === -1) {
             const schema = this.getSchema();
-            const timestampsSettings = Object.getPrototypeOf(this).constructor.timestamps;
-            if (timestampsSettings) {
-                schema.set('timestamps', timestampsSettings === true ? DEFAULT_TIMESTAMPS : timestampsSettings);
+            if (EloquentMetadata_1.EloquentMetadata.hasTimestamps(this)) {
+                schema.set('timestamps', EloquentMetadata_1.EloquentMetadata.timestamps(this));
             }
             if (softDeletes) {
                 schema.plugin(SoftDelete_1.SoftDelete, softDeletes === true ? DEFAULT_SOFT_DELETES : softDeletes);

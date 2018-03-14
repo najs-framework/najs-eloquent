@@ -1,9 +1,10 @@
-import { EloquentBase, EloquentSoftDelete } from './EloquentBase';
+import { EloquentBase } from './EloquentBase';
 import { OrderDirection, SubCondition } from '../interfaces/IBasicQueryGrammar';
 import { IMongooseProvider } from '../interfaces/IMongooseProvider';
 import { MongooseQueryBuilder } from '../query-builders/MongooseQueryBuilder';
 import { Document, Schema, Model } from 'mongoose';
 import { Collection } from 'collect.js';
+import { EloquentSoftDelete } from './EloquentMetadata';
 export declare abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
     protected collection: string;
     protected schema: Schema;

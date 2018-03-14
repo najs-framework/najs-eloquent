@@ -1,4 +1,4 @@
-import { EloquentBase, EloquentTimestamps, EloquentSoftDelete } from './EloquentBase'
+import { EloquentBase } from './EloquentBase'
 import { OrderDirection, SubCondition } from '../interfaces/IBasicQueryGrammar'
 import { IMongooseProvider } from '../interfaces/IMongooseProvider'
 import { MongooseQueryBuilder } from '../query-builders/MongooseQueryBuilder'
@@ -7,6 +7,7 @@ import collect, { Collection } from 'collect.js'
 import { make } from 'najs-binding'
 import { NotFoundError } from '../errors/NotFoundError'
 import { SoftDelete } from './mongoose/SoftDelete'
+import { EloquentTimestamps, EloquentSoftDelete, EloquentMetadata } from './EloquentMetadata'
 Schema.prototype['setupTimestamp'] = require('./mongoose/setupTimestamp').setupTimestamp
 
 const DEFAULT_TIMESTAMPS: EloquentTimestamps = {
@@ -53,9 +54,8 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
         .indexOf(modelName) === -1
     ) {
       const schema = this.getSchema()
-      const timestampsSettings = Object.getPrototypeOf(this).constructor.timestamps
-      if (timestampsSettings) {
-        schema.set('timestamps', timestampsSettings === true ? DEFAULT_TIMESTAMPS : timestampsSettings)
+      if (EloquentMetadata.hasTimestamps(this)) {
+        schema.set('timestamps', EloquentMetadata.timestamps(this))
       }
       if (softDeletes) {
         schema.plugin(SoftDelete, softDeletes === true ? DEFAULT_SOFT_DELETES : softDeletes)

@@ -1,11 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const EloquentMetadata_1 = require("./EloquentMetadata");
 const attributes_proxy_1 = require("../components/attributes_proxy");
 const collect_js_1 = require("collect.js");
 const najs_binding_1 = require("najs-binding");
 const lodash_1 = require("lodash");
 class EloquentBase {
     constructor(data) {
+        this.timestamps = false;
+        this.softDeletes = false;
         this.registerIfNeeded();
         return this.initialize(data);
     }
@@ -46,10 +49,10 @@ class EloquentBase {
         return this;
     }
     getFillable() {
-        return this.fillable || [];
+        return EloquentMetadata_1.EloquentMetadata.fillable(this);
     }
     getGuarded() {
-        return this.guarded || ['*'];
+        return EloquentMetadata_1.EloquentMetadata.guarded(this);
     }
     isFillable(key) {
         const fillable = this.getFillable();

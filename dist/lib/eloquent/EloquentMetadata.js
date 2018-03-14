@@ -9,8 +9,8 @@ const DEFAULT_SOFT_DELETES = {
     deletedAt: 'deleted_at',
     overrideMethods: false
 };
-exports.EloquentMetadata = {
-    getSettingProperty(eloquent, property, defaultValue) {
+class EloquentMetadata {
+    static getSettingProperty(eloquent, property, defaultValue) {
         if (eloquent instanceof EloquentBase_1.EloquentBase) {
             const definition = Object.getPrototypeOf(eloquent).constructor;
             if (definition[property]) {
@@ -23,17 +23,35 @@ exports.EloquentMetadata = {
         }
         const instance = Reflect.construct(eloquent, []);
         return instance[property] ? instance[property] : defaultValue;
-    },
-    fillable(eloquent) {
-        return this.getSettingProperty(eloquent, 'fillable', []);
-    },
-    guarded(eloquent) {
-        return this.getSettingProperty(eloquent, 'guarded', ['*']);
-    },
-    timestamps(eloquent, defaultValue = DEFAULT_TIMESTAMPS) {
-        return this.getSettingProperty(eloquent, 'timestamps', defaultValue);
-    },
-    softDeletes(eloquent, defaultValue = DEFAULT_SOFT_DELETES) {
-        return this.getSettingProperty(eloquent, 'softDeletes', defaultValue);
     }
-};
+    static fillable(eloquent) {
+        return this.getSettingProperty(eloquent, 'fillable', []);
+    }
+    static guarded(eloquent) {
+        return this.getSettingProperty(eloquent, 'guarded', ['*']);
+    }
+    static hasSetting(eloquent, property) {
+        const value = this.getSettingProperty(eloquent, property, false);
+        return value !== false;
+    }
+    static getSettingWithTrueValue(eloquent, property, defaultValue) {
+        const value = this.getSettingProperty(eloquent, property, false);
+        if (value === true) {
+            return defaultValue;
+        }
+        return value || defaultValue;
+    }
+    static hasTimestamps(eloquent) {
+        return this.hasSetting(eloquent, 'timestamps');
+    }
+    static timestamps(eloquent, defaultValue = DEFAULT_TIMESTAMPS) {
+        return this.getSettingWithTrueValue(eloquent, 'timestamps', defaultValue);
+    }
+    static hasSoftDeletes(eloquent) {
+        return this.hasSetting(eloquent, 'softDeletes');
+    }
+    static softDeletes(eloquent, defaultValue = DEFAULT_SOFT_DELETES) {
+        return this.getSettingWithTrueValue(eloquent, 'softDeletes', defaultValue);
+    }
+}
+exports.EloquentMetadata = EloquentMetadata;
