@@ -64,8 +64,6 @@ describe('EloquentMongoose', function () {
     afterAll(async function () {
         await util_1.delete_collection(mongoose, 'users');
         await util_1.delete_collection(mongoose, 'models');
-        await util_1.delete_collection(mongoose, 'timestampmodeldefaults');
-        await util_1.delete_collection(mongoose, 'customtimestampmodels');
         await util_1.delete_collection(mongoose, 'softdeletemodels');
         await util_1.delete_collection(mongoose, 'softdelete1s');
         await util_1.delete_collection(mongoose, 'softdelete2s');
@@ -935,103 +933,6 @@ describe('EloquentMongoose', function () {
                 const markModifiedSpy = Sinon.spy(user['attributes'], 'markModified');
                 user.touch();
                 expect(markModifiedSpy.called).toBe(false);
-            });
-        });
-    });
-    describe('Timestamps', function () {
-        class TimestampModelDefault extends lib_1.Eloquent.Mongoose() {
-            getClassName() {
-                return 'TimestampModelDefault';
-            }
-            getSchema() {
-                return new mongoose_1.Schema({ name: String });
-            }
-        }
-        TimestampModelDefault.timestamps = true;
-        it('should use custom "setupTimestamp" which use Moment instead of native Date', async function () {
-            const now = new Date(1988, 4, 16);
-            Moment.now = () => now;
-            const model = new TimestampModelDefault();
-            await model.save();
-            expect(model.created_at).toEqual(now);
-            expect(model.updated_at).toEqual(now);
-        });
-        it('works with ActiveRecord.save()', async function () {
-            const createdAt = new Date(1988, 4, 16);
-            Moment.now = () => createdAt;
-            const model = new TimestampModelDefault();
-            await model.save();
-            const updatedAt = new Date(2000, 0, 1);
-            Moment.now = () => updatedAt;
-            model.name = 'updated';
-            await model.save();
-            const updatedModel = await TimestampModelDefault.find(model.id);
-            expect(updatedModel.updated_at).toEqual(updatedAt);
-        });
-        it('works with QueryBuilder.update(), one document', async function () {
-            const createdAt = new Date(1988, 4, 16);
-            Moment.now = () => createdAt;
-            const model = new TimestampModelDefault();
-            await model.save();
-            const updatedAt = new Date(2000, 0, 1);
-            Moment.now = () => updatedAt;
-            await TimestampModelDefault.where('_id', model.id).update({});
-            const updatedModel = await TimestampModelDefault.find(model.id);
-            expect(updatedModel.updated_at).toEqual(updatedAt);
-        });
-        it('works with QueryBuilder.update(), multiple documents', async function () {
-            const now = new Date(2010, 0, 1);
-            Moment.now = () => now;
-            const idList = await TimestampModelDefault.pluck('id');
-            await TimestampModelDefault.whereIn('id', Object.keys(idList)).update({});
-            const documents = await TimestampModelDefault.all();
-            expect(documents.map(item => item.updated_at).all()).toEqual([now, now, now]);
-        });
-        class CustomTimestampModel extends lib_1.Eloquent.Mongoose() {
-            getClassName() {
-                return 'CustomTimestampModel';
-            }
-            getSchema() {
-                return new mongoose_1.Schema({ name: String });
-            }
-        }
-        CustomTimestampModel.timestamps = {
-            createdAt: 'createdAt',
-            updatedAt: 'updatedAt'
-        };
-        it('works with custom name for createdAt and updatedAt', async function () {
-            const now = new Date(1988, 4, 16);
-            Moment.now = () => now;
-            const model = new CustomTimestampModel();
-            await model.save();
-            expect(model['createdAt']).toEqual(now);
-            expect(model['updatedAt']).toEqual(now);
-        });
-        describe('touch()', function () {
-            it('does nothing with not supported Timestamp Model', async function () {
-                const user = new User();
-                const markModifiedSpy = Sinon.spy(user['attributes'], 'markModified');
-                user.touch();
-                expect(markModifiedSpy.called).toBe(false);
-            });
-            it('updates timestamps by calling markModified', async function () {
-                let now = new Date(1988, 4, 16);
-                Moment.now = () => now;
-                const defaultSettings = new TimestampModelDefault();
-                await defaultSettings.save();
-                defaultSettings.touch();
-                expect(defaultSettings.created_at).toEqual(now);
-                expect(defaultSettings.updated_at).toEqual(now);
-                const model = new CustomTimestampModel();
-                const markModifiedSpy = Sinon.spy(model['attributes'], 'markModified');
-                await model.save();
-                expect(model['createdAt']).toEqual(now);
-                expect(model['updatedAt']).toEqual(now);
-                now = new Date(2000, 1, 1);
-                model.touch();
-                expect(markModifiedSpy.calledWith('updatedAt')).toBe(true);
-                await model.save();
-                expect(model['updatedAt']).toEqual(now);
             });
         });
     });

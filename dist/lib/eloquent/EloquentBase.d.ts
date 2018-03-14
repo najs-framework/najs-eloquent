@@ -13,7 +13,6 @@ export declare type EloquentMutator = {
     ref?: string;
 };
 export declare abstract class EloquentBase<NativeRecord extends Object = {}> implements IEloquent, IAutoload {
-    protected static timestamps: EloquentTimestamps | boolean;
     protected static softDeletes: EloquentSoftDelete | boolean;
     protected __knownAttributeList: string[];
     protected attributes: NativeRecord;

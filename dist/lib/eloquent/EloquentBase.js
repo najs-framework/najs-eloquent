@@ -7,8 +7,6 @@ const najs_binding_1 = require("najs-binding");
 const lodash_1 = require("lodash");
 class EloquentBase {
     constructor(data) {
-        this.timestamps = false;
-        this.softDeletes = false;
         this.registerIfNeeded();
         return this.initialize(data);
     }
@@ -168,6 +166,5 @@ class EloquentBase {
         ];
     }
 }
-EloquentBase.timestamps = false;
 EloquentBase.softDeletes = false;
 exports.EloquentBase = EloquentBase;

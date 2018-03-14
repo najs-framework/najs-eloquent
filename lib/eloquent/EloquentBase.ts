@@ -17,15 +17,14 @@ export type EloquentMutator = {
 }
 
 export abstract class EloquentBase<NativeRecord extends Object = {}> implements IEloquent, IAutoload {
-  protected static timestamps: EloquentTimestamps | boolean = false
   protected static softDeletes: EloquentSoftDelete | boolean = false
 
   protected __knownAttributeList: string[]
   protected attributes: NativeRecord
   protected fillable?: string[]
   protected guarded?: string[]
-  protected timestamps?: EloquentTimestamps | boolean = false
-  protected softDeletes?: EloquentSoftDelete | boolean = false
+  protected timestamps?: EloquentTimestamps | boolean
+  protected softDeletes?: EloquentSoftDelete | boolean
   protected accessors: { [key in string]: EloquentAccessor }
   protected mutators: { [key in string]: EloquentMutator }
 
