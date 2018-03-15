@@ -44,29 +44,27 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
 
   // -------------------------------------------------------------------------------------------------------------------
-  protected initializeModelIfNeeded(softDeletes: boolean | EloquentSoftDelete) {
+  protected initializeModelIfNeeded() {
     const modelName: string = this.getModelName()
     const mongooseProvider: IMongooseProvider = this.getMongooseProvider()
-    if (
-      mongooseProvider
-        .getMongooseInstance()
-        .modelNames()
-        .indexOf(modelName) === -1
-    ) {
-      const schema = this.getSchema()
-      const sampleInstance = make<EloquentBase<Document & T>>(this.getClassName(), ['do-not-initialize'])
-      if (EloquentMetadata.hasTimestamps(sampleInstance)) {
-        schema.set('timestamps', EloquentMetadata.timestamps(sampleInstance))
-      }
-      if (softDeletes) {
-        schema.plugin(SoftDelete, softDeletes === true ? DEFAULT_SOFT_DELETES : softDeletes)
-      }
-      mongooseProvider.createModelFromSchema<Document & T>(modelName, schema)
+    // prettier-ignore
+    if (mongooseProvider.getMongooseInstance().modelNames().indexOf(modelName) !== -1) {
+      return
     }
+
+    const schema = this.getSchema()
+    const sampleInstance = make<EloquentBase<Document & T>>(this.getClassName(), ['do-not-initialize'])
+    if (EloquentMetadata.hasTimestamps(sampleInstance)) {
+      schema.set('timestamps', EloquentMetadata.timestamps(sampleInstance))
+    }
+    if (EloquentMetadata.hasSoftDeletes(sampleInstance)) {
+      schema.plugin(SoftDelete, EloquentMetadata.softDeletes(sampleInstance))
+    }
+    mongooseProvider.createModelFromSchema<Document & T>(modelName, schema)
   }
 
   protected initialize(data: Document & T | Object | undefined): EloquentMongoose<T> {
-    this.initializeModelIfNeeded(Object.getPrototypeOf(this).constructor.softDeletes)
+    this.initializeModelIfNeeded()
     this.model = this.getMongooseProvider()
       .getMongooseInstance()
       .model(this.getModelName())
@@ -113,7 +111,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   newQuery(softDeletes?: boolean | EloquentSoftDelete): any {
     const softDeleteSettings = softDeletes || Object.getPrototypeOf(this).constructor.softDeletes
     this.registerIfNeeded()
-    this.initializeModelIfNeeded(softDeleteSettings)
+    this.initializeModelIfNeeded()
     return new MongooseQueryBuilder(
       this.getModelName(),
       softDeleteSettings === true ? DEFAULT_SOFT_DELETES : softDeleteSettings
@@ -203,8 +201,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static queryName(name: string): MongooseQueryBuilder {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .queryName(name)
+    .queryName(name)
   }
 
   select(field: string): MongooseQueryBuilder
@@ -218,8 +215,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   static select(...fields: Array<string | string[]>): MongooseQueryBuilder
   static select(...fields: Array<string | string[]>): MongooseQueryBuilder {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .select(...fields)
+    .select(...fields)
   }
 
   distinct(field: string): MongooseQueryBuilder
@@ -233,8 +229,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   static distinct(...fields: Array<string | string[]>): MongooseQueryBuilder
   static distinct(...fields: Array<string | string[]>): MongooseQueryBuilder {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .distinct(...fields)
+    .distinct(...fields)
   }
 
   orderBy(field: string): MongooseQueryBuilder
@@ -245,18 +240,14 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   static orderBy(field: string): MongooseQueryBuilder
   static orderBy(field: string, direction: OrderDirection): MongooseQueryBuilder
   static orderBy(field: string, direction: OrderDirection = 'asc'): MongooseQueryBuilder {
-    return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .orderBy(field, direction)
+    return Reflect.construct(this, []).orderBy(field, direction)
   }
 
   orderByAsc(field: string): MongooseQueryBuilder {
     return this.newQuery().orderByAsc(field)
   }
   static orderByAsc(field: string): MongooseQueryBuilder {
-    return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .orderByAsc(field)
+    return Reflect.construct(this, []).orderByAsc(field)
   }
 
   orderByDesc(field: string): MongooseQueryBuilder {
@@ -264,8 +255,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static orderByDesc(field: string): MongooseQueryBuilder {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .orderByDesc(field)
+    .orderByDesc(field)
   }
 
   limit(records: number): MongooseQueryBuilder {
@@ -273,8 +263,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static limit(records: number): MongooseQueryBuilder {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .limit(records)
+    .limit(records)
   }
 
   where(conditionBuilder: SubCondition): MongooseQueryBuilder
@@ -288,8 +277,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   static where(field: string, operator: Operator, value: any): MongooseQueryBuilder
   static where(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): MongooseQueryBuilder {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .where(<any>arg0, arg1, arg2)
+    .where(<any>arg0, arg1, arg2)
   }
 
   orWhere(conditionBuilder: SubCondition): MongooseQueryBuilder
@@ -303,8 +291,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   static orWhere(field: string, operator: Operator, value: any): MongooseQueryBuilder
   static orWhere(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): MongooseQueryBuilder {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .orWhere(<any>arg0, arg1, arg2)
+    .orWhere(<any>arg0, arg1, arg2)
   }
 
   whereIn(field: string, values: Array<any>): MongooseQueryBuilder {
@@ -312,8 +299,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static whereIn(field: string, values: Array<any>): MongooseQueryBuilder {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .whereIn(field, values)
+    .whereIn(field, values)
   }
 
   whereNotIn(field: string, values: Array<any>): MongooseQueryBuilder {
@@ -321,8 +307,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static whereNotIn(field: string, values: Array<any>): MongooseQueryBuilder {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .whereNotIn(field, values)
+    .whereNotIn(field, values)
   }
 
   orWhereIn(field: string, values: Array<any>): MongooseQueryBuilder {
@@ -330,8 +315,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static orWhereIn(field: string, values: Array<any>): MongooseQueryBuilder {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .orWhereIn(field, values)
+    .orWhereIn(field, values)
   }
 
   orWhereNotIn(field: string, values: Array<any>): MongooseQueryBuilder {
@@ -339,8 +323,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static orWhereNotIn(field: string, values: Array<any>): MongooseQueryBuilder {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .orWhereNotIn(field, values)
+    .orWhereNotIn(field, values)
   }
 
   whereNull(field: string) {
@@ -348,8 +331,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static whereNull(field: string) {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .whereNull(field)
+    .whereNull(field)
   }
 
   whereNotNull(field: string) {
@@ -357,8 +339,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static whereNotNull(field: string) {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .whereNotNull(field)
+    .whereNotNull(field)
   }
 
   orWhereNull(field: string) {
@@ -366,8 +347,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static orWhereNull(field: string) {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .orWhereNull(field)
+    .orWhereNull(field)
   }
 
   orWhereNotNull(field: string) {
@@ -375,8 +355,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static orWhereNotNull(field: string) {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .orWhereNotNull(field)
+    .orWhereNotNull(field)
   }
 
   withTrashed() {
@@ -384,8 +363,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static withTrashed() {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .withTrashed()
+    .withTrashed()
   }
 
   onlyTrashed() {
@@ -393,8 +371,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static onlyTrashed() {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .onlyTrashed()
+    .onlyTrashed()
   }
 
   async all(): Promise<any> {
@@ -402,8 +379,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static async all(): Promise<any> {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .all()
+    .all()
   }
 
   async get(): Promise<any>
@@ -421,7 +397,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   static async get(...fields: Array<string | string[]>): Promise<any>
   static async get(...fields: Array<string | string[]>): Promise<any> {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
+
       .select(...fields)
       .get()
   }
@@ -438,12 +414,11 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   static async find(id: any): Promise<any>
   static async find(id?: any): Promise<any> {
     if (typeof id !== 'undefined') {
-      const query = this.prototype.newQuery(this.softDeletes)
+      const query = this.prototype.newQuery()
       return query.where(query.getPrimaryKey(), id).find()
     }
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .find()
+    .find()
   }
 
   async first(): Promise<any> {
@@ -451,8 +426,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static async first(): Promise<any> {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .first()
+    .first()
   }
 
   pluck(value: string): Promise<Object>
@@ -464,8 +438,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   static async pluck(value: string, key: string): Promise<Object>
   static async pluck(value: string, key?: string): Promise<Object> {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .pluck(value, key)
+    .pluck(value, key)
   }
 
   async count(): Promise<number> {
@@ -473,8 +446,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static async count(): Promise<number> {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .count()
+    .count()
   }
 
   native(handler: (native: any) => any): Promise<any> {
@@ -482,8 +454,7 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   }
   static native(handler: (native: any) => any): Promise<any> {
     return Reflect.construct(this, [])
-      .newQuery(this.softDeletes)
-      .native(handler)
+    .native(handler)
   }
 
   async findById(id: any): Promise<any> {

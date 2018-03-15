@@ -31,26 +31,25 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         return this.getClassName();
     }
     // -------------------------------------------------------------------------------------------------------------------
-    initializeModelIfNeeded(softDeletes) {
+    initializeModelIfNeeded() {
         const modelName = this.getModelName();
         const mongooseProvider = this.getMongooseProvider();
-        if (mongooseProvider
-            .getMongooseInstance()
-            .modelNames()
-            .indexOf(modelName) === -1) {
-            const schema = this.getSchema();
-            const sampleInstance = najs_binding_1.make(this.getClassName(), ['do-not-initialize']);
-            if (EloquentMetadata_1.EloquentMetadata.hasTimestamps(sampleInstance)) {
-                schema.set('timestamps', EloquentMetadata_1.EloquentMetadata.timestamps(sampleInstance));
-            }
-            if (softDeletes) {
-                schema.plugin(SoftDelete_1.SoftDelete, softDeletes === true ? DEFAULT_SOFT_DELETES : softDeletes);
-            }
-            mongooseProvider.createModelFromSchema(modelName, schema);
+        // prettier-ignore
+        if (mongooseProvider.getMongooseInstance().modelNames().indexOf(modelName) !== -1) {
+            return;
         }
+        const schema = this.getSchema();
+        const sampleInstance = najs_binding_1.make(this.getClassName(), ['do-not-initialize']);
+        if (EloquentMetadata_1.EloquentMetadata.hasTimestamps(sampleInstance)) {
+            schema.set('timestamps', EloquentMetadata_1.EloquentMetadata.timestamps(sampleInstance));
+        }
+        if (EloquentMetadata_1.EloquentMetadata.hasSoftDeletes(sampleInstance)) {
+            schema.plugin(SoftDelete_1.SoftDelete, EloquentMetadata_1.EloquentMetadata.softDeletes(sampleInstance));
+        }
+        mongooseProvider.createModelFromSchema(modelName, schema);
     }
     initialize(data) {
-        this.initializeModelIfNeeded(Object.getPrototypeOf(this).constructor.softDeletes);
+        this.initializeModelIfNeeded();
         this.model = this.getMongooseProvider()
             .getMongooseInstance()
             .model(this.getModelName());
@@ -88,7 +87,7 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     newQuery(softDeletes) {
         const softDeleteSettings = softDeletes || Object.getPrototypeOf(this).constructor.softDeletes;
         this.registerIfNeeded();
-        this.initializeModelIfNeeded(softDeleteSettings);
+        this.initializeModelIfNeeded();
         return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.getModelName(), softDeleteSettings === true ? DEFAULT_SOFT_DELETES : softDeleteSettings).setQueryLogGroup(this.getQueryLogGroup());
     }
     getQueryLogGroup() {
@@ -160,7 +159,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static queryName(name) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .queryName(name);
     }
     select(...fields) {
@@ -168,7 +166,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static select(...fields) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .select(...fields);
     }
     distinct(...fields) {
@@ -176,31 +173,25 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static distinct(...fields) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .distinct(...fields);
     }
     orderBy(field, direction = 'asc') {
         return this.newQuery().orderBy(field, direction);
     }
     static orderBy(field, direction = 'asc') {
-        return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
-            .orderBy(field, direction);
+        return Reflect.construct(this, []).orderBy(field, direction);
     }
     orderByAsc(field) {
         return this.newQuery().orderByAsc(field);
     }
     static orderByAsc(field) {
-        return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
-            .orderByAsc(field);
+        return Reflect.construct(this, []).orderByAsc(field);
     }
     orderByDesc(field) {
         return this.newQuery().orderByDesc(field);
     }
     static orderByDesc(field) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .orderByDesc(field);
     }
     limit(records) {
@@ -208,7 +199,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static limit(records) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .limit(records);
     }
     where(arg0, arg1, arg2) {
@@ -216,7 +206,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static where(arg0, arg1, arg2) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .where(arg0, arg1, arg2);
     }
     orWhere(arg0, arg1, arg2) {
@@ -224,7 +213,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static orWhere(arg0, arg1, arg2) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .orWhere(arg0, arg1, arg2);
     }
     whereIn(field, values) {
@@ -232,7 +220,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static whereIn(field, values) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .whereIn(field, values);
     }
     whereNotIn(field, values) {
@@ -240,7 +227,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static whereNotIn(field, values) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .whereNotIn(field, values);
     }
     orWhereIn(field, values) {
@@ -248,7 +234,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static orWhereIn(field, values) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .orWhereIn(field, values);
     }
     orWhereNotIn(field, values) {
@@ -256,7 +241,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static orWhereNotIn(field, values) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .orWhereNotIn(field, values);
     }
     whereNull(field) {
@@ -264,7 +248,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static whereNull(field) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .whereNull(field);
     }
     whereNotNull(field) {
@@ -272,7 +255,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static whereNotNull(field) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .whereNotNull(field);
     }
     orWhereNull(field) {
@@ -280,7 +262,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static orWhereNull(field) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .orWhereNull(field);
     }
     orWhereNotNull(field) {
@@ -288,7 +269,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static orWhereNotNull(field) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .orWhereNotNull(field);
     }
     withTrashed() {
@@ -296,7 +276,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static withTrashed() {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .withTrashed();
     }
     onlyTrashed() {
@@ -304,7 +283,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static onlyTrashed() {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .onlyTrashed();
     }
     async all() {
@@ -312,7 +290,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static async all() {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .all();
     }
     async get(...fields) {
@@ -322,7 +299,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static async get(...fields) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .select(...fields)
             .get();
     }
@@ -335,11 +311,10 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static async find(id) {
         if (typeof id !== 'undefined') {
-            const query = this.prototype.newQuery(this.softDeletes);
+            const query = this.prototype.newQuery();
             return query.where(query.getPrimaryKey(), id).find();
         }
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .find();
     }
     async first() {
@@ -347,7 +322,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static async first() {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .first();
     }
     pluck(value, key) {
@@ -355,7 +329,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static async pluck(value, key) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .pluck(value, key);
     }
     async count() {
@@ -363,7 +336,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static async count() {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .count();
     }
     native(handler) {
@@ -371,7 +343,6 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
     }
     static native(handler) {
         return Reflect.construct(this, [])
-            .newQuery(this.softDeletes)
             .native(handler);
     }
     async findById(id) {
