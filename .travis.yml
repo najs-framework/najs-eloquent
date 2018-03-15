@@ -13,6 +13,7 @@ jobs:
       before_script: 
         - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
         - chmod +x ./cc-test-reporter
+        - chmod +x ./script/copy-custom-definitions.js
         - npm run build || exit 1
         - sleep 5
         - ./cc-test-reporter before-build

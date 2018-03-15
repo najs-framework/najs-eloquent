@@ -1,10 +1,10 @@
 {
   "name": "najs-eloquent",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "scripts": {
     "build": "npm run build-ts && npm run tslint && npm run copy-js-files",
     "copy-js-files": "chmod u+x ./script/copy-js-files.sh && ./script/copy-js-files.sh",
-    "build-ts": "tsc -d",
+    "build-ts": "tsc -d && ./script/copy-custom-definitions.js",
     "coverage": "export SUPPRESS_NO_CONFIG_WARNING=0 && npm run build && jest ./dist/test --coverage --forceExit",
     "test": "export SUPPRESS_NO_CONFIG_WARNING=0 && jest ./dist/test --forceExit",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
@@ -17,18 +17,11 @@
         "skipBabel": true
       }
     },
-    "moduleFileExtensions": [
-      "js",
-      "ts",
-      "json"
-    ],
+    "moduleFileExtensions": ["js", "ts", "json"],
     "transform": {
       "^.+\\.(ts|tsx)$": "./node_modules/ts-jest/preprocessor.js"
     },
-    "testMatch": [
-      "**/test/**/*.test.ts",
-      "**/test/**/*.test.js"
-    ],
+    "testMatch": ["**/test/**/*.test.ts", "**/test/**/*.test.js"],
     "testEnvironment": "node",
     "collectCoverageFrom": [
       "dist/lib/**/*.js",
@@ -37,9 +30,7 @@
       "!dist/lib/eloquent/mongoose/setupTimestamp.js"
     ]
   },
-  "files": [
-    "dist/**/*"
-  ],
+  "files": ["dist/**/*"],
   "main": "./dist/lib/index.js",
   "types": "./dist/lib/index.d.ts",
   "repository": {

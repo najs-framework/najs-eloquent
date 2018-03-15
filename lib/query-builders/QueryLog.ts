@@ -39,6 +39,156 @@ export type QueryLogSpecs = {
   pull(transform: QueryLogTransform, since: Moment.Moment, until: Moment.Moment, group: string): QueryLogItem[]
 }
 
+function parse_pull_arguments_1(args: ArrayLike<any>) {
+  const result = {
+    group: undefined,
+    since: undefined,
+    until: undefined,
+    transform: undefined
+  }
+
+  // pull(since: Moment.Moment): QueryLogItem[]
+  if (Moment.isMoment(args[0])) {
+    result.since = args[0]
+    return result
+  }
+  // pull(transform: QueryLogTransform): QueryLogItem[]
+  if (isFunction(args[0])) {
+    result.transform = args[0]
+    return result
+  }
+  // pull(group: string): QueryLogItem[]
+  if (isString(args[0])) {
+    result.group = args[0]
+    return result
+  }
+
+  return result
+}
+
+function parse_pull_arguments_2(args: ArrayLike<any>) {
+  const result = {
+    group: undefined,
+    since: undefined,
+    until: undefined,
+    transform: undefined
+  }
+
+  // pull(group: string, since: Moment.Moment): QueryLogItem[]
+  if (isString(args[0]) && Moment.isMoment(args[1])) {
+    result.group = args[0]
+    result.since = args[1]
+    return result
+  }
+  // pull(group: string, transform: QueryLogTransform): QueryLogItem[]
+  if (isString(args[0]) && isFunction(args[1])) {
+    result.group = args[0]
+    result.transform = args[1]
+    return result
+  }
+  // pull(since: Moment.Moment, group: string): QueryLogItem[]
+  if (Moment.isMoment(args[0]) && isString(args[1])) {
+    result.since = args[0]
+    result.group = args[1]
+    return result
+  }
+  // pull(since: Moment.Moment, until: Moment.Moment): QueryLogItem[]
+  if (Moment.isMoment(args[0]) && Moment.isMoment(args[1])) {
+    result.since = args[0]
+    result.until = args[1]
+    return result
+  }
+  // pull(since: Moment.Moment, transform: QueryLogTransform): QueryLogItem[]
+  if (Moment.isMoment(args[0]) && isFunction(args[1])) {
+    result.since = args[0]
+    result.transform = args[1]
+    return result
+  }
+  // pull(transform: QueryLogTransform, since: Moment.Moment): QueryLogItem[]
+  if (isFunction(args[0]) && Moment.isMoment(args[1])) {
+    result.transform = args[0]
+    result.since = args[1]
+    return result
+  }
+  // pull(transform: QueryLogTransform, group: string): QueryLogItem[]
+  if (isFunction(args[0]) && isString(args[1])) {
+    result.transform = args[0]
+    result.group = args[1]
+    return result
+  }
+
+  return result
+}
+
+function parse_pull_arguments_3(args: ArrayLike<any>) {
+  const result = {
+    group: undefined,
+    since: undefined,
+    until: undefined,
+    transform: undefined
+  }
+
+  // pull(group: string, since: Moment.Moment, until: Moment.Moment): QueryLogItem[]
+  if (isString(args[0]) && Moment.isMoment(args[1]) && Moment.isMoment(args[2])) {
+    result.group = args[0]
+    result.since = args[1]
+    result.until = args[2]
+  }
+  // pull(group: string, since: Moment.Moment, transform: QueryLogTransform): QueryLogItem[]
+  if (isString(args[0]) && Moment.isMoment(args[1]) && isFunction(args[2])) {
+    result.group = args[0]
+    result.since = args[1]
+    result.transform = args[2]
+  }
+  // pull(since: Moment.Moment, until: Moment.Moment, group: string): QueryLogItem[]
+  if (Moment.isMoment(args[0]) && Moment.isMoment(args[1]) && isString(args[2])) {
+    result.since = args[0]
+    result.until = args[1]
+    result.group = args[2]
+  }
+  // pull(since: Moment.Moment, transform: QueryLogTransform, group: string): QueryLogItem[]
+  if (Moment.isMoment(args[0]) && isFunction(args[1]) && isString(args[2])) {
+    result.since = args[0]
+    result.transform = args[1]
+    result.group = args[2]
+  }
+
+  return result
+}
+
+function parse_pull_arguments_4(args: ArrayLike<any>) {
+  const result = {
+    group: undefined,
+    since: undefined,
+    until: undefined,
+    transform: undefined
+  }
+
+  // pull(group: string, since: Moment.Moment, until: Moment.Moment, transform: QueryLogTransform): QueryLogItem[]
+  if (isString(args[0]) && Moment.isMoment(args[1]) && Moment.isMoment(args[2]) && isFunction(args[3])) {
+    result.group = args[0]
+    result.since = args[1]
+    result.until = args[2]
+    result.transform = args[3]
+  }
+  // pull(since: Moment.Moment, until: Moment.Moment, transform: QueryLogTransform, group: string): QueryLogItem[]
+  if (Moment.isMoment(args[0]) && Moment.isMoment(args[1]) && isFunction(args[2]) && isString(args[3])) {
+    result.since = args[0]
+    result.until = args[1]
+    result.transform = args[2]
+    result.group = args[3]
+  }
+  // pull(transform: QueryLogTransform, since: Moment.Moment, until: Moment.Moment, group: string): QueryLogItem[]
+  if (isFunction(args[0]) && Moment.isMoment(args[1]) && Moment.isMoment(args[2]) && isString(args[3])) {
+    result.transform = args[0]
+    result.since = args[1]
+    result.until = args[2]
+    result.group = args[3]
+  }
+
+  return result
+}
+
 const implementation: any = {
   // we are using 2 pipes to ensure that the item is never miss when pulling or pushing at the same time
   // the strategy is:
@@ -92,119 +242,16 @@ const implementation: any = {
     }
     switch (args.length) {
       case 1:
-        // pull(since: Moment.Moment): QueryLogItem[]
-        if (Moment.isMoment(args[0])) {
-          result.since = args[0]
-          return result
-        }
-        // pull(transform: QueryLogTransform): QueryLogItem[]
-        if (isFunction(args[0])) {
-          result.transform = args[0]
-          return result
-        }
-        // pull(group: string): QueryLogItem[]
-        if (isString(args[0])) {
-          result.group = args[0]
-          return result
-        }
-        break
+        return parse_pull_arguments_1(args)
       case 2:
-        // pull(group: string, since: Moment.Moment): QueryLogItem[]
-        if (isString(args[0]) && Moment.isMoment(args[1])) {
-          result.group = args[0]
-          result.since = args[1]
-          return result
-        }
-        // pull(group: string, transform: QueryLogTransform): QueryLogItem[]
-        if (isString(args[0]) && isFunction(args[1])) {
-          result.group = args[0]
-          result.transform = args[1]
-          return result
-        }
-        // pull(since: Moment.Moment, group: string): QueryLogItem[]
-        if (Moment.isMoment(args[0]) && isString(args[1])) {
-          result.since = args[0]
-          result.group = args[1]
-          return result
-        }
-        // pull(since: Moment.Moment, until: Moment.Moment): QueryLogItem[]
-        if (Moment.isMoment(args[0]) && Moment.isMoment(args[1])) {
-          result.since = args[0]
-          result.until = args[1]
-          return result
-        }
-        // pull(since: Moment.Moment, transform: QueryLogTransform): QueryLogItem[]
-        if (Moment.isMoment(args[0]) && isFunction(args[1])) {
-          result.since = args[0]
-          result.transform = args[1]
-          return result
-        }
-        // pull(transform: QueryLogTransform, since: Moment.Moment): QueryLogItem[]
-        if (isFunction(args[0]) && Moment.isMoment(args[1])) {
-          result.transform = args[0]
-          result.since = args[1]
-          return result
-        }
-        // pull(transform: QueryLogTransform, group: string): QueryLogItem[]
-        if (isFunction(args[0]) && isString(args[1])) {
-          result.transform = args[0]
-          result.group = args[1]
-          return result
-        }
-        break
+        return parse_pull_arguments_2(args)
       case 3:
-        // pull(group: string, since: Moment.Moment, until: Moment.Moment): QueryLogItem[]
-        if (isString(args[0]) && Moment.isMoment(args[1]) && Moment.isMoment(args[2])) {
-          result.group = args[0]
-          result.since = args[1]
-          result.until = args[2]
-        }
-        // pull(group: string, since: Moment.Moment, transform: QueryLogTransform): QueryLogItem[]
-        if (isString(args[0]) && Moment.isMoment(args[1]) && isFunction(args[2])) {
-          result.group = args[0]
-          result.since = args[1]
-          result.transform = args[2]
-        }
-        // pull(since: Moment.Moment, until: Moment.Moment, group: string): QueryLogItem[]
-        if (Moment.isMoment(args[0]) && Moment.isMoment(args[1]) && isString(args[2])) {
-          result.since = args[0]
-          result.until = args[1]
-          result.group = args[2]
-        }
-        // pull(since: Moment.Moment, transform: QueryLogTransform, group: string): QueryLogItem[]
-        if (Moment.isMoment(args[0]) && isFunction(args[1]) && isString(args[2])) {
-          result.since = args[0]
-          result.transform = args[1]
-          result.group = args[2]
-        }
-        break
+        return parse_pull_arguments_3(args)
       case 4:
-        // pull(group: string, since: Moment.Moment, until: Moment.Moment, transform: QueryLogTransform): QueryLogItem[]
-        if (isString(args[0]) && Moment.isMoment(args[1]) && Moment.isMoment(args[2]) && isFunction(args[3])) {
-          result.group = args[0]
-          result.since = args[1]
-          result.until = args[2]
-          result.transform = args[3]
-        }
-        // pull(since: Moment.Moment, until: Moment.Moment, transform: QueryLogTransform, group: string): QueryLogItem[]
-        if (Moment.isMoment(args[0]) && Moment.isMoment(args[1]) && isFunction(args[2]) && isString(args[3])) {
-          result.since = args[0]
-          result.until = args[1]
-          result.transform = args[2]
-          result.group = args[3]
-        }
-        // pull(transform: QueryLogTransform, since: Moment.Moment, until: Moment.Moment, group: string): QueryLogItem[]
-        if (isFunction(args[0]) && Moment.isMoment(args[1]) && Moment.isMoment(args[2]) && isString(args[3])) {
-          result.transform = args[0]
-          result.since = args[1]
-          result.until = args[2]
-          result.group = args[3]
-        }
-        break
+        return parse_pull_arguments_4(args)
       default:
         break
     }
-
     // pull(): QueryLogItem[]
     return result
   },
