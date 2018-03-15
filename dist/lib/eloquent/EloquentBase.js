@@ -7,8 +7,13 @@ const najs_binding_1 = require("najs-binding");
 const lodash_1 = require("lodash");
 class EloquentBase {
     constructor(data) {
-        this.registerIfNeeded();
-        return this.initialize(data);
+        // this is a hidden initialize, if the data === false we trigger initialize process
+        // just simply returns a fresh instance. Only case use this option is create fresh
+        // instance for getting metadata defined as class member (like: fillable, guard, timestamps...)
+        if (data !== 'do-not-initialize') {
+            this.registerIfNeeded();
+            return this.initialize(data);
+        }
     }
     get id() {
         return this.getId();

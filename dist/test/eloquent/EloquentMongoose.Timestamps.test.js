@@ -55,13 +55,13 @@ User.className = 'User';
 describe('EloquentMongoose.Timestamps', function () {
     jest.setTimeout(10000);
     beforeAll(async function () {
-        await util_1.init_mongoose(mongoose, 'eloquent_mongoose');
+        await util_1.init_mongoose(mongoose, 'eloquent_mongoose_timestamps');
     });
     afterAll(async function () {
         await util_1.delete_collection(mongoose, 'users');
         await util_1.delete_collection(mongoose, 'timestampmodeldefaults');
         await util_1.delete_collection(mongoose, 'customtimestampmodels');
-        await util_1.delete_collection(mongoose, 'notstatictimestampmodel');
+        await util_1.delete_collection(mongoose, 'notstatictimestampmodels');
     });
     class TimestampModelDefault extends lib_1.Eloquent.Mongoose() {
         getClassName() {
@@ -131,24 +131,26 @@ describe('EloquentMongoose.Timestamps', function () {
         expect(model['createdAt']).toEqual(now);
         expect(model['updatedAt']).toEqual(now);
     });
-    // class NotStaticTimestampModel extends Eloquent.Mongoose<Timestamps, TimestampModelDefault>() {
-    //   timestamps = true
-    //   getClassName() {
-    //     return 'NotStaticTimestampModel'
-    //   }
-    //   getSchema() {
-    //     return new Schema({ name: String })
-    //   }
-    // }
-    // it.only('works with timestamps settings which not use static variable', async function() {
-    //   const now = new Date(1988, 4, 16)
-    //   Moment.now = () => now
-    //   const model = new NotStaticTimestampModel()
-    //   console.log(model)
-    //   await model.save()
-    //   expect(model.created_at).toEqual(now)
-    //   expect(model.updated_at).toEqual(now)
-    // })
+    class NotStaticTimestampModel extends lib_1.Eloquent.Mongoose() {
+        constructor() {
+            super(...arguments);
+            this.timestamps = true;
+        }
+        getClassName() {
+            return 'NotStaticTimestampModel';
+        }
+        getSchema() {
+            return new mongoose_1.Schema({ name: String });
+        }
+    }
+    it('works with timestamps settings which not use static variable', async function () {
+        const now = new Date(1988, 4, 16);
+        Moment.now = () => now;
+        const model = new NotStaticTimestampModel();
+        await model.save();
+        expect(model.created_at).toEqual(now);
+        expect(model.updated_at).toEqual(now);
+    });
     describe('.touch()', function () {
         it('does nothing with not supported Timestamp Model', async function () {
             const user = new User();

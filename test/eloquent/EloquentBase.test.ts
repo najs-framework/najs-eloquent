@@ -52,19 +52,36 @@ class User extends EloquentTestBase<IUser> {
 describe('Eloquent', function() {
   describe('constructor()', function() {
     it('always returns a proxy, and register to Najs.ClassRegistry if needed', function() {
+      const initializeSpy = Sinon.spy(User.prototype, <any>'initialize')
       expect(ClassRegistry.has('User')).toBe(false)
       new User()
       expect(ClassRegistry.has('User')).toBe(true)
+      expect(initializeSpy.called).toBe(true)
+      initializeSpy.restore()
     })
 
     it('can create new object with value', function() {
+      const initializeSpy = Sinon.spy(User.prototype, <any>'initialize')
       const user = new User({ first_name: 'test' })
       expect(user.toObject()).toEqual({ first_name: 'test' })
+      expect(initializeSpy.called).toBe(true)
+      initializeSpy.restore()
     })
 
     it('can create new object with Record instance', function() {
+      const initializeSpy = Sinon.spy(User.prototype, <any>'initialize')
       const user = new User(Record.create<IUser>({ first_name: 'test' }))
       expect(user.toObject()).toEqual({ first_name: 'test' })
+      expect(initializeSpy.called).toBe(true)
+      initializeSpy.restore()
+    })
+
+    it('supports a hidden initialize options which never calls .initialize()', function() {
+      const initializeSpy = Sinon.spy(User.prototype, <any>'initialize')
+      // hidden constructor
+      new User('do-not-initialize')
+      expect(initializeSpy.called).toBe(false)
+      initializeSpy.restore()
     })
   })
 

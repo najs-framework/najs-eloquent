@@ -37,17 +37,33 @@ class User extends EloquentTestBase_1.EloquentTestBase {
 describe('Eloquent', function () {
     describe('constructor()', function () {
         it('always returns a proxy, and register to Najs.ClassRegistry if needed', function () {
+            const initializeSpy = Sinon.spy(User.prototype, 'initialize');
             expect(najs_binding_1.ClassRegistry.has('User')).toBe(false);
             new User();
             expect(najs_binding_1.ClassRegistry.has('User')).toBe(true);
+            expect(initializeSpy.called).toBe(true);
+            initializeSpy.restore();
         });
         it('can create new object with value', function () {
+            const initializeSpy = Sinon.spy(User.prototype, 'initialize');
             const user = new User({ first_name: 'test' });
             expect(user.toObject()).toEqual({ first_name: 'test' });
+            expect(initializeSpy.called).toBe(true);
+            initializeSpy.restore();
         });
         it('can create new object with Record instance', function () {
+            const initializeSpy = Sinon.spy(User.prototype, 'initialize');
             const user = new User(Record_1.Record.create({ first_name: 'test' }));
             expect(user.toObject()).toEqual({ first_name: 'test' });
+            expect(initializeSpy.called).toBe(true);
+            initializeSpy.restore();
+        });
+        it('supports a hidden initialize options which never calls .initialize()', function () {
+            const initializeSpy = Sinon.spy(User.prototype, 'initialize');
+            // hidden constructor
+            new User('do-not-initialize');
+            expect(initializeSpy.called).toBe(false);
+            initializeSpy.restore();
         });
     });
     describe('getReservedPropertiesList()', function () {

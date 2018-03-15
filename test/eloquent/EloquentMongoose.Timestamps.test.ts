@@ -86,14 +86,14 @@ describe('EloquentMongoose.Timestamps', function() {
   jest.setTimeout(10000)
 
   beforeAll(async function() {
-    await init_mongoose(mongoose, 'eloquent_mongoose')
+    await init_mongoose(mongoose, 'eloquent_mongoose_timestamps')
   })
 
   afterAll(async function() {
     await delete_collection(mongoose, 'users')
     await delete_collection(mongoose, 'timestampmodeldefaults')
     await delete_collection(mongoose, 'customtimestampmodels')
-    await delete_collection(mongoose, 'notstatictimestampmodel')
+    await delete_collection(mongoose, 'notstatictimestampmodels')
   })
 
   class TimestampModelDefault extends Eloquent.Mongoose<Timestamps, TimestampModelDefault>() {
@@ -185,28 +185,27 @@ describe('EloquentMongoose.Timestamps', function() {
     expect(model['updatedAt']).toEqual(now)
   })
 
-  // class NotStaticTimestampModel extends Eloquent.Mongoose<Timestamps, TimestampModelDefault>() {
-  //   timestamps = true
+  class NotStaticTimestampModel extends Eloquent.Mongoose<Timestamps, TimestampModelDefault>() {
+    timestamps = true
 
-  //   getClassName() {
-  //     return 'NotStaticTimestampModel'
-  //   }
+    getClassName() {
+      return 'NotStaticTimestampModel'
+    }
 
-  //   getSchema() {
-  //     return new Schema({ name: String })
-  //   }
-  // }
+    getSchema() {
+      return new Schema({ name: String })
+    }
+  }
 
-  // it.only('works with timestamps settings which not use static variable', async function() {
-  //   const now = new Date(1988, 4, 16)
-  //   Moment.now = () => now
+  it('works with timestamps settings which not use static variable', async function() {
+    const now = new Date(1988, 4, 16)
+    Moment.now = () => now
 
-  //   const model = new NotStaticTimestampModel()
-  //   console.log(model)
-  //   await model.save()
-  //   expect(model.created_at).toEqual(now)
-  //   expect(model.updated_at).toEqual(now)
-  // })
+    const model = new NotStaticTimestampModel()
+    await model.save()
+    expect(model.created_at).toEqual(now)
+    expect(model.updated_at).toEqual(now)
+  })
 
   describe('.touch()', function() {
     it('does nothing with not supported Timestamp Model', async function() {

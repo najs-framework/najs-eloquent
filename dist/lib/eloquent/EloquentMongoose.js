@@ -39,8 +39,9 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
             .modelNames()
             .indexOf(modelName) === -1) {
             const schema = this.getSchema();
-            if (EloquentMetadata_1.EloquentMetadata.hasTimestamps(this)) {
-                schema.set('timestamps', EloquentMetadata_1.EloquentMetadata.timestamps(this));
+            const sampleInstance = najs_binding_1.make(this.getClassName(), ['do-not-initialize']);
+            if (EloquentMetadata_1.EloquentMetadata.hasTimestamps(sampleInstance)) {
+                schema.set('timestamps', EloquentMetadata_1.EloquentMetadata.timestamps(sampleInstance));
             }
             if (softDeletes) {
                 schema.plugin(SoftDelete_1.SoftDelete, softDeletes === true ? DEFAULT_SOFT_DELETES : softDeletes);

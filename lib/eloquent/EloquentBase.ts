@@ -53,8 +53,13 @@ export abstract class EloquentBase<NativeRecord extends Object = {}> implements 
   constructor(data: Object)
   constructor(data: NativeRecord)
   constructor(data?: NativeRecord | Object) {
-    this.registerIfNeeded()
-    return this.initialize(data)
+    // this is a hidden initialize, if the data === false we trigger initialize process
+    // just simply returns a fresh instance. Only case use this option is create fresh
+    // instance for getting metadata defined as class member (like: fillable, guard, timestamps...)
+    if (data !== 'do-not-initialize') {
+      this.registerIfNeeded()
+      return this.initialize(data)
+    }
   }
 
   public get id(): any {

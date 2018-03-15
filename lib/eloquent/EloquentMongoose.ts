@@ -54,8 +54,9 @@ export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
         .indexOf(modelName) === -1
     ) {
       const schema = this.getSchema()
-      if (EloquentMetadata.hasTimestamps(this)) {
-        schema.set('timestamps', EloquentMetadata.timestamps(this))
+      const sampleInstance = make<EloquentBase<Document & T>>(this.getClassName(), ['do-not-initialize'])
+      if (EloquentMetadata.hasTimestamps(sampleInstance)) {
+        schema.set('timestamps', EloquentMetadata.timestamps(sampleInstance))
       }
       if (softDeletes) {
         schema.plugin(SoftDelete, softDeletes === true ? DEFAULT_SOFT_DELETES : softDeletes)
