@@ -171,5 +171,4 @@ class EloquentBase {
         ];
     }
 }
-EloquentBase.softDeletes = false;
 exports.EloquentBase = EloquentBase;

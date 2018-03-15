@@ -11,7 +11,6 @@ const EloquentMongoose_1 = require("../../lib/eloquent/EloquentMongoose");
 const NotFoundError_1 = require("../../lib/errors/NotFoundError");
 const util_1 = require("../util");
 const mongoose = require('mongoose');
-const Moment = require('moment');
 class MongooseProvider {
     getClassName() {
         return MongooseProvider.className;
@@ -934,107 +933,6 @@ describe('EloquentMongoose', function () {
                 user.touch();
                 expect(markModifiedSpy.called).toBe(false);
             });
-        });
-    });
-    describe('SoftDeletes', function () {
-        class SoftDeleteModel extends lib_1.Eloquent.Mongoose() {
-            getClassName() {
-                return 'SoftDeleteModel';
-            }
-            getSchema() {
-                return new mongoose_1.Schema({ name: String });
-            }
-        }
-        SoftDeleteModel.softDeletes = true;
-        it('does not load plugin SoftDelete with deleted_at by default', async function () {
-            const model = new User();
-            expect(model['schema'].path('deleted_at')).toBeUndefined();
-            expect(model.newQuery()['softDelete']).toBe(false);
-        });
-        it('loads plugin SoftDelete with deleted_at by default', async function () {
-            class SoftDelete1 extends lib_1.Eloquent.Mongoose() {
-                getClassName() {
-                    return 'SoftDelete1';
-                }
-                getSchema() {
-                    return new mongoose_1.Schema({ name: String });
-                }
-            }
-            SoftDelete1.softDeletes = true;
-            const model = new SoftDelete1();
-            expect(model['schema'].path('deleted_at')['instance']).toEqual('Date');
-            expect(model['schema'].path('deleted_at')['defaultValue']).toBeDefined();
-            expect(model.newQuery()['softDelete']).toMatchObject({
-                deletedAt: 'deleted_at'
-            });
-        });
-        it('has custom field for deletedAt', async function () {
-            class SoftDelete2 extends lib_1.Eloquent.Mongoose() {
-                getClassName() {
-                    return 'SoftDelete2';
-                }
-                getSchema() {
-                    return new mongoose_1.Schema({ name: String });
-                }
-            }
-            SoftDelete2.softDeletes = { deletedAt: 'any' };
-            const model = new SoftDelete2();
-            expect(model['schema'].path('any')['instance']).toEqual('Date');
-            expect(model['schema'].path('any')['defaultValue']).toBeDefined();
-            expect(model['schema'].path('deleted_at')).toBeUndefined();
-            expect(model.newQuery()['softDelete']).toMatchObject({
-                deletedAt: 'any'
-            });
-        });
-        it('works with ActiveRecord and use Moment as Date source', async function () {
-            const now = new Date(1988, 4, 16);
-            Moment.now = () => now;
-            const model = new SoftDeleteModel({
-                name: 'test'
-            });
-            await model.delete();
-            expect(model.deleted_at).toEqual(now);
-            await model.restore();
-            expect(model.deleted_at).toBeNull();
-            await model.forceDelete();
-        });
-        it('works with static functions', async function () {
-            const now = new Date(1988, 4, 16);
-            Moment.now = () => now;
-            expect(await SoftDeleteModel.count()).toEqual(0);
-            const notDeletedModel = new SoftDeleteModel({
-                name: 'test'
-            });
-            await notDeletedModel.save();
-            const deletedModel = new SoftDeleteModel({
-                name: 'test'
-            });
-            await deletedModel.delete();
-            expect(await SoftDeleteModel.count()).toEqual(1);
-            expect(await SoftDeleteModel.withTrashed().count()).toEqual(2);
-            expect(await SoftDeleteModel.onlyTrashed().count()).toEqual(1);
-            await notDeletedModel.forceDelete();
-            await deletedModel.forceDelete();
-        });
-        it('does not override .find or .findOne when use .native()', async function () {
-            const now = new Date(1988, 4, 16);
-            Moment.now = () => now;
-            const notDeletedModel = new SoftDeleteModel({
-                name: 'test'
-            });
-            await notDeletedModel.save();
-            const deletedModel = new SoftDeleteModel({
-                name: 'test'
-            });
-            await deletedModel.delete();
-            expect(await SoftDeleteModel.count()).toEqual(1);
-            expect(await SoftDeleteModel.withTrashed().count()).toEqual(2);
-            expect(await SoftDeleteModel.onlyTrashed().count()).toEqual(1);
-            expect(await SoftDeleteModel.native(function (model) {
-                return model.find();
-            }).count()).toEqual(2);
-            await notDeletedModel.forceDelete();
-            await deletedModel.forceDelete();
         });
     });
 });

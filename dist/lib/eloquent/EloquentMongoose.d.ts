@@ -4,7 +4,6 @@ import { IMongooseProvider } from '../interfaces/IMongooseProvider';
 import { MongooseQueryBuilder } from '../query-builders/MongooseQueryBuilder';
 import { Document, Schema, Model } from 'mongoose';
 import { Collection } from 'collect.js';
-import { EloquentSoftDelete } from './EloquentMetadata';
 export declare abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
     protected collection: string;
     protected schema: Schema;
@@ -24,7 +23,7 @@ export declare abstract class EloquentMongoose<T> extends EloquentBase<Document 
     protected getReservedPropertiesList(): string[];
     getAttribute(name: string): any;
     setAttribute(name: string, value: any): boolean;
-    newQuery(softDeletes?: boolean | EloquentSoftDelete): any;
+    newQuery(): any;
     protected getQueryLogGroup(): string;
     newInstance(document?: Document & T | Object): EloquentMongoose<T>;
     newCollection(dataset: Array<Document & T>): Collection<EloquentMongoose<T>>;

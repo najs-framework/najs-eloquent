@@ -9,14 +9,6 @@ const NotFoundError_1 = require("../errors/NotFoundError");
 const SoftDelete_1 = require("./mongoose/SoftDelete");
 const EloquentMetadata_1 = require("./EloquentMetadata");
 mongoose_1.Schema.prototype['setupTimestamp'] = require('./mongoose/setupTimestamp').setupTimestamp;
-const DEFAULT_TIMESTAMPS = {
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
-};
-const DEFAULT_SOFT_DELETES = {
-    deletedAt: 'deleted_at',
-    overrideMethods: false
-};
 class EloquentMongoose extends EloquentBase_1.EloquentBase {
     getId() {
         return this.attributes._id;
@@ -84,11 +76,11 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         this.attributes[name] = value;
         return true;
     }
-    newQuery(softDeletes) {
-        const softDeleteSettings = softDeletes || Object.getPrototypeOf(this).constructor.softDeletes;
+    newQuery() {
         this.registerIfNeeded();
         this.initializeModelIfNeeded();
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.getModelName(), softDeleteSettings === true ? DEFAULT_SOFT_DELETES : softDeleteSettings).setQueryLogGroup(this.getQueryLogGroup());
+        const softDeleteSettings = EloquentMetadata_1.EloquentMetadata.hasSoftDeletes(this) ? EloquentMetadata_1.EloquentMetadata.softDeletes(this) : false;
+        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.getModelName(), softDeleteSettings).setQueryLogGroup(this.getQueryLogGroup());
     }
     getQueryLogGroup() {
         return 'all';
@@ -121,9 +113,8 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         return this;
     }
     touch() {
-        const timestampsSettings = Object.getPrototypeOf(this).constructor.timestamps;
-        if (timestampsSettings) {
-            const opts = timestampsSettings === true ? DEFAULT_TIMESTAMPS : timestampsSettings;
+        if (EloquentMetadata_1.EloquentMetadata.hasTimestamps(this)) {
+            const opts = EloquentMetadata_1.EloquentMetadata.timestamps(this);
             this.attributes.markModified(opts.updatedAt);
         }
     }
@@ -132,7 +123,7 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         return this.attributes.save();
     }
     async delete() {
-        if (Object.getPrototypeOf(this).constructor.softDeletes) {
+        if (EloquentMetadata_1.EloquentMetadata.hasSoftDeletes(this)) {
             return this.attributes['delete']();
         }
         return this.attributes.remove();
@@ -141,7 +132,7 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         return this.attributes.remove();
     }
     async restore() {
-        if (Object.getPrototypeOf(this).constructor.softDeletes) {
+        if (EloquentMetadata_1.EloquentMetadata.hasSoftDeletes(this)) {
             return this.attributes['restore']();
         }
     }
@@ -158,22 +149,19 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         return this.newQuery().queryName(name);
     }
     static queryName(name) {
-        return Reflect.construct(this, [])
-            .queryName(name);
+        return Reflect.construct(this, []).queryName(name);
     }
     select(...fields) {
         return this.newQuery().select(...fields);
     }
     static select(...fields) {
-        return Reflect.construct(this, [])
-            .select(...fields);
+        return Reflect.construct(this, []).select(...fields);
     }
     distinct(...fields) {
         return this.newQuery().distinct(...fields);
     }
     static distinct(...fields) {
-        return Reflect.construct(this, [])
-            .distinct(...fields);
+        return Reflect.construct(this, []).distinct(...fields);
     }
     orderBy(field, direction = 'asc') {
         return this.newQuery().orderBy(field, direction);
@@ -191,106 +179,91 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
         return this.newQuery().orderByDesc(field);
     }
     static orderByDesc(field) {
-        return Reflect.construct(this, [])
-            .orderByDesc(field);
+        return Reflect.construct(this, []).orderByDesc(field);
     }
     limit(records) {
         return this.newQuery().limit(records);
     }
     static limit(records) {
-        return Reflect.construct(this, [])
-            .limit(records);
+        return Reflect.construct(this, []).limit(records);
     }
     where(arg0, arg1, arg2) {
         return this.newQuery().where(arg0, arg1, arg2);
     }
     static where(arg0, arg1, arg2) {
-        return Reflect.construct(this, [])
-            .where(arg0, arg1, arg2);
+        return Reflect.construct(this, []).where(arg0, arg1, arg2);
     }
     orWhere(arg0, arg1, arg2) {
         return this.newQuery().orWhere(arg0, arg1, arg2);
     }
     static orWhere(arg0, arg1, arg2) {
-        return Reflect.construct(this, [])
-            .orWhere(arg0, arg1, arg2);
+        return Reflect.construct(this, []).orWhere(arg0, arg1, arg2);
     }
     whereIn(field, values) {
         return this.newQuery().whereIn(field, values);
     }
     static whereIn(field, values) {
-        return Reflect.construct(this, [])
-            .whereIn(field, values);
+        return Reflect.construct(this, []).whereIn(field, values);
     }
     whereNotIn(field, values) {
         return this.newQuery().whereNotIn(field, values);
     }
     static whereNotIn(field, values) {
-        return Reflect.construct(this, [])
-            .whereNotIn(field, values);
+        return Reflect.construct(this, []).whereNotIn(field, values);
     }
     orWhereIn(field, values) {
         return this.newQuery().orWhereIn(field, values);
     }
     static orWhereIn(field, values) {
-        return Reflect.construct(this, [])
-            .orWhereIn(field, values);
+        return Reflect.construct(this, []).orWhereIn(field, values);
     }
     orWhereNotIn(field, values) {
         return this.newQuery().orWhereNotIn(field, values);
     }
     static orWhereNotIn(field, values) {
-        return Reflect.construct(this, [])
-            .orWhereNotIn(field, values);
+        return Reflect.construct(this, []).orWhereNotIn(field, values);
     }
     whereNull(field) {
         return this.newQuery().whereNull(field);
     }
     static whereNull(field) {
-        return Reflect.construct(this, [])
-            .whereNull(field);
+        return Reflect.construct(this, []).whereNull(field);
     }
     whereNotNull(field) {
         return this.newQuery().whereNotNull(field);
     }
     static whereNotNull(field) {
-        return Reflect.construct(this, [])
-            .whereNotNull(field);
+        return Reflect.construct(this, []).whereNotNull(field);
     }
     orWhereNull(field) {
         return this.newQuery().orWhereNull(field);
     }
     static orWhereNull(field) {
-        return Reflect.construct(this, [])
-            .orWhereNull(field);
+        return Reflect.construct(this, []).orWhereNull(field);
     }
     orWhereNotNull(field) {
         return this.newQuery().orWhereNotNull(field);
     }
     static orWhereNotNull(field) {
-        return Reflect.construct(this, [])
-            .orWhereNotNull(field);
+        return Reflect.construct(this, []).orWhereNotNull(field);
     }
     withTrashed() {
         return this.newQuery().withTrashed();
     }
     static withTrashed() {
-        return Reflect.construct(this, [])
-            .withTrashed();
+        return Reflect.construct(this, []).withTrashed();
     }
     onlyTrashed() {
         return this.newQuery().onlyTrashed();
     }
     static onlyTrashed() {
-        return Reflect.construct(this, [])
-            .onlyTrashed();
+        return Reflect.construct(this, []).onlyTrashed();
     }
     async all() {
         return this.newQuery().all();
     }
     static async all() {
-        return Reflect.construct(this, [])
-            .all();
+        return Reflect.construct(this, []).all();
     }
     async get(...fields) {
         return this.newQuery()
@@ -314,36 +287,31 @@ class EloquentMongoose extends EloquentBase_1.EloquentBase {
             const query = this.prototype.newQuery();
             return query.where(query.getPrimaryKey(), id).find();
         }
-        return Reflect.construct(this, [])
-            .find();
+        return Reflect.construct(this, []).find();
     }
     async first() {
         return this.newQuery().first();
     }
     static async first() {
-        return Reflect.construct(this, [])
-            .first();
+        return Reflect.construct(this, []).first();
     }
     pluck(value, key) {
         return this.newQuery().pluck(value, key);
     }
     static async pluck(value, key) {
-        return Reflect.construct(this, [])
-            .pluck(value, key);
+        return Reflect.construct(this, []).pluck(value, key);
     }
     async count() {
         return this.newQuery().count();
     }
     static async count() {
-        return Reflect.construct(this, [])
-            .count();
+        return Reflect.construct(this, []).count();
     }
     native(handler) {
         return this.newQuery().native(handler);
     }
     static native(handler) {
-        return Reflect.construct(this, [])
-            .native(handler);
+        return Reflect.construct(this, []).native(handler);
     }
     async findById(id) {
         return this.find(id);
