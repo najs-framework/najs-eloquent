@@ -25,9 +25,9 @@
     "testEnvironment": "node",
     "collectCoverageFrom": [
       "dist/lib/**/*.js",
-      "!dist/lib/model/Model.js",
-      "!dist/lib/query-builders/IBasicQuery.js",
-      "!dist/lib/query-builders/IConditionQuery.js",
+      "!dist/lib/model/Eloquent.js",
+      "!dist/lib/model/EloquentMetadata.js",
+      "!dist/lib/**/interfaces/*.js",
       "!dist/lib/v0.x/interfaces/*.js",
       "!dist/lib/v0.x/specs/*.js",
       "!dist/lib/v0.x/eloquent/mongoose/setupTimestamp.js"

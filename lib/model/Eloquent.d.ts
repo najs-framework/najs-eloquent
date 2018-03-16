@@ -1,5 +1,5 @@
 import { Collection } from 'collect.js'
-export declare class Model {
+export declare class Eloquent {
   id: any
 
   getClassName(): string
