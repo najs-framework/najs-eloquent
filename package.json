@@ -27,6 +27,7 @@
       "dist/lib/**/*.js",
       "!dist/lib/model/Eloquent.js",
       "!dist/lib/model/EloquentMetadata.js",
+      "!dist/lib/model/EloquentProxy.js",
       "!dist/lib/**/interfaces/*.js",
       "!dist/lib/v0.x/interfaces/*.js",
       "!dist/lib/v0.x/specs/*.js",

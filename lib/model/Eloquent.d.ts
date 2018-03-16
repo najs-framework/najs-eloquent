@@ -19,11 +19,7 @@ export declare class Eloquent {
   toObject(): Object
   toJson(): Object
 
-  is(model: Model): boolean
+  is(model: Eloquent): boolean
 
   fireEvent(event: string): this
-
-  newQuery(): any
-  newInstance(data: Object | undefined): any
-  newCollection(dataset: any[]): Collection<Model>
 }
