@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose'
 import { Eloquent } from '../lib/index'
-import { EloquentMongooseSpec } from '../lib/specs/EloquentMongooseSpec'
+import { EloquentMongooseSpec } from '../lib/v0.x/specs/EloquentMongooseSpec'
 
 // Definition
 export interface IParentVirtualAttribute {

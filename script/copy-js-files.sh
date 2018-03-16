@@ -1,11 +1,11 @@
 #!/bin/sh
 
-if [ ! -d ./dist/lib/eloquent/mongoose ]; then
-  mkdir ./dist/lib/eloquent/mongoose
+if [ ! -d ./dist/lib/v0.x/eloquent/mongoose ]; then
+  mkdir ./dist/lib/v0.x/eloquent/mongoose
 fi
-cp ./lib/eloquent/mongoose/setupTimestamp.js ./dist/lib/eloquent/mongoose
+cp ./lib/v0.x/eloquent/mongoose/setupTimestamp.js ./dist/lib/v0.x/eloquent/mongoose
 
-if [ ! -d ./dist/test/eloquent/mongoose ]; then
-  mkdir ./dist/test/eloquent/mongoose
+if [ ! -d ./dist/test/v0.x/eloquent/mongoose ]; then
+  mkdir ./dist/test/v0.x/eloquent/mongoose
 fi
-cp ./test/eloquent/mongoose/schema.timestamps.test.js ./dist/test/eloquent/mongoose
+cp ./test/v0.x/eloquent/mongoose/schema.timestamps.test.js ./dist/test/v0.x/eloquent/mongoose

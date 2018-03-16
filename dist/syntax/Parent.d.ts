@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { EloquentMongooseSpec } from '../lib/specs/EloquentMongooseSpec';
+import { EloquentMongooseSpec } from '../lib/v0.x/specs/EloquentMongooseSpec';
 export interface IParentVirtualAttribute {
     parent_virtual_attribute: Date;
 }

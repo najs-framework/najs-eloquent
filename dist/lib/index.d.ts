@@ -1,15 +1,15 @@
-import { EloquentMongoose } from './eloquent/EloquentMongoose';
-import { EloquentMongooseSpec } from './specs/EloquentMongooseSpec';
+import { EloquentMongoose } from './v0.x/eloquent/EloquentMongoose';
+import { EloquentMongooseSpec } from './v0.x/specs/EloquentMongooseSpec';
 export declare const Mongoose: typeof EloquentMongoose;
 export declare const Eloquent: {
     Mongoose<T, R>(): EloquentMongooseSpec<T, R>;
 };
 export default Eloquent;
-export { QueryLog } from './query-builders/QueryLog';
-export { EloquentBase } from './eloquent/EloquentBase';
-export { EloquentMetadata, EloquentTimestamps, EloquentSoftDelete } from './eloquent/EloquentMetadata';
-export { IMongooseProvider } from './interfaces/IMongooseProvider';
-export { IBasicQueryConditionGrammar, IBasicQueryGrammar } from './interfaces/IBasicQueryGrammar';
-export { IEloquent } from './interfaces/IEloquent';
-export { IQueryFetchResult } from './interfaces/IQueryFetchResult';
-export { EloquentMongooseSpec } from './specs/EloquentMongooseSpec';
+export { QueryLog } from './v0.x/query-builders/QueryLog';
+export { EloquentBase } from './v0.x/eloquent/EloquentBase';
+export { EloquentMetadata, EloquentTimestamps, EloquentSoftDelete } from './v0.x/eloquent/EloquentMetadata';
+export { IMongooseProvider } from './v0.x/interfaces/IMongooseProvider';
+export { IBasicQueryConditionGrammar, IBasicQueryGrammar } from './v0.x/interfaces/IBasicQueryGrammar';
+export { IEloquent } from './v0.x/interfaces/IEloquent';
+export { IQueryFetchResult } from './v0.x/interfaces/IQueryFetchResult';
+export { EloquentMongooseSpec } from './v0.x/specs/EloquentMongooseSpec';
