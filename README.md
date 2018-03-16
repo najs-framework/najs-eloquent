@@ -13,11 +13,6 @@
 If you are Laravel Eloquent lover and want to use it in `Node JS` you will love `Najs Eloquent`. `Najs Eloquent` is
 Laravel Eloquent, written in `Typescript` (with some helpers you can use it in Javascript for sure).
 
-Current version - `0.2.13` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
-some features of Laravel Eloquent are removed such as relationship or scope. In the way to `1.0.0`, the `Najs Eloquent`
-will support full Eloquent's features with difference kinds of DB like `MySql`, `PostgreSQL` or `SqlLite`
-(use `knex` as a query builder).
-
 You can take a look on fully setup example in [najs-eloquent-example](https://github.com/najs-framework/najs-eloquent-example) repository.
 
 # Installation
@@ -598,18 +593,23 @@ class UserRepository {
 
 # Versioning and Road map
 
+Current version - `0.2.17` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
+some features of Laravel Eloquent are removed such as relationship or scope. In the way to `2.0.0`, the `Najs Eloquent` will support full Eloquent's features with difference kinds of DB like `MySql`, `PostgreSQL` or `SqlLite`
+(use `knex` as a query builder).
+
 * `0.1.x` [Released] - Basic features of Eloquent, targeted to mongodb only
 * `0.2.x` [Released] - Advance features of Eloquent, accessor, mutator, `timestamps` and `soft-delete` queries
-* `0.3.x` [In Progress] - Support full static helper functions of Eloquent such as `findOrFail`, `paginate`, `chunk`
+* `1.2.x` [In Progress] - Refactor, solve tech-debt, add more syntax to model extends
+* `1.3.x` [Todo] - Support full static helper functions of Eloquent such as `findOrFail`, `paginate`, `chunk`
 
-I'm gonna take a break and use `0.3.x` in real world. With node applications, the stuff below seems not so important, doesn't it?
+I'm gonna take a break and use `1.3.x` in real world. With node applications, the stuff below seems not so important, doesn't it?
 
-* `0.4.x` [Todo] - Introduce migration strategy for Mongodb. This is not so important
-* `0.5.x` [Todo] - Use knex as a query builder, targeted to RDB such as `MySQL`, `SqlLite` without transaction
-* `0.6.x` [Todo] - Introduce Eloquent scope and relationship
-* `0.7.x` [Todo] - Support RDB transactional query
-* `0.8.x` [Todo] - Introduce migration for RDB
-* `0.9.x` [Todo] - Support other kinds of db requested by community
+* `1.4.x` [Todo] - Introduce migration strategy for Mongodb. This is not so important
+* `1.5.x` [Todo] - Use knex as a query builder, targeted to RDB such as `MySQL`, `SqlLite` without transaction
+* `1.6.x` [Todo] - Introduce Eloquent scope and relationship
+* `1.7.x` [Todo] - Support RDB transactional query
+* `1.8.x` [Todo] - Introduce migration for RDB
+* `1.9.x` [Todo] - Support other kinds of db requested by community
 
 # Contribute
 
