@@ -1,34 +1,44 @@
+import { IEloquentDriverProvider } from './interfaces/IEloquentDriverProvider'
 import { register, make, getClassName } from 'najs-binding'
 import { Eloquent } from '../model/Eloquent'
 import { IEloquentDriver } from './interfaces/IEloquentDriver'
 
-export class EloquentDriverProvider {
-  protected static drivers: {
+class DefaultEloquentDriverProvider implements IEloquentDriverProvider {
+  static className: string = 'EloquentDriverProvider'
+
+  protected drivers: {
     [key: string]: {
       driverClassName: string
       isDefault: boolean
     }
   } = {}
 
-  protected static binding: {
+  protected binding: {
     [key: string]: string
   } = {}
 
-  protected static findDefaultDriver(): string {
-    return ''
+  protected findDefaultDriver(): string {
+    let first: string = ''
+    for (const name in this.drivers) {
+      if (!first) {
+        first = this.drivers[name].driverClassName
+      }
+      if (this.drivers[name].isDefault) {
+        return this.drivers[name].driverClassName
+      }
+    }
+    return first
   }
 
-  protected static createDriver<T>(model: Eloquent<T>, driverClass: string): IEloquentDriver<T> {
+  protected createDriver<T>(model: Eloquent<T>, driverClass: string): IEloquentDriver<T> {
     return make<IEloquentDriver<T>>(driverClass, [model])
   }
 
-  static create<T extends Object = {}>(model: Eloquent<T>): IEloquentDriver<T> {
+  create<T extends Object = {}>(model: Eloquent<T>): IEloquentDriver<T> {
     return this.createDriver(model, this.findDriverClassName(model))
   }
 
-  static findDriverClassName(model: string): string
-  static findDriverClassName(model: Eloquent<any>): string
-  static findDriverClassName(model: Eloquent<any> | string): string {
+  findDriverClassName(model: Eloquent<any> | string): string {
     const modelName = typeof model === 'string' ? model : model.getClassName()
     if (this.binding[modelName] === 'undefined' || typeof this.drivers[this.binding[modelName]] === 'undefined') {
       return this.findDefaultDriver()
@@ -36,9 +46,7 @@ export class EloquentDriverProvider {
     return this.drivers[this.binding[modelName]].driverClassName
   }
 
-  static register(driver: string, name: string, isDefault: boolean): void
-  static register(driver: Function, name: string, isDefault: boolean): void
-  static register(driver: any, name: string, isDefault: boolean): void {
+  register(driver: any, name: string, isDefault: boolean = false): void {
     register(driver)
     this.drivers[name] = {
       driverClassName: getClassName(driver),
@@ -46,7 +54,9 @@ export class EloquentDriverProvider {
     }
   }
 
-  static bind(model: string, name: string) {
-    this.binding[model] = name
+  bind(model: string, driver: string) {
+    this.binding[model] = driver
   }
 }
+
+export const EloquentDriverProvider: IEloquentDriverProvider = new DefaultEloquentDriverProvider()

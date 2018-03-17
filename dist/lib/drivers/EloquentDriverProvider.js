@@ -1,34 +1,46 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
-class EloquentDriverProvider {
-    static findDefaultDriver() {
-        return '';
+class DefaultEloquentDriverProvider {
+    constructor() {
+        this.drivers = {};
+        this.binding = {};
     }
-    static createDriver(model, driverClass) {
+    findDefaultDriver() {
+        let first = '';
+        for (const name in this.drivers) {
+            if (!first) {
+                first = this.drivers[name].driverClassName;
+            }
+            if (this.drivers[name].isDefault) {
+                return this.drivers[name].driverClassName;
+            }
+        }
+        return first;
+    }
+    createDriver(model, driverClass) {
         return najs_binding_1.make(driverClass, [model]);
     }
-    static create(model) {
+    create(model) {
         return this.createDriver(model, this.findDriverClassName(model));
     }
-    static findDriverClassName(model) {
+    findDriverClassName(model) {
         const modelName = typeof model === 'string' ? model : model.getClassName();
         if (this.binding[modelName] === 'undefined' || typeof this.drivers[this.binding[modelName]] === 'undefined') {
             return this.findDefaultDriver();
         }
         return this.drivers[this.binding[modelName]].driverClassName;
     }
-    static register(driver, name, isDefault) {
+    register(driver, name, isDefault = false) {
         najs_binding_1.register(driver);
         this.drivers[name] = {
             driverClassName: najs_binding_1.getClassName(driver),
             isDefault: isDefault
         };
     }
-    static bind(model, name) {
-        this.binding[model] = name;
+    bind(model, driver) {
+        this.binding[model] = driver;
     }
 }
-EloquentDriverProvider.drivers = {};
-EloquentDriverProvider.binding = {};
-exports.EloquentDriverProvider = EloquentDriverProvider;
+DefaultEloquentDriverProvider.className = 'EloquentDriverProvider';
+exports.EloquentDriverProvider = new DefaultEloquentDriverProvider();
