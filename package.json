@@ -25,6 +25,8 @@
     "testEnvironment": "node",
     "collectCoverageFrom": [
       "dist/lib/**/*.js",
+      "!dist/lib/drivers/EloquentDriverProvider.js",
+      "!dist/lib/drivers/DummyDriver.js",
       "!dist/lib/model/Eloquent.js",
       "!dist/lib/model/EloquentMetadata.js",
       "!dist/lib/model/EloquentProxy.js",

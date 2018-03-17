@@ -1,6 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const EloquentMetadata_1 = require("./EloquentMetadata");
+const najs_binding_1 = require("najs-binding");
 const EloquentProxy_1 = require("./EloquentProxy");
+const lodash_1 = require("lodash");
+const collect_js_1 = require("collect.js");
 /**
  * Base class of an Eloquent, handles proxy attributes, contains cross-driver features like
  *   - fill
@@ -11,12 +15,64 @@ const EloquentProxy_1 = require("./EloquentProxy");
 class Eloquent {
     constructor(data) {
         if (data !== 'do-not-initialize') {
+            this.driver = this.getDriver();
+            this.driver.initialize(this, data);
             return new Proxy(this, EloquentProxy_1.EloquentProxy);
         }
     }
     getDriver() {
-        return {};
+        if (!this.driver) {
+            this.driver = {};
+        }
+        return this.driver;
     }
-    getAttribute(name) { }
+    getAttribute(name) {
+        return this.driver.getAttribute(name);
+    }
+    setAttribute(name, value) {
+        return this.driver.setAttribute(name, value);
+    }
+    fill(data) {
+        const fillable = this.getFillable();
+        const fillableAttributes = fillable.length > 0 ? lodash_1.pick(data, fillable) : data;
+        for (const key in fillableAttributes) {
+            if (this.isFillable(key)) {
+                this.setAttribute(key, fillableAttributes[key]);
+            }
+        }
+        return this;
+    }
+    forceFill(data) {
+        for (const key in data) {
+            this.setAttribute(key, data[key]);
+        }
+        return this;
+    }
+    getFillable() {
+        return EloquentMetadata_1.EloquentMetadata.get(this).fillable();
+    }
+    getGuarded() {
+        return EloquentMetadata_1.EloquentMetadata.get(this).guarded();
+    }
+    isFillable(key) {
+        const fillable = this.getFillable();
+        if (fillable.length > 0 && fillable.indexOf(key) !== -1) {
+            return true;
+        }
+        if (this.isGuarded(key)) {
+            return false;
+        }
+        return fillable.length === 0 && EloquentMetadata_1.EloquentMetadata.get(this).hasAttribute(key) && key.indexOf('_') !== 0;
+    }
+    isGuarded(key) {
+        const guarded = this.getGuarded();
+        return (guarded.length === 1 && guarded[0] === '*') || guarded.indexOf(key) !== -1;
+    }
+    newInstance(data) {
+        return najs_binding_1.make(this.getClassName(), [data]);
+    }
+    newCollection(dataset) {
+        return collect_js_1.collect(dataset.map(item => this.newInstance(item)));
+    }
 }
 exports.Eloquent = Eloquent;

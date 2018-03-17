@@ -31,9 +31,9 @@ export declare class EloquentMetadata {
      */
     static get(model: Eloquent): EloquentMetadata;
     static get(model: Eloquent, cache: boolean): EloquentMetadata;
-    protected getSettingProperty<T extends any>(property: string, defaultValue: T): T;
-    protected hasSetting(property: string): boolean;
-    protected getSettingWithTrueValue(property: string, defaultValue: any): any;
+    getSettingProperty<T extends any>(property: string, defaultValue: T): T;
+    hasSetting(property: string): boolean;
+    getSettingWithTrueValue(property: string, defaultValue: any): any;
     fillable(): string[];
     guarded(): string[];
     hasTimestamps(): boolean;

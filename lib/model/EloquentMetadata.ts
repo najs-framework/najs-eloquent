@@ -57,19 +57,19 @@ export class EloquentMetadata {
     return this.cached[className]
   }
 
-  protected getSettingProperty<T extends any>(property: string, defaultValue: T): T {
+  getSettingProperty<T extends any>(property: string, defaultValue: T): T {
     if (this.definition[property]) {
       return this.definition[property]
     }
     return this.model[property] ? this.model[property] : defaultValue
   }
 
-  protected hasSetting(property: string): boolean {
+  hasSetting(property: string): boolean {
     const value = this.getSettingProperty(property, false)
     return value !== false
   }
 
-  protected getSettingWithTrueValue(property: string, defaultValue: any): any {
+  getSettingWithTrueValue(property: string, defaultValue: any): any {
     const value = this.getSettingProperty<any | boolean>(property, false)
     if (value === true) {
       return defaultValue
