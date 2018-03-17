@@ -1,5 +1,6 @@
-import { EloquentMetadata, EloquentTimestamps, EloquentSoftDelete } from './EloquentMetadata'
 import { IAutoload, make } from 'najs-binding'
+import { EloquentMetadata, EloquentTimestamps, EloquentSoftDelete } from './EloquentMetadata'
+import { EloquentDriverProvider } from '../drivers/EloquentDriverProvider'
 import { IEloquentDriver } from '../drivers/interfaces/IEloquentDriver'
 import { EloquentProxy } from './EloquentProxy'
 import { pick } from 'lodash'
@@ -27,20 +28,13 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
   constructor(data: Record)
   constructor(data?: any) {
     if (data !== 'do-not-initialize') {
-      this.driver = this.getDriver()
-      this.driver.initialize(this, data)
+      this.driver = EloquentDriverProvider.create(this)
+      this.driver.initialize(data)
       return new Proxy(this, EloquentProxy)
     }
   }
 
   abstract getClassName(): string
-
-  getDriver(): IEloquentDriver<Record> {
-    if (!this.driver) {
-      this.driver = <any>{}
-    }
-    return this.driver
-  }
 
   getAttribute(name: string): any {
     return this.driver.getAttribute(name)

@@ -3,8 +3,9 @@ import { IEloquentDriver } from './interfaces/IEloquentDriver';
 import { IBasicQuery } from '../query-builders/interfaces/IBasicQuery';
 import { IConditionQuery } from '../query-builders/interfaces/IConditionQuery';
 export declare class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
+    attributes: Object;
     model: Eloquent<T>;
-    initialize(model: Eloquent<T>, data: T): void;
+    initialize(data: T): void;
     getAttribute(name: string): any;
     setAttribute(name: string, value: any): boolean;
     getId(): any;

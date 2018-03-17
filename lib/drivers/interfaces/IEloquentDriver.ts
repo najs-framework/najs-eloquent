@@ -2,8 +2,12 @@ import { Eloquent } from '../../model/Eloquent'
 import { IBasicQuery } from '../../query-builders/interfaces/IBasicQuery'
 import { IConditionQuery } from '../../query-builders/interfaces/IConditionQuery'
 
+export interface IEloquentDriverConstructor<Record extends Object = {}> {
+  constructor(model: Eloquent<Record>): any
+}
+
 export interface IEloquentDriver<Record extends Object = {}> {
-  initialize(model: Eloquent<Record>, data: Record): void
+  initialize(data: Record): void
 
   getAttribute(name: string): any
 

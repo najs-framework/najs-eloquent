@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const EloquentMetadata_1 = require("./EloquentMetadata");
 const najs_binding_1 = require("najs-binding");
+const EloquentMetadata_1 = require("./EloquentMetadata");
+const EloquentDriverProvider_1 = require("../drivers/EloquentDriverProvider");
 const EloquentProxy_1 = require("./EloquentProxy");
 const lodash_1 = require("lodash");
 const collect_js_1 = require("collect.js");
@@ -15,16 +16,10 @@ const collect_js_1 = require("collect.js");
 class Eloquent {
     constructor(data) {
         if (data !== 'do-not-initialize') {
-            this.driver = this.getDriver();
-            this.driver.initialize(this, data);
+            this.driver = EloquentDriverProvider_1.EloquentDriverProvider.create(this);
+            this.driver.initialize(data);
             return new Proxy(this, EloquentProxy_1.EloquentProxy);
         }
-    }
-    getDriver() {
-        if (!this.driver) {
-            this.driver = {};
-        }
-        return this.driver;
     }
     getAttribute(name) {
         return this.driver.getAttribute(name);

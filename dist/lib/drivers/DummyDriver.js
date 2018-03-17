@@ -1,15 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class DummyDriver {
-    initialize(model, data) {
-        this.model = model;
-        this.model['attributes'] = data || {};
+    constructor() {
+        this.attributes = {};
+    }
+    initialize(data) {
+        this.attributes = data || {};
     }
     getAttribute(name) {
-        return this.model['attributes'][name];
+        return this.attributes[name];
     }
     setAttribute(name, value) {
-        this.model['attributes'][name] = value;
+        this.attributes[name] = value;
         return true;
     }
     getId() {
@@ -22,13 +24,13 @@ class DummyDriver {
         return {};
     }
     toObject() {
-        return this.model['attribute'];
+        return this.attributes;
     }
     toJSON() {
-        return this.model['attribute'];
+        return this.attributes;
     }
     is(model) {
-        return model['attributes'] === this.model['attributes'];
+        return this.attributes === this.model['driver']['attributes'];
     }
 }
 exports.DummyDriver = DummyDriver;

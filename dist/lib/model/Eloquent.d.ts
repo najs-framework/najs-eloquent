@@ -1,5 +1,5 @@
-import { EloquentTimestamps, EloquentSoftDelete } from './EloquentMetadata';
 import { IAutoload } from 'najs-binding';
+import { EloquentTimestamps, EloquentSoftDelete } from './EloquentMetadata';
 import { IEloquentDriver } from '../drivers/interfaces/IEloquentDriver';
 import { Collection } from 'collect.js';
 /**
@@ -20,7 +20,6 @@ export declare abstract class Eloquent<Record extends Object = {}> implements IA
     constructor(data: Object);
     constructor(data: Record);
     abstract getClassName(): string;
-    getDriver(): IEloquentDriver<Record>;
     getAttribute(name: string): any;
     setAttribute(name: string, value: any): boolean;
     fill(data: Object): this;

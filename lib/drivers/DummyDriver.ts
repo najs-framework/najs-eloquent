@@ -4,19 +4,19 @@ import { IBasicQuery } from '../query-builders/interfaces/IBasicQuery'
 import { IConditionQuery } from '../query-builders/interfaces/IConditionQuery'
 
 export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
+  attributes: Object = {}
   model: Eloquent<T>
 
-  initialize(model: Eloquent<T>, data: T): void {
-    this.model = model
-    this.model['attributes'] = data || {}
+  initialize(data: T): void {
+    this.attributes = data || {}
   }
 
   getAttribute(name: string): any {
-    return this.model['attributes'][name]
+    return this.attributes[name]
   }
 
   setAttribute(name: string, value: any): boolean {
-    this.model['attributes'][name] = value
+    this.attributes[name] = value
     return true
   }
 
@@ -33,14 +33,14 @@ export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
   }
 
   toObject(): Object {
-    return this.model['attribute']
+    return this.attributes
   }
 
   toJSON(): Object {
-    return this.model['attribute']
+    return this.attributes
   }
 
   is(model: Eloquent): boolean {
-    return model['attributes'] === this.model['attributes']
+    return this.attributes === this.model['driver']['attributes']
   }
 }
