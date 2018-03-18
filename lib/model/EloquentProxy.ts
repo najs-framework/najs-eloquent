@@ -7,11 +7,11 @@ const GET_QUERY_FUNCTIONS: string[] = ['where', 'orWhere']
 
 export const EloquentProxy = {
   get(target: Eloquent<any>, key: any, value: any): any {
-    if (GET_FORWARD_TO_DRIVER_FUNCTIONS.indexOf(key)) {
+    if (GET_FORWARD_TO_DRIVER_FUNCTIONS.indexOf(key) !== -1) {
       return target['driver'][key]
     }
 
-    if (GET_QUERY_FUNCTIONS.indexOf(key)) {
+    if (GET_QUERY_FUNCTIONS.indexOf(key) !== -1) {
       return target['driver'].newQuery()[key]
     }
 

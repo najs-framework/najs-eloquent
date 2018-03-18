@@ -39,10 +39,9 @@ class EloquentMetadata {
         return this.model[property] ? this.model[property] : defaultValue;
     }
     hasSetting(property) {
-        const value = this.getSettingProperty(property, false);
-        return value !== false;
+        return !!this.getSettingProperty(property, false);
     }
-    getSettingWithTrueValue(property, defaultValue) {
+    getSettingWithDefaultForTrueValue(property, defaultValue) {
         const value = this.getSettingProperty(property, false);
         if (value === true) {
             return defaultValue;
@@ -59,19 +58,19 @@ class EloquentMetadata {
         return this.hasSetting('timestamps');
     }
     timestamps(defaultValue = DEFAULT_TIMESTAMPS) {
-        return this.getSettingWithTrueValue('timestamps', defaultValue);
+        return this.getSettingWithDefaultForTrueValue('timestamps', defaultValue);
     }
     hasSoftDeletes() {
-        return this.hasSetting('timestamps');
+        return this.hasSetting('softDeletes');
     }
     softDeletes(defaultValue = DEFAULT_SOFT_DELETES) {
-        return this.getSettingWithTrueValue('softDeletes', defaultValue);
+        return this.getSettingWithDefaultForTrueValue('softDeletes', defaultValue);
     }
     hasAttribute(name) {
         if (typeof name === 'symbol') {
-            return false;
+            return true;
         }
-        return this.knownAttributes.indexOf(name) === -1;
+        return this.knownAttributes.indexOf(name) !== -1;
     }
 }
 /**

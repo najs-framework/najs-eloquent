@@ -4,10 +4,12 @@ import { IBasicQuery } from '../query-builders/interfaces/IBasicQuery'
 import { IConditionQuery } from '../query-builders/interfaces/IConditionQuery'
 
 export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
+  static className: string = 'NajsEloquent.DummyDriver'
+
   attributes: Object = {}
   model: Eloquent<T>
 
-  initialize(data: T): void {
+  initialize(data?: T): void {
     this.attributes = data || {}
   }
 
@@ -40,7 +42,7 @@ export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
     return this.attributes
   }
 
-  is(model: Eloquent): boolean {
-    return this.attributes === this.model['driver']['attributes']
+  is(model: Eloquent<T>): boolean {
+    return this.attributes['id'] === model['driver']['attributes']['id']
   }
 }

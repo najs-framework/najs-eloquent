@@ -65,11 +65,10 @@ export class EloquentMetadata {
   }
 
   hasSetting(property: string): boolean {
-    const value = this.getSettingProperty(property, false)
-    return value !== false
+    return !!this.getSettingProperty(property, false)
   }
 
-  getSettingWithTrueValue(property: string, defaultValue: any): any {
+  getSettingWithDefaultForTrueValue(property: string, defaultValue: any): any {
     const value = this.getSettingProperty<any | boolean>(property, false)
     if (value === true) {
       return defaultValue
@@ -90,21 +89,21 @@ export class EloquentMetadata {
   }
 
   timestamps(defaultValue: EloquentTimestamps = DEFAULT_TIMESTAMPS): EloquentTimestamps {
-    return this.getSettingWithTrueValue('timestamps', defaultValue)
+    return this.getSettingWithDefaultForTrueValue('timestamps', defaultValue)
   }
 
   hasSoftDeletes(): boolean {
-    return this.hasSetting('timestamps')
+    return this.hasSetting('softDeletes')
   }
 
   softDeletes(defaultValue: EloquentSoftDelete = DEFAULT_SOFT_DELETES): EloquentSoftDelete {
-    return this.getSettingWithTrueValue('softDeletes', defaultValue)
+    return this.getSettingWithDefaultForTrueValue('softDeletes', defaultValue)
   }
 
   hasAttribute(name: string | Symbol) {
     if (typeof name === 'symbol') {
-      return false
+      return true
     }
-    return this.knownAttributes.indexOf(name as string) === -1
+    return this.knownAttributes.indexOf(name as string) !== -1
   }
 }

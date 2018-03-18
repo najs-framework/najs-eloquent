@@ -30,7 +30,8 @@ class DummyDriver {
         return this.attributes;
     }
     is(model) {
-        return this.attributes === this.model['driver']['attributes'];
+        return this.attributes['id'] === model['driver']['attributes']['id'];
     }
 }
+DummyDriver.className = 'NajsEloquent.DummyDriver';
 exports.DummyDriver = DummyDriver;

@@ -5,7 +5,7 @@ export interface IEloquentDriverConstructor<Record extends Object = {}> {
     constructor(model: Eloquent<Record>): any;
 }
 export interface IEloquentDriver<Record extends Object = {}> {
-    initialize(data: Record): void;
+    initialize(data?: Record): void;
     getAttribute(name: string): any;
     setAttribute(name: string, value: any): boolean;
     getId(): any;

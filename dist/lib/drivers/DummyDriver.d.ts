@@ -3,9 +3,10 @@ import { IEloquentDriver } from './interfaces/IEloquentDriver';
 import { IBasicQuery } from '../query-builders/interfaces/IBasicQuery';
 import { IConditionQuery } from '../query-builders/interfaces/IConditionQuery';
 export declare class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
+    static className: string;
     attributes: Object;
     model: Eloquent<T>;
-    initialize(data: T): void;
+    initialize(data?: T): void;
     getAttribute(name: string): any;
     setAttribute(name: string, value: any): boolean;
     getId(): any;
@@ -13,5 +14,5 @@ export declare class DummyDriver<T extends Object = {}> implements IEloquentDriv
     newQuery(): IBasicQuery & IConditionQuery;
     toObject(): Object;
     toJSON(): Object;
-    is(model: Eloquent): boolean;
+    is(model: Eloquent<T>): boolean;
 }
