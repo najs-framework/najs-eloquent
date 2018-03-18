@@ -111,6 +111,149 @@ describe('EloquentMetadata', function() {
     })
   })
 
+  describe('protected .findGettersAndSetters()', function() {
+    it('finds all defined getters and put to accessors with type = getter', function() {
+      class GetterEmpty extends Eloquent {
+        getClassName() {
+          return 'GetterEmpty'
+        }
+      }
+      register(GetterEmpty)
+      expect(EloquentMetadata.get(new GetterEmpty())['accessors']).toEqual({})
+
+      class GetterA extends Eloquent {
+        get a() {
+          return ''
+        }
+
+        get b() {
+          return ''
+        }
+
+        getClassName() {
+          return 'GetterA'
+        }
+      }
+      register(GetterA)
+      const metadata = EloquentMetadata.get(new GetterA())
+      expect(metadata['accessors']).toEqual({
+        a: { name: 'a', type: 'getter' },
+        b: { name: 'b', type: 'getter' }
+      })
+    })
+
+    it('finds all defined setters and put to mutators with type = setter', function() {
+      class SetterEmpty extends Eloquent {
+        getClassName() {
+          return 'MutatorEmpty'
+        }
+      }
+      register(SetterEmpty)
+      expect(EloquentMetadata.get(new SetterEmpty())['mutators']).toEqual({})
+
+      class SetterA extends Eloquent {
+        set a(value: any) {}
+
+        set b(value: any) {}
+
+        getClassName() {
+          return 'SetterA'
+        }
+      }
+      register(SetterA)
+      const metadata = EloquentMetadata.get(new SetterA())
+      expect(metadata['mutators']).toEqual({
+        a: { name: 'a', type: 'setter' },
+        b: { name: 'b', type: 'setter' }
+      })
+    })
+  })
+
+  describe('protected .findAccessorsAndMutators()', function() {
+    it('does thing if there is no function with format `get|set...Attribute`', function() {
+      class NoAccessorOrMutator extends Eloquent {
+        getClassName() {
+          return 'NoAccessorOrMutator'
+        }
+      }
+      register(NoAccessorOrMutator)
+      expect(EloquentMetadata.get(new NoAccessorOrMutator())['accessors']).toEqual({})
+      expect(EloquentMetadata.get(new NoAccessorOrMutator())['mutators']).toEqual({})
+    })
+
+    it('puts `get...Attribute` to accessors with type function, but skip if getter of same attribute is defined', function() {
+      class AccessorA extends Eloquent {
+        get a() {
+          return ''
+        }
+
+        getAAttribute() {}
+
+        getFirstNameAttribute() {}
+
+        getWrongFormat() {}
+
+        getDoublegetDoubleAttribute() {}
+
+        getClassName() {
+          return 'AccessorA'
+        }
+      }
+      register(AccessorA)
+      expect(EloquentMetadata.get(new AccessorA())['accessors']).toEqual({
+        a: {
+          name: 'a',
+          type: 'getter'
+        },
+        first_name: {
+          name: 'first_name',
+          type: 'function',
+          ref: 'getFirstNameAttribute'
+        },
+        doubleget_double: {
+          name: 'doubleget_double',
+          type: 'function',
+          ref: 'getDoublegetDoubleAttribute'
+        }
+      })
+    })
+
+    it('puts `set...Attribute` to mutators with type function, but skip if setter of same attribute is defined', function() {
+      class MutatorA extends Eloquent {
+        set a(value: any) {}
+
+        setAAttribute() {}
+
+        setFirstNameAttribute() {}
+
+        setWrongFormat() {}
+
+        setDoublegetDoubleAttribute() {}
+
+        getClassName() {
+          return 'MutatorA'
+        }
+      }
+      register(MutatorA)
+      expect(EloquentMetadata.get(new MutatorA())['mutators']).toEqual({
+        a: {
+          name: 'a',
+          type: 'setter'
+        },
+        first_name: {
+          name: 'first_name',
+          type: 'function',
+          ref: 'setFirstNameAttribute'
+        },
+        doubleget_double: {
+          name: 'doubleget_double',
+          type: 'function',
+          ref: 'setDoublegetDoubleAttribute'
+        }
+      })
+    })
+  })
+
   describe('.getSettingProperty()', function() {
     it('returns "static" version of property if it exists found', function() {
       class ClassA extends Eloquent {

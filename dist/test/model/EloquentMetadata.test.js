@@ -90,6 +90,128 @@ describe('EloquentMetadata', function () {
             }
         });
     });
+    describe('protected .findGettersAndSetters()', function () {
+        it('finds all defined getters and put to accessors with type = getter', function () {
+            class GetterEmpty extends Eloquent_1.Eloquent {
+                getClassName() {
+                    return 'GetterEmpty';
+                }
+            }
+            najs_binding_1.register(GetterEmpty);
+            expect(EloquentMetadata_1.EloquentMetadata.get(new GetterEmpty())['accessors']).toEqual({});
+            class GetterA extends Eloquent_1.Eloquent {
+                get a() {
+                    return '';
+                }
+                get b() {
+                    return '';
+                }
+                getClassName() {
+                    return 'GetterA';
+                }
+            }
+            najs_binding_1.register(GetterA);
+            const metadata = EloquentMetadata_1.EloquentMetadata.get(new GetterA());
+            expect(metadata['accessors']).toEqual({
+                a: { name: 'a', type: 'getter' },
+                b: { name: 'b', type: 'getter' }
+            });
+        });
+        it('finds all defined setters and put to mutators with type = setter', function () {
+            class SetterEmpty extends Eloquent_1.Eloquent {
+                getClassName() {
+                    return 'MutatorEmpty';
+                }
+            }
+            najs_binding_1.register(SetterEmpty);
+            expect(EloquentMetadata_1.EloquentMetadata.get(new SetterEmpty())['mutators']).toEqual({});
+            class SetterA extends Eloquent_1.Eloquent {
+                set a(value) { }
+                set b(value) { }
+                getClassName() {
+                    return 'SetterA';
+                }
+            }
+            najs_binding_1.register(SetterA);
+            const metadata = EloquentMetadata_1.EloquentMetadata.get(new SetterA());
+            expect(metadata['mutators']).toEqual({
+                a: { name: 'a', type: 'setter' },
+                b: { name: 'b', type: 'setter' }
+            });
+        });
+    });
+    describe('protected .findAccessorsAndMutators()', function () {
+        it('does thing if there is no function with format `get|set...Attribute`', function () {
+            class NoAccessorOrMutator extends Eloquent_1.Eloquent {
+                getClassName() {
+                    return 'NoAccessorOrMutator';
+                }
+            }
+            najs_binding_1.register(NoAccessorOrMutator);
+            expect(EloquentMetadata_1.EloquentMetadata.get(new NoAccessorOrMutator())['accessors']).toEqual({});
+            expect(EloquentMetadata_1.EloquentMetadata.get(new NoAccessorOrMutator())['mutators']).toEqual({});
+        });
+        it('puts `get...Attribute` to accessors with type function, but skip if getter of same attribute is defined', function () {
+            class AccessorA extends Eloquent_1.Eloquent {
+                get a() {
+                    return '';
+                }
+                getAAttribute() { }
+                getFirstNameAttribute() { }
+                getWrongFormat() { }
+                getDoublegetDoubleAttribute() { }
+                getClassName() {
+                    return 'AccessorA';
+                }
+            }
+            najs_binding_1.register(AccessorA);
+            expect(EloquentMetadata_1.EloquentMetadata.get(new AccessorA())['accessors']).toEqual({
+                a: {
+                    name: 'a',
+                    type: 'getter'
+                },
+                first_name: {
+                    name: 'first_name',
+                    type: 'function',
+                    ref: 'getFirstNameAttribute'
+                },
+                doubleget_double: {
+                    name: 'doubleget_double',
+                    type: 'function',
+                    ref: 'getDoublegetDoubleAttribute'
+                }
+            });
+        });
+        it('puts `set...Attribute` to mutators with type function, but skip if setter of same attribute is defined', function () {
+            class MutatorA extends Eloquent_1.Eloquent {
+                set a(value) { }
+                setAAttribute() { }
+                setFirstNameAttribute() { }
+                setWrongFormat() { }
+                setDoublegetDoubleAttribute() { }
+                getClassName() {
+                    return 'MutatorA';
+                }
+            }
+            najs_binding_1.register(MutatorA);
+            expect(EloquentMetadata_1.EloquentMetadata.get(new MutatorA())['mutators']).toEqual({
+                a: {
+                    name: 'a',
+                    type: 'setter'
+                },
+                first_name: {
+                    name: 'first_name',
+                    type: 'function',
+                    ref: 'setFirstNameAttribute'
+                },
+                doubleget_double: {
+                    name: 'doubleget_double',
+                    type: 'function',
+                    ref: 'setDoublegetDoubleAttribute'
+                }
+            });
+        });
+    });
     describe('.getSettingProperty()', function () {
         it('returns "static" version of property if it exists found', function () {
             class ClassA extends Eloquent_1.Eloquent {
