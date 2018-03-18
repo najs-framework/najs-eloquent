@@ -14,4 +14,5 @@ export interface IEloquentDriver<Record extends Object = {}> {
     toObject(): Object;
     toJSON(): Object;
     is(model: Eloquent): boolean;
+    getReservedProperties(): string[];
 }

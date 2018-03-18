@@ -15,8 +15,8 @@ const collect_js_1 = require("collect.js");
  */
 class Eloquent {
     constructor(data) {
+        this.driver = EloquentDriverProvider_1.EloquentDriverProvider.create(this);
         if (data !== 'do-not-initialize') {
-            this.driver = EloquentDriverProvider_1.EloquentDriverProvider.create(this);
             this.driver.initialize(data);
             return new Proxy(this, EloquentProxy_1.EloquentProxy);
         }
@@ -26,6 +26,15 @@ class Eloquent {
     }
     setAttribute(name, value) {
         return this.driver.setAttribute(name, value);
+    }
+    toObject() {
+        return this.driver.toObject();
+    }
+    toJSON() {
+        return this.driver.toJSON();
+    }
+    toJson() {
+        return this.driver.toJSON();
     }
     fill(data) {
         const fillable = this.getFillable();
@@ -57,7 +66,7 @@ class Eloquent {
         if (this.isGuarded(key)) {
             return false;
         }
-        return fillable.length === 0 && EloquentMetadata_1.EloquentMetadata.get(this).hasAttribute(key) && key.indexOf('_') !== 0;
+        return fillable.length === 0 && !EloquentMetadata_1.EloquentMetadata.get(this).hasAttribute(key) && key.indexOf('_') !== 0;
     }
     isGuarded(key) {
         const guarded = this.getGuarded();
@@ -67,7 +76,22 @@ class Eloquent {
         return najs_binding_1.make(this.getClassName(), [data]);
     }
     newCollection(dataset) {
-        return collect_js_1.collect(dataset.map(item => this.newInstance(item)));
+        return collect_js_1.default(dataset.map(item => this.newInstance(item)));
+    }
+    getReservedProperties() {
+        return [
+            'inspect',
+            'valueOf',
+            'driver',
+            'fillable',
+            'guarded',
+            'softDeletes',
+            'timestamps',
+            'table',
+            'collection',
+            'schema',
+            'options'
+        ].concat(this.driver.getReservedProperties());
     }
 }
 exports.Eloquent = Eloquent;

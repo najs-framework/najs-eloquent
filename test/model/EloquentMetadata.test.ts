@@ -5,15 +5,43 @@ import { DummyDriver } from '../../lib/drivers/DummyDriver'
 import { EloquentDriverProvider } from '../../lib/drivers/EloquentDriverProvider'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { EloquentMetadata } from '../../lib/model/EloquentMetadata'
+import { GET_FORWARD_TO_DRIVER_FUNCTIONS, GET_QUERY_FUNCTIONS } from '../../lib/model/EloquentProxy'
 
 EloquentDriverProvider.register(DummyDriver, 'dummy')
 
 class Model extends Eloquent {
+  props: string
+
+  get accessor() {
+    return ''
+  }
+
+  set mutator(value: any) {}
+
   getClassName() {
     return 'Model'
   }
+
+  modelMethod() {}
 }
 register(Model)
+
+class ChildModel extends Model {
+  child_props: string
+
+  get child_accessor() {
+    return ''
+  }
+
+  set child_mutator(value: any) {}
+
+  getClassName() {
+    return 'ChildModel'
+  }
+
+  childModelMethod() {}
+}
+register(ChildModel)
 
 describe('EloquentMetadata', function() {
   describe('EloquentMetadata.get()', function() {
@@ -25,6 +53,61 @@ describe('EloquentMetadata', function() {
     it('finds an definition of Model and saves in "definition"', function() {
       const metadata = EloquentMetadata.get(new Model())
       expect(metadata['definition'] === Model).toBe(true)
+    })
+  })
+
+  describe('protected .buildKnownAttributes()', function() {
+    it('merges reserved properties defined in .getReservedProperties() of model and driver', function() {
+      const metadata = EloquentMetadata.get(new Model())
+      const props = new Model()['getReservedProperties']()
+      for (const name of props) {
+        expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true)
+      }
+    })
+
+    it('merges properties defined Eloquent.prototype', function() {
+      const metadata = EloquentMetadata.get(new Model())
+      const props = Object.getOwnPropertyNames(Model.prototype)
+      for (const name of props) {
+        expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true)
+      }
+    })
+
+    it('merges properties defined in model', function() {
+      const metadata = EloquentMetadata.get(new Model())
+      const props = ['accessor', 'mutator', 'modelMethod']
+      for (const name of props) {
+        expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true)
+      }
+
+      // warning: props defined in model is not included in list
+      expect(metadata['knownAttributes'].indexOf('props') === -1).toBe(true)
+    })
+
+    it('merges properties defined in child model', function() {
+      const metadata = EloquentMetadata.get(new ChildModel())
+      const props = ['child_accessor', 'child_mutator', 'childModelMethod']
+      for (const name of props) {
+        expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true)
+      }
+      // warning: props defined in model is not included in list
+      expect(metadata['knownAttributes'].indexOf('child_props') === -1).toBe(true)
+    })
+
+    it('merges properties defined GET_FORWARD_TO_DRIVER_FUNCTIONS', function() {
+      const metadata = EloquentMetadata.get(new Model())
+      const props = GET_FORWARD_TO_DRIVER_FUNCTIONS
+      for (const name of props) {
+        expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true)
+      }
+    })
+
+    it('merges properties defined GET_QUERY_FUNCTIONS', function() {
+      const metadata = EloquentMetadata.get(new Model())
+      const props = GET_QUERY_FUNCTIONS
+      for (const name of props) {
+        expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true)
+      }
     })
   })
 

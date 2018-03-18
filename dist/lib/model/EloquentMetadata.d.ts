@@ -22,6 +22,7 @@ export declare class EloquentMetadata {
     protected model: Eloquent;
     protected knownAttributes: string[];
     private constructor();
+    protected buildKnownAttributes(): void;
     /**
      * store EloquentMetadata instance with "sample" model
      */

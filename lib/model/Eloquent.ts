@@ -4,7 +4,7 @@ import { EloquentDriverProvider } from '../drivers/EloquentDriverProvider'
 import { IEloquentDriver } from '../drivers/interfaces/IEloquentDriver'
 import { EloquentProxy } from './EloquentProxy'
 import { pick } from 'lodash'
-import { collect, Collection } from 'collect.js'
+import collect, { Collection } from 'collect.js'
 
 /**
  * Base class of an Eloquent, handles proxy attributes, contains cross-driver features like
@@ -22,13 +22,16 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
   protected timestamps?: EloquentTimestamps | boolean
   protected softDeletes?: EloquentSoftDelete | boolean
   protected table?: string
+  protected collection?: string
+  protected schema?: Object
+  protected options?: Object
 
   constructor()
   constructor(data: Object)
   constructor(data: Record)
   constructor(data?: any) {
+    this.driver = EloquentDriverProvider.create(this)
     if (data !== 'do-not-initialize') {
-      this.driver = EloquentDriverProvider.create(this)
       this.driver.initialize(data)
       return new Proxy(this, EloquentProxy)
     }
@@ -42,6 +45,18 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
 
   setAttribute(name: string, value: any): boolean {
     return this.driver.setAttribute(name, value)
+  }
+
+  toObject() {
+    return this.driver.toObject()
+  }
+
+  toJSON() {
+    return this.driver.toJSON()
+  }
+
+  toJson() {
+    return this.driver.toJSON()
   }
 
   fill(data: Object): this {
@@ -82,7 +97,7 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
       return false
     }
 
-    return fillable.length === 0 && EloquentMetadata.get(this).hasAttribute(key) && key.indexOf('_') !== 0
+    return fillable.length === 0 && !EloquentMetadata.get(this).hasAttribute(key) && key.indexOf('_') !== 0
   }
 
   isGuarded(key: string): boolean {
@@ -90,11 +105,27 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
     return (guarded.length === 1 && guarded[0] === '*') || guarded.indexOf(key) !== -1
   }
 
-  newInstance(data: any): any {
-    return make<Eloquent<Record>>(this.getClassName(), [data])
+  newInstance(data?: Object | Record): this {
+    return <any>make<Eloquent<Record>>(this.getClassName(), [data])
   }
 
-  newCollection(dataset: any[]): Collection<this> {
+  newCollection(dataset: Array<Object | Record>): Collection<this> {
     return collect(dataset.map(item => this.newInstance(item)))
+  }
+
+  protected getReservedProperties(): Array<string> {
+    return [
+      'inspect',
+      'valueOf',
+      'driver',
+      'fillable',
+      'guarded',
+      'softDeletes',
+      'timestamps',
+      'table',
+      'collection',
+      'schema',
+      'options'
+    ].concat(this.driver.getReservedProperties())
   }
 }

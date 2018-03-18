@@ -7,13 +7,30 @@ const DummyDriver_1 = require("../../lib/drivers/DummyDriver");
 const EloquentDriverProvider_1 = require("../../lib/drivers/EloquentDriverProvider");
 const Eloquent_1 = require("../../lib/model/Eloquent");
 const EloquentMetadata_1 = require("../../lib/model/EloquentMetadata");
+const EloquentProxy_1 = require("../../lib/model/EloquentProxy");
 EloquentDriverProvider_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
 class Model extends Eloquent_1.Eloquent {
+    get accessor() {
+        return '';
+    }
+    set mutator(value) { }
     getClassName() {
         return 'Model';
     }
+    modelMethod() { }
 }
 najs_binding_1.register(Model);
+class ChildModel extends Model {
+    get child_accessor() {
+        return '';
+    }
+    set child_mutator(value) { }
+    getClassName() {
+        return 'ChildModel';
+    }
+    childModelMethod() { }
+}
+najs_binding_1.register(ChildModel);
 describe('EloquentMetadata', function () {
     describe('EloquentMetadata.get()', function () {
         it('returns an instance of EloquentMetadata', function () {
@@ -23,6 +40,54 @@ describe('EloquentMetadata', function () {
         it('finds an definition of Model and saves in "definition"', function () {
             const metadata = EloquentMetadata_1.EloquentMetadata.get(new Model());
             expect(metadata['definition'] === Model).toBe(true);
+        });
+    });
+    describe('protected .buildKnownAttributes()', function () {
+        it('merges reserved properties defined in .getReservedProperties() of model and driver', function () {
+            const metadata = EloquentMetadata_1.EloquentMetadata.get(new Model());
+            const props = new Model()['getReservedProperties']();
+            for (const name of props) {
+                expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true);
+            }
+        });
+        it('merges properties defined Eloquent.prototype', function () {
+            const metadata = EloquentMetadata_1.EloquentMetadata.get(new Model());
+            const props = Object.getOwnPropertyNames(Model.prototype);
+            for (const name of props) {
+                expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true);
+            }
+        });
+        it('merges properties defined in model', function () {
+            const metadata = EloquentMetadata_1.EloquentMetadata.get(new Model());
+            const props = ['accessor', 'mutator', 'modelMethod'];
+            for (const name of props) {
+                expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true);
+            }
+            // warning: props defined in model is not included in list
+            expect(metadata['knownAttributes'].indexOf('props') === -1).toBe(true);
+        });
+        it('merges properties defined in child model', function () {
+            const metadata = EloquentMetadata_1.EloquentMetadata.get(new ChildModel());
+            const props = ['child_accessor', 'child_mutator', 'childModelMethod'];
+            for (const name of props) {
+                expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true);
+            }
+            // warning: props defined in model is not included in list
+            expect(metadata['knownAttributes'].indexOf('child_props') === -1).toBe(true);
+        });
+        it('merges properties defined GET_FORWARD_TO_DRIVER_FUNCTIONS', function () {
+            const metadata = EloquentMetadata_1.EloquentMetadata.get(new Model());
+            const props = EloquentProxy_1.GET_FORWARD_TO_DRIVER_FUNCTIONS;
+            for (const name of props) {
+                expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true);
+            }
+        });
+        it('merges properties defined GET_QUERY_FUNCTIONS', function () {
+            const metadata = EloquentMetadata_1.EloquentMetadata.get(new Model());
+            const props = EloquentProxy_1.GET_QUERY_FUNCTIONS;
+            for (const name of props) {
+                expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true);
+            }
         });
     });
     describe('.getSettingProperty()', function () {

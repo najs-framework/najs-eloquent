@@ -45,4 +45,8 @@ export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
   is(model: Eloquent<T>): boolean {
     return this.attributes['id'] === model['driver']['attributes']['id']
   }
+
+  getReservedProperties(): string[] {
+    return ['dummy']
+  }
 }

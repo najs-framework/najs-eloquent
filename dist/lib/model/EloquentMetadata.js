@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
+const Eloquent_1 = require("./Eloquent");
+const EloquentProxy_1 = require("./EloquentProxy");
 const DEFAULT_TIMESTAMPS = {
     createdAt: 'created_at',
     updatedAt: 'updated_at'
@@ -23,7 +25,10 @@ class EloquentMetadata {
     constructor(model) {
         this.model = model;
         this.definition = Object.getPrototypeOf(model).constructor;
-        this.knownAttributes = [];
+        this.buildKnownAttributes();
+    }
+    buildKnownAttributes() {
+        this.knownAttributes = Array.from(new Set(this.model['getReservedProperties']().concat(Object.getOwnPropertyNames(this.model), EloquentProxy_1.GET_FORWARD_TO_DRIVER_FUNCTIONS, EloquentProxy_1.GET_QUERY_FUNCTIONS, Object.getOwnPropertyNames(Eloquent_1.Eloquent.prototype), Object.getOwnPropertyNames(Object.getPrototypeOf(this.model)))));
     }
     static get(model, cache = true) {
         const className = model.getClassName();

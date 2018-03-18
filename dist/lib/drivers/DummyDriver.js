@@ -32,6 +32,9 @@ class DummyDriver {
     is(model) {
         return this.attributes['id'] === model['driver']['attributes']['id'];
     }
+    getReservedProperties() {
+        return ['dummy'];
+    }
 }
 DummyDriver.className = 'NajsEloquent.DummyDriver';
 exports.DummyDriver = DummyDriver;

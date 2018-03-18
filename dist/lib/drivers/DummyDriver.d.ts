@@ -15,4 +15,5 @@ export declare class DummyDriver<T extends Object = {}> implements IEloquentDriv
     toObject(): Object;
     toJSON(): Object;
     is(model: Eloquent<T>): boolean;
+    getReservedProperties(): string[];
 }

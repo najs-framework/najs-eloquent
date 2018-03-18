@@ -16,18 +16,25 @@ export declare abstract class Eloquent<Record extends Object = {}> implements IA
     protected timestamps?: EloquentTimestamps | boolean;
     protected softDeletes?: EloquentSoftDelete | boolean;
     protected table?: string;
+    protected collection?: string;
+    protected schema?: Object;
+    protected options?: Object;
     constructor();
     constructor(data: Object);
     constructor(data: Record);
     abstract getClassName(): string;
     getAttribute(name: string): any;
     setAttribute(name: string, value: any): boolean;
+    toObject(): Object;
+    toJSON(): Object;
+    toJson(): Object;
     fill(data: Object): this;
     forceFill(data: Object): this;
     getFillable(): string[];
     getGuarded(): string[];
     isFillable(key: string): boolean;
     isGuarded(key: string): boolean;
-    newInstance(data: any): any;
-    newCollection(dataset: any[]): Collection<this>;
+    newInstance(data?: Object | Record): this;
+    newCollection(dataset: Array<Object | Record>): Collection<this>;
+    protected getReservedProperties(): Array<string>;
 }

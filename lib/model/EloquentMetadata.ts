@@ -1,5 +1,6 @@
-import { Eloquent } from './Eloquent'
 import { make } from 'najs-binding'
+import { Eloquent } from './Eloquent'
+import { GET_FORWARD_TO_DRIVER_FUNCTIONS, GET_QUERY_FUNCTIONS } from './EloquentProxy'
 
 export type EloquentTimestamps = { createdAt: string; updatedAt: string }
 
@@ -36,7 +37,21 @@ export class EloquentMetadata {
   private constructor(model: Eloquent) {
     this.model = model
     this.definition = Object.getPrototypeOf(model).constructor
-    this.knownAttributes = []
+    this.buildKnownAttributes()
+  }
+
+  protected buildKnownAttributes() {
+    this.knownAttributes = Array.from(
+      new Set(
+        this.model['getReservedProperties']().concat(
+          Object.getOwnPropertyNames(this.model),
+          GET_FORWARD_TO_DRIVER_FUNCTIONS,
+          GET_QUERY_FUNCTIONS,
+          Object.getOwnPropertyNames(Eloquent.prototype),
+          Object.getOwnPropertyNames(Object.getPrototypeOf(this.model))
+        )
+      )
+    )
   }
 
   /**
