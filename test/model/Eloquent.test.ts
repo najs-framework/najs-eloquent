@@ -22,7 +22,78 @@ function update_model_setting(property: string, value: any) {
 
 describe('Eloquent', function() {
   describe('constructor()', function() {
-    // TODO: write test for constructor
+    it('always creates driver via EloquentDriverProvider.create()', function() {
+      const createSpy = Sinon.spy(EloquentDriverProvider, 'create')
+      new Model()
+      expect(createSpy.called).toBe(true)
+      expect(createSpy.lastCall.args[0]).toBeInstanceOf(Model)
+      createSpy.restore()
+    })
+
+    it('calls driver.initialize(), assigns attributes = driver.getRecords() and returns Proxy', function() {
+      const fakeDriver = {
+        record: undefined,
+        initialize(data: any) {
+          this.record = <any>{}
+        },
+        getRecord() {
+          return this.record
+        },
+        getReservedNames() {
+          return []
+        },
+        getDriverProxyMethods() {
+          return []
+        },
+        getQueryProxyMethods() {
+          return []
+        }
+      }
+
+      const initializeSpy = Sinon.spy(fakeDriver, 'initialize')
+      const createStub = Sinon.stub(EloquentDriverProvider, 'create')
+      createStub.returns(fakeDriver)
+
+      const model = new Model()
+      expect(initializeSpy.calledWith()).toBe(true)
+      expect(model['attributes']).toEqual({})
+      expect(model['attributes'] === fakeDriver.record).toBe(true)
+
+      const test = {}
+      new Model(test)
+      expect(initializeSpy.calledWith(test)).toBe(true)
+      createStub.restore()
+    })
+
+    it('has a hidden params "do-not-initialize" which never calls driver.initialize() and returns Proxy', function() {
+      const fakeDriver = {
+        record: undefined,
+        initialize(data: any) {
+          this.record = <any>{}
+        },
+        getRecord() {
+          return this.record
+        },
+        getReservedNames() {
+          return []
+        },
+        getDriverProxyMethods() {
+          return []
+        },
+        getQueryProxyMethods() {
+          return []
+        }
+      }
+
+      const initializeSpy = Sinon.spy(fakeDriver, 'initialize')
+      const createStub = Sinon.stub(EloquentDriverProvider, 'create')
+      createStub.returns(fakeDriver)
+
+      const model = new Model('do-not-initialize')
+      expect(initializeSpy.calledWith()).toBe(false)
+      expect(model['attributes']).toBeUndefined()
+      createStub.restore()
+    })
   })
 
   const forwardToDriverMethods = {

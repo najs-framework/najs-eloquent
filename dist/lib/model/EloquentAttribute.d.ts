@@ -15,7 +15,7 @@ export declare class EloquentAttribute {
     isKnownAttribute(name: string | Symbol): boolean;
     buildKnownAttributes(model: Eloquent, prototype: any): void;
     findGettersAndSetters(prototype: any): void;
-    findAccessorsAndMutators(prototype: any): void;
+    findAccessorsAndMutators(model: Eloquent<any>, prototype: any): void;
     getAttribute(target: Eloquent<any>, attribute: string): any;
     setAttribute(target: Eloquent<any>, attribute: string, value: any): boolean;
 }

@@ -1,4 +1,5 @@
 import 'jest'
+import { camelCase } from 'lodash'
 import { register } from 'najs-binding'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { EloquentAttribute } from '../../lib/model/EloquentAttribute'
@@ -86,7 +87,7 @@ describe('EloquentAttribute', function() {
     it('finds all defined getters and put to accessors with type = getter', function() {
       class ClassEmpty {}
       const attribute = new EloquentAttribute(<any>fakeModel, <any>{})
-      attribute.findAccessorsAndMutators(Object.getPrototypeOf(new ClassEmpty()))
+      attribute.findAccessorsAndMutators(new Model(), Object.getPrototypeOf(new ClassEmpty()))
       expect(attribute['dynamic']).toEqual({})
 
       class Class {
@@ -120,7 +121,7 @@ describe('EloquentAttribute', function() {
       }
 
       attribute.findGettersAndSetters(Object.getPrototypeOf(new Class()))
-      attribute.findAccessorsAndMutators(Object.getPrototypeOf(new Class()))
+      attribute.findAccessorsAndMutators(new Model(), Object.getPrototypeOf(new Class()))
       expect(attribute['dynamic']).toEqual({
         a: { name: 'a', getter: true, setter: false, accessor: 'getAAttribute' },
         b: { name: 'b', getter: false, setter: true, mutator: 'setBAttribute' },
@@ -131,6 +132,41 @@ describe('EloquentAttribute', function() {
           getter: false,
           setter: false,
           mutator: 'setDoublegetDoubleAttribute'
+        }
+      })
+    })
+
+    it('calls driver.formatAttributeName() to get the name of property', function() {
+      class Class {
+        getFirstNameAttribute() {}
+        setCustomNameConventionAttribute() {}
+      }
+
+      const attribute = new EloquentAttribute(<any>fakeModel, <any>{})
+      const customConventionModel = {
+        driver: {
+          getDriverProxyMethods() {
+            return []
+          },
+          getQueryProxyMethods() {
+            return []
+          },
+          formatAttributeName(name: string) {
+            return camelCase(name)
+          }
+        },
+        getReservedNames() {
+          return []
+        }
+      }
+      attribute.findAccessorsAndMutators(<any>customConventionModel, Object.getPrototypeOf(new Class()))
+      expect(attribute['dynamic']).toEqual({
+        firstName: { name: 'firstName', getter: false, setter: false, accessor: 'getFirstNameAttribute' },
+        customNameConvention: {
+          name: 'customNameConvention',
+          getter: false,
+          setter: false,
+          mutator: 'setCustomNameConventionAttribute'
         }
       })
     })

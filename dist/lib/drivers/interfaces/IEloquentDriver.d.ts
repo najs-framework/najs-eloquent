@@ -18,4 +18,5 @@ export interface IEloquentDriver<Record extends Object = {}> {
     getReservedNames(): string[];
     getDriverProxyMethods(): string[];
     getQueryProxyMethods(): string[];
+    formatAttributeName(name: string): string;
 }

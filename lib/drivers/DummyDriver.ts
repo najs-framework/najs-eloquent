@@ -1,3 +1,4 @@
+import { snakeCase } from 'lodash'
 import { Eloquent } from '../model/Eloquent'
 import { IEloquentDriver } from './interfaces/IEloquentDriver'
 import { IBasicQuery } from '../query-builders/interfaces/IBasicQuery'
@@ -60,5 +61,9 @@ export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
 
   getQueryProxyMethods() {
     return ['where', 'orWhere']
+  }
+
+  formatAttributeName(name: string): string {
+    return snakeCase(name)
   }
 }

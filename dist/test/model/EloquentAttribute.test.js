@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
+const lodash_1 = require("lodash");
 const najs_binding_1 = require("najs-binding");
 const Eloquent_1 = require("../../lib/model/Eloquent");
 const EloquentAttribute_1 = require("../../lib/model/EloquentAttribute");
@@ -71,7 +72,7 @@ describe('EloquentAttribute', function () {
             class ClassEmpty {
             }
             const attribute = new EloquentAttribute_1.EloquentAttribute(fakeModel, {});
-            attribute.findAccessorsAndMutators(Object.getPrototypeOf(new ClassEmpty()));
+            attribute.findAccessorsAndMutators(new Model(), Object.getPrototypeOf(new ClassEmpty()));
             expect(attribute['dynamic']).toEqual({});
             class Class {
                 get a() {
@@ -92,7 +93,7 @@ describe('EloquentAttribute', function () {
                 setCAttribute() { }
             }
             attribute.findGettersAndSetters(Object.getPrototypeOf(new Class()));
-            attribute.findAccessorsAndMutators(Object.getPrototypeOf(new Class()));
+            attribute.findAccessorsAndMutators(new Model(), Object.getPrototypeOf(new Class()));
             expect(attribute['dynamic']).toEqual({
                 a: { name: 'a', getter: true, setter: false, accessor: 'getAAttribute' },
                 b: { name: 'b', getter: false, setter: true, mutator: 'setBAttribute' },
@@ -103,6 +104,39 @@ describe('EloquentAttribute', function () {
                     getter: false,
                     setter: false,
                     mutator: 'setDoublegetDoubleAttribute'
+                }
+            });
+        });
+        it('calls driver.formatAttributeName() to get the name of property', function () {
+            class Class {
+                getFirstNameAttribute() { }
+                setCustomNameConventionAttribute() { }
+            }
+            const attribute = new EloquentAttribute_1.EloquentAttribute(fakeModel, {});
+            const customConventionModel = {
+                driver: {
+                    getDriverProxyMethods() {
+                        return [];
+                    },
+                    getQueryProxyMethods() {
+                        return [];
+                    },
+                    formatAttributeName(name) {
+                        return lodash_1.camelCase(name);
+                    }
+                },
+                getReservedNames() {
+                    return [];
+                }
+            };
+            attribute.findAccessorsAndMutators(customConventionModel, Object.getPrototypeOf(new Class()));
+            expect(attribute['dynamic']).toEqual({
+                firstName: { name: 'firstName', getter: false, setter: false, accessor: 'getFirstNameAttribute' },
+                customNameConvention: {
+                    name: 'customNameConvention',
+                    getter: false,
+                    setter: false,
+                    mutator: 'setCustomNameConventionAttribute'
                 }
             });
         });

@@ -7,7 +7,7 @@ class EloquentAttribute {
         this.dynamic = {};
         this.known = [];
         this.findGettersAndSetters(prototype);
-        this.findAccessorsAndMutators(prototype);
+        this.findAccessorsAndMutators(model, prototype);
         this.buildKnownAttributes(model, prototype);
     }
     createDynamicAttributeIfNeeded(property) {
@@ -41,7 +41,7 @@ class EloquentAttribute {
             this.dynamic[property].setter = setter;
         }
     }
-    findAccessorsAndMutators(prototype) {
+    findAccessorsAndMutators(model, prototype) {
         const names = Object.getOwnPropertyNames(prototype);
         const regex = new RegExp('^(get|set)([a-zA-z0-9_\\-]{1,})Attribute$', 'g');
         names.forEach(name => {
@@ -51,7 +51,7 @@ class EloquentAttribute {
                 // if (match.index === regex.lastIndex) {
                 //   ++regex.lastIndex
                 // }
-                const property = lodash_1.snakeCase(match[2]);
+                const property = model['driver'].formatAttributeName(match[2]);
                 this.createDynamicAttributeIfNeeded(property);
                 if (match[1] === 'get') {
                     this.dynamic[property].accessor = match[0];

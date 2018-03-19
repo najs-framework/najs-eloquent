@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const lodash_1 = require("lodash");
 class DummyDriver {
     constructor() {
         this.attributes = {};
@@ -43,6 +44,9 @@ class DummyDriver {
     }
     getQueryProxyMethods() {
         return ['where', 'orWhere'];
+    }
+    formatAttributeName(name) {
+        return lodash_1.snakeCase(name);
     }
 }
 DummyDriver.className = 'NajsEloquent.DummyDriver';

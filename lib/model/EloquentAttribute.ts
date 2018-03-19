@@ -1,5 +1,5 @@
 import { Eloquent } from './Eloquent'
-import { isFunction, snakeCase } from 'lodash'
+import { isFunction } from 'lodash'
 
 export class EloquentAttribute {
   protected known: string[]
@@ -17,7 +17,7 @@ export class EloquentAttribute {
     this.dynamic = {}
     this.known = []
     this.findGettersAndSetters(prototype)
-    this.findAccessorsAndMutators(prototype)
+    this.findAccessorsAndMutators(model, prototype)
     this.buildKnownAttributes(model, prototype)
   }
 
@@ -67,7 +67,7 @@ export class EloquentAttribute {
     }
   }
 
-  findAccessorsAndMutators(prototype: any) {
+  findAccessorsAndMutators(model: Eloquent<any>, prototype: any) {
     const names = Object.getOwnPropertyNames(prototype)
     const regex = new RegExp('^(get|set)([a-zA-z0-9_\\-]{1,})Attribute$', 'g')
     names.forEach(name => {
@@ -77,7 +77,7 @@ export class EloquentAttribute {
         // if (match.index === regex.lastIndex) {
         //   ++regex.lastIndex
         // }
-        const property: string = snakeCase(match[2])
+        const property: string = model['driver'].formatAttributeName(match[2])
         this.createDynamicAttributeIfNeeded(property)
         if (match[1] === 'get') {
           this.dynamic[property].accessor = match[0]
