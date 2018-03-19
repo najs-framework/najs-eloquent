@@ -11,4 +11,8 @@ export interface IConditionQuery {
     whereNotIn(field: string, values: Array<any>): this;
     orWhereIn(field: string, values: Array<any>): this;
     orWhereNotIn(field: string, values: Array<any>): this;
+    whereNull(field: string): this;
+    whereNotNull(field: string): this;
+    orWhereNull(field: string): this;
+    orWhereNotNull(field: string): this;
 }
