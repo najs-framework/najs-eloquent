@@ -55,9 +55,10 @@ export class GenericQueryBuilder implements IBasicQuery, IConditionQuery, ISoftD
     return this.conditions.map(item => item.toObject())
   }
 
-  protected flattenFieldNames(...fields: Array<string | string[]>) {
+  protected flattenFieldNames(type: string, fields: ArrayLike<any>) {
     this.isUsed = true
-    return Array.from(new Set(flatten(fields))).map(this.convention.formatFieldName)
+    this.fields[type] = Array.from(new Set(flatten(fields))).map(this.convention.formatFieldName)
+    return this
   }
 
   setLogGroup(group: string): this {
@@ -73,21 +74,17 @@ export class GenericQueryBuilder implements IBasicQuery, IConditionQuery, ISoftD
   select(field: string): this
   select(fields: string[]): this
   select(...fields: Array<string | string[]>): this
-  select(...fields: Array<string | string[]>): this {
-    this.fields.select = this.flattenFieldNames(...fields)
-    return this
+  select(): this {
+    return this.flattenFieldNames('select', arguments)
   }
 
   distinct(field: string): this
   distinct(fields: string[]): this
   distinct(...fields: Array<string | string[]>): this
-  distinct(...fields: Array<string | string[]>): this {
-    this.fields.distinct = this.flattenFieldNames(...fields)
-    return this
+  distinct(): this {
+    return this.flattenFieldNames('distinct', arguments)
   }
 
-  orderBy(field: string): this
-  orderBy(field: string, direction: OrderDirection): this
   orderBy(field: string, direction: OrderDirection = 'asc'): this {
     this.isUsed = true
     this.ordering[this.convention.formatFieldName(field)] = direction
@@ -109,7 +106,6 @@ export class GenericQueryBuilder implements IBasicQuery, IConditionQuery, ISoftD
   }
 
   protected createConditionQuery(
-    convention: IQueryConvention,
     operator: 'and' | 'or',
     arg0: string | SubCondition,
     arg1?: Operator | any,
@@ -120,12 +116,18 @@ export class GenericQueryBuilder implements IBasicQuery, IConditionQuery, ISoftD
     return this
   }
 
-  where(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this {
-    return this.createConditionQuery(this.convention, 'and', arg0, arg1, arg2)
+  where(conditionBuilder: SubCondition): this
+  where(field: string, value: any): this
+  where(field: string, operator: Operator, value: any): this
+  where(arg0: any, arg1?: any, arg2?: any): this {
+    return this.createConditionQuery('and', arg0, arg1, arg2)
   }
 
-  orWhere(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this {
-    return this.createConditionQuery(this.convention, 'or', arg0, arg1, arg2)
+  orWhere(conditionBuilder: SubCondition): this
+  orWhere(field: string, value: any): this
+  orWhere(field: string, operator: Operator, value: any): this
+  orWhere(arg0: any, arg1?: any, arg2?: any): this {
+    return this.createConditionQuery('or', arg0, arg1, arg2)
   }
 
   whereIn(field: string, values: Array<any>): this {

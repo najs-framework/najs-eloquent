@@ -29,9 +29,10 @@ class GenericQueryBuilder {
         }
         return this.conditions.map(item => item.toObject());
     }
-    flattenFieldNames(...fields) {
+    flattenFieldNames(type, fields) {
         this.isUsed = true;
-        return Array.from(new Set(lodash_1.flatten(fields))).map(this.convention.formatFieldName);
+        this.fields[type] = Array.from(new Set(lodash_1.flatten(fields))).map(this.convention.formatFieldName);
+        return this;
     }
     setLogGroup(group) {
         this.logGroup = group;
@@ -41,13 +42,11 @@ class GenericQueryBuilder {
         this.name = name;
         return this;
     }
-    select(...fields) {
-        this.fields.select = this.flattenFieldNames(...fields);
-        return this;
+    select() {
+        return this.flattenFieldNames('select', arguments);
     }
-    distinct(...fields) {
-        this.fields.distinct = this.flattenFieldNames(...fields);
-        return this;
+    distinct() {
+        return this.flattenFieldNames('distinct', arguments);
     }
     orderBy(field, direction = 'asc') {
         this.isUsed = true;
@@ -65,16 +64,16 @@ class GenericQueryBuilder {
         this.limitNumber = records;
         return this;
     }
-    createConditionQuery(convention, operator, arg0, arg1, arg2) {
+    createConditionQuery(operator, arg0, arg1, arg2) {
         this.isUsed = true;
         this.conditions.push(GenericQueryCondition_1.GenericQueryCondition.create(this.convention, operator, arg0, arg1, arg2));
         return this;
     }
     where(arg0, arg1, arg2) {
-        return this.createConditionQuery(this.convention, 'and', arg0, arg1, arg2);
+        return this.createConditionQuery('and', arg0, arg1, arg2);
     }
     orWhere(arg0, arg1, arg2) {
-        return this.createConditionQuery(this.convention, 'or', arg0, arg1, arg2);
+        return this.createConditionQuery('or', arg0, arg1, arg2);
     }
     whereIn(field, values) {
         return this.where(field, 'in', values);

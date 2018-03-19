@@ -37,18 +37,15 @@ describe('QueryBuilder', function () {
                 expect(query.select('a')).toEqual(query);
                 expect(query['isUsed']).toBe(true);
             });
-            it('calls flattenFieldNames() and assign to "selectedFields"', function () {
+            it('calls flattenFieldNames() and assign to "select"', function () {
                 const query = new GenericQueryBuilder_1.GenericQueryBuilder();
-                const flattenFieldNamesSpy = Sinon.spy(query, 'flattenFieldNames');
-                query.select('a');
-                expect(flattenFieldNamesSpy.calledWith('a')).toBe(true);
                 query.select('1');
                 expect(query['fields']['select']).toEqual(['1']);
                 query.select(['1', '2', '3']);
                 expect(query['fields']['select']).toEqual(['1', '2', '3']);
                 query.select(['1', '2', '3'], '4');
                 expect(query['fields']['select']).toEqual(['1', '2', '3', '4']);
-                query.select('1', ['2', '3', '4'], ['5', '6'], '7');
+                query.select('1', ['2', '3', '4'], ['5', '6'], '5', '7', '7');
                 expect(query['fields']['select']).toEqual(['1', '2', '3', '4', '5', '6', '7']);
             });
         });
@@ -59,18 +56,15 @@ describe('QueryBuilder', function () {
                 expect(query.distinct('a')).toEqual(query);
                 expect(query['isUsed']).toBe(true);
             });
-            it('calls _flatten_and_assign_to() and assign to "distinctFields"', function () {
+            it('calls .flattenFieldNames() and assign to "distinct"', function () {
                 const query = new GenericQueryBuilder_1.GenericQueryBuilder();
-                const flattenFieldNamesSpy = Sinon.spy(query, 'flattenFieldNames');
-                query.distinct('a', 'b', ['c', 'd']);
-                expect(flattenFieldNamesSpy.calledWith('a', 'b', ['c', 'd'])).toBe(true);
                 query.distinct('1');
                 expect(query['fields']['distinct']).toEqual(['1']);
                 query.distinct(['1', '2', '3']);
                 expect(query['fields']['distinct']).toEqual(['1', '2', '3']);
                 query.distinct(['1', '2', '3'], '4');
                 expect(query['fields']['distinct']).toEqual(['1', '2', '3', '4']);
-                query.distinct('1', ['2', '3', '4'], ['5', '6'], '7');
+                query.distinct('1', ['2', '3', '4'], ['5', '6'], '5', '7', '7');
                 expect(query['fields']['distinct']).toEqual(['1', '2', '3', '4', '5', '6', '7']);
             });
         });
@@ -603,31 +597,6 @@ describe('QueryBuilder', function () {
                 expect(query['isUsed']).toBe(true);
                 expect(whereNotNullSpy.calledWith('any')).toBe(true);
             });
-        });
-    });
-    describe('protected .flattenFieldNames()', function () {
-        it('converts an Array<string|string[]> to string and assign to any name', function () {
-            const query = new GenericQueryBuilder_1.GenericQueryBuilder();
-            expect(query['flattenFieldNames']('1')).toEqual(['1']);
-            expect(query['flattenFieldNames']('1', '2', '3')).toEqual(['1', '2', '3']);
-            expect(query['flattenFieldNames'](['1', '2', '3'])).toEqual(['1', '2', '3']);
-            expect(query['flattenFieldNames']('1', ['2', '3'], ['4', '5'], '6')).toEqual(['1', '2', '3', '4', '5', '6']);
-        });
-        it('removes duplicated items', function () {
-            const query = new GenericQueryBuilder_1.GenericQueryBuilder();
-            expect(query['flattenFieldNames'](['1'], ['2', '3'], '4', '4', '5', '6', ['7', '2', '3'], ['2', '3'])).toEqual([
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7'
-            ]);
-        });
-        it('can NOT converts an Array<string|string[][]> but no worries, Typescript will catch it', function () {
-            const query = new GenericQueryBuilder_1.GenericQueryBuilder();
-            expect(query['flattenFieldNames']([['1', '2']], '3')).toEqual([['1', '2'], '3']);
         });
     });
 });
