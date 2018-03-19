@@ -6,7 +6,6 @@ const Eloquent_1 = require("../../lib/model/Eloquent");
 const EloquentAttribute_1 = require("../../lib/model/EloquentAttribute");
 const EloquentDriverProvider_1 = require("../../lib/drivers/EloquentDriverProvider");
 const DummyDriver_1 = require("../../lib/drivers/DummyDriver");
-const EloquentProxy_1 = require("../../lib/model/EloquentProxy");
 EloquentDriverProvider_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
 class Model extends Eloquent_1.Eloquent {
     get accessor() {
@@ -31,7 +30,15 @@ class ChildModel extends Model {
 }
 najs_binding_1.register(ChildModel);
 const fakeModel = {
-    getReservedProperties() {
+    driver: {
+        getDriverProxyMethods() {
+            return [];
+        },
+        getQueryProxyMethods() {
+            return [];
+        }
+    },
+    getReservedNames() {
         return [];
     }
 };
@@ -103,8 +110,8 @@ describe('EloquentAttribute', function () {
     describe('protected .buildKnownAttributes()', function () {
         const attribute = new EloquentAttribute_1.EloquentAttribute(fakeModel, {});
         attribute.buildKnownAttributes(new Model(), Model.prototype);
-        it('merges reserved properties defined in .getReservedProperties() of model and driver', function () {
-            const props = new Model()['getReservedProperties']();
+        it('merges reserved properties defined in .getReservedNames() of model and driver', function () {
+            const props = new Model()['getReservedNames']();
             for (const name of props) {
                 expect(attribute['known'].indexOf(name) !== -1).toBe(true);
             }
@@ -133,16 +140,174 @@ describe('EloquentAttribute', function () {
             expect(childAttribute['known'].indexOf('child_props') === -1).toBe(true);
         });
         it('merges properties defined GET_FORWARD_TO_DRIVER_FUNCTIONS', function () {
-            const props = EloquentProxy_1.GET_FORWARD_TO_DRIVER_FUNCTIONS;
+            const props = new Model()['driver'].getDriverProxyMethods();
             for (const name of props) {
                 expect(attribute['known'].indexOf(name) !== -1).toBe(true);
             }
         });
         it('merges properties defined GET_QUERY_FUNCTIONS', function () {
-            const props = EloquentProxy_1.GET_QUERY_FUNCTIONS;
+            const props = new Model()['driver'].getQueryProxyMethods();
             for (const name of props) {
                 expect(attribute['known'].indexOf(name) !== -1).toBe(true);
             }
+        });
+    });
+    describe('.isKnownAttribute()', function () {
+        it('returns false if the name not in "knownAttributes"', function () {
+            const attribute = new EloquentAttribute_1.EloquentAttribute(fakeModel, Model.prototype);
+            attribute['known'] = ['test'];
+            expect(attribute.isKnownAttribute('test')).toEqual(true);
+            expect(attribute.isKnownAttribute('not-found')).toEqual(false);
+        });
+        it('always returns true if typeof name is Symbol', function () {
+            const attribute = new EloquentAttribute_1.EloquentAttribute(fakeModel, Model.prototype);
+            attribute['known'] = ['test'];
+            expect(attribute.isKnownAttribute(Symbol.for('test'))).toEqual(true);
+            expect(attribute.isKnownAttribute(Symbol.for('not-found'))).toEqual(true);
+        });
+    });
+    describe('.getAttribute()', function () {
+        it('calls target.getAttribute() if the attribute is not dynamic attribute', function () {
+            const attribute = new EloquentAttribute_1.EloquentAttribute(fakeModel, Model.prototype);
+            const target = {
+                getAttribute(key) {
+                    return 'target-value-' + key;
+                }
+            };
+            attribute['known'] = ['something'];
+            expect(attribute.getAttribute(target, 'something')).toEqual('target-value-something');
+        });
+        it('calls target.getAttribute() if the attribute is dynamic but there is no getter or accessor', function () {
+            const attribute = new EloquentAttribute_1.EloquentAttribute(fakeModel, Model.prototype);
+            const target = {
+                getAttribute(key) {
+                    return 'target-value-' + key;
+                }
+            };
+            attribute['dynamic'] = {
+                something: {
+                    name: 'something',
+                    getter: false,
+                    setter: false
+                }
+            };
+            expect(attribute.getAttribute(target, 'something')).toEqual('target-value-something');
+        });
+        it('calls and returns getter even accessor is provided', function () {
+            const attribute = new EloquentAttribute_1.EloquentAttribute(fakeModel, Model.prototype);
+            const target = {
+                get first_name() {
+                    return 'getter-value';
+                },
+                getFirstNameAttribute() {
+                    return 'accessor-value';
+                }
+            };
+            attribute['known'] = [];
+            attribute['dynamic'] = {
+                first_name: {
+                    name: 'first_name',
+                    getter: true,
+                    setter: false,
+                    accessor: 'getFirstNameAttribute'
+                }
+            };
+            expect(attribute.getAttribute(target, 'first_name')).toEqual('getter-value');
+        });
+        it('calls accessor if the accessor is defined and getter not found', function () {
+            const attribute = new EloquentAttribute_1.EloquentAttribute(fakeModel, Model.prototype);
+            const target = {
+                getFirstNameAttribute() {
+                    return 'accessor-value';
+                }
+            };
+            attribute['known'] = [];
+            attribute['dynamic'] = {
+                first_name: {
+                    name: 'first_name',
+                    getter: false,
+                    setter: false,
+                    accessor: 'getFirstNameAttribute'
+                }
+            };
+            expect(attribute.getAttribute(target, 'first_name')).toEqual('accessor-value');
+        });
+    });
+    describe('.setAttribute()', function () {
+        it('calls target.setAttribute() if the attribute is not dynamic attribute', function () {
+            const attribute = new EloquentAttribute_1.EloquentAttribute(fakeModel, Model.prototype);
+            const target = {
+                val: '',
+                setAttribute(key, value) {
+                    this.val = 'target-' + key + '-' + value;
+                    return true;
+                }
+            };
+            attribute['known'] = ['something'];
+            expect(attribute.setAttribute(target, 'something', 'value')).toBe(true);
+            expect(target.val).toEqual('target-something-value');
+        });
+        it('calls target.setAttribute() if the attribute is dynamic but there is no setter or mutator', function () {
+            const attribute = new EloquentAttribute_1.EloquentAttribute(fakeModel, Model.prototype);
+            const target = {
+                val: '',
+                setAttribute(key, value) {
+                    this.val = 'target-' + key + '-' + value;
+                    return true;
+                }
+            };
+            attribute['dynamic'] = {
+                something: {
+                    name: 'something',
+                    getter: false,
+                    setter: false
+                }
+            };
+            expect(attribute.setAttribute(target, 'something', 'value')).toBe(true);
+            expect(target.val).toEqual('target-something-value');
+        });
+        it('calls and returns setter even accessor is provided', function () {
+            const attribute = new EloquentAttribute_1.EloquentAttribute(fakeModel, Model.prototype);
+            const target = {
+                val: '',
+                set first_name(value) {
+                    this.val = 'setter-' + value;
+                },
+                setFirstNameAttribute(value) {
+                    this.val = 'mutator-' + value;
+                }
+            };
+            attribute['known'] = [];
+            attribute['dynamic'] = {
+                first_name: {
+                    name: 'first_name',
+                    getter: false,
+                    setter: true,
+                    mutator: 'setFirstNameAttribute'
+                }
+            };
+            expect(attribute.setAttribute(target, 'first_name', 'value')).toBe(true);
+            expect(target.val).toEqual('setter-value');
+        });
+        it('calls mutator if the mutator is defined and setter not found', function () {
+            const attribute = new EloquentAttribute_1.EloquentAttribute(fakeModel, Model.prototype);
+            const target = {
+                val: '',
+                setFirstNameAttribute(value) {
+                    this.val = 'mutator-' + value;
+                }
+            };
+            attribute['known'] = [];
+            attribute['dynamic'] = {
+                first_name: {
+                    name: 'first_name',
+                    getter: false,
+                    setter: false,
+                    mutator: 'setFirstNameAttribute'
+                }
+            };
+            expect(attribute.setAttribute(target, 'first_name', 'value')).toBe(true);
+            expect(target.val).toEqual('mutator-value');
         });
     });
 });

@@ -6,6 +6,7 @@ export interface IEloquentDriverConstructor<Record extends Object = {}> {
 }
 export interface IEloquentDriver<Record extends Object = {}> {
     initialize(data?: Record): void;
+    getRecord(): Record;
     getAttribute(name: string): any;
     setAttribute(name: string, value: any): boolean;
     getId(): any;
@@ -14,5 +15,7 @@ export interface IEloquentDriver<Record extends Object = {}> {
     toObject(): Object;
     toJSON(): Object;
     is(model: Eloquent): boolean;
-    getReservedProperties(): string[];
+    getReservedNames(): string[];
+    getDriverProxyMethods(): string[];
+    getQueryProxyMethods(): string[];
 }

@@ -1,6 +1,5 @@
 import { Eloquent } from './Eloquent'
 import { isFunction, snakeCase } from 'lodash'
-import { GET_FORWARD_TO_DRIVER_FUNCTIONS, GET_QUERY_FUNCTIONS } from './EloquentProxy'
 
 export class EloquentAttribute {
   protected known: string[]
@@ -42,10 +41,10 @@ export class EloquentAttribute {
   buildKnownAttributes(model: Eloquent, prototype: any) {
     this.known = Array.from(
       new Set(
-        model['getReservedProperties']().concat(
+        model['getReservedNames']().concat(
           Object.getOwnPropertyNames(model),
-          GET_FORWARD_TO_DRIVER_FUNCTIONS,
-          GET_QUERY_FUNCTIONS,
+          model['driver'].getDriverProxyMethods(),
+          model['driver'].getQueryProxyMethods(),
           Object.getOwnPropertyNames(Eloquent.prototype),
           Object.getOwnPropertyNames(prototype)
         )
@@ -87,5 +86,39 @@ export class EloquentAttribute {
         }
       }
     })
+  }
+
+  getAttribute(target: Eloquent<any>, attribute: string) {
+    if (!this.dynamic[attribute]) {
+      return target.getAttribute(attribute)
+    }
+
+    if (this.dynamic[attribute].getter) {
+      return target[attribute]
+    }
+
+    if (!this.dynamic[attribute].getter && this.dynamic[attribute].accessor) {
+      return target[<string>this.dynamic[attribute].accessor].call(target)
+    }
+
+    return target.getAttribute(attribute)
+  }
+
+  setAttribute(target: Eloquent<any>, attribute: string, value: any) {
+    if (!this.dynamic[attribute]) {
+      return target.setAttribute(attribute, value)
+    }
+
+    if (this.dynamic[attribute].setter) {
+      target[attribute] = value
+      return true
+    }
+
+    if (!this.dynamic[attribute].setter && this.dynamic[attribute].mutator) {
+      target[<string>this.dynamic[attribute].mutator].call(target, value)
+      return true
+    }
+
+    return target.setAttribute(attribute, value)
   }
 }

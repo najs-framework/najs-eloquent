@@ -7,6 +7,7 @@ export declare class DummyDriver<T extends Object = {}> implements IEloquentDriv
     attributes: Object;
     model: Eloquent<T>;
     initialize(data?: T): void;
+    getRecord(): T;
     getAttribute(name: string): any;
     setAttribute(name: string, value: any): boolean;
     getId(): any;
@@ -15,5 +16,7 @@ export declare class DummyDriver<T extends Object = {}> implements IEloquentDriv
     toObject(): Object;
     toJSON(): Object;
     is(model: Eloquent<T>): boolean;
-    getReservedProperties(): string[];
+    getReservedNames(): string[];
+    getDriverProxyMethods(): string[];
+    getQueryProxyMethods(): string[];
 }

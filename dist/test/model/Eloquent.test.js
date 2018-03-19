@@ -19,6 +19,9 @@ function update_model_setting(property, value) {
     EloquentMetadata_1.EloquentMetadata.get(new Model(), false);
 }
 describe('Eloquent', function () {
+    describe('constructor()', function () {
+        // TODO: write test for constructor
+    });
     const forwardToDriverMethods = {
         getAttribute: 'getAttribute',
         setAttribute: 'setAttribute',

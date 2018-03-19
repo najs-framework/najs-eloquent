@@ -13,6 +13,10 @@ export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
     this.attributes = data || {}
   }
 
+  getRecord(): T {
+    return <T>this.attributes
+  }
+
   getAttribute(name: string): any {
     return this.attributes[name]
   }
@@ -46,7 +50,15 @@ export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
     return this.attributes['id'] === model['driver']['attributes']['id']
   }
 
-  getReservedProperties(): string[] {
+  getReservedNames(): string[] {
     return ['dummy']
+  }
+
+  getDriverProxyMethods() {
+    return ['is', 'getId', 'setId', 'newQuery']
+  }
+
+  getQueryProxyMethods() {
+    return ['where', 'orWhere']
   }
 }

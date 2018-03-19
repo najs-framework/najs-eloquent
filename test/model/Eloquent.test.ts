@@ -21,6 +21,10 @@ function update_model_setting(property: string, value: any) {
 }
 
 describe('Eloquent', function() {
+  describe('constructor()', function() {
+    // TODO: write test for constructor
+  })
+
   const forwardToDriverMethods = {
     getAttribute: 'getAttribute',
     setAttribute: 'setAttribute',

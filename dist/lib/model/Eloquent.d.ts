@@ -10,6 +10,7 @@ import { Collection } from 'collect.js';
  *   - static Querying
  */
 export declare abstract class Eloquent<Record extends Object = {}> implements IAutoload {
+    protected attributes: Record;
     protected driver: IEloquentDriver<Record>;
     protected fillable?: string[];
     protected guarded?: string[];
@@ -36,5 +37,5 @@ export declare abstract class Eloquent<Record extends Object = {}> implements IA
     isGuarded(key: string): boolean;
     newInstance(data?: Object | Record): this;
     newCollection(dataset: Array<Object | Record>): Collection<this>;
-    protected getReservedProperties(): Array<string>;
+    protected getReservedNames(): Array<string>;
 }

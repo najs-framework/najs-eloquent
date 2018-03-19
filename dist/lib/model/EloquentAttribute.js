@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Eloquent_1 = require("./Eloquent");
 const lodash_1 = require("lodash");
-const EloquentProxy_1 = require("./EloquentProxy");
 class EloquentAttribute {
     constructor(model, prototype) {
         this.dynamic = {};
@@ -27,7 +26,7 @@ class EloquentAttribute {
         return this.known.indexOf(name) !== -1;
     }
     buildKnownAttributes(model, prototype) {
-        this.known = Array.from(new Set(model['getReservedProperties']().concat(Object.getOwnPropertyNames(model), EloquentProxy_1.GET_FORWARD_TO_DRIVER_FUNCTIONS, EloquentProxy_1.GET_QUERY_FUNCTIONS, Object.getOwnPropertyNames(Eloquent_1.Eloquent.prototype), Object.getOwnPropertyNames(prototype))));
+        this.known = Array.from(new Set(model['getReservedNames']().concat(Object.getOwnPropertyNames(model), model['driver'].getDriverProxyMethods(), model['driver'].getQueryProxyMethods(), Object.getOwnPropertyNames(Eloquent_1.Eloquent.prototype), Object.getOwnPropertyNames(prototype))));
     }
     findGettersAndSetters(prototype) {
         const descriptors = Object.getOwnPropertyDescriptors(prototype);
@@ -62,6 +61,32 @@ class EloquentAttribute {
                 }
             }
         });
+    }
+    getAttribute(target, attribute) {
+        if (!this.dynamic[attribute]) {
+            return target.getAttribute(attribute);
+        }
+        if (this.dynamic[attribute].getter) {
+            return target[attribute];
+        }
+        if (!this.dynamic[attribute].getter && this.dynamic[attribute].accessor) {
+            return target[this.dynamic[attribute].accessor].call(target);
+        }
+        return target.getAttribute(attribute);
+    }
+    setAttribute(target, attribute, value) {
+        if (!this.dynamic[attribute]) {
+            return target.setAttribute(attribute, value);
+        }
+        if (this.dynamic[attribute].setter) {
+            target[attribute] = value;
+            return true;
+        }
+        if (!this.dynamic[attribute].setter && this.dynamic[attribute].mutator) {
+            target[this.dynamic[attribute].mutator].call(target, value);
+            return true;
+        }
+        return target.setAttribute(attribute, value);
     }
 }
 exports.EloquentAttribute = EloquentAttribute;

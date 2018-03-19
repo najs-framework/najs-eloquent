@@ -288,18 +288,12 @@ describe('EloquentMetadata', function() {
   })
 
   describe('.hasAttribute()', function() {
-    it('returns false if the name not in "knownAttributes"', function() {
+    it('calls and returns attribute.isKnownAttribute()', function() {
       const metadata = EloquentMetadata.get(new Model())
-      metadata['attribute']['known'] = ['test']
-      expect(metadata.hasAttribute('test')).toEqual(true)
-      expect(metadata.hasAttribute('not-found')).toEqual(false)
-    })
-
-    it('always returns true if typeof name is Symbol', function() {
-      const metadata = EloquentMetadata.get(new Model())
-      metadata['attribute']['known'] = ['test']
-      expect(metadata.hasAttribute(Symbol.for('test'))).toEqual(true)
-      expect(metadata.hasAttribute(Symbol.for('not-found'))).toEqual(true)
+      const isKnownAttributeStub = Sinon.stub(metadata['attribute'], <any>'isKnownAttribute')
+      isKnownAttributeStub.returns('anything')
+      expect(metadata.hasAttribute('test')).toEqual('anything')
+      expect(isKnownAttributeStub.calledWith('test')).toBe(true)
     })
   })
 })

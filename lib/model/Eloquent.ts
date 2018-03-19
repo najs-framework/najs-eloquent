@@ -14,6 +14,7 @@ import collect, { Collection } from 'collect.js'
  *   - static Querying
  */
 export abstract class Eloquent<Record extends Object = {}> implements IAutoload {
+  protected attributes: Record
   protected driver: IEloquentDriver<Record>
 
   // setting members
@@ -33,6 +34,7 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
     this.driver = EloquentDriverProvider.create(this)
     if (data !== 'do-not-initialize') {
       this.driver.initialize(data)
+      this.attributes = this.driver.getRecord()
       return new Proxy(this, EloquentProxy)
     }
   }
@@ -113,10 +115,11 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
     return collect(dataset.map(item => this.newInstance(item)))
   }
 
-  protected getReservedProperties(): Array<string> {
+  protected getReservedNames(): Array<string> {
     return [
       'inspect',
       'valueOf',
+      'attributes',
       'driver',
       'fillable',
       'guarded',
@@ -126,6 +129,6 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
       'collection',
       'schema',
       'options'
-    ].concat(this.driver.getReservedProperties())
+    ].concat(this.driver.getReservedNames())
   }
 }

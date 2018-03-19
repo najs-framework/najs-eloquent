@@ -7,6 +7,9 @@ class DummyDriver {
     initialize(data) {
         this.attributes = data || {};
     }
+    getRecord() {
+        return this.attributes;
+    }
     getAttribute(name) {
         return this.attributes[name];
     }
@@ -32,8 +35,14 @@ class DummyDriver {
     is(model) {
         return this.attributes['id'] === model['driver']['attributes']['id'];
     }
-    getReservedProperties() {
+    getReservedNames() {
         return ['dummy'];
+    }
+    getDriverProxyMethods() {
+        return ['is', 'getId', 'setId', 'newQuery'];
+    }
+    getQueryProxyMethods() {
+        return ['where', 'orWhere'];
     }
 }
 DummyDriver.className = 'NajsEloquent.DummyDriver';

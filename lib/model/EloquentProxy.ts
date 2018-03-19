@@ -1,27 +1,28 @@
 import { Eloquent } from './Eloquent'
 import { EloquentMetadata } from './EloquentMetadata'
 
-export const GET_FORWARD_TO_DRIVER_FUNCTIONS: string[] = ['is', 'getId', 'setId', 'newQuery']
-export const GET_QUERY_FUNCTIONS: string[] = ['where', 'orWhere']
-
 export const EloquentProxy = {
-  get(target: Eloquent<any>, key: any, value: any): any {
-    if (GET_FORWARD_TO_DRIVER_FUNCTIONS.indexOf(key) !== -1) {
+  get(target: Eloquent<any>, key: any): any {
+    if (target['driver'].getDriverProxyMethods().indexOf(key) !== -1) {
       return target['driver'][key].bind(target['driver'])
     }
 
-    if (GET_QUERY_FUNCTIONS.indexOf(key) !== -1) {
-      return target['driver'].newQuery()[key]
+    if (target['driver'].getQueryProxyMethods().indexOf(key) !== -1) {
+      const query = target['driver'].newQuery()
+      return query[key].bind(query)
     }
 
-    if (EloquentMetadata.get(target).hasAttribute(key)) {
+    if (!EloquentMetadata.get(target).hasAttribute(key)) {
+      return EloquentMetadata.get(target)['attribute'].getAttribute(target, key)
     }
     return target[key]
   },
 
   set(target: Eloquent<any>, key: any, value: any): any {
-    if (EloquentMetadata.get(target).hasAttribute(key)) {
+    if (!EloquentMetadata.get(target).hasAttribute(key)) {
+      return EloquentMetadata.get(target)['attribute'].setAttribute(target, key, value)
     }
+
     target[key] = value
     return true
   }

@@ -18,6 +18,7 @@ class Eloquent {
         this.driver = EloquentDriverProvider_1.EloquentDriverProvider.create(this);
         if (data !== 'do-not-initialize') {
             this.driver.initialize(data);
+            this.attributes = this.driver.getRecord();
             return new Proxy(this, EloquentProxy_1.EloquentProxy);
         }
     }
@@ -78,10 +79,11 @@ class Eloquent {
     newCollection(dataset) {
         return collect_js_1.default(dataset.map(item => this.newInstance(item)));
     }
-    getReservedProperties() {
+    getReservedNames() {
         return [
             'inspect',
             'valueOf',
+            'attributes',
             'driver',
             'fillable',
             'guarded',
@@ -91,7 +93,7 @@ class Eloquent {
             'collection',
             'schema',
             'options'
-        ].concat(this.driver.getReservedProperties());
+        ].concat(this.driver.getReservedNames());
     }
 }
 exports.Eloquent = Eloquent;
