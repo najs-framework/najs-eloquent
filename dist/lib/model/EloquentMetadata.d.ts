@@ -1,4 +1,5 @@
 import { Eloquent } from './Eloquent';
+import { EloquentAttribute } from './EloquentAttribute';
 export declare type EloquentTimestamps = {
     createdAt: string;
     updatedAt: string;
@@ -6,20 +7,6 @@ export declare type EloquentTimestamps = {
 export declare type EloquentSoftDelete = {
     deletedAt: string;
     overrideMethods: boolean | 'all' | string[];
-};
-export declare type EloquentAccessors = {
-    [key: string]: {
-        name: string;
-        type: 'getter' | 'function' | string;
-        ref?: string;
-    };
-};
-export declare type EloquentMutators = {
-    [key: string]: {
-        name: string;
-        type: 'setter' | 'function' | string;
-        ref?: string;
-    };
 };
 /**
  * This class contains all metadata parsing functions, such as:
@@ -36,15 +23,8 @@ export declare class EloquentMetadata {
     protected prototype: any;
     protected definition: typeof Eloquent;
     protected knownAttributes: string[];
-    protected accessors: EloquentAccessors;
-    protected mutators: EloquentMutators;
+    protected attribute: EloquentAttribute;
     private constructor();
-    protected buildKnownAttributes(): void;
-    /**
-     * Find accessors and mutators defined in getter/setter, only available for node >= 8.7
-     */
-    protected findGettersAndSetters(): void;
-    protected findAccessorsAndMutators(): void;
     getSettingProperty<T extends any>(property: string, defaultValue: T): T;
     hasSetting(property: string): boolean;
     getSettingWithDefaultForTrueValue(property: string, defaultValue: any): any;

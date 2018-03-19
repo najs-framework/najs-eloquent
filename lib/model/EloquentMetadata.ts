@@ -1,29 +1,12 @@
 import { make } from 'najs-binding'
 import { Eloquent } from './Eloquent'
-import { GET_FORWARD_TO_DRIVER_FUNCTIONS, GET_QUERY_FUNCTIONS } from './EloquentProxy'
-import { isFunction, snakeCase } from 'lodash'
+import { EloquentAttribute } from './EloquentAttribute'
 
 export type EloquentTimestamps = { createdAt: string; updatedAt: string }
 
 export type EloquentSoftDelete = {
   deletedAt: string
   overrideMethods: boolean | 'all' | string[]
-}
-
-export type EloquentAccessors = {
-  [key: string]: {
-    name: string
-    type: 'getter' | 'function' | string
-    ref?: string
-  }
-}
-
-export type EloquentMutators = {
-  [key: string]: {
-    name: string
-    type: 'setter' | 'function' | string
-    ref?: string
-  }
 }
 
 const DEFAULT_TIMESTAMPS: EloquentTimestamps = {
@@ -51,79 +34,13 @@ export class EloquentMetadata {
   protected prototype: any
   protected definition: typeof Eloquent
   protected knownAttributes: string[]
-  protected accessors: EloquentAccessors
-  protected mutators: EloquentMutators
+  protected attribute: EloquentAttribute
 
   private constructor(model: Eloquent) {
     this.model = model
     this.prototype = Object.getPrototypeOf(this.model)
     this.definition = Object.getPrototypeOf(model).constructor
-    this.accessors = {}
-    this.mutators = {}
-    this.buildKnownAttributes()
-    this.findGettersAndSetters()
-    this.findAccessorsAndMutators()
-  }
-
-  protected buildKnownAttributes() {
-    this.knownAttributes = Array.from(
-      new Set(
-        this.model['getReservedProperties']().concat(
-          Object.getOwnPropertyNames(this.model),
-          GET_FORWARD_TO_DRIVER_FUNCTIONS,
-          GET_QUERY_FUNCTIONS,
-          Object.getOwnPropertyNames(Eloquent.prototype),
-          Object.getOwnPropertyNames(this.prototype)
-        )
-      )
-    )
-  }
-
-  /**
-   * Find accessors and mutators defined in getter/setter, only available for node >= 8.7
-   */
-  protected findGettersAndSetters() {
-    const descriptors: Object = Object.getOwnPropertyDescriptors(this.prototype)
-    for (const name in descriptors) {
-      if (isFunction(descriptors[name].get)) {
-        this.accessors[name] = {
-          name: name,
-          type: 'getter'
-        }
-      }
-      if (isFunction(descriptors[name].set)) {
-        this.mutators[name] = {
-          name: name,
-          type: 'setter'
-        }
-      }
-    }
-  }
-
-  protected findAccessorsAndMutators() {
-    const names = Object.getOwnPropertyNames(this.prototype)
-    const regex = new RegExp('^(get|set)([a-zA-z0-9_\\-]{1,})Attribute$', 'g')
-    names.forEach(name => {
-      let match
-      while ((match = regex.exec(name)) != undefined) {
-        // javascript RegExp has a bug when the match has length 0
-        // if (match.index === regex.lastIndex) {
-        //   ++regex.lastIndex
-        // }
-        const property: string = snakeCase(match[2])
-        const data = {
-          name: property,
-          type: 'function',
-          ref: <string>match[0]
-        }
-        if (match[1] === 'get' && typeof this.accessors[property] === 'undefined') {
-          this.accessors[property] = data
-        }
-        if (match[1] === 'set' && typeof this.mutators[property] === 'undefined') {
-          this.mutators[property] = data
-        }
-      }
-    })
+    this.attribute = new EloquentAttribute(model, this.prototype)
   }
 
   getSettingProperty<T extends any>(property: string, defaultValue: T): T {
@@ -170,10 +87,7 @@ export class EloquentMetadata {
   }
 
   hasAttribute(name: string | Symbol) {
-    if (typeof name === 'symbol') {
-      return true
-    }
-    return this.knownAttributes.indexOf(name as string) !== -1
+    return this.attribute.isKnownAttribute(name)
   }
 
   /**

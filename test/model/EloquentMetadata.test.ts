@@ -5,7 +5,7 @@ import { DummyDriver } from '../../lib/drivers/DummyDriver'
 import { EloquentDriverProvider } from '../../lib/drivers/EloquentDriverProvider'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { EloquentMetadata } from '../../lib/model/EloquentMetadata'
-import { GET_FORWARD_TO_DRIVER_FUNCTIONS, GET_QUERY_FUNCTIONS } from '../../lib/model/EloquentProxy'
+import { EloquentAttribute } from '../../lib/model/EloquentAttribute'
 
 EloquentDriverProvider.register(DummyDriver, 'dummy')
 
@@ -54,203 +54,10 @@ describe('EloquentMetadata', function() {
       const metadata = EloquentMetadata.get(new Model())
       expect(metadata['definition'] === Model).toBe(true)
     })
-  })
 
-  describe('protected .buildKnownAttributes()', function() {
-    it('merges reserved properties defined in .getReservedProperties() of model and driver', function() {
+    it('create new instances of EloquentAttribute and saves in "attribute"', function() {
       const metadata = EloquentMetadata.get(new Model())
-      const props = new Model()['getReservedProperties']()
-      for (const name of props) {
-        expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true)
-      }
-    })
-
-    it('merges properties defined Eloquent.prototype', function() {
-      const metadata = EloquentMetadata.get(new Model())
-      const props = Object.getOwnPropertyNames(Model.prototype)
-      for (const name of props) {
-        expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true)
-      }
-    })
-
-    it('merges properties defined in model', function() {
-      const metadata = EloquentMetadata.get(new Model())
-      const props = ['accessor', 'mutator', 'modelMethod']
-      for (const name of props) {
-        expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true)
-      }
-
-      // warning: props defined in model is not included in list
-      expect(metadata['knownAttributes'].indexOf('props') === -1).toBe(true)
-    })
-
-    it('merges properties defined in child model', function() {
-      const metadata = EloquentMetadata.get(new ChildModel())
-      const props = ['child_accessor', 'child_mutator', 'childModelMethod']
-      for (const name of props) {
-        expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true)
-      }
-      // warning: props defined in model is not included in list
-      expect(metadata['knownAttributes'].indexOf('child_props') === -1).toBe(true)
-    })
-
-    it('merges properties defined GET_FORWARD_TO_DRIVER_FUNCTIONS', function() {
-      const metadata = EloquentMetadata.get(new Model())
-      const props = GET_FORWARD_TO_DRIVER_FUNCTIONS
-      for (const name of props) {
-        expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true)
-      }
-    })
-
-    it('merges properties defined GET_QUERY_FUNCTIONS', function() {
-      const metadata = EloquentMetadata.get(new Model())
-      const props = GET_QUERY_FUNCTIONS
-      for (const name of props) {
-        expect(metadata['knownAttributes'].indexOf(name) !== -1).toBe(true)
-      }
-    })
-  })
-
-  describe('protected .findGettersAndSetters()', function() {
-    it('finds all defined getters and put to accessors with type = getter', function() {
-      class GetterEmpty extends Eloquent {
-        getClassName() {
-          return 'GetterEmpty'
-        }
-      }
-      register(GetterEmpty)
-      expect(EloquentMetadata.get(new GetterEmpty())['accessors']).toEqual({})
-
-      class GetterA extends Eloquent {
-        get a() {
-          return ''
-        }
-
-        get b() {
-          return ''
-        }
-
-        getClassName() {
-          return 'GetterA'
-        }
-      }
-      register(GetterA)
-      const metadata = EloquentMetadata.get(new GetterA())
-      expect(metadata['accessors']).toEqual({
-        a: { name: 'a', type: 'getter' },
-        b: { name: 'b', type: 'getter' }
-      })
-    })
-
-    it('finds all defined setters and put to mutators with type = setter', function() {
-      class SetterEmpty extends Eloquent {
-        getClassName() {
-          return 'MutatorEmpty'
-        }
-      }
-      register(SetterEmpty)
-      expect(EloquentMetadata.get(new SetterEmpty())['mutators']).toEqual({})
-
-      class SetterA extends Eloquent {
-        set a(value: any) {}
-
-        set b(value: any) {}
-
-        getClassName() {
-          return 'SetterA'
-        }
-      }
-      register(SetterA)
-      const metadata = EloquentMetadata.get(new SetterA())
-      expect(metadata['mutators']).toEqual({
-        a: { name: 'a', type: 'setter' },
-        b: { name: 'b', type: 'setter' }
-      })
-    })
-  })
-
-  describe('protected .findAccessorsAndMutators()', function() {
-    it('does thing if there is no function with format `get|set...Attribute`', function() {
-      class NoAccessorOrMutator extends Eloquent {
-        getClassName() {
-          return 'NoAccessorOrMutator'
-        }
-      }
-      register(NoAccessorOrMutator)
-      expect(EloquentMetadata.get(new NoAccessorOrMutator())['accessors']).toEqual({})
-      expect(EloquentMetadata.get(new NoAccessorOrMutator())['mutators']).toEqual({})
-    })
-
-    it('puts `get...Attribute` to accessors with type function, but skip if getter of same attribute is defined', function() {
-      class AccessorA extends Eloquent {
-        get a() {
-          return ''
-        }
-
-        getAAttribute() {}
-
-        getFirstNameAttribute() {}
-
-        getWrongFormat() {}
-
-        getDoublegetDoubleAttribute() {}
-
-        getClassName() {
-          return 'AccessorA'
-        }
-      }
-      register(AccessorA)
-      expect(EloquentMetadata.get(new AccessorA())['accessors']).toEqual({
-        a: {
-          name: 'a',
-          type: 'getter'
-        },
-        first_name: {
-          name: 'first_name',
-          type: 'function',
-          ref: 'getFirstNameAttribute'
-        },
-        doubleget_double: {
-          name: 'doubleget_double',
-          type: 'function',
-          ref: 'getDoublegetDoubleAttribute'
-        }
-      })
-    })
-
-    it('puts `set...Attribute` to mutators with type function, but skip if setter of same attribute is defined', function() {
-      class MutatorA extends Eloquent {
-        set a(value: any) {}
-
-        setAAttribute() {}
-
-        setFirstNameAttribute() {}
-
-        setWrongFormat() {}
-
-        setDoublegetDoubleAttribute() {}
-
-        getClassName() {
-          return 'MutatorA'
-        }
-      }
-      register(MutatorA)
-      expect(EloquentMetadata.get(new MutatorA())['mutators']).toEqual({
-        a: {
-          name: 'a',
-          type: 'setter'
-        },
-        first_name: {
-          name: 'first_name',
-          type: 'function',
-          ref: 'setFirstNameAttribute'
-        },
-        doubleget_double: {
-          name: 'doubleget_double',
-          type: 'function',
-          ref: 'setDoublegetDoubleAttribute'
-        }
-      })
+      expect(metadata['attribute']).toBeInstanceOf(EloquentAttribute)
     })
   })
 
@@ -483,14 +290,14 @@ describe('EloquentMetadata', function() {
   describe('.hasAttribute()', function() {
     it('returns false if the name not in "knownAttributes"', function() {
       const metadata = EloquentMetadata.get(new Model())
-      metadata['knownAttributes'] = ['test']
+      metadata['attribute']['known'] = ['test']
       expect(metadata.hasAttribute('test')).toEqual(true)
       expect(metadata.hasAttribute('not-found')).toEqual(false)
     })
 
     it('always returns true if typeof name is Symbol', function() {
       const metadata = EloquentMetadata.get(new Model())
-      metadata['knownAttributes'] = ['test']
+      metadata['attribute']['known'] = ['test']
       expect(metadata.hasAttribute(Symbol.for('test'))).toEqual(true)
       expect(metadata.hasAttribute(Symbol.for('not-found'))).toEqual(true)
     })
