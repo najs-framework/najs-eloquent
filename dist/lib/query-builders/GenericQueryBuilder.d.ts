@@ -10,8 +10,8 @@ export declare class GenericQueryBuilder implements IBasicQuery, IConditionQuery
     protected isUsed: boolean;
     protected name: string;
     protected fields: {
-        select: string[];
-        distinct: string[];
+        select?: string[];
+        distinct?: string[];
     };
     protected selectedFields: string[];
     protected distinctFields: string[];

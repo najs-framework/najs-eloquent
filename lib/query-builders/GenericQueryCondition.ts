@@ -86,11 +86,17 @@ export class GenericQueryCondition implements IConditionQuery {
     return this
   }
 
-  where(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this {
+  where(conditionBuilder: SubCondition): this
+  where(field: string, value: any): this
+  where(field: string, operator: Operator, value: any): this
+  where(arg0: any, arg1?: any, arg2?: any): this {
     return this.buildQuery('and', arg0, arg1, arg2)
   }
 
-  orWhere(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this {
+  orWhere(conditionBuilder: SubCondition): this
+  orWhere(field: string, value: any): this
+  orWhere(field: string, operator: Operator, value: any): this
+  orWhere(arg0: any, arg1?: any, arg2?: any): this {
     return this.buildQuery('or', arg0, arg1, arg2)
   }
 

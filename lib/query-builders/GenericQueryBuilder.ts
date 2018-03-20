@@ -13,8 +13,8 @@ export class GenericQueryBuilder implements IBasicQuery, IConditionQuery, ISoftD
   protected isUsed: boolean
   protected name: string
   protected fields: {
-    select: string[]
-    distinct: string[]
+    select?: string[]
+    distinct?: string[]
   }
   protected selectedFields: string[]
   protected distinctFields: string[]
@@ -27,7 +27,7 @@ export class GenericQueryBuilder implements IBasicQuery, IConditionQuery, ISoftD
   protected logGroup: string
 
   constructor(softDelete?: QueryBuilderSoftDelete) {
-    this.fields = { select: [], distinct: [] }
+    this.fields = {}
     this.ordering = {}
     this.conditions = []
     this.convention = this.getQueryConvention()

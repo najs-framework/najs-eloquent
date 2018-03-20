@@ -4,7 +4,7 @@ const GenericQueryCondition_1 = require("./GenericQueryCondition");
 const lodash_1 = require("lodash");
 class GenericQueryBuilder {
     constructor(softDelete) {
-        this.fields = { select: [], distinct: [] };
+        this.fields = {};
         this.ordering = {};
         this.conditions = [];
         this.convention = this.getQueryConvention();

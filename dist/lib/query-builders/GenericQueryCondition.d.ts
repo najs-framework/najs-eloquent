@@ -13,8 +13,12 @@ export declare class GenericQueryCondition implements IConditionQuery {
     toObject(): Object;
     protected buildQuery(bool: 'and' | 'or', arg0: string | SubCondition, arg1: Operator | any, arg2: any): this;
     protected buildSubQuery(queryCondition: GenericQueryCondition, arg0: Function): this;
-    where(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this;
-    orWhere(arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this;
+    where(conditionBuilder: SubCondition): this;
+    where(field: string, value: any): this;
+    where(field: string, operator: Operator, value: any): this;
+    orWhere(conditionBuilder: SubCondition): this;
+    orWhere(field: string, value: any): this;
+    orWhere(field: string, operator: Operator, value: any): this;
     whereIn(field: string, values: Array<any>): this;
     whereNotIn(field: string, values: Array<any>): this;
     orWhereIn(field: string, values: Array<any>): this;
