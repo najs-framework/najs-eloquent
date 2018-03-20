@@ -8,7 +8,7 @@ import { make } from 'najs-binding'
 import { NotFoundError } from '../errors/NotFoundError'
 import { SoftDelete } from './mongoose/SoftDelete'
 import { EloquentMetadata } from './EloquentMetadata'
-Schema.prototype['setupTimestamp'] = require('./mongoose/setupTimestamp').setupTimestamp
+Schema.prototype['setupTimestamp'] = require('mongoose-timestamps-moment').setupTimestamp
 
 export abstract class EloquentMongoose<T> extends EloquentBase<Document & T> {
   protected collection: string

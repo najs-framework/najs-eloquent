@@ -8,7 +8,7 @@ const najs_binding_1 = require("najs-binding");
 const NotFoundError_1 = require("../errors/NotFoundError");
 const SoftDelete_1 = require("./mongoose/SoftDelete");
 const EloquentMetadata_1 = require("./EloquentMetadata");
-mongoose_1.Schema.prototype['setupTimestamp'] = require('./mongoose/setupTimestamp').setupTimestamp;
+mongoose_1.Schema.prototype['setupTimestamp'] = require('mongoose-timestamps-moment').setupTimestamp;
 class EloquentMongoose extends EloquentBase_1.EloquentBase {
     getId() {
         return this.attributes._id;

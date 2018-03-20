@@ -37,6 +37,28 @@ export type QueryLogSpecs = {
   pull(group: string, since: Moment.Moment, until: Moment.Moment, transform: QueryLogTransform): QueryLogItem[]
   pull(since: Moment.Moment, until: Moment.Moment, transform: QueryLogTransform, group: string): QueryLogItem[]
   pull(transform: QueryLogTransform, since: Moment.Moment, until: Moment.Moment, group: string): QueryLogItem[]
+
+  // pull(): QueryLogItem[]
+  // pull(group: string): QueryLogItem[]
+  // pull(group: string, since: Moment.Moment): QueryLogItem[]
+  // pull(group: string, since: Moment.Moment, until: Moment.Moment): QueryLogItem[]
+  // pull(group: string, since: Moment.Moment, until: Moment.Moment, transform: QueryLogTransform): QueryLogItem[]
+  // pull(group: string, since: Moment.Moment, transform: QueryLogTransform): QueryLogItem[]
+  // pull(group: string, transform: QueryLogTransform): QueryLogItem[]
+
+  // pull(since: Moment.Moment): QueryLogItem[]
+  // pull(since: Moment.Moment, group: string): QueryLogItem[]
+  // pull(since: Moment.Moment, until: Moment.Moment): QueryLogItem[]
+  // pull(since: Moment.Moment, until: Moment.Moment, group: string): QueryLogItem[]
+  // pull(since: Moment.Moment, until: Moment.Moment, transform: QueryLogTransform, group: string): QueryLogItem[]
+  // pull(since: Moment.Moment, transform: QueryLogTransform): QueryLogItem[]
+  // pull(since: Moment.Moment, transform: QueryLogTransform, group: string): QueryLogItem[]
+
+  // pull(transform: QueryLogTransform): QueryLogItem[]
+  // pull(transform: QueryLogTransform, group: string): QueryLogItem[]
+  // pull(transform: QueryLogTransform, since: Moment.Moment): QueryLogItem[]
+  // pull(transform: QueryLogTransform, since: Moment.Moment, group: string): QueryLogItem[]
+  // pull(transform: QueryLogTransform, since: Moment.Moment, until: Moment.Moment, group: string): QueryLogItem[]
 }
 
 function parse_pull_arguments_1(args: ArrayLike<any>) {

@@ -74,6 +74,18 @@ describe('Eloquent', function() {
       expect(user.toObject()).toEqual({ first_name: 'test' })
       expect(initializeSpy.called).toBe(true)
       initializeSpy.restore()
+
+      // hacky to covers Test purpose classes
+      user.is(user)
+      user.fireEvent('test')
+      user.newQuery()
+      user.touch()
+      user.delete()
+      user.restore()
+      user.forceDelete()
+      user.save()
+      user.fresh()
+      user['attributes']['data'] = <any>{}
     })
 
     it('supports a hidden initialize options which never calls .initialize()', function() {
