@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
-const QueryLog_1 = require("../../../lib/v0.x/query-builders/QueryLog");
+const QueryLog_1 = require("../../../lib/log/QueryLog");
 const MongooseQueryBuilder_1 = require("../../../lib/v0.x/query-builders/MongooseQueryBuilder");
 const najs_binding_1 = require("najs-binding");
 const mongoose_1 = require("mongoose");

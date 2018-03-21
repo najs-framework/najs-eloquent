@@ -1,4 +1,4 @@
-import { QueryLog } from './QueryLog'
+import { QueryLog } from '../../log/QueryLog'
 import { MongooseQuery } from './MongooseQueryBuilder'
 import { QueryBuilder, QueryBuilderSoftDelete } from './QueryBuilder'
 import { MongodbConditionConverter } from './MongodbConditionConverter'

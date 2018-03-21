@@ -9,7 +9,7 @@ exports.Eloquent = {
     }
 };
 exports.default = exports.Eloquent;
-var QueryLog_1 = require("./v0.x/query-builders/QueryLog");
+var QueryLog_1 = require("./log/QueryLog");
 exports.QueryLog = QueryLog_1.QueryLog;
 var EloquentBase_1 = require("./v0.x/eloquent/EloquentBase");
 exports.EloquentBase = EloquentBase_1.EloquentBase;

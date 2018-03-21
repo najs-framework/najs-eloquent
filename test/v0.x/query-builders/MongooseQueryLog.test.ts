@@ -1,5 +1,5 @@
 import 'jest'
-import { QueryLog } from '../../../lib/v0.x/query-builders/QueryLog'
+import { QueryLog } from '../../../lib/log/QueryLog'
 import { MongooseQueryBuilder } from '../../../lib/v0.x/query-builders/MongooseQueryBuilder'
 import { register } from 'najs-binding'
 import { IMongooseProvider } from '../../../lib/v0.x/interfaces/IMongooseProvider'

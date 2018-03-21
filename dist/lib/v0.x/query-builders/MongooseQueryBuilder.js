@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const QueryLog_1 = require("./QueryLog");
+const QueryLog_1 = require("../../log/QueryLog");
 const QueryBuilder_1 = require("./QueryBuilder");
 const MongodbConditionConverter_1 = require("./MongodbConditionConverter");
 const najs_binding_1 = require("najs-binding");
