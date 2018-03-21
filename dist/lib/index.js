@@ -9,8 +9,9 @@ exports.Eloquent = {
     }
 };
 exports.default = exports.Eloquent;
-var QueryLog_1 = require("./log/QueryLog");
-exports.QueryLog = QueryLog_1.QueryLog;
+var QueryLogFacade_1 = require("./facades/global/QueryLogFacade");
+exports.QueryLogFacade = QueryLogFacade_1.QueryLogFacade;
+exports.QueryLog = QueryLogFacade_1.QueryLog;
 var EloquentBase_1 = require("./v0.x/eloquent/EloquentBase");
 exports.EloquentBase = EloquentBase_1.EloquentBase;
 var EloquentMetadata_1 = require("./v0.x/eloquent/EloquentMetadata");

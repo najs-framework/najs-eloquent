@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
+require("../../../lib/log/FlipFlopQueryLog");
 const Sinon = require("sinon");
 const EloquentTestBase_1 = require("../eloquent/EloquentTestBase");
 const MongooseQueryBuilder_1 = require("../../../lib/v0.x/query-builders/MongooseQueryBuilder");

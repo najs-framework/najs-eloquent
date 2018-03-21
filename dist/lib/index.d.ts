@@ -5,7 +5,7 @@ export declare const Eloquent: {
     Mongoose<T, R>(): EloquentMongooseSpec<T, R>;
 };
 export default Eloquent;
-export { QueryLog } from './log/QueryLog';
+export { QueryLogFacade, QueryLog } from './facades/global/QueryLogFacade';
 export { EloquentBase } from './v0.x/eloquent/EloquentBase';
 export { EloquentMetadata, EloquentTimestamps, EloquentSoftDelete } from './v0.x/eloquent/EloquentMetadata';
 export { IMongooseProvider } from './v0.x/interfaces/IMongooseProvider';

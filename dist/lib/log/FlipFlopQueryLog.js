@@ -1,13 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Moment = require("moment");
+const najs_binding_1 = require("najs-binding");
+const najs_facade_1 = require("najs-facade");
+const constants_1 = require("../constants");
 const lodash_1 = require("lodash");
-class DefaultQueryLog {
+class FlipFlopQueryLog extends najs_facade_1.Facade {
     constructor() {
+        super();
         this.flip = [];
         this.flop = [];
         this.circle = 'flip';
         this.enabled = false;
+    }
+    getClassName() {
+        return FlipFlopQueryLog.className;
     }
     assign_if_last_argument_is(type, args) {
         return typeof args[args.length - 1] === type ? args[args.length - 1] : undefined;
@@ -107,4 +114,6 @@ class DefaultQueryLog {
         });
     }
 }
-exports.QueryLog = new DefaultQueryLog();
+FlipFlopQueryLog.className = constants_1.NajsEloquentClass.QueryLog;
+exports.FlipFlopQueryLog = FlipFlopQueryLog;
+najs_binding_1.register(FlipFlopQueryLog);

@@ -1,8 +1,18 @@
 import 'jest'
-import { QueryLog } from '../../lib/log/QueryLog'
+import { NajsEloquentClass } from '../../lib/constants'
+import { Facade } from 'najs-facade'
+import { IQueryLog } from '../../lib/log/interfaces/IQueryLog'
+import { FlipFlopQueryLog } from '../../lib/log/FlipFlopQueryLog'
 const Moment = require('moment')
 
-describe('QueryLog', function() {
+describe('FlipFlopQueryLog', function() {
+  const QueryLog: IQueryLog = new FlipFlopQueryLog()
+
+  it('extends Facade class, implements IAutoload', function() {
+    expect(QueryLog).toBeInstanceOf(Facade)
+    expect(QueryLog['getClassName']()).toEqual(NajsEloquentClass.QueryLog)
+  })
+
   describe('.enable()', function() {
     it('enables QueryLog', function() {
       expect(QueryLog.isEnabled()).toBe(false)

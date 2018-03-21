@@ -1,4 +1,5 @@
 import 'jest'
+import '../../../lib/log/FlipFlopQueryLog'
 import { Schema, Document, model } from 'mongoose'
 import { register } from 'najs-binding'
 import { Eloquent } from '../../../lib'

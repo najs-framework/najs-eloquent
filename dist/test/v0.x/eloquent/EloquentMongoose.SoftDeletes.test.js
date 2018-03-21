@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
+require("../../../lib/log/FlipFlopQueryLog");
 const mongoose_1 = require("mongoose");
 const najs_binding_1 = require("najs-binding");
 const lib_1 = require("../../../lib");

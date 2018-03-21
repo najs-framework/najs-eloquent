@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const QueryLog_1 = require("../../log/QueryLog");
+const QueryLogFacade_1 = require("../../facades/global/QueryLogFacade");
 const QueryBuilder_1 = require("./QueryBuilder");
 const MongodbConditionConverter_1 = require("./MongodbConditionConverter");
 const najs_binding_1 = require("najs-binding");
@@ -85,7 +85,7 @@ class MongooseQueryBuilder extends QueryBuilder_1.QueryBuilder {
         data['builder'] = MongooseQueryBuilder.className;
         data['action'] = action;
         data['raw'] = raw;
-        QueryLog_1.QueryLog.push(data, this.queryLogGroup);
+        QueryLogFacade_1.QueryLog.push(data, this.queryLogGroup);
     }
     getFieldByName(name) {
         if (name === 'id') {

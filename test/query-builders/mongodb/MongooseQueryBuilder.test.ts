@@ -1,4 +1,5 @@
 import 'jest'
+import '../../../lib/log/FlipFlopQueryLog'
 import * as Sinon from 'sinon'
 import { Eloquent } from '../../../lib/model/Eloquent'
 import { IMongooseProvider } from '../../../lib/query-builders/interfaces/IMongooseProvider'

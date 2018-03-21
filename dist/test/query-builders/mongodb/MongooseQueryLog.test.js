@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
-const QueryLog_1 = require("../../../lib/log/QueryLog");
+require("../../../lib/log/FlipFlopQueryLog");
+const QueryLogFacade_1 = require("../../../lib/facades/global/QueryLogFacade");
 const MongooseQueryBuilder_1 = require("../../../lib/query-builders/mongodb/MongooseQueryBuilder");
 const najs_binding_1 = require("najs-binding");
 const mongoose_1 = require("mongoose");
@@ -29,7 +30,7 @@ const UserSchema = new mongoose_1.Schema({
 mongoose_1.model('User', UserSchema);
 describe('MongooseQueryLog', function () {
     beforeEach(function () {
-        QueryLog_1.QueryLog.clear().enable();
+        QueryLogFacade_1.QueryLog.clear().enable();
     });
     describe('.get()', function () {
         it('should work', function () {
@@ -38,7 +39,7 @@ describe('MongooseQueryLog', function () {
                 .select()
                 .where('first_name', 'test')
                 .get();
-            const log = QueryLog_1.QueryLog.pull()[0];
+            const log = QueryLogFacade_1.QueryLog.pull()[0];
             console.log(log);
             // expect(log.query.raw).toEqual('User.find({"first_name":"test"}).exec()')
         });
@@ -47,7 +48,7 @@ describe('MongooseQueryLog', function () {
         it('should work', function () {
             const builder = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
             builder.where('first_name', 'test').count();
-            const log = QueryLog_1.QueryLog.pull()[0];
+            const log = QueryLogFacade_1.QueryLog.pull()[0];
             console.log(log);
         });
     });
@@ -58,7 +59,7 @@ describe('MongooseQueryLog', function () {
                 .distinct('first_name')
                 .where('first_name', 'test')
                 .find();
-            const log = QueryLog_1.QueryLog.pull()[0];
+            const log = QueryLogFacade_1.QueryLog.pull()[0];
             console.log(log);
         });
     });
@@ -69,7 +70,7 @@ describe('MongooseQueryLog', function () {
                 .limit(10)
                 .where('first_name', '!=', 'test')
                 .pluck('first_name');
-            const log = QueryLog_1.QueryLog.pull()[0];
+            const log = QueryLogFacade_1.QueryLog.pull()[0];
             console.log(log);
         });
     });
@@ -77,7 +78,7 @@ describe('MongooseQueryLog', function () {
         it('should work', function () {
             const builder = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
             builder.where('id', '000000000000000000000000').update({ test: 'anything' });
-            const log = QueryLog_1.QueryLog.pull()[0];
+            const log = QueryLogFacade_1.QueryLog.pull()[0];
             console.log(log);
         });
     });
@@ -85,7 +86,7 @@ describe('MongooseQueryLog', function () {
         it('should work', function () {
             const builder = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
             builder.where('id', '000000000000000000000000').delete();
-            const log = QueryLog_1.QueryLog.pull()[0];
+            const log = QueryLogFacade_1.QueryLog.pull()[0];
             console.log(log);
         });
     });
@@ -94,7 +95,7 @@ describe('MongooseQueryLog', function () {
             const builder = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
             builder['softDelete'] = { deletedAt: 'deleted_at' };
             builder.where('id', '000000000000000000000000').restore();
-            const log = QueryLog_1.QueryLog.pull()[0];
+            const log = QueryLogFacade_1.QueryLog.pull()[0];
             console.log(log);
         });
     });
@@ -102,7 +103,7 @@ describe('MongooseQueryLog', function () {
         it('should work', function () {
             const builder = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
             builder.where('id', '000000000000000000000000').execute();
-            const log = QueryLog_1.QueryLog.pull()[0];
+            const log = QueryLogFacade_1.QueryLog.pull()[0];
             console.log(log);
         });
     });

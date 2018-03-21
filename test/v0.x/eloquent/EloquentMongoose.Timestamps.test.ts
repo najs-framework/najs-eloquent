@@ -1,4 +1,5 @@
 import 'jest'
+import '../../../lib/log/FlipFlopQueryLog'
 import * as Sinon from 'sinon'
 import { Schema, Document, model } from 'mongoose'
 import { register } from 'najs-binding'

@@ -1,4 +1,4 @@
-import { QueryLog } from '../../log/QueryLog'
+import { QueryLog } from '../../facades/global/QueryLogFacade'
 import { MongooseQueryBuilder } from './MongooseQueryBuilder'
 import { flatten } from 'lodash'
 export class MongooseQueryLog {

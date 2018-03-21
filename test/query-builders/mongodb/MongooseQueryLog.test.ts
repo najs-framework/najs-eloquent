@@ -1,5 +1,6 @@
 import 'jest'
-import { QueryLog } from '../../../lib/log/QueryLog'
+import '../../../lib/log/FlipFlopQueryLog'
+import { QueryLog } from '../../../lib/facades/global/QueryLogFacade'
 import { MongooseQueryBuilder } from '../../../lib/query-builders/mongodb/MongooseQueryBuilder'
 import { register } from 'najs-binding'
 import { IMongooseProvider } from '../../../lib/query-builders/interfaces/IMongooseProvider'

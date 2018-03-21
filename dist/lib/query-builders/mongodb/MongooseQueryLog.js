@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const QueryLog_1 = require("../../log/QueryLog");
+const QueryLogFacade_1 = require("../../facades/global/QueryLogFacade");
 const MongooseQueryBuilder_1 = require("./MongooseQueryBuilder");
 const lodash_1 = require("lodash");
 class MongooseQueryLog {
@@ -24,7 +24,7 @@ class MongooseQueryLog {
         return this;
     }
     end() {
-        QueryLog_1.QueryLog.push(this.data);
+        QueryLogFacade_1.QueryLog.push(this.data);
     }
     static create(queryBuilder) {
         const log = new MongooseQueryLog(queryBuilder.toObject());

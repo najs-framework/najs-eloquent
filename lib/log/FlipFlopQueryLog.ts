@@ -1,18 +1,27 @@
 import * as Moment from 'moment'
+import { register, IAutoload } from 'najs-binding'
+import { Facade } from 'najs-facade'
+import { NajsEloquentClass } from '../constants'
 import { IQueryLog, QueryLogItem } from './interfaces/IQueryLog'
 import { isString, isFunction } from 'lodash'
 
-class DefaultQueryLog implements IQueryLog {
+export class FlipFlopQueryLog extends Facade implements IQueryLog, IAutoload {
+  static className: string = NajsEloquentClass.QueryLog
   protected flip: QueryLogItem[]
   protected flop: QueryLogItem[]
   protected circle: 'flip' | 'flop'
   protected enabled: boolean
 
   constructor() {
+    super()
     this.flip = []
     this.flop = []
     this.circle = 'flip'
     this.enabled = false
+  }
+
+  getClassName() {
+    return FlipFlopQueryLog.className
   }
 
   protected assign_if_last_argument_is(type: string, args: ArrayLike<any>) {
@@ -123,5 +132,4 @@ class DefaultQueryLog implements IQueryLog {
     })
   }
 }
-
-export const QueryLog: IQueryLog = new DefaultQueryLog()
+register(FlipFlopQueryLog)
