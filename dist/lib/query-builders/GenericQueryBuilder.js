@@ -34,12 +34,15 @@ class GenericQueryBuilder {
         this.fields[type] = Array.from(new Set(lodash_1.flatten(fields))).map(this.convention.formatFieldName);
         return this;
     }
-    setLogGroup(group) {
-        this.logGroup = group;
-        return this;
-    }
     queryName(name) {
         this.name = name;
+        return this;
+    }
+    getPrimaryKey() {
+        return this.convention.formatFieldName('id');
+    }
+    setLogGroup(group) {
+        this.logGroup = group;
         return this;
     }
     select() {

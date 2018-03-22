@@ -22,6 +22,9 @@ class Eloquent {
             return new Proxy(this, EloquentProxy_1.EloquentProxy);
         }
     }
+    getModelName() {
+        return this.getClassName();
+    }
     getAttribute(name) {
         return this.driver.getAttribute(name);
     }

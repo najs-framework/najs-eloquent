@@ -24,6 +24,7 @@ export declare abstract class Eloquent<Record extends Object = {}> implements IA
     constructor(data: Object);
     constructor(data: Record);
     abstract getClassName(): string;
+    getModelName(): string;
     getAttribute(name: string): any;
     setAttribute(name: string, value: any): boolean;
     toObject(): Object;

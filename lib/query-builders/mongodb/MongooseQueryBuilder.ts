@@ -17,7 +17,7 @@ export type MongooseQuery<T> =
   | DocumentQuery<Document & T | null, Document & T>
   | DocumentQuery<(Document & T)[] | null, Document & T>
 
-export class MongooseQueryBuilder<T = {}> extends GenericQueryBuilder
+export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBuilder
   implements IBasicQuery, IFetchResultQuery<Document & T> {
   static className: string = 'MongooseQueryBuilder'
   protected mongooseModel: Model<Document & T>
@@ -26,7 +26,7 @@ export class MongooseQueryBuilder<T = {}> extends GenericQueryBuilder
   protected primaryKey: string
 
   constructor(modelName: string)
-  constructor(modelName: string, softDelete: QueryBuilderSoftDelete)
+  constructor(modelName: string, softDelete: QueryBuilderSoftDelete | undefined)
   constructor(modelName: string, softDelete: QueryBuilderSoftDelete | undefined, primaryKey: string)
   constructor(modelName: string, softDelete?: QueryBuilderSoftDelete, primaryKey: string = '_id') {
     super(softDelete)

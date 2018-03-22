@@ -26,8 +26,9 @@ export declare class GenericQueryBuilder implements IBasicQuery, IConditionQuery
     protected getQueryConvention(): IQueryConvention;
     protected getConditions(): Object[];
     protected flattenFieldNames(type: string, fields: ArrayLike<any>): this;
-    setLogGroup(group: string): this;
     queryName(name: string): this;
+    getPrimaryKey(): string;
+    setLogGroup(group: string): this;
     select(field: string): this;
     select(fields: string[]): this;
     select(...fields: Array<string | string[]>): this;

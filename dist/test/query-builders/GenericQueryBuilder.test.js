@@ -13,6 +13,14 @@ const TestConvention = {
 };
 describe('QueryBuilder', function () {
     describe('implements IBasicQuery', function () {
+        describe('.getPrimaryKey()', function () {
+            it('calls and returns convention.formatFieldName("id") by default', function () {
+                const query = new GenericQueryBuilder_1.GenericQueryBuilder();
+                const formatFieldNameSpy = Sinon.spy(query['convention'], 'formatFieldName');
+                expect(query.getPrimaryKey()).toEqual('id');
+                expect(formatFieldNameSpy.calledWith('id')).toBe(true);
+            });
+        });
         describe('.queryName()', function () {
             it('is chain-able, and simply sets provided value to "name"', function () {
                 const query = new GenericQueryBuilder_1.GenericQueryBuilder();

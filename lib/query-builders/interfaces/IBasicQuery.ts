@@ -3,6 +3,8 @@ export type OrderDirection = 'asc' | 'desc'
 export interface IBasicQuery {
   queryName(name: string): this
 
+  getPrimaryKey(): string
+
   setLogGroup(group: string): this
 
   select(field: string): this

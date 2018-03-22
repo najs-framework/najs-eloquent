@@ -41,6 +41,10 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
 
   abstract getClassName(): string
 
+  getModelName(): string {
+    return this.getClassName()
+  }
+
   getAttribute(name: string): any {
     return this.driver.getAttribute(name)
   }

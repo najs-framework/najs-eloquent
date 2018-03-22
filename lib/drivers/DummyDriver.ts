@@ -1,14 +1,10 @@
 import { snakeCase } from 'lodash'
 import { Eloquent } from '../model/Eloquent'
 import { IEloquentDriver } from './interfaces/IEloquentDriver'
-import { IBasicQuery } from '../query-builders/interfaces/IBasicQuery'
-import { IConditionQuery } from '../query-builders/interfaces/IConditionQuery'
 
 export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
   static className: string = 'NajsEloquent.DummyDriver'
-
   attributes: Object = {}
-  model: Eloquent<T>
 
   initialize(data?: T): void {
     this.attributes = data || {}
@@ -35,8 +31,8 @@ export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
     this.setAttribute('id', id)
   }
 
-  newQuery(): IBasicQuery & IConditionQuery {
-    return <any>{}
+  newQuery(): any {
+    return {}
   }
 
   toObject(): Object {

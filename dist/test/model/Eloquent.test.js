@@ -87,6 +87,12 @@ describe('Eloquent', function () {
             createStub.restore();
         });
     });
+    describe('.getModelName()', function () {
+        it('returns .getClassName() by default', function () {
+            const model = new Model();
+            expect(model.getModelName()).toEqual(model.getClassName());
+        });
+    });
     const forwardToDriverMethods = {
         getAttribute: 'getAttribute',
         setAttribute: 'setAttribute',

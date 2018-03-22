@@ -61,13 +61,17 @@ export class GenericQueryBuilder implements IBasicQuery, IConditionQuery, ISoftD
     return this
   }
 
-  setLogGroup(group: string): this {
-    this.logGroup = group
+  queryName(name: string): this {
+    this.name = name
     return this
   }
 
-  queryName(name: string): this {
-    this.name = name
+  getPrimaryKey(): string {
+    return this.convention.formatFieldName('id')
+  }
+
+  setLogGroup(group: string): this {
+    this.logGroup = group
     return this
   }
 

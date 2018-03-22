@@ -1,0 +1,36 @@
+import { IAutoload } from 'najs-binding';
+import { Eloquent } from '../model/Eloquent';
+import { EloquentMetadata } from '../model/EloquentMetadata';
+import { IEloquentDriver } from './interfaces/IEloquentDriver';
+import { Document, Model, Schema } from 'mongoose';
+import { MongooseQueryBuilder } from '../query-builders/mongodb/MongooseQueryBuilder';
+export declare class MongooseDriver<T extends Object = {}> implements IAutoload, IEloquentDriver {
+    attributes: Document & T;
+    metadata: EloquentMetadata;
+    mongooseModel: Model<Document & T>;
+    mongooseSchema: Schema;
+    queryLogGroup: string;
+    modelName: string;
+    constructor(model: Eloquent<T>);
+    getClassName(): string;
+    initialize(data?: T): void;
+    getRecord(): T;
+    getAttribute(name: string): any;
+    setAttribute(name: string, value: any): boolean;
+    getId(): any;
+    setId(id: any): void;
+    newQuery(): MongooseQueryBuilder<T>;
+    toObject(): Object;
+    toJSON(): Object;
+    is(model: Eloquent<T>): boolean;
+    formatAttributeName(name: string): string;
+    touch(): void;
+    save(): Promise<any>;
+    delete(): Promise<any>;
+    forceDelete(): Promise<any>;
+    restore(): Promise<any>;
+    fresh(): Promise<T | null>;
+    getReservedNames(): string[];
+    getDriverProxyMethods(): string[];
+    getQueryProxyMethods(): string[];
+}

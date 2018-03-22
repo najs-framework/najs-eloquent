@@ -7,14 +7,14 @@ import { IFetchResultQuery } from '../interfaces/IFetchResultQuery';
 import { Collection } from 'collect.js';
 import { Model, Document, DocumentQuery } from 'mongoose';
 export declare type MongooseQuery<T> = DocumentQuery<Document & T | null, Document & T> | DocumentQuery<(Document & T)[] | null, Document & T>;
-export declare class MongooseQueryBuilder<T = {}> extends GenericQueryBuilder implements IBasicQuery, IFetchResultQuery<Document & T> {
+export declare class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBuilder implements IBasicQuery, IFetchResultQuery<Document & T> {
     static className: string;
     protected mongooseModel: Model<Document & T>;
     protected mongooseQuery: MongooseQuery<T>;
     protected hasMongooseQuery: boolean;
     protected primaryKey: string;
     constructor(modelName: string);
-    constructor(modelName: string, softDelete: QueryBuilderSoftDelete);
+    constructor(modelName: string, softDelete: QueryBuilderSoftDelete | undefined);
     constructor(modelName: string, softDelete: QueryBuilderSoftDelete | undefined, primaryKey: string);
     protected getQuery(isFindOne?: boolean, logger?: MongooseQueryLog): MongooseQuery<T>;
     protected passFieldsToQuery(query: MongooseQuery<T>, logger?: MongooseQueryLog): void;
