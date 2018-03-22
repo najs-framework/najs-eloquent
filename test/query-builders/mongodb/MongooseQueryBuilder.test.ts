@@ -11,6 +11,7 @@ import { model, Schema } from 'mongoose'
 import { NotFoundError } from '../../../lib/errors/NotFoundError'
 import { DummyDriver } from '../../../lib/drivers/DummyDriver'
 import { EloquentDriverProvider } from '../../../lib/facades/global/EloquentDriverProviderFacade'
+import { GenericQueryBuilder } from '../../../lib/query-builders/GenericQueryBuilder'
 import { ObjectId } from 'bson'
 
 const mongoose = require('mongoose')
@@ -63,6 +64,11 @@ register(Role)
 // ---------------------------------------------------------------------------------------------------------------------
 
 describe('MongooseQueryBuilder', function() {
+  it('extends GenericQueryBuilder', function() {
+    const query = new MongooseQueryBuilder('User')
+    expect(query).toBeInstanceOf(GenericQueryBuilder)
+  })
+
   describe('constructor()', function() {
     it('is created by modelName', function() {
       const query = new MongooseQueryBuilder('User')
@@ -86,7 +92,7 @@ describe('MongooseQueryBuilder', function() {
     })
   })
 
-  describe('protected getQuery()', function() {
+  describe('protected .getQuery()', function() {
     it('just build getQuery once', function() {
       const query = new MongooseQueryBuilder('User')
       query.limit(10)
@@ -108,7 +114,7 @@ describe('MongooseQueryBuilder', function() {
     })
   })
 
-  describe('Auto convert id to _id', function() {
+  describe('protected .getQueryConvention()', function() {
     it('converts id to _id if using .select()', function() {
       const query = new MongooseQueryBuilder('User')
       expect(query.select('id').toObject()).toEqual({
@@ -169,7 +175,7 @@ describe('MongooseQueryBuilder', function() {
     })
   })
 
-  describe('protected passDataToMongooseQuery()', function() {
+  describe('protected .passDataToMongooseQuery()', function() {
     it('never passes to mongooseQuery.select if .select() was not used', function() {
       const nativeQuery = UserModel.find()
       const selectSpy = Sinon.spy(nativeQuery, 'select')
@@ -251,7 +257,7 @@ describe('MongooseQueryBuilder', function() {
     })
   })
 
-  describe('native()', function() {
+  describe('.native()', function() {
     it('is chain-able', function() {
       const query = new MongooseQueryBuilder('User')
       expect(
@@ -279,7 +285,7 @@ describe('MongooseQueryBuilder', function() {
     })
   })
 
-  describe('toObject()', function() {
+  describe('.toObject()', function() {
     it('returns signature object of the query, conditions is translated to mongodb query', function() {
       const query = new MongooseQueryBuilder('User')
       query
@@ -334,7 +340,7 @@ describe('MongooseQueryBuilder', function() {
     })
   })
 
-  describe('Fetch Result Functions', function() {
+  describe('implements IFetchResultQuery', function() {
     jest.setTimeout(10000)
 
     const dataset = [
@@ -373,7 +379,7 @@ describe('MongooseQueryBuilder', function() {
       }
     }
 
-    describe('get()', function() {
+    describe('.get()', function() {
       it('gets all data of collection and return an instance of Collection<Eloquent<T>>', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.get()
@@ -428,7 +434,7 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
-    describe('all()', function() {
+    describe('.all()', function() {
       it('just an alias of .get()', async function() {
         const query = new MongooseQueryBuilder('User')
         const getSpy = Sinon.spy(query, 'get')
@@ -437,7 +443,7 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
-    describe('find()', function() {
+    describe('.find()', function() {
       it('finds first document of collection and return an instance of Eloquent<T>', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.find()
@@ -513,8 +519,8 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
-    describe('first()', function() {
-      it('just an alias of find', async function() {
+    describe('.first()', function() {
+      it('just an alias of .find()', async function() {
         const query = new MongooseQueryBuilder('User')
         const findSpy = Sinon.spy(query, 'find')
         await query.first()
@@ -522,7 +528,7 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
-    describe('findOrFail', function() {
+    describe('.findOrFail()', function() {
       it('calls find() and returns instance of Model if found', async function() {
         const query = new MongooseQueryBuilder('User')
         const findSpy = Sinon.spy(query, 'find')
@@ -548,8 +554,8 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
-    describe('firstOrFail()', function() {
-      it('just an alias of firstOrFail', async function() {
+    describe('.firstOrFail()', function() {
+      it('just an alias of .firstOrFail()', async function() {
         const query = new MongooseQueryBuilder('User')
         const firstOrFailSpy = Sinon.spy(query, 'firstOrFail')
         await query.firstOrFail()
@@ -557,7 +563,7 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
-    describe('pluck()', function() {
+    describe('.pluck()', function() {
       it('plucks all data of collection and returns an Object', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.pluck('first_name', '_id')
@@ -601,7 +607,7 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
-    describe('count()', function() {
+    describe('.count()', function() {
       it('counts all data of collection and returns a Number', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.count()
@@ -641,7 +647,7 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
-    describe('update()', function() {
+    describe('.update()', function() {
       it('can update data of collection, returns update result of mongoose', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.where('first_name', 'peter').update({ $set: { age: 19 } })
@@ -693,7 +699,7 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
-    describe('delete()', function() {
+    describe('.delete()', function() {
       it('can delete data of collection, returns delete result of mongoose', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.where('first_name', 'peter').delete()
@@ -757,7 +763,7 @@ describe('MongooseQueryBuilder', function() {
       })
     })
 
-    describe('restore()', function() {
+    describe('.restore()', function() {
       it('does nothing if Model do not support SoftDeletes', async function() {
         const query = new MongooseQueryBuilder('User')
         const result = await query.where('first_name', 'peter').restore()
