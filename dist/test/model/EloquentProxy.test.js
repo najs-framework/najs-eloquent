@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
+require("../../lib/providers/DriverManager");
 const Sinon = require("sinon");
 const najs_binding_1 = require("najs-binding");
 const DummyDriver_1 = require("../../lib/drivers/DummyDriver");
-const EloquentDriverProvider_1 = require("../../lib/drivers/EloquentDriverProvider");
+const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
 const Eloquent_1 = require("../../lib/model/Eloquent");
-EloquentDriverProvider_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
+EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
 describe('EloquentProxy', function () {
     describe('proxy:get', function () {
         class GetProxy extends Eloquent_1.Eloquent {

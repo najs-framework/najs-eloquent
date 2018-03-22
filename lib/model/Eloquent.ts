@@ -1,6 +1,6 @@
 import { IAutoload, make } from 'najs-binding'
 import { EloquentMetadata, EloquentTimestamps, EloquentSoftDelete } from './EloquentMetadata'
-import { EloquentDriverProvider } from '../drivers/EloquentDriverProvider'
+import { EloquentDriverProvider } from '../facades/global/EloquentDriverProviderFacade'
 import { IEloquentDriver } from '../drivers/interfaces/IEloquentDriver'
 import { EloquentProxy } from './EloquentProxy'
 import { pick } from 'lodash'

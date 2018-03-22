@@ -1,9 +1,10 @@
 import 'jest'
+import '../../lib/providers/DriverManager'
 import { camelCase } from 'lodash'
 import { register } from 'najs-binding'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { EloquentAttribute } from '../../lib/model/EloquentAttribute'
-import { EloquentDriverProvider } from '../../lib/drivers/EloquentDriverProvider'
+import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverProviderFacade'
 import { DummyDriver } from '../../lib/drivers/DummyDriver'
 
 EloquentDriverProvider.register(DummyDriver, 'dummy')

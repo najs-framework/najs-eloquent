@@ -1,10 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const najs_facade_1 = require("najs-facade");
+const constants_1 = require("../constants");
 const najs_binding_1 = require("najs-binding");
-class DefaultEloquentDriverProvider {
+class DriverManager extends najs_facade_1.Facade {
     constructor() {
+        super(...arguments);
         this.drivers = {};
         this.binding = {};
+    }
+    getClassName() {
+        return constants_1.NajsEloquentClass.DriverManager;
     }
     findDefaultDriver() {
         let first = '';
@@ -42,5 +48,6 @@ class DefaultEloquentDriverProvider {
         this.binding[model] = driver;
     }
 }
-DefaultEloquentDriverProvider.className = 'EloquentDriverProvider';
-exports.EloquentDriverProvider = new DefaultEloquentDriverProvider();
+DriverManager.className = constants_1.NajsEloquentClass.DriverManager;
+exports.DriverManager = DriverManager;
+najs_binding_1.register(DriverManager);

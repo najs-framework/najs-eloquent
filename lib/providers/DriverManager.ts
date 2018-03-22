@@ -1,10 +1,12 @@
+import { Facade } from 'najs-facade'
+import { NajsEloquentClass } from '../constants'
 import { IEloquentDriverProvider } from './interfaces/IEloquentDriverProvider'
-import { register, make, getClassName } from 'najs-binding'
+import { register, make, getClassName, IAutoload } from 'najs-binding'
 import { Eloquent } from '../model/Eloquent'
-import { IEloquentDriver } from './interfaces/IEloquentDriver'
+import { IEloquentDriver } from '../drivers/interfaces/IEloquentDriver'
 
-class DefaultEloquentDriverProvider implements IEloquentDriverProvider {
-  static className: string = 'EloquentDriverProvider'
+export class DriverManager extends Facade implements IEloquentDriverProvider, IAutoload {
+  static className: string = NajsEloquentClass.DriverManager
 
   protected drivers: {
     [key: string]: {
@@ -16,6 +18,10 @@ class DefaultEloquentDriverProvider implements IEloquentDriverProvider {
   protected binding: {
     [key: string]: string
   } = {}
+
+  getClassName() {
+    return NajsEloquentClass.DriverManager
+  }
 
   protected findDefaultDriver(): string {
     let first: string = ''
@@ -58,5 +64,4 @@ class DefaultEloquentDriverProvider implements IEloquentDriverProvider {
     this.binding[model] = driver
   }
 }
-
-export const EloquentDriverProvider: IEloquentDriverProvider = new DefaultEloquentDriverProvider()
+register(DriverManager)

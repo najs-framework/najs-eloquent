@@ -7,7 +7,7 @@ const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/Eloquen
 class FakeDriver {
 }
 FakeDriver.className = 'FakeDriver';
-describe('EloquentDriverProvider', function () {
+describe('DriverManager', function () {
     describe('.register()', function () {
         it('registers class to ClassRegistry by using najs-binding', function () {
             const registerSpy = Sinon.spy(NajsBinding, 'register');

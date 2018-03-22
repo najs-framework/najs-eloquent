@@ -1,2 +1,2 @@
 import 'jest';
-import '../../log/FlipFlopQueryLog.test';
+import '../../../lib/log/FlipFlopQueryLog';

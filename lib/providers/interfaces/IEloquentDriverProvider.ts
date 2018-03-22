@@ -1,5 +1,5 @@
 import { Eloquent } from '../../model/Eloquent'
-import { IEloquentDriver } from './IEloquentDriver'
+import { IEloquentDriver } from '../../drivers/interfaces/IEloquentDriver'
 
 export interface IEloquentDriverProvider {
   create<T extends Object = {}>(model: Eloquent<T>): IEloquentDriver<T>

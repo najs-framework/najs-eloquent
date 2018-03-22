@@ -1,13 +1,13 @@
 import 'jest'
 import * as Sinon from 'sinon'
 import * as NajsBinding from 'najs-binding'
-import { EloquentDriverProvider } from './../../lib/drivers/EloquentDriverProvider'
+import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverProviderFacade'
 
 class FakeDriver {
   static className = 'FakeDriver'
 }
 
-describe('EloquentDriverProvider', function() {
+describe('DriverManager', function() {
   describe('.register()', function() {
     it('registers class to ClassRegistry by using najs-binding', function() {
       const registerSpy = Sinon.spy(NajsBinding, 'register')

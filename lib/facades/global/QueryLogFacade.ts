@@ -1,3 +1,4 @@
+import '../../log/FlipFlopQueryLog'
 import { make } from 'najs-binding'
 import { Facade, IFacade } from 'najs-facade'
 import { NajsEloquent } from '../NajsEloquent'

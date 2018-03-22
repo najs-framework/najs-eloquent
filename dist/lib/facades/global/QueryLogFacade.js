@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+require("../../log/FlipFlopQueryLog");
 const najs_binding_1 = require("najs-binding");
 const najs_facade_1 = require("najs-facade");
 const NajsEloquent_1 = require("../NajsEloquent");

@@ -1,9 +1,10 @@
 import 'jest'
+import '../../lib/providers/DriverManager'
 import * as Sinon from 'sinon'
 import { register } from 'najs-binding'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { DummyDriver } from '../../lib/drivers/DummyDriver'
-import { EloquentDriverProvider } from '../../lib/drivers/EloquentDriverProvider'
+import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverProviderFacade'
 import { EloquentMetadata } from '../../lib/model/EloquentMetadata'
 
 EloquentDriverProvider.register(DummyDriver, 'dummy')

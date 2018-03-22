@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
 const EloquentMetadata_1 = require("./EloquentMetadata");
-const EloquentDriverProvider_1 = require("../drivers/EloquentDriverProvider");
+const EloquentDriverProviderFacade_1 = require("../facades/global/EloquentDriverProviderFacade");
 const EloquentProxy_1 = require("./EloquentProxy");
 const lodash_1 = require("lodash");
 const collect_js_1 = require("collect.js");
@@ -15,7 +15,7 @@ const collect_js_1 = require("collect.js");
  */
 class Eloquent {
     constructor(data) {
-        this.driver = EloquentDriverProvider_1.EloquentDriverProvider.create(this);
+        this.driver = EloquentDriverProviderFacade_1.EloquentDriverProvider.create(this);
         if (data !== 'do-not-initialize') {
             this.driver.initialize(data);
             this.attributes = this.driver.getRecord();

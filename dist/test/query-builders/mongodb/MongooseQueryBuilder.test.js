@@ -17,10 +17,10 @@ const najs_binding_1 = require("najs-binding");
 const mongoose_1 = require("mongoose");
 const NotFoundError_1 = require("../../../lib/errors/NotFoundError");
 const DummyDriver_1 = require("../../../lib/drivers/DummyDriver");
-const EloquentDriverProvider_1 = require("../../../lib/drivers/EloquentDriverProvider");
+const EloquentDriverProviderFacade_1 = require("../../../lib/facades/global/EloquentDriverProviderFacade");
 const bson_1 = require("bson");
 const mongoose = require('mongoose');
-EloquentDriverProvider_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
+EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
 let MongooseProvider = MongooseProvider_1 = class MongooseProvider {
     getClassName() {
         return MongooseProvider_1.className;

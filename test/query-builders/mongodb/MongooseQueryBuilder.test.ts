@@ -10,7 +10,7 @@ import { make, register } from 'najs-binding'
 import { model, Schema, Mongoose, Model, Document } from 'mongoose'
 import { NotFoundError } from '../../../lib/errors/NotFoundError'
 import { DummyDriver } from '../../../lib/drivers/DummyDriver'
-import { EloquentDriverProvider } from '../../../lib/drivers/EloquentDriverProvider'
+import { EloquentDriverProvider } from '../../../lib/facades/global/EloquentDriverProviderFacade'
 import { ObjectId } from 'bson'
 
 const mongoose = require('mongoose')

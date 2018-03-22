@@ -1,13 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
+require("../../lib/providers/DriverManager");
 const lodash_1 = require("lodash");
 const najs_binding_1 = require("najs-binding");
 const Eloquent_1 = require("../../lib/model/Eloquent");
 const EloquentAttribute_1 = require("../../lib/model/EloquentAttribute");
-const EloquentDriverProvider_1 = require("../../lib/drivers/EloquentDriverProvider");
+const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
 const DummyDriver_1 = require("../../lib/drivers/DummyDriver");
-EloquentDriverProvider_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
+EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
 class Model extends Eloquent_1.Eloquent {
     get accessor() {
         return '';

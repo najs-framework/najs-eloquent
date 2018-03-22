@@ -1,13 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
+require("../../lib/providers/DriverManager");
 const Sinon = require("sinon");
 const najs_binding_1 = require("najs-binding");
 const Eloquent_1 = require("../../lib/model/Eloquent");
 const DummyDriver_1 = require("../../lib/drivers/DummyDriver");
-const EloquentDriverProvider_1 = require("../../lib/drivers/EloquentDriverProvider");
+const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
 const EloquentMetadata_1 = require("../../lib/model/EloquentMetadata");
-EloquentDriverProvider_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
+EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
 class Model extends Eloquent_1.Eloquent {
     getClassName() {
         return 'Model';
@@ -21,7 +22,7 @@ function update_model_setting(property, value) {
 describe('Eloquent', function () {
     describe('constructor()', function () {
         it('always creates driver via EloquentDriverProvider.create()', function () {
-            const createSpy = Sinon.spy(EloquentDriverProvider_1.EloquentDriverProvider, 'create');
+            const createSpy = Sinon.spy(EloquentDriverProviderFacade_1.EloquentDriverProvider, 'create');
             new Model();
             expect(createSpy.called).toBe(true);
             expect(createSpy.lastCall.args[0]).toBeInstanceOf(Model);
@@ -47,7 +48,7 @@ describe('Eloquent', function () {
                 }
             };
             const initializeSpy = Sinon.spy(fakeDriver, 'initialize');
-            const createStub = Sinon.stub(EloquentDriverProvider_1.EloquentDriverProvider, 'create');
+            const createStub = Sinon.stub(EloquentDriverProviderFacade_1.EloquentDriverProvider, 'create');
             createStub.returns(fakeDriver);
             const model = new Model();
             expect(initializeSpy.calledWith()).toBe(true);
@@ -78,7 +79,7 @@ describe('Eloquent', function () {
                 }
             };
             const initializeSpy = Sinon.spy(fakeDriver, 'initialize');
-            const createStub = Sinon.stub(EloquentDriverProvider_1.EloquentDriverProvider, 'create');
+            const createStub = Sinon.stub(EloquentDriverProviderFacade_1.EloquentDriverProvider, 'create');
             createStub.returns(fakeDriver);
             const model = new Model('do-not-initialize');
             expect(initializeSpy.calledWith()).toBe(false);
