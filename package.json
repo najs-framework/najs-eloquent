@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.4",
+    "mongoose": "^5.0.11",
     "mongoose-timestamps-moment": "^1.0.0",
     "najs-facade": "^1.1.1",
     "pluralize": "^7.0.0"
@@ -60,7 +61,7 @@
     "coveralls": "^3.0.0",
     "jest": "^21.2.1",
     "moment": "^2.20.1",
-    "mongoose": "^5.0.6",
+    "mongoose": "^5.0.11",
     "najs-binding": "^1.4.0",
     "sinon": "^4.1.3",
     "ts-jest": "^21.2.3",

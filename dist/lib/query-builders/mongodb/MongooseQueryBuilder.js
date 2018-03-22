@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const MongooseProviderFacade_1 = require("../../facades/global/MongooseProviderFacade");
 const MongooseQueryLog_1 = require("./MongooseQueryLog");
 const GenericQueryBuilder_1 = require("../GenericQueryBuilder");
 const MongodbConditionConverter_1 = require("./MongodbConditionConverter");
@@ -11,14 +12,11 @@ class MongooseQueryBuilder extends GenericQueryBuilder_1.GenericQueryBuilder {
     constructor(modelName, softDelete, primaryKey = '_id') {
         super(softDelete);
         this.primaryKey = primaryKey;
-        const mongoose = this.getMongooseProvider().getMongooseInstance();
+        const mongoose = MongooseProviderFacade_1.MongooseProvider.getMongooseInstance();
         if (mongoose.modelNames().indexOf(modelName) === -1) {
             throw new Error('Model ' + modelName + ' Not Found');
         }
         this.mongooseModel = mongoose.model(modelName);
-    }
-    getMongooseProvider() {
-        return najs_binding_1.make('MongooseProvider');
     }
     getQuery(isFindOne = false, logger) {
         if (!this.hasMongooseQuery) {

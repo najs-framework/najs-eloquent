@@ -4,7 +4,6 @@ import { MongooseQuery } from './MongooseQueryBuilder';
 import { GenericQueryBuilder, QueryBuilderSoftDelete } from '../GenericQueryBuilder';
 import { IBasicQuery } from '../interfaces/IBasicQuery';
 import { IFetchResultQuery } from '../interfaces/IFetchResultQuery';
-import { IMongooseProvider } from '../interfaces/IMongooseProvider';
 import { Collection } from 'collect.js';
 import { Model, Document, DocumentQuery } from 'mongoose';
 export declare type MongooseQuery<T> = DocumentQuery<Document & T | null, Document & T> | DocumentQuery<(Document & T)[] | null, Document & T>;
@@ -17,7 +16,6 @@ export declare class MongooseQueryBuilder<T = {}> extends GenericQueryBuilder im
     constructor(modelName: string);
     constructor(modelName: string, softDelete: QueryBuilderSoftDelete);
     constructor(modelName: string, softDelete: QueryBuilderSoftDelete | undefined, primaryKey: string);
-    protected getMongooseProvider(): IMongooseProvider;
     protected getQuery(isFindOne?: boolean, logger?: MongooseQueryLog): MongooseQuery<T>;
     protected passFieldsToQuery(query: MongooseQuery<T>, logger?: MongooseQueryLog): void;
     protected passLimitToQuery(query: MongooseQuery<T>, logger?: MongooseQueryLog): void;

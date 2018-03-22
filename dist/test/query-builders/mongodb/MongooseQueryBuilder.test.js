@@ -1,13 +1,8 @@
 "use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 require("../../../lib/log/FlipFlopQueryLog");
+require("../../../lib/facades/global/MongooseProviderFacade");
 const Sinon = require("sinon");
 const Eloquent_1 = require("../../../lib/model/Eloquent");
 const MongooseQueryBuilder_1 = require("../../../lib/query-builders/mongodb/MongooseQueryBuilder");
@@ -21,21 +16,6 @@ const EloquentDriverProviderFacade_1 = require("../../../lib/facades/global/Eloq
 const bson_1 = require("bson");
 const mongoose = require('mongoose');
 EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
-let MongooseProvider = MongooseProvider_1 = class MongooseProvider {
-    getClassName() {
-        return MongooseProvider_1.className;
-    }
-    getMongooseInstance() {
-        return mongoose;
-    }
-    createModelFromSchema(modelName, schema) {
-        return mongoose_1.model(modelName, schema);
-    }
-};
-MongooseProvider.className = 'MongooseProvider';
-MongooseProvider = MongooseProvider_1 = __decorate([
-    najs_binding_1.register()
-], MongooseProvider);
 const UserSchema = new mongoose_1.Schema({
     first_name: { type: String },
     last_name: { type: String },
@@ -65,11 +45,6 @@ class Role extends Eloquent_1.Eloquent {
 najs_binding_1.register(Role);
 // ---------------------------------------------------------------------------------------------------------------------
 describe('MongooseQueryBuilder', function () {
-    describe('pre-configuration', function () {
-        it('must register MongooseProvider before using MongooseQueryBuilder', function () {
-            expect(najs_binding_1.make(MongooseProvider.className).getMongooseInstance()).toBeInstanceOf(mongoose_1.Mongoose);
-        });
-    });
     describe('constructor()', function () {
         it('is created by modelName', function () {
             const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
@@ -89,12 +64,6 @@ describe('MongooseQueryBuilder', function () {
                 return;
             }
             expect('it').toEqual('should throw exception');
-        });
-    });
-    describe('protected getMongooseProvider()', function () {
-        it('uses make("MongooseProvider") to get an instance of mongoose', function () {
-            const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
-            expect(query['getMongooseProvider']().getMongooseInstance() === mongoose).toBe(true);
         });
     });
     describe('protected getQuery()', function () {
@@ -732,4 +701,3 @@ describe('MongooseQueryBuilder', function () {
         });
     });
 });
-var MongooseProvider_1;

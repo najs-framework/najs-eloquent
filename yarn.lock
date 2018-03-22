@@ -1859,7 +1859,7 @@ mongoose-timestamps-moment@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/mongoose-timestamps-moment/-/mongoose-timestamps-moment-1.0.0.tgz#c25a5b251337ae4f5ceeca17888899ab243a2370"
 
-mongoose@^5.0.6:
+mongoose@^5.0.11:
   version "5.0.11"
   resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-5.0.11.tgz#bb31a98591cd2377312ded28155281110a9e1da0"
   dependencies:

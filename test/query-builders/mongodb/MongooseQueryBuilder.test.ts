@@ -1,13 +1,13 @@
 import 'jest'
 import '../../../lib/log/FlipFlopQueryLog'
+import '../../../lib/facades/global/MongooseProviderFacade'
 import * as Sinon from 'sinon'
 import { Eloquent } from '../../../lib/model/Eloquent'
-import { IMongooseProvider } from '../../../lib/query-builders/interfaces/IMongooseProvider'
 import { MongooseQueryBuilder } from '../../../lib/query-builders/mongodb/MongooseQueryBuilder'
 import { SoftDelete } from '../../../lib/v0.x/eloquent/mongoose/SoftDelete'
 import { init_mongoose, delete_collection } from '../../util'
-import { make, register } from 'najs-binding'
-import { model, Schema, Mongoose, Model, Document } from 'mongoose'
+import { register } from 'najs-binding'
+import { model, Schema } from 'mongoose'
 import { NotFoundError } from '../../../lib/errors/NotFoundError'
 import { DummyDriver } from '../../../lib/drivers/DummyDriver'
 import { EloquentDriverProvider } from '../../../lib/facades/global/EloquentDriverProviderFacade'
@@ -16,23 +16,6 @@ import { ObjectId } from 'bson'
 const mongoose = require('mongoose')
 
 EloquentDriverProvider.register(DummyDriver, 'dummy')
-
-@register()
-class MongooseProvider implements IMongooseProvider {
-  static className: string = 'MongooseProvider'
-
-  getClassName() {
-    return MongooseProvider.className
-  }
-
-  getMongooseInstance() {
-    return mongoose
-  }
-
-  createModelFromSchema<T extends Document>(modelName: string, schema: Schema): Model<T> {
-    return model<T>(modelName, schema)
-  }
-}
 
 const UserSchema: Schema = new Schema(
   {
@@ -80,12 +63,6 @@ register(Role)
 // ---------------------------------------------------------------------------------------------------------------------
 
 describe('MongooseQueryBuilder', function() {
-  describe('pre-configuration', function() {
-    it('must register MongooseProvider before using MongooseQueryBuilder', function() {
-      expect(make<IMongooseProvider>(MongooseProvider.className).getMongooseInstance()).toBeInstanceOf(Mongoose)
-    })
-  })
-
   describe('constructor()', function() {
     it('is created by modelName', function() {
       const query = new MongooseQueryBuilder('User')
@@ -106,13 +83,6 @@ describe('MongooseQueryBuilder', function() {
         return
       }
       expect('it').toEqual('should throw exception')
-    })
-  })
-
-  describe('protected getMongooseProvider()', function() {
-    it('uses make("MongooseProvider") to get an instance of mongoose', function() {
-      const query = new MongooseQueryBuilder('User')
-      expect(query['getMongooseProvider']().getMongooseInstance() === mongoose).toBe(true)
     })
   })
 

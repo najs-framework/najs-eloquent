@@ -1,3 +1,4 @@
+import { MongooseProvider } from '../../facades/global/MongooseProviderFacade'
 import { IQueryConvention } from '../interfaces/IQueryConvention'
 import { MongooseQueryLog } from './MongooseQueryLog'
 import { MongooseQuery } from './MongooseQueryBuilder'
@@ -5,7 +6,6 @@ import { GenericQueryBuilder, QueryBuilderSoftDelete } from '../GenericQueryBuil
 import { MongodbConditionConverter } from './MongodbConditionConverter'
 import { IBasicQuery } from '../interfaces/IBasicQuery'
 import { IFetchResultQuery } from '../interfaces/IFetchResultQuery'
-import { IMongooseProvider } from '../interfaces/IMongooseProvider'
 import { Eloquent } from '../../model/Eloquent'
 import { make } from 'najs-binding'
 import { isEmpty } from 'lodash'
@@ -31,16 +31,12 @@ export class MongooseQueryBuilder<T = {}> extends GenericQueryBuilder
   constructor(modelName: string, softDelete?: QueryBuilderSoftDelete, primaryKey: string = '_id') {
     super(softDelete)
     this.primaryKey = primaryKey
-    const mongoose: Mongoose = this.getMongooseProvider().getMongooseInstance()
+    const mongoose: Mongoose = MongooseProvider.getMongooseInstance()
     if (mongoose.modelNames().indexOf(modelName) === -1) {
       throw new Error('Model ' + modelName + ' Not Found')
     }
 
     this.mongooseModel = mongoose.model(modelName)
-  }
-
-  protected getMongooseProvider(): IMongooseProvider {
-    return make<IMongooseProvider>('MongooseProvider')
   }
 
   protected getQuery(isFindOne: boolean = false, logger?: MongooseQueryLog): MongooseQuery<T> {

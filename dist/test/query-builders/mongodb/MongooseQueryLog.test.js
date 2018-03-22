@@ -2,24 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 require("../../../lib/log/FlipFlopQueryLog");
+const MongooseProviderFacade_1 = require("../../../lib/facades/global/MongooseProviderFacade");
 const QueryLogFacade_1 = require("../../../lib/facades/global/QueryLogFacade");
 const MongooseQueryBuilder_1 = require("../../../lib/query-builders/mongodb/MongooseQueryBuilder");
-const najs_binding_1 = require("najs-binding");
 const mongoose_1 = require("mongoose");
-const mongoose = require('mongoose');
-class MongooseProvider {
-    getClassName() {
-        return MongooseProvider.className;
-    }
-    getMongooseInstance() {
-        return mongoose;
-    }
-    createModelFromSchema(modelName, schema) {
-        return mongoose_1.model(modelName, schema);
-    }
-}
-MongooseProvider.className = 'MongooseProvider';
-najs_binding_1.register(MongooseProvider);
 const UserSchema = new mongoose_1.Schema({
     first_name: { type: String },
     last_name: { type: String },
@@ -27,7 +13,7 @@ const UserSchema = new mongoose_1.Schema({
 }, {
     collection: 'users'
 });
-mongoose_1.model('User', UserSchema);
+MongooseProviderFacade_1.MongooseProvider.createModelFromSchema('User', UserSchema);
 describe('MongooseQueryLog', function () {
     beforeEach(function () {
         QueryLogFacade_1.QueryLog.clear().enable();

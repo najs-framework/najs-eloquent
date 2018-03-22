@@ -1,29 +1,9 @@
 import 'jest'
 import '../../../lib/log/FlipFlopQueryLog'
+import { MongooseProvider } from '../../../lib/facades/global/MongooseProviderFacade'
 import { QueryLog } from '../../../lib/facades/global/QueryLogFacade'
 import { MongooseQueryBuilder } from '../../../lib/query-builders/mongodb/MongooseQueryBuilder'
-import { register } from 'najs-binding'
-import { IMongooseProvider } from '../../../lib/query-builders/interfaces/IMongooseProvider'
-import { model, Schema, Model, Document } from 'mongoose'
-
-const mongoose = require('mongoose')
-
-class MongooseProvider implements IMongooseProvider {
-  static className: string = 'MongooseProvider'
-
-  getClassName() {
-    return MongooseProvider.className
-  }
-
-  getMongooseInstance() {
-    return mongoose
-  }
-
-  createModelFromSchema<T extends Document>(modelName: string, schema: Schema): Model<T> {
-    return model<T>(modelName, schema)
-  }
-}
-register(MongooseProvider)
+import { Schema } from 'mongoose'
 
 const UserSchema: Schema = new Schema(
   {
@@ -35,7 +15,7 @@ const UserSchema: Schema = new Schema(
     collection: 'users'
   }
 )
-model('User', UserSchema)
+MongooseProvider.createModelFromSchema('User', UserSchema)
 
 describe('MongooseQueryLog', function() {
   beforeEach(function() {
