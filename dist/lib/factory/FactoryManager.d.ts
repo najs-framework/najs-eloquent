@@ -1,11 +1,13 @@
+import { Facade } from 'najs-facade';
 import { IAutoload } from 'najs-binding';
 import { IFactoryBuilder } from './interfaces/IFactoryBuilder';
 import { IFactoryManager, FactoryDefinition } from './interfaces/IFactoryManager';
 export declare type ChanceFaker = Chance.Chance;
-export declare class FactoryManager implements IAutoload, IFactoryManager<ChanceFaker> {
+export declare class FactoryManager extends Facade implements IAutoload, IFactoryManager<ChanceFaker> {
+    static className: string;
     protected faker: ChanceFaker;
-    protected definitions: {};
-    protected states: {};
+    protected definitions: Object;
+    protected states: Object;
     constructor();
     getClassName(): string;
     define(className: string, definition: FactoryDefinition<ChanceFaker>, name?: string): this;

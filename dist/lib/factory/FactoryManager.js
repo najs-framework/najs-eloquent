@@ -1,17 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const najs_facade_1 = require("najs-facade");
 const FactoryBuilder_1 = require("./FactoryBuilder");
 const najs_binding_1 = require("najs-binding");
 const chance_1 = require("chance");
 const constants_1 = require("../constants");
-class FactoryManager {
+class FactoryManager extends najs_facade_1.Facade {
     constructor() {
+        super();
+        this.faker = new chance_1.Chance();
         this.definitions = {};
         this.states = {};
-        this.faker = new chance_1.Chance();
     }
     getClassName() {
-        return constants_1.NajsEloquentClass.MongooseProvider;
+        return constants_1.NajsEloquentClass.FactoryManager;
     }
     define(className, definition, name = 'default') {
         if (!this.definitions[className]) {
@@ -53,5 +55,6 @@ class FactoryManager {
         return this.of(className, name).raw(attributes);
     }
 }
+FactoryManager.className = constants_1.NajsEloquentClass.FactoryManager;
 exports.FactoryManager = FactoryManager;
 najs_binding_1.register(FactoryManager);

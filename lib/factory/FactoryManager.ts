@@ -1,3 +1,4 @@
+import { Facade } from 'najs-facade'
 import { FactoryBuilder } from './FactoryBuilder'
 import { register, IAutoload } from 'najs-binding'
 import { Chance } from 'chance'
@@ -7,17 +8,22 @@ import { IFactoryManager, FactoryDefinition } from './interfaces/IFactoryManager
 
 export type ChanceFaker = Chance.Chance
 
-export class FactoryManager implements IAutoload, IFactoryManager<ChanceFaker> {
+export class FactoryManager extends Facade implements IAutoload, IFactoryManager<ChanceFaker> {
+  static className: string = NajsEloquentClass.FactoryManager
+
   protected faker: ChanceFaker
-  protected definitions = {}
-  protected states = {}
+  protected definitions: Object
+  protected states: Object
 
   constructor() {
+    super()
     this.faker = new Chance()
+    this.definitions = {}
+    this.states = {}
   }
 
   getClassName() {
-    return NajsEloquentClass.MongooseProvider
+    return NajsEloquentClass.FactoryManager
   }
 
   define(className: string, definition: FactoryDefinition<ChanceFaker>, name: string = 'default'): this {
