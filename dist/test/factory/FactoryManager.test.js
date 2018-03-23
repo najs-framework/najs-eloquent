@@ -85,14 +85,14 @@ describe('FactoryManager', function () {
             expect(firstInstance['className']).toEqual('Class');
             expect(firstInstance['name']).toEqual('default');
             expect(firstInstance['definitions'] === factoryManager['definitions']).toBe(true);
-            expect(firstInstance['states'] === factoryManager['states']).toBe(true);
+            expect(firstInstance['definedStates'] === factoryManager['states']).toBe(true);
             expect(firstInstance['faker'] === factoryManager['faker']).toBe(true);
             const secondInstance = factoryManager.of('Class', 'test');
             expect(secondInstance).toBeInstanceOf(FactoryBuilder_1.FactoryBuilder);
             expect(secondInstance['className']).toEqual('Class');
             expect(secondInstance['name']).toEqual('test');
             expect(secondInstance['definitions'] === factoryManager['definitions']).toBe(true);
-            expect(secondInstance['states'] === factoryManager['states']).toBe(true);
+            expect(secondInstance['definedStates'] === factoryManager['states']).toBe(true);
             expect(secondInstance['faker'] === factoryManager['faker']).toBe(true);
         });
     });
