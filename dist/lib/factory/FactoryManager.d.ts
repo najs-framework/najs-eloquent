@@ -1,9 +1,16 @@
-import { IFactoryBuilder } from './IFactoryBuilder';
-export declare type FactoryDefinition<Faker> = (this: IFactoryManager<Faker>, faker: Faker) => Object;
-export interface IFactoryManager<Faker> {
-    define(className: string, definition: FactoryDefinition<Faker>): this;
-    defineAs(className: string, name: string, definition: FactoryDefinition<Faker>): this;
-    state(className: string, state: string, definition: FactoryDefinition<Faker>): this;
+import { IAutoload } from 'najs-binding';
+import { IFactoryBuilder } from './interfaces/IFactoryBuilder';
+import { IFactoryManager, FactoryDefinition } from './interfaces/IFactoryManager';
+export declare type ChanceFaker = Chance.Chance;
+export declare class FactoryManager implements IAutoload, IFactoryManager<ChanceFaker> {
+    protected faker: ChanceFaker;
+    protected definitions: {};
+    protected states: {};
+    constructor();
+    getClassName(): string;
+    define(className: string, definition: FactoryDefinition<ChanceFaker>, name?: string): this;
+    defineAs(className: string, name: string, definition: FactoryDefinition<ChanceFaker>): this;
+    state(className: string, state: string, definition: FactoryDefinition<ChanceFaker>): this;
     of(className: string): IFactoryBuilder;
     of(className: string, name: string): IFactoryBuilder;
     create<T = any>(className: string): Promise<T>;
