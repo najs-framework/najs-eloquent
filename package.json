@@ -1,6 +1,6 @@
 {
   "name": "najs-eloquent",
-  "version": "0.2.17",
+  "version": "0.2.18",
   "scripts": {
     "build": "npm run build-ts && npm run tslint",
     "build-ts": "tsc -d && ./script/copy-custom-definitions.js",
@@ -44,6 +44,7 @@
     "najs-binding": "^1.4.0"
   },
   "dependencies": {
+    "chance": "^1.0.13",
     "lodash": "^4.17.4",
     "mongoose": "^5.0.11",
     "mongoose-timestamps-moment": "^1.0.0",
@@ -51,6 +52,7 @@
     "pluralize": "^7.0.0"
   },
   "devDependencies": {
+    "@types/chance": "^1.0.0",
     "@types/jest": "^21.1.8",
     "@types/lodash": "^4.14.91",
     "@types/moment": "^2.13.0",
