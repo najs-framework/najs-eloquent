@@ -1,6 +1,6 @@
 import { IFactoryBuilder } from './IFactoryBuilder'
 
-export type FactoryDefinition<Faker> = (this: IFactoryManager<Faker>, faker: Faker) => Object
+export type FactoryDefinition<Faker> = (faker: Faker, attributes?: Object) => Object
 
 export interface IFactoryManager<Faker> {
   define(className: string, definition: FactoryDefinition<Faker>): this

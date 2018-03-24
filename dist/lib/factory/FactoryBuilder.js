@@ -50,7 +50,45 @@ class FactoryBuilder {
         }
         return collect_js_1.default(lodash_1.range(0, this.amount).map((item) => this.getRawAttributes(attributes)));
     }
-    makeInstance(attribute) { }
-    getRawAttributes(attribute) { }
+    makeInstance(attributes) {
+        // The false value is isGuarded
+        return najs_binding_1.make(this.className, [this.getRawAttributes(attributes), false]);
+    }
+    getRawAttributes(attributes) {
+        if (!this.definitions[this.className] || !lodash_1.isFunction(this.definitions[this.className][this.name])) {
+            throw new ReferenceError(`Unable to locate factory with name [${this.name}] [${this.className}].`);
+        }
+        const definition = Reflect.apply(this.definitions[this.className][this.name], undefined, [
+            this.faker,
+            attributes
+        ]);
+        return this.triggerReferenceAttributes(Object.assign(this.applyStates(definition, attributes), attributes));
+    }
+    applyStates(definition, attributes) {
+        if (typeof this.activeStates === 'undefined') {
+            return definition;
+        }
+        for (const state of this.activeStates) {
+            if (!this.definedStates[this.className] || !lodash_1.isFunction(this.definedStates[this.className][state])) {
+                throw new ReferenceError(`Unable to locate [${state}] state for [${this.className}].`);
+            }
+            Object.assign(definition, Reflect.apply(this.definedStates[this.className][state], undefined, [this.faker, attributes]));
+        }
+        return definition;
+    }
+    triggerReferenceAttributes(attributes) {
+        for (const name in attributes) {
+            if (lodash_1.isFunction(attributes[name])) {
+                attributes[name] = attributes[name].call(undefined, attributes);
+            }
+            if (attributes[name] instanceof Eloquent_1.Eloquent) {
+                attributes[name] = attributes[name].getId();
+            }
+            if (lodash_1.isPlainObject(attributes[name])) {
+                this.triggerReferenceAttributes(attributes[name]);
+            }
+        }
+        return attributes;
+    }
 }
 exports.FactoryBuilder = FactoryBuilder;

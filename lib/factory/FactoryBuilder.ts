@@ -1,10 +1,11 @@
 import { make } from 'najs-binding'
-import { range, flatten } from 'lodash'
+import { range, flatten, isFunction, isPlainObject } from 'lodash'
 import collect from 'collect.js'
 import { ChanceFaker } from './FactoryManager'
 import { Eloquent } from '../model/Eloquent'
+import { IFactoryBuilder } from './interfaces/IFactoryBuilder'
 
-export class FactoryBuilder {
+export class FactoryBuilder implements IFactoryBuilder {
   protected className: string
   protected name: string
   protected definitions: Object
@@ -83,7 +84,55 @@ export class FactoryBuilder {
     return collect(range(0, this.amount).map((item: any) => this.getRawAttributes(attributes)))
   }
 
-  protected makeInstance(attribute?: Object): any {}
+  protected makeInstance(attributes?: Object): any {
+    // The false value is isGuarded
+    return make(this.className, [this.getRawAttributes(attributes), false])
+  }
 
-  protected getRawAttributes(attribute?: Object): any {}
+  protected getRawAttributes(attributes?: Object): any {
+    if (!this.definitions[this.className] || !isFunction(this.definitions[this.className][this.name])) {
+      throw new ReferenceError(`Unable to locate factory with name [${this.name}] [${this.className}].`)
+    }
+
+    const definition: Object = Reflect.apply(this.definitions[this.className][this.name], undefined, [
+      this.faker,
+      attributes
+    ])
+    return this.triggerReferenceAttributes(Object.assign(this.applyStates(definition, attributes), attributes))
+  }
+
+  protected applyStates(definition: Object, attributes?: Object): Object {
+    if (typeof this.activeStates === 'undefined') {
+      return definition
+    }
+
+    for (const state of this.activeStates) {
+      if (!this.definedStates[this.className] || !isFunction(this.definedStates[this.className][state])) {
+        throw new ReferenceError(`Unable to locate [${state}] state for [${this.className}].`)
+      }
+
+      Object.assign(
+        definition,
+        Reflect.apply(this.definedStates[this.className][state], undefined, [this.faker, attributes])
+      )
+    }
+    return definition
+  }
+
+  protected triggerReferenceAttributes(attributes: Object): Object {
+    for (const name in attributes) {
+      if (isFunction(attributes[name])) {
+        attributes[name] = attributes[name].call(undefined, attributes)
+      }
+
+      if (attributes[name] instanceof Eloquent) {
+        attributes[name] = attributes[name].getId()
+      }
+
+      if (isPlainObject(attributes[name])) {
+        this.triggerReferenceAttributes(attributes[name])
+      }
+    }
+    return attributes
+  }
 }

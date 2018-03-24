@@ -26,10 +26,14 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
     return NajsEloquentClass.FactoryManager
   }
 
-  define(className: string, definition: FactoryDefinition<ChanceFaker>, name: string = 'default'): this {
-    if (!this.definitions[className]) {
-      this.definitions[className] = {}
+  private initBagIfNeeded(name: string, className: string) {
+    if (!this[name][className]) {
+      this[name][className] = {}
     }
+  }
+
+  define(className: string, definition: FactoryDefinition<ChanceFaker>, name: string = 'default'): this {
+    this.initBagIfNeeded('definitions', className)
     this.definitions[className][name] = definition
     return this
   }
@@ -39,9 +43,7 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
   }
 
   state(className: string, state: string, definition: FactoryDefinition<ChanceFaker>): this {
-    if (!this.states[className]) {
-      this.states[className] = {}
-    }
+    this.initBagIfNeeded('states', className)
     this.states[className][state] = definition
     return this
   }
@@ -49,44 +51,31 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
   of(className: string): IFactoryBuilder
   of(className: string, name: string): IFactoryBuilder
   of(className: string, name: string = 'default'): IFactoryBuilder {
-    // TODO: remove any in here
-    return <any>new FactoryBuilder(className, name, this.definitions, this.states, this.faker)
+    return new FactoryBuilder(className, name, this.definitions, this.states, this.faker)
   }
 
-  create<T = any>(className: string): Promise<T>
-  create<T = any>(className: string, attributes: Object): Promise<T>
-  create<T = any>(className: string, attributes?: Object): Promise<T> {
+  create(className: string, attributes?: any): any {
     return this.of(className).create(<any>attributes)
   }
 
-  createAs<T = any>(className: string, name: string): Promise<T>
-  createAs<T = any>(className: string, name: string, attributes: Object): Promise<T>
-  createAs<T = any>(className: string, name: string, attributes?: Object): Promise<T> {
+  createAs(className: string, name: string, attributes?: any): any {
     return this.of(className, name).create(<any>attributes)
   }
 
-  make<T = any>(className: string): T
-  make<T = any>(className: string, attributes: Object): T
-  make<T = any>(className: string, attributes?: Object): T {
+  make(className: string, attributes?: Object): any {
     return this.of(className).make(<any>attributes)
   }
 
-  makeAs<T = any>(className: string, name: string): T
-  makeAs<T = any>(className: string, name: string, attributes: Object): T
-  makeAs<T = any>(className: string, name: string, attributes?: Object): T {
-    return this.of(className, name).make(<any>attributes)
+  makeAs(className: string, name: string, attributes?: any): any {
+    return this.of(className, name).make(attributes)
   }
 
-  raw<T = any>(className: string): T
-  raw<T = any>(className: string, attributes: Object): T
-  raw<T = any>(className: string, attributes?: Object): T {
-    return this.of(className).raw(<any>attributes)
+  raw(className: string, attributes?: any): any {
+    return this.of(className).raw(attributes)
   }
 
-  rawOf<T = any>(className: string, name: string): T
-  rawOf<T = any>(className: string, name: string, attributes: Object): T
-  rawOf<T = any>(className: string, name: string, attributes?: Object): T {
-    return this.of(className, name).raw(<any>attributes)
+  rawOf(className: string, name: string, attributes?: any): any {
+    return this.of(className, name).raw(attributes)
   }
 }
 register(FactoryManager)

@@ -1,5 +1,6 @@
 import { ChanceFaker } from './FactoryManager';
-export declare class FactoryBuilder {
+import { IFactoryBuilder } from './interfaces/IFactoryBuilder';
+export declare class FactoryBuilder implements IFactoryBuilder {
     protected className: string;
     protected name: string;
     protected definitions: Object;
@@ -19,6 +20,8 @@ export declare class FactoryBuilder {
     make<T = any>(attributes: Object): T;
     raw<T = any>(): T;
     raw<T = any>(attributes: Object): T;
-    protected makeInstance(attribute?: Object): any;
-    protected getRawAttributes(attribute?: Object): any;
+    protected makeInstance(attributes?: Object): any;
+    protected getRawAttributes(attributes?: Object): any;
+    protected applyStates(definition: Object, attributes?: Object): Object;
+    protected triggerReferenceAttributes(attributes: Object): Object;
 }

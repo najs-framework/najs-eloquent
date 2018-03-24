@@ -10,21 +10,16 @@ export declare class FactoryManager extends Facade implements IAutoload, IFactor
     protected states: Object;
     constructor();
     getClassName(): string;
+    private initBagIfNeeded(name, className);
     define(className: string, definition: FactoryDefinition<ChanceFaker>, name?: string): this;
     defineAs(className: string, name: string, definition: FactoryDefinition<ChanceFaker>): this;
     state(className: string, state: string, definition: FactoryDefinition<ChanceFaker>): this;
     of(className: string): IFactoryBuilder;
     of(className: string, name: string): IFactoryBuilder;
-    create<T = any>(className: string): Promise<T>;
-    create<T = any>(className: string, attributes: Object): Promise<T>;
-    createAs<T = any>(className: string, name: string): Promise<T>;
-    createAs<T = any>(className: string, name: string, attributes: Object): Promise<T>;
-    make<T = any>(className: string): T;
-    make<T = any>(className: string, attributes: Object): T;
-    makeAs<T = any>(className: string, name: string): T;
-    makeAs<T = any>(className: string, name: string, attributes: Object): T;
-    raw<T = any>(className: string): T;
-    raw<T = any>(className: string, attributes: Object): T;
-    rawOf<T = any>(className: string, name: string): T;
-    rawOf<T = any>(className: string, name: string, attributes: Object): T;
+    create(className: string, attributes?: any): any;
+    createAs(className: string, name: string, attributes?: any): any;
+    make(className: string, attributes?: Object): any;
+    makeAs(className: string, name: string, attributes?: any): any;
+    raw(className: string, attributes?: any): any;
+    rawOf(className: string, name: string, attributes?: any): any;
 }

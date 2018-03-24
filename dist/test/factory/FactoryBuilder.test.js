@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const Sinon = require("sinon");
+const NajsBinding = require("najs-binding");
 const collect_js_1 = require("collect.js");
-const najs_binding_1 = require("najs-binding");
 const FactoryBuilder_1 = require("../../lib/factory/FactoryBuilder");
 const DummyDriver_1 = require("../../lib/drivers/DummyDriver");
 const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
@@ -14,7 +14,7 @@ class Model extends Eloquent_1.Eloquent {
         return 'Model';
     }
 }
-najs_binding_1.register(Model);
+NajsBinding.register(Model);
 describe('FactoryBuilder', function () {
     describe('constructor()', function () {
         it('simply creates new instance and assign parameters to member variables', function () {
@@ -150,15 +150,204 @@ describe('FactoryBuilder', function () {
         });
     });
     describe('protected .makeInstance()', function () {
-        it('does something', function () {
+        it('calls .make() to create instance of model with 2 params, 1st from .getRawAttribute(), 2nd is isGuarded always = false', function () {
             const builder = new FactoryBuilder_1.FactoryBuilder('Model', 'name', {}, {}, {});
-            builder['makeInstance']();
+            const makeSpy = Sinon.spy(NajsBinding, 'make');
+            const getRawAttributesStub = Sinon.stub(builder, 'getRawAttributes');
+            getRawAttributesStub.returns('anything');
+            const firstInstance = builder['makeInstance']();
+            expect(firstInstance).toBeInstanceOf(Eloquent_1.Eloquent);
+            expect(firstInstance).toBeInstanceOf(Model);
+            expect(getRawAttributesStub.calledWith()).toBe(true);
+            expect(makeSpy.calledWith('Model', ['anything', false])).toBe(true);
+            const attributes = {};
+            const secondInstance = builder['makeInstance'](attributes);
+            expect(secondInstance).toBeInstanceOf(Eloquent_1.Eloquent);
+            expect(secondInstance).toBeInstanceOf(Model);
+            expect(getRawAttributesStub.calledWith(attributes)).toBe(true);
+            expect(makeSpy.calledWith('Model', ['anything', false])).toBe(true);
+            makeSpy.restore();
         });
     });
     describe('protected .getRawAttributes()', function () {
-        it('does something', function () {
+        it('throws an exception if definition not defined in "definitions"', function () {
             const builder = new FactoryBuilder_1.FactoryBuilder('Model', 'name', {}, {}, {});
-            builder['getRawAttributes']();
+            try {
+                builder['getRawAttributes']({});
+            }
+            catch (error) {
+                expect(error).toBeInstanceOf(ReferenceError);
+                expect(error.message).toEqual('Unable to locate factory with name [name] [Model].');
+                return;
+            }
+            expect('should not reach here').toEqual('hmm');
+        });
+        it('throws an exception if definition is not a function', function () {
+            const builder = new FactoryBuilder_1.FactoryBuilder('Model', 'name', {
+                Model: {
+                    name: 'invalid'
+                }
+            }, {}, {});
+            try {
+                builder['getRawAttributes']({});
+            }
+            catch (error) {
+                expect(error).toBeInstanceOf(ReferenceError);
+                expect(error.message).toEqual('Unable to locate factory with name [name] [Model].');
+                return;
+            }
+            expect('should not reach here').toEqual('hmm');
+        });
+        it('calls definition to get definition value, then call .applyStates() and .triggerReferenceAttributes()', function () {
+            const builder = new FactoryBuilder_1.FactoryBuilder('Model', 'name', {
+                Model: {
+                    name: function (faker, attributes) {
+                        return {
+                            a: 1,
+                            b: 2
+                        };
+                    }
+                }
+            }, {}, {});
+            const applyStatesSpy = Sinon.spy(builder, 'applyStates');
+            const triggerReferenceAttributesSpy = Sinon.spy(builder, 'triggerReferenceAttributes');
+            const result = builder['getRawAttributes']();
+            expect(result).toEqual({ a: 1, b: 2 });
+            expect(applyStatesSpy.called).toBe(true);
+            expect(triggerReferenceAttributesSpy.called).toBe(true);
+        });
+    });
+    describe('protected .applyStates()', function () {
+        it('returns definition if there is no "activeStates"', function () {
+            const builder = new FactoryBuilder_1.FactoryBuilder('Model', 'name', {}, {}, {});
+            const definition = {};
+            expect(builder['applyStates'](definition, {}) === definition).toBe(true);
+        });
+        it('loops all activeState and throw an exception if not defined in "definedState"', function () {
+            const builder = new FactoryBuilder_1.FactoryBuilder('Model', 'name', {}, {}, {});
+            try {
+                builder.states('test')['applyStates']({}, {});
+            }
+            catch (error) {
+                expect(error).toBeInstanceOf(ReferenceError);
+                expect(error.message).toEqual('Unable to locate [test] state for [Model].');
+                return;
+            }
+            expect('should not reach here').toEqual('hmm');
+        });
+        it('loops all "activeState" and throw an exception if stateDefinition is not a function', function () {
+            const builder = new FactoryBuilder_1.FactoryBuilder('Model', 'name', {}, {
+                Model: {
+                    test: 'wrong type'
+                }
+            }, {});
+            try {
+                builder.states('test')['applyStates']({}, {});
+            }
+            catch (error) {
+                expect(error).toBeInstanceOf(ReferenceError);
+                expect(error.message).toEqual('Unable to locate [test] state for [Model].');
+                return;
+            }
+            expect('should not reach here').toEqual('hmm');
+        });
+        it('loops all "activeState" and call state definition, then merge the result to definition', function () {
+            const builder = new FactoryBuilder_1.FactoryBuilder('Model', 'name', {}, {
+                Model: {
+                    test: function (faker, attributes) {
+                        return {
+                            a: 1,
+                            b: 2,
+                            c: attributes['c']
+                        };
+                    }
+                }
+            }, {});
+            const definition = { a: 10 };
+            builder.states('test');
+            expect(builder['applyStates'](definition, { c: 'test' }) === definition).toBe(true);
+            expect(definition).toEqual({ a: 1, b: 2, c: 'test' });
+        });
+    });
+    describe('protected .triggerReferenceAttributes()', function () {
+        it('calls a function and reassign value if the property of attribute is a function', function () {
+            const builder = new FactoryBuilder_1.FactoryBuilder('Model', 'name', {}, {}, {});
+            const attributes = {
+                a: 1,
+                b: 2,
+                c: function (attr) {
+                    return attr['a'] + attr['b'];
+                },
+                d: function () {
+                    return 'string';
+                }
+            };
+            expect(builder['triggerReferenceAttributes'](attributes)).toEqual({ a: 1, b: 2, c: 3, d: 'string' });
+        });
+        it('calls .getId() and reassign value if the property of attribute is an instance of Eloquent', function () {
+            const model = new Model();
+            model['setId']('test');
+            const builder = new FactoryBuilder_1.FactoryBuilder('Model', 'name', {}, {}, {});
+            const attributes = {
+                a: 1,
+                b: 2,
+                c: model
+            };
+            expect(builder['triggerReferenceAttributes'](attributes)).toEqual({ a: 1, b: 2, c: 'test' });
+        });
+        it('works if the property is a function with returns an instance of Eloquent', function () {
+            const model = new Model();
+            model['setId']('test');
+            const builder = new FactoryBuilder_1.FactoryBuilder('Model', 'name', {}, {}, {});
+            const attributes = {
+                a: 1,
+                b: 2,
+                c: function () {
+                    return model;
+                }
+            };
+            expect(builder['triggerReferenceAttributes'](attributes)).toEqual({ a: 1, b: 2, c: 'test' });
+        });
+        it('works with nested object', function () {
+            const model = new Model();
+            model['setId']('test');
+            const builder = new FactoryBuilder_1.FactoryBuilder('Model', 'name', {}, {}, {});
+            const attributes = {
+                a: 10,
+                b: 20,
+                child: {
+                    a: 1,
+                    b: 2,
+                    c: function (attr) {
+                        return attr['a'] + attr['b'];
+                    },
+                    d: model,
+                    e: function () {
+                        return model;
+                    }
+                },
+                level0: {
+                    level1: {
+                        level2: {
+                            a: function () {
+                                return 'multi';
+                            }
+                        }
+                    }
+                }
+            };
+            expect(builder['triggerReferenceAttributes'](attributes)).toEqual({
+                a: 10,
+                b: 20,
+                child: { a: 1, b: 2, c: 3, d: 'test', e: 'test' },
+                level0: {
+                    level1: {
+                        level2: {
+                            a: 'multi'
+                        }
+                    }
+                }
+            });
         });
     });
 });
