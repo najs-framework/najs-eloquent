@@ -1,32 +1,75 @@
 import { IAutoload } from 'najs-binding'
 import { snakeCase } from 'lodash'
+import { plural } from 'pluralize'
 import { Eloquent } from '../model/Eloquent'
 import { EloquentMetadata } from '../model/EloquentMetadata'
 import { IEloquentDriver } from './interfaces/IEloquentDriver'
 import { Document, Model, Schema } from 'mongoose'
 import { MongooseQueryBuilder } from '../query-builders/mongodb/MongooseQueryBuilder'
+import { MongooseProvider } from '../facades/global/MongooseProviderFacade'
+// import { SoftDelete } from '../v0.x/eloquent/mongoose/SoftDelete'
 
 export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloquentDriver {
   attributes: Document & T
   metadata: EloquentMetadata
+  eloquentModel: Eloquent<T>
   mongooseModel: Model<Document & T>
-  mongooseSchema: Schema
   queryLogGroup: string
   modelName: string
   isGuarded: boolean
 
   constructor(model: Eloquent<T>, isGuarded: boolean) {
-    this.metadata = EloquentMetadata.get(model)
+    this.eloquentModel = model
+    this.modelName = model.getModelName()
     this.queryLogGroup = 'all'
     this.isGuarded = isGuarded
   }
 
   getClassName() {
-    return 'NajsEloquent.MongooseProvider'
+    return 'NajsEloquent.MongooseDriver'
   }
 
   initialize(data?: T): void {
-    // this.attributes = data || {}
+    this.metadata = EloquentMetadata.get(this.eloquentModel)
+    this.initializeModelIfNeeded()
+    this.mongooseModel = MongooseProvider.getMongooseInstance().model(this.modelName)
+    if (data instanceof this.mongooseModel) {
+      this.attributes = <Document & T>data
+      return
+    }
+
+    this.attributes = new this.mongooseModel()
+    if (typeof data === 'object') {
+      if (this.isGuarded) {
+        this.eloquentModel.fill(data)
+      } else {
+        this.attributes.set(data)
+      }
+    }
+  }
+
+  protected initializeModelIfNeeded() {
+    // prettier-ignore
+    if (MongooseProvider.getMongooseInstance().modelNames().indexOf(this.modelName) !== -1) {
+      return
+    }
+
+    const schema = new Schema(
+      this.metadata.getSettingProperty('schema', {}),
+      this.metadata.getSettingProperty('options', { collection: plural(snakeCase(this.modelName)) })
+    )
+
+    // timestamps
+    // if (this.metadata.hasTimestamps()) {
+    //   schema.set('timestamps', this.metadata.timestamps())
+    // }
+
+    // soft-deletes
+    // if (this.metadata.hasSoftDeletes()) {
+    //   schema.plugin(SoftDelete, this.metadata.softDeletes())
+    // }
+
+    MongooseProvider.createModelFromSchema(this.modelName, schema)
   }
 
   getRecord(): T {
@@ -50,11 +93,11 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
     this.attributes._id = id
   }
 
-  // TODO: implementation
   newQuery(): MongooseQueryBuilder<T> {
     return new MongooseQueryBuilder<T>(
       this.modelName,
-      this.metadata.hasSoftDeletes() ? this.metadata.softDeletes() : undefined
+      undefined
+      // this.metadata.hasSoftDeletes() ? this.metadata.softDeletes() : undefined
     ).setLogGroup(this.queryLogGroup)
   }
 
@@ -68,54 +111,16 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
     return this.attributes
   }
 
-  // TODO: implementation
-  is(model: Eloquent<T>): boolean {
-    return this.attributes['id'] === model['driver']['attributes']['id']
+  is(model: any): boolean {
+    return this.attributes['_id'] === model['getId']()
   }
 
   formatAttributeName(name: string): string {
     return snakeCase(name)
   }
 
-  touch() {
-    if (this.metadata.hasTimestamps()) {
-      const opts = this.metadata.timestamps()
-      this.attributes.markModified(opts.updatedAt)
-    }
-  }
-
-  async save(): Promise<any> {
-    return this.attributes.save()
-  }
-
-  async delete(): Promise<any> {
-    if (this.metadata.hasSoftDeletes()) {
-      return this.attributes['delete']()
-    }
-    return this.attributes.remove()
-  }
-
-  async forceDelete(): Promise<any> {
-    return this.attributes.remove()
-  }
-
-  async restore(): Promise<any> {
-    if (this.metadata.hasSoftDeletes()) {
-      return this.attributes['restore']()
-    }
-  }
-
-  async fresh(): Promise<T | null> {
-    if (this.attributes.isNew) {
-      // tslint:disable-next-line
-      return null
-    }
-    const query = this.newQuery()
-    return query.where(query.getPrimaryKey(), this.attributes._id).first()
-  }
-
   getReservedNames(): string[] {
-    return ['schema', 'collection', 'schemaOptions']
+    return ['schema', 'collection', 'options']
   }
 
   getDriverProxyMethods() {
@@ -155,5 +160,42 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
       // 'restore', conflict to .getDriverProxyMethods() then it should be removed
       'execute'
     ]
+  }
+
+  touch() {
+    if (this.metadata.hasTimestamps()) {
+      const opts = this.metadata.timestamps()
+      this.attributes.markModified(opts.updatedAt)
+    }
+  }
+
+  async save(): Promise<any> {
+    return this.attributes.save()
+  }
+
+  async delete(): Promise<any> {
+    if (this.metadata.hasSoftDeletes()) {
+      return this.attributes['delete']()
+    }
+    return this.attributes.remove()
+  }
+
+  async forceDelete(): Promise<any> {
+    return this.attributes.remove()
+  }
+
+  async restore(): Promise<any> {
+    if (this.metadata.hasSoftDeletes()) {
+      return this.attributes['restore']()
+    }
+  }
+
+  async fresh(): Promise<T | null> {
+    if (this.attributes.isNew) {
+      // tslint:disable-next-line
+      return null
+    }
+    const query = this.newQuery()
+    return query.where(query.getPrimaryKey(), this.attributes._id).first()
   }
 }

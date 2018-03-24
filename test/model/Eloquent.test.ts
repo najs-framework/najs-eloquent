@@ -1,7 +1,7 @@
 import 'jest'
 import '../../lib/providers/DriverManager'
 import * as Sinon from 'sinon'
-import { register } from 'najs-binding'
+import { register, ClassRegistry } from 'najs-binding'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { DummyDriver } from '../../lib/drivers/DummyDriver'
 import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverProviderFacade'
@@ -39,6 +39,19 @@ describe('Eloquent', function() {
       expect(createSpy.lastCall.args[0]).toBeInstanceOf(Model)
       expect(createSpy.lastCall.args[1]).toBe(false)
       createSpy.restore()
+    })
+
+    it('automatically .register() model if not in ClassRegistry', function() {
+      class NotRegisterYet extends Eloquent {
+        static className = 'NotRegisterYet'
+
+        getClassName() {
+          return NotRegisterYet.className
+        }
+      }
+      expect(ClassRegistry.has('NotRegisterYet')).toBe(false)
+      new NotRegisterYet()
+      expect(ClassRegistry.has('NotRegisterYet')).toBe(true)
     })
 
     it('calls driver.initialize(), assigns attributes = driver.getRecords() and returns Proxy', function() {

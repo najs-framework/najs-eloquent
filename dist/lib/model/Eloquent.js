@@ -16,6 +16,9 @@ const collect_js_1 = require("collect.js");
 class Eloquent {
     constructor(data, isGuarded = true) {
         this.driver = EloquentDriverProviderFacade_1.EloquentDriverProvider.create(this, isGuarded);
+        if (!najs_binding_1.ClassRegistry.has(this.getClassName())) {
+            najs_binding_1.register(Object.getPrototypeOf(this).constructor, this.getClassName(), false);
+        }
         if (data !== 'do-not-initialize') {
             this.driver.initialize(data);
             this.attributes = this.driver.getRecord();

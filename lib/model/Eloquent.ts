@@ -1,4 +1,4 @@
-import { IAutoload, make } from 'najs-binding'
+import { IAutoload, make, ClassRegistry, register } from 'najs-binding'
 import { EloquentMetadata, EloquentTimestamps, EloquentSoftDelete } from './EloquentMetadata'
 import { EloquentDriverProvider } from '../facades/global/EloquentDriverProviderFacade'
 import { IEloquentDriver } from '../drivers/interfaces/IEloquentDriver'
@@ -32,6 +32,9 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
   constructor(data: Record)
   constructor(data?: any, isGuarded: boolean = true) {
     this.driver = EloquentDriverProvider.create(this, isGuarded)
+    if (!ClassRegistry.has(this.getClassName())) {
+      register(Object.getPrototypeOf(this).constructor, this.getClassName(), false)
+    }
     if (data !== 'do-not-initialize') {
       this.driver.initialize(data)
       this.attributes = this.driver.getRecord()
