@@ -9,6 +9,10 @@ exports.Eloquent = {
     }
 };
 exports.default = exports.Eloquent;
+var FactoryFacade_1 = require("./facades/global/FactoryFacade");
+exports.FactoryFacade = FactoryFacade_1.FactoryFacade;
+exports.Factory = FactoryFacade_1.Factory;
+exports.factory = FactoryFacade_1.factory;
 var QueryLogFacade_1 = require("./facades/global/QueryLogFacade");
 exports.QueryLogFacade = QueryLogFacade_1.QueryLogFacade;
 exports.QueryLog = QueryLogFacade_1.QueryLog;

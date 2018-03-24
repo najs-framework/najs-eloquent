@@ -4,6 +4,8 @@ import { Facade, IFacade } from 'najs-facade'
 import { NajsEloquent } from '../NajsEloquent'
 import { NajsEloquentClass } from '../../constants'
 import { IFactoryManager } from '../../factory/interfaces/IFactoryManager'
+import { IFactoryBuilder } from '../../factory/interfaces/IFactoryBuilder'
+import { IFactory } from '../../factory/interfaces/IFactory'
 import { ChanceFaker } from '../../factory/FactoryManager'
 
 const facade = Facade.create<IFactoryManager<ChanceFaker>>(NajsEloquent, 'FactoryManager', function() {
@@ -12,3 +14,6 @@ const facade = Facade.create<IFactoryManager<ChanceFaker>>(NajsEloquent, 'Factor
 
 export const FactoryFacade: IFactoryManager<ChanceFaker> & IFacade = facade
 export const Factory: IFactoryManager<ChanceFaker> = facade
+export const factory: IFactory = function(className: string, name: string = 'default'): IFactoryBuilder {
+  return Factory.of(className, name)
+}

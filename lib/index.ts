@@ -11,6 +11,8 @@ export const Eloquent = {
   }
 }
 export default Eloquent
+
+export { FactoryFacade, Factory, factory } from './facades/global/FactoryFacade'
 export { QueryLogFacade, QueryLog } from './facades/global/QueryLogFacade'
 
 export { EloquentBase } from './v0.x/eloquent/EloquentBase'

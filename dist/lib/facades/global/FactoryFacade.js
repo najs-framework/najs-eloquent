@@ -10,3 +10,6 @@ const facade = najs_facade_1.Facade.create(NajsEloquent_1.NajsEloquent, 'Factory
 });
 exports.FactoryFacade = facade;
 exports.Factory = facade;
+exports.factory = function (className, name = 'default') {
+    return exports.Factory.of(className, name);
+};
