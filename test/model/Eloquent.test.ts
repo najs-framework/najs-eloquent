@@ -28,6 +28,16 @@ describe('Eloquent', function() {
       new Model()
       expect(createSpy.called).toBe(true)
       expect(createSpy.lastCall.args[0]).toBeInstanceOf(Model)
+      expect(createSpy.lastCall.args[1]).toBe(true)
+      createSpy.restore()
+    })
+
+    it('has a hidden constructor value isGuarded', function() {
+      const createSpy = Sinon.spy(EloquentDriverProvider, 'create')
+      Reflect.construct(Model, [{}, false])
+      expect(createSpy.called).toBe(true)
+      expect(createSpy.lastCall.args[0]).toBeInstanceOf(Model)
+      expect(createSpy.lastCall.args[1]).toBe(false)
       createSpy.restore()
     })
 

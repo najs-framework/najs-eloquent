@@ -30,8 +30,8 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
   constructor()
   constructor(data: Object)
   constructor(data: Record)
-  constructor(data?: any) {
-    this.driver = EloquentDriverProvider.create(this)
+  constructor(data?: any, isGuarded: boolean = true) {
+    this.driver = EloquentDriverProvider.create(this, isGuarded)
     if (data !== 'do-not-initialize') {
       this.driver.initialize(data)
       this.attributes = this.driver.getRecord()

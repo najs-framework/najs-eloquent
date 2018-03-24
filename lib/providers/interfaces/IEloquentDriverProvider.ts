@@ -3,6 +3,7 @@ import { IEloquentDriver } from '../../drivers/interfaces/IEloquentDriver'
 
 export interface IEloquentDriverProvider {
   create<T extends Object = {}>(model: Eloquent<T>): IEloquentDriver<T>
+  create<T extends Object = {}>(model: Eloquent<T>, isGuarded: boolean): IEloquentDriver<T>
 
   findDriverClassName(model: string): string
   findDriverClassName(model: Eloquent<any>): string

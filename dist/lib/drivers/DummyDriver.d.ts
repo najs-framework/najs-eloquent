@@ -3,6 +3,10 @@ import { IEloquentDriver } from './interfaces/IEloquentDriver';
 export declare class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
     static className: string;
     attributes: Object;
+    isGuarded: boolean;
+    constructor();
+    constructor(model: Eloquent);
+    constructor(model: Eloquent, isGuarded: boolean);
     initialize(data?: T): void;
     getRecord(): T;
     getAttribute(name: string): any;

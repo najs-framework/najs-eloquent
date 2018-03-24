@@ -36,12 +36,14 @@ export class DriverManager extends Facade implements IEloquentDriverProvider, IA
     return first
   }
 
-  protected createDriver<T>(model: Eloquent<T>, driverClass: string): IEloquentDriver<T> {
-    return make<IEloquentDriver<T>>(driverClass, [model])
+  protected createDriver<T>(model: Eloquent<T>, driverClass: string, isGuarded: boolean): IEloquentDriver<T> {
+    return make<IEloquentDriver<T>>(driverClass, [model, isGuarded])
   }
 
-  create<T extends Object = {}>(model: Eloquent<T>): IEloquentDriver<T> {
-    return this.createDriver(model, this.findDriverClassName(model))
+  create<T extends Object = {}>(model: Eloquent<T>): IEloquentDriver<T>
+  create<T extends Object = {}>(model: Eloquent<T>, isGuarded: boolean): IEloquentDriver<T>
+  create<T extends Object = {}>(model: Eloquent<T>, isGuarded: boolean = true): IEloquentDriver<T> {
+    return this.createDriver(model, this.findDriverClassName(model), isGuarded)
   }
 
   findDriverClassName(model: Eloquent<any> | string): string {

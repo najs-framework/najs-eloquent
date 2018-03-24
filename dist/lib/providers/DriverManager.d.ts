@@ -16,8 +16,9 @@ export declare class DriverManager extends Facade implements IEloquentDriverProv
     };
     getClassName(): string;
     protected findDefaultDriver(): string;
-    protected createDriver<T>(model: Eloquent<T>, driverClass: string): IEloquentDriver<T>;
+    protected createDriver<T>(model: Eloquent<T>, driverClass: string, isGuarded: boolean): IEloquentDriver<T>;
     create<T extends Object = {}>(model: Eloquent<T>): IEloquentDriver<T>;
+    create<T extends Object = {}>(model: Eloquent<T>, isGuarded: boolean): IEloquentDriver<T>;
     findDriverClassName(model: Eloquent<any> | string): string;
     register(driver: any, name: string, isDefault?: boolean): void;
     bind(model: string, driver: string): void;

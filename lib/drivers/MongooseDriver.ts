@@ -13,10 +13,12 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
   mongooseSchema: Schema
   queryLogGroup: string
   modelName: string
+  isGuarded: boolean
 
-  constructor(model: Eloquent<T>) {
+  constructor(model: Eloquent<T>, isGuarded: boolean) {
     this.metadata = EloquentMetadata.get(model)
     this.queryLogGroup = 'all'
+    this.isGuarded = isGuarded
   }
 
   getClassName() {

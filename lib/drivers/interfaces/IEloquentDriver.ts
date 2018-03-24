@@ -4,7 +4,7 @@ import { IConditionQuery } from '../../query-builders/interfaces/IConditionQuery
 import { IFetchResultQuery } from '../../query-builders/interfaces/IFetchResultQuery'
 
 export interface IEloquentDriverConstructor<Record extends Object = {}> {
-  constructor(model: Eloquent<Record>): any
+  constructor(model: Eloquent<Record>, isGuarded: boolean): any
 }
 
 export interface IEloquentDriver<Record extends Object = {}> {

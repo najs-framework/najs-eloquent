@@ -5,6 +5,14 @@ import { IEloquentDriver } from './interfaces/IEloquentDriver'
 export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
   static className: string = 'NajsEloquent.DummyDriver'
   attributes: Object = {}
+  isGuarded: boolean
+
+  constructor()
+  constructor(model: Eloquent)
+  constructor(model: Eloquent, isGuarded: boolean)
+  constructor(model?: Eloquent, isGuarded: boolean = true) {
+    this.isGuarded = isGuarded
+  }
 
   initialize(data?: T): void {
     this.attributes = data || {}

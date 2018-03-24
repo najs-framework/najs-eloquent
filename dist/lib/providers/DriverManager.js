@@ -24,11 +24,11 @@ class DriverManager extends najs_facade_1.Facade {
         }
         return first;
     }
-    createDriver(model, driverClass) {
-        return najs_binding_1.make(driverClass, [model]);
+    createDriver(model, driverClass, isGuarded) {
+        return najs_binding_1.make(driverClass, [model, isGuarded]);
     }
-    create(model) {
-        return this.createDriver(model, this.findDriverClassName(model));
+    create(model, isGuarded = true) {
+        return this.createDriver(model, this.findDriverClassName(model), isGuarded);
     }
     findDriverClassName(model) {
         const modelName = typeof model === 'string' ? model : model.getClassName();

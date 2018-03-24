@@ -4,9 +4,10 @@ const lodash_1 = require("lodash");
 const EloquentMetadata_1 = require("../model/EloquentMetadata");
 const MongooseQueryBuilder_1 = require("../query-builders/mongodb/MongooseQueryBuilder");
 class MongooseDriver {
-    constructor(model) {
+    constructor(model, isGuarded) {
         this.metadata = EloquentMetadata_1.EloquentMetadata.get(model);
         this.queryLogGroup = 'all';
+        this.isGuarded = isGuarded;
     }
     getClassName() {
         return 'NajsEloquent.MongooseProvider';

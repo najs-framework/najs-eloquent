@@ -14,8 +14,8 @@ const collect_js_1 = require("collect.js");
  *   - static Querying
  */
 class Eloquent {
-    constructor(data) {
-        this.driver = EloquentDriverProviderFacade_1.EloquentDriverProvider.create(this);
+    constructor(data, isGuarded = true) {
+        this.driver = EloquentDriverProviderFacade_1.EloquentDriverProvider.create(this, isGuarded);
         if (data !== 'do-not-initialize') {
             this.driver.initialize(data);
             this.attributes = this.driver.getRecord();

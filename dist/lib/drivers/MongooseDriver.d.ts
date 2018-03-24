@@ -11,7 +11,8 @@ export declare class MongooseDriver<T extends Object = {}> implements IAutoload,
     mongooseSchema: Schema;
     queryLogGroup: string;
     modelName: string;
-    constructor(model: Eloquent<T>);
+    isGuarded: boolean;
+    constructor(model: Eloquent<T>, isGuarded: boolean);
     getClassName(): string;
     initialize(data?: T): void;
     getRecord(): T;

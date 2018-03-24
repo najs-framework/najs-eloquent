@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
 class DummyDriver {
-    constructor() {
+    constructor(model, isGuarded = true) {
         this.attributes = {};
+        this.isGuarded = isGuarded;
     }
     initialize(data) {
         this.attributes = data || {};
