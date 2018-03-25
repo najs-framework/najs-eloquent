@@ -10,6 +10,43 @@ import { MongooseProvider } from '../facades/global/MongooseProviderFacade'
 import { SoftDelete } from '../v0.x/eloquent/mongoose/SoftDelete'
 
 const STATIC_METHODS_WITH_ID = ['first', 'firstOrFail', 'find', 'findOrFail', 'delete', 'restore']
+const QUERY_PROXY_METHODS_IBasicQuery = [
+  'queryName',
+  'select',
+  'distinct',
+  'orderBy',
+  'orderByAsc',
+  'orderByDesc',
+  'limit'
+]
+const QUERY_PROXY_METHODS_IConditionQuery = [
+  'where',
+  'orWhere',
+  'whereIn',
+  'whereNotIn',
+  'orWhereIn',
+  'orWhereNotIn',
+  'whereNull',
+  'whereNotNull',
+  'orWhereNull',
+  'orWhereNotNull',
+  'native'
+]
+const QUERY_PROXY_METHODS_ISoftDeletesQuery = ['withTrashed', 'onlyTrashed']
+const QUERY_PROXY_METHODS_MongooseQueryHelpers = ['findOrFail', 'firstOrFail']
+const QUERY_PROXY_METHODS_IFetchResultQuery = [
+  // IFetchResultQuery
+  'get',
+  'all',
+  'find',
+  'first',
+  'count',
+  'pluck',
+  'update'
+  // 'delete', conflict to .getDriverProxyMethods() then it should be removed
+  // 'restore', conflict to .getDriverProxyMethods() then it should be removed
+  // 'execute', removed because it could not run alone
+]
 
 export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloquentDriver {
   static className: string = 'NajsEloquent.MongooseDriver'
@@ -152,45 +189,12 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
   }
 
   getQueryProxyMethods() {
-    return [
-      // IBasicQuery
-      'queryName',
-      'select',
-      'distinct',
-      'orderBy',
-      'orderByAsc',
-      'orderByDesc',
-      'limit',
-      // IConditionQuery
-      'where',
-      'orWhere',
-      'whereIn',
-      'whereNotIn',
-      'orWhereIn',
-      'orWhereNotIn',
-      'whereNull',
-      'whereNotNull',
-      'orWhereNull',
-      'orWhereNotNull',
-      'native',
-      // ISoftDeletesQuery
-      'withTrashed',
-      'onlyTrashed',
-      // Mongoose Query Helpers
-      'findOrFail',
-      'firstOrFail',
-      // IFetchResultQuery
-      'get',
-      'all',
-      'find',
-      'first',
-      'count',
-      'pluck',
-      'update'
-      // 'delete', conflict to .getDriverProxyMethods() then it should be removed
-      // 'restore', conflict to .getDriverProxyMethods() then it should be removed
-      // 'execute', removed because it could not run alone
-    ]
+    return QUERY_PROXY_METHODS_IBasicQuery.concat(
+      QUERY_PROXY_METHODS_IConditionQuery,
+      QUERY_PROXY_METHODS_ISoftDeletesQuery,
+      QUERY_PROXY_METHODS_MongooseQueryHelpers,
+      QUERY_PROXY_METHODS_IFetchResultQuery
+    )
   }
 
   createStaticMethods(eloquent: typeof Eloquent) {

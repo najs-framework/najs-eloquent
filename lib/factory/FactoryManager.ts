@@ -54,28 +54,40 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
     return new FactoryBuilder(className, name, this.definitions, this.states, this.faker)
   }
 
-  create(className: string, attributes?: Object): any {
-    return this.of(className).create(<any>attributes)
+  create<T>(className: string): T
+  create<T>(className: string, attributes: Object): T
+  create(className: any): any {
+    return this.of(className).create(arguments[1])
   }
 
-  createAs(className: string, name: string, attributes?: Object): any {
-    return this.of(className, name).create(<any>attributes)
+  createAs<T>(className: string, name: string): T
+  createAs<T>(className: string, name: string, attributes: Object): T
+  createAs(className: any, name: any): any {
+    return this.of(className, name).create(arguments[2])
   }
 
-  make(className: string, attributes?: Object): any {
-    return this.of(className).make(<any>attributes)
+  make<T>(className: string): T
+  make<T>(className: string, attributes: Object): T
+  make(className: string): any {
+    return this.of(className).make(arguments[1])
   }
 
-  makeAs(className: string, name: string, attributes?: Object): any {
-    return this.of(className, name).make(<any>attributes)
+  makeAs<T>(className: string, name: string): T
+  makeAs<T>(className: string, name: string, attributes: Object): T
+  makeAs(className: string, name: string): any {
+    return this.of(className, name).make(arguments[2])
   }
 
-  raw(className: string, attributes?: Object): any {
-    return this.of(className).raw(<any>attributes)
+  raw<T>(className: string): T
+  raw<T>(className: string, attributes: Object): T
+  raw(className: string): any {
+    return this.of(className).raw(arguments[1])
   }
 
-  rawOf(className: string, name: string, attributes?: Object): any {
-    return this.of(className, name).raw(<any>attributes)
+  rawOf<T>(className: string, name: string): T
+  rawOf<T>(className: string, name: string, attributes: Object): T
+  rawOf(className: string, name: string): any {
+    return this.of(className, name).raw(arguments[2])
   }
 }
 register(FactoryManager)

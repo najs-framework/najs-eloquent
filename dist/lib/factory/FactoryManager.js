@@ -36,23 +36,23 @@ class FactoryManager extends najs_facade_1.Facade {
     of(className, name = 'default') {
         return new FactoryBuilder_1.FactoryBuilder(className, name, this.definitions, this.states, this.faker);
     }
-    create(className, attributes) {
-        return this.of(className).create(attributes);
+    create(className) {
+        return this.of(className).create(arguments[1]);
     }
-    createAs(className, name, attributes) {
-        return this.of(className, name).create(attributes);
+    createAs(className, name) {
+        return this.of(className, name).create(arguments[2]);
     }
-    make(className, attributes) {
-        return this.of(className).make(attributes);
+    make(className) {
+        return this.of(className).make(arguments[1]);
     }
-    makeAs(className, name, attributes) {
-        return this.of(className, name).make(attributes);
+    makeAs(className, name) {
+        return this.of(className, name).make(arguments[2]);
     }
-    raw(className, attributes) {
-        return this.of(className).raw(attributes);
+    raw(className) {
+        return this.of(className).raw(arguments[1]);
     }
-    rawOf(className, name, attributes) {
-        return this.of(className, name).raw(attributes);
+    rawOf(className, name) {
+        return this.of(className, name).raw(arguments[2]);
     }
 }
 FactoryManager.className = constants_1.NajsEloquentClass.FactoryManager;
