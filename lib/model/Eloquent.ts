@@ -3,7 +3,7 @@ import { EloquentMetadata, EloquentTimestamps, EloquentSoftDelete } from './Eloq
 import { EloquentDriverProvider } from '../facades/global/EloquentDriverProviderFacade'
 import { IEloquentDriver } from '../drivers/interfaces/IEloquentDriver'
 import { EloquentProxy } from './EloquentProxy'
-import { pick } from 'lodash'
+import { flatten, pick } from 'lodash'
 import collect, { Collection } from 'collect.js'
 
 /**
@@ -16,10 +16,18 @@ import collect, { Collection } from 'collect.js'
 export abstract class Eloquent<Record extends Object = {}> implements IAutoload {
   protected attributes: Record
   protected driver: IEloquentDriver<Record>
+  protected temporarySettings?: {
+    fillable?: string[]
+    guarded?: string[]
+    visible?: string[]
+    hidden?: string[]
+  }
 
   // setting members
   protected fillable?: string[]
   protected guarded?: string[]
+  protected visible?: string[]
+  protected hidden?: string[]
   protected timestamps?: EloquentTimestamps | boolean
   protected softDeletes?: EloquentSoftDelete | boolean
   protected table?: string
@@ -88,30 +96,92 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
   }
 
   getFillable(): string[] {
-    return EloquentMetadata.get(this).fillable()
+    return this.mergeWithTemporarySetting('fillable', EloquentMetadata.get(this).fillable())
   }
 
   getGuarded(): string[] {
-    return EloquentMetadata.get(this).guarded()
+    return this.mergeWithTemporarySetting('guarded', EloquentMetadata.get(this).guarded())
   }
 
   isFillable(key: string): boolean {
-    const fillable = this.getFillable()
-
-    if (fillable.length > 0 && fillable.indexOf(key) !== -1) {
-      return true
-    }
-
-    if (this.isGuarded(key)) {
-      return false
-    }
-
-    return fillable.length === 0 && !EloquentMetadata.get(this).hasAttribute(key) && key.indexOf('_') !== 0
+    return this.isInWhiteList(key, this.getFillable(), this.getGuarded())
   }
 
   isGuarded(key: string): boolean {
-    const guarded: string[] = this.getGuarded()
-    return (guarded.length === 1 && guarded[0] === '*') || guarded.indexOf(key) !== -1
+    return this.isInBlackList(key, this.getGuarded())
+  }
+
+  getVisible(): string[] {
+    return this.mergeWithTemporarySetting('visible', EloquentMetadata.get(this).visible())
+  }
+
+  getHidden(): string[] {
+    return this.mergeWithTemporarySetting('hidden', EloquentMetadata.get(this).hidden())
+  }
+
+  isVisible(key: string): boolean {
+    return this.isInWhiteList(key, this.getVisible(), this.getHidden())
+  }
+
+  isHidden(key: string): boolean {
+    return this.isInBlackList(key, this.getHidden())
+  }
+
+  protected isInWhiteList(key: string, whiteList: string[], blackList: string[]) {
+    if (whiteList.length > 0 && whiteList.indexOf(key) !== -1) {
+      return true
+    }
+
+    if (this.isInBlackList(key, blackList)) {
+      return false
+    }
+
+    return whiteList.length === 0 && !EloquentMetadata.get(this).hasAttribute(key) && key.indexOf('_') !== 0
+  }
+
+  protected isInBlackList(key: string, blackList: string[]) {
+    return (blackList.length === 1 && blackList[0] === '*') || blackList.indexOf(key) !== -1
+  }
+
+  private mergeWithTemporarySetting(name: string, value: any[]) {
+    if (!this.temporarySettings || !this.temporarySettings[name]) {
+      return value
+    }
+    return Array.from(new Set(value.concat(this.temporarySettings[name])))
+  }
+
+  private concatTemporarySetting(name: string, value: any[]) {
+    if (!this.temporarySettings) {
+      this.temporarySettings = {}
+    }
+    if (!this.temporarySettings[name]) {
+      this.temporarySettings[name] = []
+    }
+    this.temporarySettings[name] = Array.from(new Set(this.temporarySettings[name].concat(value)))
+  }
+
+  markFillable(...args: Array<string | string[]>): this {
+    this.concatTemporarySetting('fillable', flatten(args))
+
+    return this
+  }
+
+  markGuarded(...args: Array<string | string[]>): this {
+    this.concatTemporarySetting('guarded', flatten(args))
+
+    return this
+  }
+
+  markVisible(...args: Array<string | string[]>): this {
+    this.concatTemporarySetting('visible', flatten(args))
+
+    return this
+  }
+
+  markHidden(...args: Array<string | string[]>): this {
+    this.concatTemporarySetting('hidden', flatten(args))
+
+    return this
   }
 
   newInstance(data?: Object | Record): this {
@@ -130,6 +200,9 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
       'driver',
       'fillable',
       'guarded',
+      'visible',
+      'hidden',
+      'temporarySettings',
       'softDeletes',
       'timestamps',
       'table',

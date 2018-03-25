@@ -142,6 +142,7 @@ class MongooseDriver {
             const opts = this.metadata.timestamps();
             this.attributes.markModified(opts.updatedAt);
         }
+        return this.eloquentModel;
     }
     async save() {
         return this.attributes.save();

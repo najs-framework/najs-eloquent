@@ -60,24 +60,71 @@ class Eloquent {
         return this;
     }
     getFillable() {
-        return EloquentMetadata_1.EloquentMetadata.get(this).fillable();
+        return this.mergeWithTemporarySetting('fillable', EloquentMetadata_1.EloquentMetadata.get(this).fillable());
     }
     getGuarded() {
-        return EloquentMetadata_1.EloquentMetadata.get(this).guarded();
+        return this.mergeWithTemporarySetting('guarded', EloquentMetadata_1.EloquentMetadata.get(this).guarded());
     }
     isFillable(key) {
-        const fillable = this.getFillable();
-        if (fillable.length > 0 && fillable.indexOf(key) !== -1) {
-            return true;
-        }
-        if (this.isGuarded(key)) {
-            return false;
-        }
-        return fillable.length === 0 && !EloquentMetadata_1.EloquentMetadata.get(this).hasAttribute(key) && key.indexOf('_') !== 0;
+        return this.isInWhiteList(key, this.getFillable(), this.getGuarded());
     }
     isGuarded(key) {
-        const guarded = this.getGuarded();
-        return (guarded.length === 1 && guarded[0] === '*') || guarded.indexOf(key) !== -1;
+        return this.isInBlackList(key, this.getGuarded());
+    }
+    getVisible() {
+        return this.mergeWithTemporarySetting('visible', EloquentMetadata_1.EloquentMetadata.get(this).visible());
+    }
+    getHidden() {
+        return this.mergeWithTemporarySetting('hidden', EloquentMetadata_1.EloquentMetadata.get(this).hidden());
+    }
+    isVisible(key) {
+        return this.isInWhiteList(key, this.getVisible(), this.getHidden());
+    }
+    isHidden(key) {
+        return this.isInBlackList(key, this.getHidden());
+    }
+    isInWhiteList(key, whiteList, blackList) {
+        if (whiteList.length > 0 && whiteList.indexOf(key) !== -1) {
+            return true;
+        }
+        if (this.isInBlackList(key, blackList)) {
+            return false;
+        }
+        return whiteList.length === 0 && !EloquentMetadata_1.EloquentMetadata.get(this).hasAttribute(key) && key.indexOf('_') !== 0;
+    }
+    isInBlackList(key, blackList) {
+        return (blackList.length === 1 && blackList[0] === '*') || blackList.indexOf(key) !== -1;
+    }
+    mergeWithTemporarySetting(name, value) {
+        if (!this.temporarySettings || !this.temporarySettings[name]) {
+            return value;
+        }
+        return Array.from(new Set(value.concat(this.temporarySettings[name])));
+    }
+    concatTemporarySetting(name, value) {
+        if (!this.temporarySettings) {
+            this.temporarySettings = {};
+        }
+        if (!this.temporarySettings[name]) {
+            this.temporarySettings[name] = [];
+        }
+        this.temporarySettings[name] = Array.from(new Set(this.temporarySettings[name].concat(value)));
+    }
+    markFillable(...args) {
+        this.concatTemporarySetting('fillable', lodash_1.flatten(args));
+        return this;
+    }
+    markGuarded(...args) {
+        this.concatTemporarySetting('guarded', lodash_1.flatten(args));
+        return this;
+    }
+    markVisible(...args) {
+        this.concatTemporarySetting('visible', lodash_1.flatten(args));
+        return this;
+    }
+    markHidden(...args) {
+        this.concatTemporarySetting('hidden', lodash_1.flatten(args));
+        return this;
     }
     newInstance(data) {
         return najs_binding_1.make(this.getClassName(), [data]);
@@ -93,6 +140,9 @@ class Eloquent {
             'driver',
             'fillable',
             'guarded',
+            'visible',
+            'hidden',
+            'temporarySettings',
             'softDeletes',
             'timestamps',
             'table',

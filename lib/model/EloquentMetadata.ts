@@ -70,6 +70,14 @@ export class EloquentMetadata {
     return this.getSettingProperty<string[]>('guarded', ['*'])
   }
 
+  visible(): string[] {
+    return this.getSettingProperty<string[]>('visible', [])
+  }
+
+  hidden(): string[] {
+    return this.getSettingProperty<string[]>('hidden', [])
+  }
+
   hasTimestamps(): boolean {
     return this.hasSetting('timestamps')
   }

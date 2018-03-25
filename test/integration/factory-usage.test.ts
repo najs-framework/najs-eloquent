@@ -1,27 +1,9 @@
 import 'jest'
 import { register } from 'najs-binding'
-import { Factory, factory, Eloquent, IMongooseProvider } from '../../lib'
-import { Schema, Document, model } from 'mongoose'
+import { Factory, factory, Eloquent } from '../../lib/v1'
+import { Schema } from 'mongoose'
 import { init_mongoose, delete_collection } from '../util'
-
 const mongoose = require('mongoose')
-
-class MongooseProvider implements IMongooseProvider {
-  static className: string = 'MongooseProvider'
-
-  getClassName() {
-    return MongooseProvider.className
-  }
-
-  getMongooseInstance() {
-    return mongoose
-  }
-
-  createModelFromSchema<T extends Document>(modelName: string, schema: Schema) {
-    return model<T>(modelName, schema)
-  }
-}
-register(MongooseProvider)
 
 describe('Integration Test - Factory Usage', function() {
   beforeAll(async function() {
@@ -39,7 +21,7 @@ describe('Integration Test - Factory Usage', function() {
       last_name: string
       age: number
     }
-    class User extends Eloquent.Mongoose<IUser, User>() {
+    class User extends Eloquent<IUser> {
       static className: string = 'User'
 
       getClassName() {
@@ -78,6 +60,11 @@ describe('Integration Test - Factory Usage', function() {
       factory(User.className).raw({
         age: 20
       })
+
+      // const user: User
+      // user.getId()
+      // user.getId()
+
       // console.log(raw)
 
       // console.log(

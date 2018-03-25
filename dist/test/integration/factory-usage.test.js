@@ -2,23 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const najs_binding_1 = require("najs-binding");
-const lib_1 = require("../../lib");
+const v1_1 = require("../../lib/v1");
 const mongoose_1 = require("mongoose");
 const util_1 = require("../util");
 const mongoose = require('mongoose');
-class MongooseProvider {
-    getClassName() {
-        return MongooseProvider.className;
-    }
-    getMongooseInstance() {
-        return mongoose;
-    }
-    createModelFromSchema(modelName, schema) {
-        return mongoose_1.model(modelName, schema);
-    }
-}
-MongooseProvider.className = 'MongooseProvider';
-najs_binding_1.register(MongooseProvider);
 describe('Integration Test - Factory Usage', function () {
     beforeAll(async function () {
         await util_1.init_mongoose(mongoose, 'integration_factory_usage');
@@ -27,7 +14,7 @@ describe('Integration Test - Factory Usage', function () {
         await util_1.delete_collection(mongoose, 'users');
     });
     describe('User model', function () {
-        class User extends lib_1.Eloquent.Mongoose() {
+        class User extends v1_1.Eloquent {
             getClassName() {
                 return User.className;
             }
@@ -43,7 +30,7 @@ describe('Integration Test - Factory Usage', function () {
         User.className = 'User';
         najs_binding_1.register(User);
         it('can use Factory.define() to define factory for model', function () {
-            lib_1.Factory.define(User.className, (faker, attributes) => {
+            v1_1.Factory.define(User.className, (faker, attributes) => {
                 return Object.assign({
                     email: faker.email(),
                     first_name: faker.first(),
@@ -53,9 +40,12 @@ describe('Integration Test - Factory Usage', function () {
             });
         });
         it('can use factory(User).raw() to get raw attributes', async function () {
-            lib_1.factory(User.className).raw({
+            v1_1.factory(User.className).raw({
                 age: 20
             });
+            // const user: User
+            // user.getId()
+            // user.getId()
             // console.log(raw)
             // console.log(
             //   factory(User.className)

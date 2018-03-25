@@ -5,7 +5,7 @@ const Path = require('path')
 const cwd = Path.resolve(__dirname, '..')
 const distBase = 'dist'
 
-const files = []
+const files = [['lib', 'model', 'Eloquent.d.ts']]
 
 console.log('Start writing custom definitions...')
 for (const file of files) {

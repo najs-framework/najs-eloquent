@@ -49,6 +49,12 @@ class EloquentMetadata {
     guarded() {
         return this.getSettingProperty('guarded', ['*']);
     }
+    visible() {
+        return this.getSettingProperty('visible', []);
+    }
+    hidden() {
+        return this.getSettingProperty('hidden', []);
+    }
     hasTimestamps() {
         return this.hasSetting('timestamps');
     }

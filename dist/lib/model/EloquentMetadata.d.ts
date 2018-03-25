@@ -30,6 +30,8 @@ export declare class EloquentMetadata {
     getSettingWithDefaultForTrueValue(property: string, defaultValue: any): any;
     fillable(): string[];
     guarded(): string[];
+    visible(): string[];
+    hidden(): string[];
     hasTimestamps(): boolean;
     timestamps(defaultValue?: EloquentTimestamps): EloquentTimestamps;
     hasSoftDeletes(): boolean;

@@ -184,6 +184,7 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
       const opts = this.metadata.timestamps()
       this.attributes.markModified(opts.updatedAt)
     }
+    return this.eloquentModel
   }
 
   async save(): Promise<any> {

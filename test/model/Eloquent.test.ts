@@ -155,74 +155,162 @@ describe('Eloquent', function() {
     })
   }
 
-  describe('.getGuarded()', function() {
-    it('returns ["*"] by default even the guarded property is not set', function() {
-      const model = new Model()
-      expect(model.getGuarded()).toEqual(['*'])
-    })
-  })
-
-  describe('.isGuarded()', function() {
-    it('guards all attributes by default', function() {
-      const model = new Model()
-      expect(model.isGuarded('first_name')).toBe(true)
-    })
-
-    it('checks attribute in guarded property if it was set', function() {
-      const model = new Model()
-      update_model_setting('guarded', ['password'])
-      expect(model.isGuarded('first_name')).toBe(false)
-      expect(model.isGuarded('last_name')).toBe(false)
-      expect(model.isGuarded('password')).toBe(true)
-    })
-  })
-
   describe('.getFillable()', function() {
     it('returns [] by default even the fillable property is not set', function() {
       const model = new Model()
       expect(model.getFillable()).toEqual([])
     })
+
+    it('merges temporarySettings key fillable to Metadata.fillable settings', function() {
+      const model = new Model()
+      model.markFillable('test', 'a', 'a', 'b')
+      expect(model.getFillable()).toEqual(['test', 'a', 'b'])
+    })
+  })
+
+  describe('.getGuarded()', function() {
+    it('returns ["*"] by default even the guarded property is not set', function() {
+      const model = new Model()
+      expect(model.getGuarded()).toEqual(['*'])
+    })
+
+    it('merges temporarySettings key guarded to Metadata.guarded settings', function() {
+      const model = new Model()
+      model.markGuarded('test', 'a', 'a', 'b')
+      expect(model.getGuarded()).toEqual(['*', 'test', 'a', 'b'])
+    })
   })
 
   describe('.isFillable()', function() {
-    it('returns false if fillable is not defined', function() {
+    it('calls .isInWhiteList() with whiteList = .getFillable(), blackList = .getGuarded()', function() {
       const model = new Model()
-      update_model_setting('fillable', [])
-      update_model_setting('guarded', ['*'])
-      expect(model.isFillable('first_name')).toBe(false)
-      expect(model.isFillable('last_name')).toBe(false)
+      const isInWhiteListStub = Sinon.stub(model, <any>'isInWhiteList')
+      isInWhiteListStub.callsFake(() => {
+        return 'anything'
+      })
+
+      const getFillableStub = Sinon.stub(model, 'getFillable')
+      getFillableStub.returns('whiteList')
+      const getGuardedStub = Sinon.stub(model, 'getGuarded')
+      getGuardedStub.returns('blackList')
+
+      expect(model.isFillable('key')).toEqual('anything')
+      expect(isInWhiteListStub.calledWith('key', 'whiteList', 'blackList')).toBe(true)
+    })
+  })
+
+  describe('.isGuarded()', function() {
+    it('calls .isInBlackList() with blackList = .getGuarded()', function() {
+      const model = new Model()
+      const isInBlackListStub = Sinon.stub(model, <any>'isInBlackList')
+      isInBlackListStub.callsFake(() => {
+        return 'anything'
+      })
+
+      const getGuardedStub = Sinon.stub(model, 'getGuarded')
+      getGuardedStub.returns('blackList')
+
+      expect(model.isGuarded('key')).toEqual('anything')
+      expect(isInBlackListStub.calledWith('key', 'blackList')).toBe(true)
+    })
+  })
+
+  describe('.getVisible()', function() {
+    it('returns [] by default even the visible property is not set', function() {
+      const model = new Model()
+      expect(model.getVisible()).toEqual([])
     })
 
-    it('returns true if the key is in fillable', function() {
+    it('merges temporarySettings key visible to Metadata.visible settings', function() {
       const model = new Model()
-      update_model_setting('fillable', ['first_name'])
-      expect(model.isFillable('first_name')).toBe(true)
-      expect(model.isFillable('last_name')).toBe(false)
+      model.markVisible('test', 'a', 'a', 'b')
+      expect(model.getVisible()).toEqual(['test', 'a', 'b'])
+    })
+  })
+
+  describe('.getHidden()', function() {
+    it('returns [] by default even the hidden property is not set', function() {
+      const model = new Model()
+      expect(model.getHidden()).toEqual([])
     })
 
-    it('returns false if the key is guarded', function() {
+    it('merges temporarySettings key hidden to Metadata.hidden settings', function() {
       const model = new Model()
-      update_model_setting('fillable', ['last_name'])
-      update_model_setting('guarded', ['first_name'])
-      expect(model.isFillable('first_name')).toBe(false)
-      expect(model.isFillable('last_name')).toBe(true)
+      model.markHidden('test', 'a', 'a', 'b')
+      expect(model.getHidden()).toEqual(['test', 'a', 'b'])
+    })
+  })
+
+  describe('.isVisible()', function() {
+    it('calls .isInWhiteList() with whiteList = .getVisible(), blackList = .getHidden()', function() {
+      const model = new Model()
+      const isInWhiteListStub = Sinon.stub(model, <any>'isInWhiteList')
+      isInWhiteListStub.callsFake(() => {
+        return 'anything'
+      })
+
+      const getVisibleStub = Sinon.stub(model, 'getVisible')
+      getVisibleStub.returns('whiteList')
+      const getHiddenStub = Sinon.stub(model, 'getHidden')
+      getHiddenStub.returns('blackList')
+
+      expect(model.isVisible('key')).toEqual('anything')
+      expect(isInWhiteListStub.calledWith('key', 'whiteList', 'blackList')).toBe(true)
+    })
+  })
+
+  describe('.isHidden()', function() {
+    it('calls .isInBlackList() with blackList = .getHidden()', function() {
+      const model = new Model()
+      const isInBlackListStub = Sinon.stub(model, <any>'isInBlackList')
+      isInBlackListStub.callsFake(() => {
+        return 'anything'
+      })
+
+      const getHiddenStub = Sinon.stub(model, 'getHidden')
+      getHiddenStub.returns('blackList')
+
+      expect(model.isHidden('key')).toEqual('anything')
+      expect(isInBlackListStub.calledWith('key', 'blackList')).toBe(true)
+    })
+  })
+
+  describe('protected .isInWhiteList()', function() {
+    it('returns false if whiteList is empty and .isInBlackList() returns false', function() {
+      const model = new Model()
+      expect(model['isInWhiteList']('first_name', [], ['*'])).toBe(false)
+      expect(model['isInWhiteList']('first_name', [], ['first_name'])).toBe(false)
     })
 
-    it('returns true if fillable not defined, not in guarded, not known properties and not start by _', function() {
+    it('returns true if the key is in whiteList', function() {
       const model = new Model()
-      update_model_setting('fillable', [])
-      update_model_setting('guarded', ['password'])
-      expect(model.isFillable('not_defined')).toBe(true)
-      expect(model.isFillable('driver')).toBe(false)
-      expect(model.isFillable('_private')).toBe(false)
+      expect(model['isInWhiteList']('first_name', ['first_name'], ['*'])).toBe(true)
+      expect(model['isInWhiteList']('last_name', ['first_name'], ['*'])).toBe(false)
     })
 
-    it('always checks in fillable before guarded', function() {
+    it('returns true key in whiteList despite it also in blackList', function() {
       const model = new Model()
-      update_model_setting('fillable', ['first_name'])
-      update_model_setting('guarded', ['first_name'])
-      expect(model.isFillable('first_name')).toBe(true)
-      expect(model.isFillable('last_name')).toBe(false)
+      expect(model['isInWhiteList']('first_name', ['first_name'], ['first_name'])).toBe(true)
+    })
+
+    it('returns true if not in whiteList, not in blackList, not known properties and not start by _', function() {
+      const model = new Model()
+      expect(model['isInWhiteList']('not_defined', [], ['password'])).toBe(true)
+      expect(model['isInWhiteList']('driver', [], ['password'])).toBe(false)
+      expect(model['isInWhiteList']('_private', [], ['password'])).toBe(false)
+    })
+  })
+
+  describe('protected .isInBlackList()', function() {
+    it('returns true if blackList = [*]', function() {
+      const model = new Model()
+      expect(model['isInBlackList']('any', ['*'])).toBe(true)
+    })
+
+    it('returns true if blackList not equal [*] and key in blackList', function() {
+      const model = new Model()
+      expect(model['isInBlackList']('first_name', ['password'])).toBe(false)
+      expect(model['isInBlackList']('password', ['password'])).toBe(true)
     })
   })
 
@@ -284,6 +372,35 @@ describe('Eloquent', function() {
       expect(model.toObject()).toEqual({ first_name: 'john', last_name: 'doe' })
     })
   })
+
+  const makeTemporarySettingsMethods = {
+    markFillable: 'fillable',
+    markGuarded: 'guarded',
+    markVisible: 'visible',
+    markHidden: 'hidden'
+  }
+  for (const name in makeTemporarySettingsMethods) {
+    describe('.' + name + '()', function() {
+      it('is chain-able', function() {
+        const model = new Model()
+        expect(model[name]('a') === model).toBe(true)
+      })
+
+      it('creates temporarySettings with key "' + makeTemporarySettingsMethods[name] + '"', function() {
+        const model = new Model()
+
+        expect(model['temporarySettings']).toBeUndefined()
+        model[name]('a')
+        expect(model['temporarySettings']).toEqual({ [makeTemporarySettingsMethods[name]]: ['a'] })
+
+        model[name](['b', 'c'])
+        expect(model['temporarySettings']).toEqual({ [makeTemporarySettingsMethods[name]]: ['a', 'b', 'c'] })
+
+        model[name]('b', ['d'], 'e')
+        expect(model['temporarySettings']).toEqual({ [makeTemporarySettingsMethods[name]]: ['a', 'b', 'c', 'd', 'e'] })
+      })
+    })
+  }
 
   describe('.newInstance(data)', function() {
     it('creates new instance of Eloquent based by passing data', function() {

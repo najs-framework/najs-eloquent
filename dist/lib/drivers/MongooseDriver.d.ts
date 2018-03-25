@@ -31,7 +31,7 @@ export declare class MongooseDriver<T extends Object = {}> implements IAutoload,
     getReservedNames(): string[];
     getDriverProxyMethods(): string[];
     getQueryProxyMethods(): string[];
-    touch(): void;
+    touch(): Eloquent<T>;
     save(): Promise<any>;
     delete(): Promise<any>;
     forceDelete(): Promise<any>;

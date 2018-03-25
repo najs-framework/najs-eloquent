@@ -172,6 +172,26 @@ describe('EloquentMetadata', function () {
             getSettingPropertyStub.restore();
         });
     });
+    describe('.visible()', function () {
+        it('calls .getSettingProperty() with "visible" and default value = []', function () {
+            const metadata = EloquentMetadata_1.EloquentMetadata.get(new Model());
+            const getSettingPropertyStub = Sinon.stub(metadata, 'getSettingProperty');
+            getSettingPropertyStub.returns(['test']);
+            expect(metadata.visible()).toEqual(['test']);
+            expect(getSettingPropertyStub.calledWith('visible', [])).toBe(true);
+            getSettingPropertyStub.restore();
+        });
+    });
+    describe('.hidden()', function () {
+        it('calls .getSettingProperty() with "hidden" and default value = []', function () {
+            const metadata = EloquentMetadata_1.EloquentMetadata.get(new Model());
+            const getSettingPropertyStub = Sinon.stub(metadata, 'getSettingProperty');
+            getSettingPropertyStub.returns([]);
+            expect(metadata.hidden()).toEqual([]);
+            expect(getSettingPropertyStub.calledWith('hidden', [])).toBe(true);
+            getSettingPropertyStub.restore();
+        });
+    });
     describe('.hasTimestamps()', function () {
         it('calls .hasSetting() with key "timestamps" and returns result', function () {
             const metadata = EloquentMetadata_1.EloquentMetadata.get(new Model());

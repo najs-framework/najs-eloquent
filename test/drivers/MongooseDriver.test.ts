@@ -468,6 +468,18 @@ describe('MongooseDriver', function() {
 
   describe('ActiveRecord Functions', function() {
     describe('.touch()', function() {
+      it('returns "eloquentModel" for chain-ing', function() {
+        const eloquentModel = {}
+        const driver = new MongooseDriver(<any>fakeModel, true)
+        driver['eloquentModel'] = <any>eloquentModel
+        driver['metadata'] = <any>{
+          hasTimestamps() {
+            return false
+          }
+        }
+        expect(driver.touch() === eloquentModel).toBe(true)
+      })
+
       it('does nothing if metadata.hasTimestamps() is false', function() {
         const driver = new MongooseDriver(<any>fakeModel, true)
         driver.attributes = <any>{
