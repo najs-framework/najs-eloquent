@@ -10,13 +10,13 @@ import { MongooseProvider } from '../facades/global/MongooseProviderFacade'
 import { SoftDelete } from '../v0.x/eloquent/mongoose/SoftDelete'
 
 export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloquentDriver {
-  attributes: Document & T
-  metadata: EloquentMetadata
-  eloquentModel: Eloquent<T>
-  mongooseModel: Model<Document & T>
-  queryLogGroup: string
-  modelName: string
-  isGuarded: boolean
+  protected attributes: Document & T
+  protected metadata: EloquentMetadata
+  protected eloquentModel: Eloquent<T>
+  protected mongooseModel: Model<Document & T>
+  protected queryLogGroup: string
+  protected modelName: string
+  protected isGuarded: boolean
 
   constructor(model: Eloquent<T>, isGuarded: boolean) {
     this.eloquentModel = model
@@ -113,19 +113,23 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
   newQuery(): MongooseQueryBuilder<T> {
     return new MongooseQueryBuilder<T>(
       this.modelName,
-      undefined
-      // this.metadata.hasSoftDeletes() ? this.metadata.softDeletes() : undefined
+      this.metadata.hasSoftDeletes() ? this.metadata.softDeletes() : undefined
     ).setLogGroup(this.queryLogGroup)
   }
 
-  // TODO: implementation
   toObject(): Object {
-    return this.attributes
+    return this.attributes.toObject()
   }
 
-  // TODO: implementation
   toJSON(): Object {
-    return this.attributes
+    const data = this.toObject()
+    return Object.getOwnPropertyNames(data).reduce((memo, name) => {
+      const key = name === '_id' ? 'id' : name
+      if (this.eloquentModel.isVisible(key)) {
+        memo[key] = data[name]
+      }
+      return memo
+    }, {})
   }
 
   is(model: any): boolean {

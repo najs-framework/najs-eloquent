@@ -109,22 +109,19 @@ class Eloquent {
             this.temporarySettings[name] = [];
         }
         this.temporarySettings[name] = Array.from(new Set(this.temporarySettings[name].concat(value)));
+        return this;
     }
     markFillable(...args) {
-        this.concatTemporarySetting('fillable', lodash_1.flatten(args));
-        return this;
+        return this.concatTemporarySetting('fillable', lodash_1.flatten(args));
     }
     markGuarded(...args) {
-        this.concatTemporarySetting('guarded', lodash_1.flatten(args));
-        return this;
+        return this.concatTemporarySetting('guarded', lodash_1.flatten(args));
     }
     markVisible(...args) {
-        this.concatTemporarySetting('visible', lodash_1.flatten(args));
-        return this;
+        return this.concatTemporarySetting('visible', lodash_1.flatten(args));
     }
     markHidden(...args) {
-        this.concatTemporarySetting('hidden', lodash_1.flatten(args));
-        return this;
+        return this.concatTemporarySetting('hidden', lodash_1.flatten(args));
     }
     newInstance(data) {
         return najs_binding_1.make(this.getClassName(), [data]);

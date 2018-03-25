@@ -54,11 +54,11 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
     return new FactoryBuilder(className, name, this.definitions, this.states, this.faker)
   }
 
-  create(className: string, attributes?: any): any {
+  create(className: string, attributes?: Object): any {
     return this.of(className).create(<any>attributes)
   }
 
-  createAs(className: string, name: string, attributes?: any): any {
+  createAs(className: string, name: string, attributes?: Object): any {
     return this.of(className, name).create(<any>attributes)
   }
 
@@ -66,16 +66,16 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
     return this.of(className).make(<any>attributes)
   }
 
-  makeAs(className: string, name: string, attributes?: any): any {
-    return this.of(className, name).make(attributes)
+  makeAs(className: string, name: string, attributes?: Object): any {
+    return this.of(className, name).make(<any>attributes)
   }
 
-  raw(className: string, attributes?: any): any {
-    return this.of(className).raw(attributes)
+  raw(className: string, attributes?: Object): any {
+    return this.of(className).raw(<any>attributes)
   }
 
-  rawOf(className: string, name: string, attributes?: any): any {
-    return this.of(className, name).raw(attributes)
+  rawOf(className: string, name: string, attributes?: Object): any {
+    return this.of(className, name).raw(<any>attributes)
   }
 }
 register(FactoryManager)

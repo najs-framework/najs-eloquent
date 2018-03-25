@@ -79,17 +79,20 @@ class MongooseDriver {
         this.attributes._id = id;
     }
     newQuery() {
-        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.modelName, undefined
-        // this.metadata.hasSoftDeletes() ? this.metadata.softDeletes() : undefined
-        ).setLogGroup(this.queryLogGroup);
+        return new MongooseQueryBuilder_1.MongooseQueryBuilder(this.modelName, this.metadata.hasSoftDeletes() ? this.metadata.softDeletes() : undefined).setLogGroup(this.queryLogGroup);
     }
-    // TODO: implementation
     toObject() {
-        return this.attributes;
+        return this.attributes.toObject();
     }
-    // TODO: implementation
     toJSON() {
-        return this.attributes;
+        const data = this.toObject();
+        return Object.getOwnPropertyNames(data).reduce((memo, name) => {
+            const key = name === '_id' ? 'id' : name;
+            if (this.eloquentModel.isVisible(key)) {
+                memo[key] = data[name];
+            }
+            return memo;
+        }, {});
     }
     is(model) {
         return this.attributes['_id'] === model['getId']();

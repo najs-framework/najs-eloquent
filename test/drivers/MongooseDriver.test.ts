@@ -181,7 +181,7 @@ describe('MongooseDriver', function() {
       MongooseProvider.createModelFromSchema('RegisteredModel', new Schema({}))
       const driver = new MongooseDriver(new User(), false)
       const getMongooseSchemaSpy = Sinon.spy(driver, <any>'getMongooseSchema')
-      driver.modelName = 'RegisteredModel'
+      driver['modelName'] = 'RegisteredModel'
       driver['initializeModelIfNeeded']()
       expect(getMongooseSchemaSpy.called).toBe(false)
     })
@@ -205,7 +205,7 @@ describe('MongooseDriver', function() {
       const getMongooseSchemaStub = Sinon.stub(driver, <any>'getMongooseSchema')
       getMongooseSchemaStub.returns(schema)
 
-      driver.modelName = 'Test'
+      driver['modelName'] = 'Test'
       driver['initializeModelIfNeeded']()
 
       expect(getMongooseSchemaStub.called).toBe(true)
@@ -238,7 +238,7 @@ describe('MongooseDriver', function() {
 
       const setSpy = Sinon.spy(schema, 'set')
 
-      driver.modelName = 'Test'
+      driver['modelName'] = 'Test'
       driver['initializeModelIfNeeded']()
 
       expect(setSpy.calledWith('timestamps', 'anything')).toBe(true)
@@ -272,7 +272,7 @@ describe('MongooseDriver', function() {
 
       const pluginSpy = Sinon.spy(schema, 'plugin')
 
-      driver.modelName = 'Test'
+      driver['modelName'] = 'Test'
       driver['initializeModelIfNeeded']()
 
       expect(pluginSpy.calledWith(SoftDelete, 'anything')).toBe(true)
@@ -362,22 +362,65 @@ describe('MongooseDriver', function() {
         const query = user['newQuery']()
         expect(query).toBeInstanceOf(MongooseQueryBuilder)
         expect(query['logGroup']).toEqual('test')
+        expect(query['softDelete']).toBeUndefined()
+      })
+
+      it('creates new instance of MongooseQueryBuilder with softDeletes options if metadata.hasSoftDeletes() returns true', function() {
+        const softDeletes = { deletedAt: 'deleted_at' }
+        const user = new User()
+        user['driver']['queryLogGroup'] = 'test'
+        user['driver']['metadata'] = {
+          hasSoftDeletes() {
+            return true
+          },
+          softDeletes() {
+            return softDeletes
+          }
+        }
+        const query = user['newQuery']()
+
+        expect(query).toBeInstanceOf(MongooseQueryBuilder)
+        expect(query['logGroup']).toEqual('test')
+        expect(query['softDelete'] === softDeletes).toBe(true)
       })
     })
 
     describe('.toObject()', function() {
-      // TODO: write a test
-      it('works (not finished yet)', function() {
-        const user = new User()
-        user.toObject()
+      it('simply returns "attributes".toObject()', function() {
+        const attributes = {
+          toObject() {
+            return { a: 'test' }
+          }
+        }
+        const driver = new MongooseDriver(<any>fakeModel, true)
+        driver['attributes'] = <any>attributes
+        const toObjectSpy = Sinon.spy(attributes, 'toObject')
+        expect(driver.toObject()).toEqual({ a: 'test' })
+        expect(toObjectSpy.called).toBe(true)
       })
     })
 
     describe('.toJSON()', function() {
-      // TODO: write a test
-      it('works (not finished yet)', function() {
+      it('calls .toObject() transform _id to id, and calls .isVisible() to filter visible keys', function() {
         const user = new User()
-        user.toJSON()
+        const driver = new MongooseDriver(<any>fakeModel, true)
+        driver['eloquentModel'] = user
+
+        const toObjectStub = Sinon.stub(driver, 'toObject')
+        toObjectStub.returns({
+          _id: 1,
+          a: 'a',
+          b: 'b',
+          c: 'c',
+          __v: 0
+        })
+        expect(driver.toJSON()).toEqual({ id: 1, a: 'a', b: 'b', c: 'c' })
+
+        user.markHidden('a')
+        expect(driver.toJSON()).toEqual({ id: 1, b: 'b', c: 'c' })
+
+        user.markHidden('id', 'b', 'c').markVisible('b')
+        expect(driver.toJSON()).toEqual({ b: 'b' })
       })
     })
 
@@ -482,7 +525,7 @@ describe('MongooseDriver', function() {
 
       it('does nothing if metadata.hasTimestamps() is false', function() {
         const driver = new MongooseDriver(<any>fakeModel, true)
-        driver.attributes = <any>{
+        driver['attributes'] = <any>{
           markModified() {}
         }
         driver['metadata'] = <any>{
@@ -493,14 +536,14 @@ describe('MongooseDriver', function() {
             return { updatedAt: 'updated' }
           }
         }
-        const markModifiedSpy = Sinon.spy(driver.attributes, 'markModified')
+        const markModifiedSpy = Sinon.spy(driver['attributes'], 'markModified')
         driver.touch()
         expect(markModifiedSpy.called).toBe(false)
       })
 
       it('calls "attributes".markModified() if metadata.hasTimestamps() return true', function() {
         const driver = new MongooseDriver(<any>fakeModel, true)
-        driver.attributes = <any>{
+        driver['attributes'] = <any>{
           markModified() {}
         }
         driver['metadata'] = <any>{
@@ -511,7 +554,7 @@ describe('MongooseDriver', function() {
             return { updatedAt: 'updated' }
           }
         }
-        const markModifiedSpy = Sinon.spy(driver.attributes, 'markModified')
+        const markModifiedSpy = Sinon.spy(driver['attributes'], 'markModified')
         driver.touch()
         expect(markModifiedSpy.calledWith('updated')).toBe(true)
       })
@@ -520,10 +563,10 @@ describe('MongooseDriver', function() {
     describe('.save()', function() {
       it('simply calls "attributes".save()', function() {
         const driver = new MongooseDriver(<any>fakeModel, true)
-        driver.attributes = <any>{
+        driver['attributes'] = <any>{
           save() {}
         }
-        const saveSpy = Sinon.spy(driver.attributes, 'save')
+        const saveSpy = Sinon.spy(driver['attributes'], 'save')
         driver.save()
         expect(saveSpy.called).toBe(true)
       })
@@ -532,7 +575,7 @@ describe('MongooseDriver', function() {
     describe('.delete()', function() {
       it('simply calls "attributes".delete() metadata.hasSoftDelete() returns true', function() {
         const driver = new MongooseDriver(<any>fakeModel, true)
-        driver.attributes = <any>{
+        driver['attributes'] = <any>{
           delete() {},
           remove() {}
         }
@@ -541,8 +584,8 @@ describe('MongooseDriver', function() {
             return true
           }
         }
-        const deleteSpy = Sinon.spy(driver.attributes, <any>'delete')
-        const removeSpy = Sinon.spy(driver.attributes, 'remove')
+        const deleteSpy = Sinon.spy(driver['attributes'], <any>'delete')
+        const removeSpy = Sinon.spy(driver['attributes'], 'remove')
         driver.delete()
         expect(deleteSpy.called).toBe(true)
         expect(removeSpy.called).toBe(false)
@@ -550,7 +593,7 @@ describe('MongooseDriver', function() {
 
       it('simply calls "attributes".remove() metadata.hasSoftDelete() returns false', function() {
         const driver = new MongooseDriver(<any>fakeModel, true)
-        driver.attributes = <any>{
+        driver['attributes'] = <any>{
           delete() {},
           remove() {}
         }
@@ -559,8 +602,8 @@ describe('MongooseDriver', function() {
             return false
           }
         }
-        const deleteSpy = Sinon.spy(driver.attributes, <any>'delete')
-        const removeSpy = Sinon.spy(driver.attributes, 'remove')
+        const deleteSpy = Sinon.spy(driver['attributes'], <any>'delete')
+        const removeSpy = Sinon.spy(driver['attributes'], 'remove')
         driver.delete()
         expect(deleteSpy.called).toBe(false)
         expect(removeSpy.called).toBe(true)
@@ -570,7 +613,7 @@ describe('MongooseDriver', function() {
     describe('.forceDelete()', function() {
       it('simply calls "attributes".remove() even metadata.hasSoftDeletes() returns false', function() {
         const driver = new MongooseDriver(<any>fakeModel, true)
-        driver.attributes = <any>{
+        driver['attributes'] = <any>{
           remove() {}
         }
         driver['metadata'] = <any>{
@@ -578,7 +621,7 @@ describe('MongooseDriver', function() {
             return false
           }
         }
-        const removeSpy = Sinon.spy(driver.attributes, 'remove')
+        const removeSpy = Sinon.spy(driver['attributes'], 'remove')
         driver.forceDelete()
         expect(removeSpy.called).toBe(true)
       })
@@ -587,7 +630,7 @@ describe('MongooseDriver', function() {
     describe('.restore()', function() {
       it('does nothing if metadata.hasSoftDeletes() returns false', function() {
         const driver = new MongooseDriver(<any>fakeModel, true)
-        driver.attributes = <any>{
+        driver['attributes'] = <any>{
           restore() {}
         }
         driver['metadata'] = <any>{
@@ -595,14 +638,14 @@ describe('MongooseDriver', function() {
             return false
           }
         }
-        const restoreSpy = Sinon.spy(driver.attributes, <any>'restore')
+        const restoreSpy = Sinon.spy(driver['attributes'], <any>'restore')
         driver.restore()
         expect(restoreSpy.called).toBe(false)
       })
 
       it('calls "attributes".restore() if metadata.hasSoftDelete() return true', function() {
         const driver = new MongooseDriver(<any>fakeModel, true)
-        driver.attributes = <any>{
+        driver['attributes'] = <any>{
           restore() {}
         }
         driver['metadata'] = <any>{
@@ -610,7 +653,7 @@ describe('MongooseDriver', function() {
             return true
           }
         }
-        const restoreSpy = Sinon.spy(driver.attributes, <any>'restore')
+        const restoreSpy = Sinon.spy(driver['attributes'], <any>'restore')
         driver.restore()
         expect(restoreSpy.called).toBe(true)
       })
@@ -619,7 +662,7 @@ describe('MongooseDriver', function() {
     describe('.fresh()', function() {
       it('always returns null if "attributes".isNew is true', async function() {
         const driver = new MongooseDriver(<any>fakeModel, true)
-        driver.attributes = <any>{
+        driver['attributes'] = <any>{
           isNew: true
         }
         expect(await driver.fresh()).toBeNull()

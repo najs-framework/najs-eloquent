@@ -150,7 +150,7 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
     return Array.from(new Set(value.concat(this.temporarySettings[name])))
   }
 
-  private concatTemporarySetting(name: string, value: any[]) {
+  private concatTemporarySetting(name: string, value: any[]): this {
     if (!this.temporarySettings) {
       this.temporarySettings = {}
     }
@@ -158,30 +158,23 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
       this.temporarySettings[name] = []
     }
     this.temporarySettings[name] = Array.from(new Set(this.temporarySettings[name].concat(value)))
+    return this
   }
 
   markFillable(...args: Array<string | string[]>): this {
-    this.concatTemporarySetting('fillable', flatten(args))
-
-    return this
+    return this.concatTemporarySetting('fillable', flatten(args))
   }
 
   markGuarded(...args: Array<string | string[]>): this {
-    this.concatTemporarySetting('guarded', flatten(args))
-
-    return this
+    return this.concatTemporarySetting('guarded', flatten(args))
   }
 
   markVisible(...args: Array<string | string[]>): this {
-    this.concatTemporarySetting('visible', flatten(args))
-
-    return this
+    return this.concatTemporarySetting('visible', flatten(args))
   }
 
   markHidden(...args: Array<string | string[]>): this {
-    this.concatTemporarySetting('hidden', flatten(args))
-
-    return this
+    return this.concatTemporarySetting('hidden', flatten(args))
   }
 
   newInstance(data?: Object | Record): this {
