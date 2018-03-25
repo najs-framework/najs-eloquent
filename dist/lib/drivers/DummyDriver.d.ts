@@ -20,5 +20,6 @@ export declare class DummyDriver<T extends Object = {}> implements IEloquentDriv
     getReservedNames(): string[];
     getDriverProxyMethods(): string[];
     getQueryProxyMethods(): string[];
+    createStaticMethods(model: any): void;
     formatAttributeName(name: string): string;
 }

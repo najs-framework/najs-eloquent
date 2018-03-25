@@ -67,6 +67,8 @@ export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
     return ['where', 'orWhere']
   }
 
+  createStaticMethods(model: any) {}
+
   formatAttributeName(name: string): string {
     return snakeCase(name)
   }

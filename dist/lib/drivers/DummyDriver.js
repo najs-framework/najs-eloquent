@@ -46,6 +46,7 @@ class DummyDriver {
     getQueryProxyMethods() {
         return ['where', 'orWhere'];
     }
+    createStaticMethods(model) { }
     formatAttributeName(name) {
         return lodash_1.snakeCase(name);
     }

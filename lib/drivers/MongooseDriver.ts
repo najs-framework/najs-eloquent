@@ -9,7 +9,10 @@ import { MongooseQueryBuilder } from '../query-builders/mongodb/MongooseQueryBui
 import { MongooseProvider } from '../facades/global/MongooseProviderFacade'
 import { SoftDelete } from '../v0.x/eloquent/mongoose/SoftDelete'
 
+const STATIC_METHODS_WITH_ID = ['first', 'firstOrFail', 'find', 'findOrFail', 'delete', 'restore']
+
 export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloquentDriver {
+  static className: string = 'NajsEloquent.MongooseDriver'
   protected attributes: Document & T
   protected metadata: EloquentMetadata
   protected eloquentModel: Eloquent<T>
@@ -26,7 +29,7 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
   }
 
   getClassName() {
-    return 'NajsEloquent.MongooseDriver'
+    return MongooseDriver.className
   }
 
   initialize(data?: any): void {
@@ -169,6 +172,13 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
       'whereNotNull',
       'orWhereNull',
       'orWhereNotNull',
+      'native',
+      // ISoftDeletesQuery
+      'withTrashed',
+      'onlyTrashed',
+      // Mongoose Query Helpers
+      'findOrFail',
+      'firstOrFail',
       // IFetchResultQuery
       'get',
       'all',
@@ -176,11 +186,36 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
       'first',
       'count',
       'pluck',
-      'update',
+      'update'
       // 'delete', conflict to .getDriverProxyMethods() then it should be removed
       // 'restore', conflict to .getDriverProxyMethods() then it should be removed
-      'execute'
+      // 'execute', removed because it could not run alone
     ]
+  }
+
+  createStaticMethods(eloquent: typeof Eloquent) {
+    this.getQueryProxyMethods()
+      .concat(['delete', 'restore'])
+      .forEach(function(method) {
+        if (!!eloquent[method]) {
+          return
+        }
+
+        if (STATIC_METHODS_WITH_ID.indexOf(method) !== -1) {
+          eloquent[method] = function() {
+            const query = Reflect.construct(eloquent, []).newQuery()
+            if (arguments.length === 1) {
+              query.where('id', arguments[0])
+            }
+            return query[method]()
+          }
+        } else {
+          eloquent[method] = function() {
+            const query = Reflect.construct(eloquent, []).newQuery()
+            return query[method](...arguments)
+          }
+        }
+      })
   }
 
   touch() {

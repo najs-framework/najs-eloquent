@@ -37,7 +37,9 @@ export class DriverManager extends Facade implements IEloquentDriverProvider, IA
   }
 
   protected createDriver<T>(model: Eloquent<T>, driverClass: string, isGuarded: boolean): IEloquentDriver<T> {
-    return make<IEloquentDriver<T>>(driverClass, [model, isGuarded])
+    const driver = make<IEloquentDriver<T>>(driverClass, [model, isGuarded])
+    driver.createStaticMethods(<any>Object.getPrototypeOf(model).constructor)
+    return driver
   }
 
   create<T extends Object = {}>(model: Eloquent<T>): IEloquentDriver<T>

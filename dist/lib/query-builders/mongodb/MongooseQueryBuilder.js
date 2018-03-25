@@ -226,6 +226,7 @@ class MongooseQueryBuilder extends GenericQueryBuilder_1.GenericQueryBuilder {
             .end();
         return query.exec();
     }
+    // Helpers -----------------------------------------------------------------------------------------------------------
     async findOrFail() {
         const value = await this.find();
         if (!value) {

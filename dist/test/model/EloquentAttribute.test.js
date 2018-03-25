@@ -8,7 +8,7 @@ const Eloquent_1 = require("../../lib/model/Eloquent");
 const EloquentAttribute_1 = require("../../lib/model/EloquentAttribute");
 const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
 const DummyDriver_1 = require("../../lib/drivers/DummyDriver");
-EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
+EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy', true);
 class Model extends Eloquent_1.Eloquent {
     get accessor() {
         return '';

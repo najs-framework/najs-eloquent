@@ -25,7 +25,9 @@ class DriverManager extends najs_facade_1.Facade {
         return first;
     }
     createDriver(model, driverClass, isGuarded) {
-        return najs_binding_1.make(driverClass, [model, isGuarded]);
+        const driver = najs_binding_1.make(driverClass, [model, isGuarded]);
+        driver.createStaticMethods(Object.getPrototypeOf(model).constructor);
+        return driver;
     }
     create(model, isGuarded = true) {
         return this.createDriver(model, this.findDriverClassName(model), isGuarded);

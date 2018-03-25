@@ -5,6 +5,7 @@ const Sinon = require("sinon");
 const NajsBinding = require("najs-binding");
 const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
 class FakeDriver {
+    createStaticMethods() { }
 }
 FakeDriver.className = 'FakeDriver';
 describe('DriverManager', function () {
@@ -66,7 +67,9 @@ describe('DriverManager', function () {
         it('calls "najs-binding".make() to create an instance of driver, model is passed in param', function () {
             const model = {};
             const makeStub = Sinon.stub(NajsBinding, 'make');
-            makeStub.callsFake(() => { });
+            makeStub.callsFake(() => ({
+                createStaticMethods() { }
+            }));
             EloquentDriverProviderFacade_1.EloquentDriverProvider['createDriver'](model, 'DriverClass');
             expect(makeStub.calledWith('DriverClass', [model]));
             makeStub.restore();

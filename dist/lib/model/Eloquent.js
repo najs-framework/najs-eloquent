@@ -25,6 +25,11 @@ class Eloquent {
             return new Proxy(this, EloquentProxy_1.EloquentProxy);
         }
     }
+    static register(model) {
+        // just create new instance, it's auto register and bind static Queries
+        najs_binding_1.register(model);
+        Reflect.construct(model, []);
+    }
     getModelName() {
         return this.getClassName();
     }
@@ -111,17 +116,17 @@ class Eloquent {
         this.temporarySettings[name] = Array.from(new Set(this.temporarySettings[name].concat(value)));
         return this;
     }
-    markFillable(...args) {
-        return this.concatTemporarySetting('fillable', lodash_1.flatten(args));
+    markFillable() {
+        return this.concatTemporarySetting('fillable', lodash_1.flatten(arguments));
     }
-    markGuarded(...args) {
-        return this.concatTemporarySetting('guarded', lodash_1.flatten(args));
+    markGuarded() {
+        return this.concatTemporarySetting('guarded', lodash_1.flatten(arguments));
     }
-    markVisible(...args) {
-        return this.concatTemporarySetting('visible', lodash_1.flatten(args));
+    markVisible() {
+        return this.concatTemporarySetting('visible', lodash_1.flatten(arguments));
     }
-    markHidden(...args) {
-        return this.concatTemporarySetting('hidden', lodash_1.flatten(args));
+    markHidden() {
+        return this.concatTemporarySetting('hidden', lodash_1.flatten(arguments));
     }
     newInstance(data) {
         return najs_binding_1.make(this.getClassName(), [data]);

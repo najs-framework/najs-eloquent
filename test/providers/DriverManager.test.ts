@@ -5,6 +5,8 @@ import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverP
 
 class FakeDriver {
   static className = 'FakeDriver'
+
+  createStaticMethods() {}
 }
 
 describe('DriverManager', function() {
@@ -76,7 +78,9 @@ describe('DriverManager', function() {
     it('calls "najs-binding".make() to create an instance of driver, model is passed in param', function() {
       const model = {}
       const makeStub = Sinon.stub(NajsBinding, 'make')
-      makeStub.callsFake(() => {})
+      makeStub.callsFake(() => ({
+        createStaticMethods() {}
+      }))
 
       EloquentDriverProvider['createDriver'](model, 'DriverClass')
       expect(makeStub.calledWith('DriverClass', [model]))

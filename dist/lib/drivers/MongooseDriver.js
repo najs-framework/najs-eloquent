@@ -7,6 +7,7 @@ const mongoose_1 = require("mongoose");
 const MongooseQueryBuilder_1 = require("../query-builders/mongodb/MongooseQueryBuilder");
 const MongooseProviderFacade_1 = require("../facades/global/MongooseProviderFacade");
 const SoftDelete_1 = require("../v0.x/eloquent/mongoose/SoftDelete");
+const STATIC_METHODS_WITH_ID = ['first', 'firstOrFail', 'find', 'findOrFail', 'delete', 'restore'];
 class MongooseDriver {
     constructor(model, isGuarded) {
         this.eloquentModel = model;
@@ -15,7 +16,7 @@ class MongooseDriver {
         this.isGuarded = isGuarded;
     }
     getClassName() {
-        return 'NajsEloquent.MongooseDriver';
+        return MongooseDriver.className;
     }
     initialize(data) {
         this.metadata = EloquentMetadata_1.EloquentMetadata.get(this.eloquentModel);
@@ -127,6 +128,13 @@ class MongooseDriver {
             'whereNotNull',
             'orWhereNull',
             'orWhereNotNull',
+            'native',
+            // ISoftDeletesQuery
+            'withTrashed',
+            'onlyTrashed',
+            // Mongoose Query Helpers
+            'findOrFail',
+            'firstOrFail',
             // IFetchResultQuery
             'get',
             'all',
@@ -134,11 +142,35 @@ class MongooseDriver {
             'first',
             'count',
             'pluck',
-            'update',
+            'update'
             // 'delete', conflict to .getDriverProxyMethods() then it should be removed
             // 'restore', conflict to .getDriverProxyMethods() then it should be removed
-            'execute'
+            // 'execute', removed because it could not run alone
         ];
+    }
+    createStaticMethods(eloquent) {
+        this.getQueryProxyMethods()
+            .concat(['delete', 'restore'])
+            .forEach(function (method) {
+            if (!!eloquent[method]) {
+                return;
+            }
+            if (STATIC_METHODS_WITH_ID.indexOf(method) !== -1) {
+                eloquent[method] = function () {
+                    const query = Reflect.construct(eloquent, []).newQuery();
+                    if (arguments.length === 1) {
+                        query.where('id', arguments[0]);
+                    }
+                    return query[method]();
+                };
+            }
+            else {
+                eloquent[method] = function () {
+                    const query = Reflect.construct(eloquent, []).newQuery();
+                    return query[method](...arguments);
+                };
+            }
+        });
     }
     touch() {
         if (this.metadata.hasTimestamps()) {
@@ -173,4 +205,5 @@ class MongooseDriver {
         return query.where(query.getPrimaryKey(), this.attributes._id).first();
     }
 }
+MongooseDriver.className = 'NajsEloquent.MongooseDriver';
 exports.MongooseDriver = MongooseDriver;

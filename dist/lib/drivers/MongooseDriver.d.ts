@@ -5,6 +5,7 @@ import { IEloquentDriver } from './interfaces/IEloquentDriver';
 import { Document, Model, Schema } from 'mongoose';
 import { MongooseQueryBuilder } from '../query-builders/mongodb/MongooseQueryBuilder';
 export declare class MongooseDriver<T extends Object = {}> implements IAutoload, IEloquentDriver {
+    static className: string;
     protected attributes: Document & T;
     protected metadata: EloquentMetadata;
     protected eloquentModel: Eloquent<T>;
@@ -31,6 +32,7 @@ export declare class MongooseDriver<T extends Object = {}> implements IAutoload,
     getReservedNames(): string[];
     getDriverProxyMethods(): string[];
     getQueryProxyMethods(): string[];
+    createStaticMethods(eloquent: typeof Eloquent): void;
     touch(): Eloquent<T>;
     save(): Promise<any>;
     delete(): Promise<any>;

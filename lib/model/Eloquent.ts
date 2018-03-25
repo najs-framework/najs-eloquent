@@ -50,6 +50,12 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
     }
   }
 
+  static register(model: typeof Eloquent) {
+    // just create new instance, it's auto register and bind static Queries
+    register(model)
+    Reflect.construct(model, [])
+  }
+
   abstract getClassName(): string
 
   getModelName(): string {
@@ -161,20 +167,40 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
     return this
   }
 
-  markFillable(...args: Array<string | string[]>): this {
-    return this.concatTemporarySetting('fillable', flatten(args))
+  markFillable(key: string): this
+  markFillable(keys: string[]): this
+  markFillable(...keys: Array<string>): this
+  markFillable(...keys: Array<string[]>): this
+  markFillable(...args: Array<string | string[]>): this
+  markFillable(): this {
+    return this.concatTemporarySetting('fillable', flatten(arguments))
   }
 
-  markGuarded(...args: Array<string | string[]>): this {
-    return this.concatTemporarySetting('guarded', flatten(args))
+  markGuarded(key: string): this
+  markGuarded(keys: string[]): this
+  markGuarded(...keys: Array<string>): this
+  markGuarded(...keys: Array<string[]>): this
+  markGuarded(...args: Array<string | string[]>): this
+  markGuarded(): this {
+    return this.concatTemporarySetting('guarded', flatten(arguments))
   }
 
-  markVisible(...args: Array<string | string[]>): this {
-    return this.concatTemporarySetting('visible', flatten(args))
+  markVisible(key: string): this
+  markVisible(keys: string[]): this
+  markVisible(...keys: Array<string>): this
+  markVisible(...keys: Array<string[]>): this
+  markVisible(...args: Array<string | string[]>): this
+  markVisible(): this {
+    return this.concatTemporarySetting('visible', flatten(arguments))
   }
 
-  markHidden(...args: Array<string | string[]>): this {
-    return this.concatTemporarySetting('hidden', flatten(args))
+  markHidden(key: string): this
+  markHidden(keys: string[]): this
+  markHidden(...keys: Array<string>): this
+  markHidden(...keys: Array<string[]>): this
+  markHidden(...args: Array<string | string[]>): this
+  markHidden(): this {
+    return this.concatTemporarySetting('hidden', flatten(arguments))
   }
 
   newInstance(data?: Object | Record): this {

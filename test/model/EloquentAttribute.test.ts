@@ -7,7 +7,7 @@ import { EloquentAttribute } from '../../lib/model/EloquentAttribute'
 import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverProviderFacade'
 import { DummyDriver } from '../../lib/drivers/DummyDriver'
 
-EloquentDriverProvider.register(DummyDriver, 'dummy')
+EloquentDriverProvider.register(DummyDriver, 'dummy', true)
 
 class Model extends Eloquent {
   props: string

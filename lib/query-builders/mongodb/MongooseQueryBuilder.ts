@@ -279,6 +279,8 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
     return query.exec()
   }
 
+  // Helpers -----------------------------------------------------------------------------------------------------------
+
   async findOrFail(): Promise<any> {
     const value = await this.find()
     if (!value) {

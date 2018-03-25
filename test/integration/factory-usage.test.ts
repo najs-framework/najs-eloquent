@@ -1,9 +1,10 @@
 import 'jest'
-import { register } from 'najs-binding'
-import { Factory, factory, Eloquent } from '../../lib/v1'
+import { Factory, factory, Eloquent, EloquentDriverProvider, MongooseDriver } from '../../lib/v1'
 import { Schema } from 'mongoose'
 import { init_mongoose, delete_collection } from '../util'
 const mongoose = require('mongoose')
+
+EloquentDriverProvider.register(MongooseDriver, 'mongoose', true)
 
 describe('Integration Test - Factory Usage', function() {
   beforeAll(async function() {
@@ -40,7 +41,8 @@ describe('Integration Test - Factory Usage', function() {
         )
       }
     }
-    register(User)
+    Eloquent.register(User)
+    Eloquent.register(User)
 
     it('can use Factory.define() to define factory for model', function() {
       Factory.define(User.className, (faker: Chance.Chance, attributes?: Object): Object => {
@@ -57,9 +59,12 @@ describe('Integration Test - Factory Usage', function() {
     })
 
     it('can use factory(User).raw() to get raw attributes', async function() {
-      factory(User.className).raw({
+      const user = await factory(User.className).create({
         age: 20
       })
+      expect((await User['find']()).toJson()).toEqual(user.toJson())
+      await User['delete'](user.id)
+      expect(await User['count']()).toEqual(0)
 
       // const user: User
       // user.getId()

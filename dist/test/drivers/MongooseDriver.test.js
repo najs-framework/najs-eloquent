@@ -419,6 +419,13 @@ describe('MongooseDriver', function () {
                     'whereNotNull',
                     'orWhereNull',
                     'orWhereNotNull',
+                    'native',
+                    // ISoftDeletesQuery
+                    'withTrashed',
+                    'onlyTrashed',
+                    // Mongoose Query Helpers
+                    'findOrFail',
+                    'firstOrFail',
                     // IFetchResultQuery
                     'get',
                     'all',
@@ -426,13 +433,15 @@ describe('MongooseDriver', function () {
                     'first',
                     'count',
                     'pluck',
-                    'update',
+                    'update'
                     // 'delete', conflict to .getDriverProxyMethods() then it should be removed
                     // 'restore', conflict to .getDriverProxyMethods() then it should be removed
-                    'execute'
+                    // 'execute', removed because it could not run alone
                 ]);
             });
         });
+        // TODO: write test
+        describe('.createStaticMethods()', function () { });
     });
     describe('ActiveRecord Functions', function () {
         describe('.touch()', function () {
