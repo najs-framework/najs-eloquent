@@ -1,5 +1,5 @@
 import { IAutoload } from 'najs-binding'
-import { snakeCase } from 'lodash'
+import { isFunction, snakeCase } from 'lodash'
 import { plural } from 'pluralize'
 import { Eloquent } from '../model/Eloquent'
 import { EloquentMetadata } from '../model/EloquentMetadata'
@@ -7,7 +7,7 @@ import { IEloquentDriver } from './interfaces/IEloquentDriver'
 import { Document, Model, Schema } from 'mongoose'
 import { MongooseQueryBuilder } from '../query-builders/mongodb/MongooseQueryBuilder'
 import { MongooseProvider } from '../facades/global/MongooseProviderFacade'
-// import { SoftDelete } from '../v0.x/eloquent/mongoose/SoftDelete'
+import { SoftDelete } from '../v0.x/eloquent/mongoose/SoftDelete'
 
 export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloquentDriver {
   attributes: Document & T
@@ -29,9 +29,50 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
     return 'NajsEloquent.MongooseDriver'
   }
 
-  initialize(data?: T): void {
+  initialize(data?: any): void {
     this.metadata = EloquentMetadata.get(this.eloquentModel)
     this.initializeModelIfNeeded()
+    this.createAttributesByData(data)
+  }
+
+  protected initializeModelIfNeeded() {
+    // prettier-ignore
+    if (MongooseProvider.getMongooseInstance().modelNames().indexOf(this.modelName) !== -1) {
+      return
+    }
+
+    const schema = this.getMongooseSchema()
+
+    if (this.metadata.hasTimestamps()) {
+      schema.set('timestamps', this.metadata.timestamps())
+    }
+
+    if (this.metadata.hasSoftDeletes()) {
+      schema.plugin(SoftDelete, this.metadata.softDeletes())
+    }
+
+    MongooseProvider.createModelFromSchema(this.modelName, schema)
+  }
+
+  protected getMongooseSchema(): Schema {
+    let schema: Schema | undefined = undefined
+    if (isFunction(this.eloquentModel['getSchema'])) {
+      schema = this.eloquentModel['getSchema']()
+    }
+
+    if (!schema || !(schema instanceof Schema)) {
+      schema = new Schema(
+        this.metadata.getSettingProperty('schema', {}),
+        Object.assign(
+          { collection: plural(snakeCase(this.modelName)) },
+          this.metadata.getSettingProperty('options', {})
+        )
+      )
+    }
+    return schema
+  }
+
+  protected createAttributesByData(data?: any) {
     this.mongooseModel = MongooseProvider.getMongooseInstance().model(this.modelName)
     if (data instanceof this.mongooseModel) {
       this.attributes = <Document & T>data
@@ -46,30 +87,6 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
         this.attributes.set(data)
       }
     }
-  }
-
-  protected initializeModelIfNeeded() {
-    // prettier-ignore
-    if (MongooseProvider.getMongooseInstance().modelNames().indexOf(this.modelName) !== -1) {
-      return
-    }
-
-    const schema = new Schema(
-      this.metadata.getSettingProperty('schema', {}),
-      this.metadata.getSettingProperty('options', { collection: plural(snakeCase(this.modelName)) })
-    )
-
-    // timestamps
-    // if (this.metadata.hasTimestamps()) {
-    //   schema.set('timestamps', this.metadata.timestamps())
-    // }
-
-    // soft-deletes
-    // if (this.metadata.hasSoftDeletes()) {
-    //   schema.plugin(SoftDelete, this.metadata.softDeletes())
-    // }
-
-    MongooseProvider.createModelFromSchema(this.modelName, schema)
   }
 
   getRecord(): T {
@@ -120,7 +137,7 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
   }
 
   getReservedNames(): string[] {
-    return ['schema', 'collection', 'options']
+    return ['schema', 'collection', 'options', 'getSchema']
   }
 
   getDriverProxyMethods() {

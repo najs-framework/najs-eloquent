@@ -1,6 +1,6 @@
 import '../../log/FlipFlopQueryLog'
 import { make } from 'najs-binding'
-import { Facade, IFacade } from 'najs-facade'
+import { Facade, IFacade, IFacadeBase } from 'najs-facade'
 import { NajsEloquent } from '../NajsEloquent'
 import { NajsEloquentClass } from '../../constants'
 import { IQueryLog } from '../../log/interfaces/IQueryLog'
@@ -10,4 +10,4 @@ const facade = Facade.create<IQueryLog>(NajsEloquent, 'QueryLog', function() {
 })
 
 export const QueryLogFacade: IQueryLog & IFacade = facade
-export const QueryLog: IQueryLog = facade
+export const QueryLog: IQueryLog & IFacadeBase = facade

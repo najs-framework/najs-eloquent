@@ -6,7 +6,7 @@ const EloquentMetadata_1 = require("../model/EloquentMetadata");
 const mongoose_1 = require("mongoose");
 const MongooseQueryBuilder_1 = require("../query-builders/mongodb/MongooseQueryBuilder");
 const MongooseProviderFacade_1 = require("../facades/global/MongooseProviderFacade");
-// import { SoftDelete } from '../v0.x/eloquent/mongoose/SoftDelete'
+const SoftDelete_1 = require("../v0.x/eloquent/mongoose/SoftDelete");
 class MongooseDriver {
     constructor(model, isGuarded) {
         this.eloquentModel = model;
@@ -20,6 +20,33 @@ class MongooseDriver {
     initialize(data) {
         this.metadata = EloquentMetadata_1.EloquentMetadata.get(this.eloquentModel);
         this.initializeModelIfNeeded();
+        this.createAttributesByData(data);
+    }
+    initializeModelIfNeeded() {
+        // prettier-ignore
+        if (MongooseProviderFacade_1.MongooseProvider.getMongooseInstance().modelNames().indexOf(this.modelName) !== -1) {
+            return;
+        }
+        const schema = this.getMongooseSchema();
+        if (this.metadata.hasTimestamps()) {
+            schema.set('timestamps', this.metadata.timestamps());
+        }
+        if (this.metadata.hasSoftDeletes()) {
+            schema.plugin(SoftDelete_1.SoftDelete, this.metadata.softDeletes());
+        }
+        MongooseProviderFacade_1.MongooseProvider.createModelFromSchema(this.modelName, schema);
+    }
+    getMongooseSchema() {
+        let schema = undefined;
+        if (lodash_1.isFunction(this.eloquentModel['getSchema'])) {
+            schema = this.eloquentModel['getSchema']();
+        }
+        if (!schema || !(schema instanceof mongoose_1.Schema)) {
+            schema = new mongoose_1.Schema(this.metadata.getSettingProperty('schema', {}), Object.assign({ collection: pluralize_1.plural(lodash_1.snakeCase(this.modelName)) }, this.metadata.getSettingProperty('options', {})));
+        }
+        return schema;
+    }
+    createAttributesByData(data) {
         this.mongooseModel = MongooseProviderFacade_1.MongooseProvider.getMongooseInstance().model(this.modelName);
         if (data instanceof this.mongooseModel) {
             this.attributes = data;
@@ -34,22 +61,6 @@ class MongooseDriver {
                 this.attributes.set(data);
             }
         }
-    }
-    initializeModelIfNeeded() {
-        // prettier-ignore
-        if (MongooseProviderFacade_1.MongooseProvider.getMongooseInstance().modelNames().indexOf(this.modelName) !== -1) {
-            return;
-        }
-        const schema = new mongoose_1.Schema(this.metadata.getSettingProperty('schema', {}), this.metadata.getSettingProperty('options', { collection: pluralize_1.plural(lodash_1.snakeCase(this.modelName)) }));
-        // timestamps
-        // if (this.metadata.hasTimestamps()) {
-        //   schema.set('timestamps', this.metadata.timestamps())
-        // }
-        // soft-deletes
-        // if (this.metadata.hasSoftDeletes()) {
-        //   schema.plugin(SoftDelete, this.metadata.softDeletes())
-        // }
-        MongooseProviderFacade_1.MongooseProvider.createModelFromSchema(this.modelName, schema);
     }
     getRecord() {
         return this.attributes;
@@ -87,7 +98,7 @@ class MongooseDriver {
         return lodash_1.snakeCase(name);
     }
     getReservedNames() {
-        return ['schema', 'collection', 'options'];
+        return ['schema', 'collection', 'options', 'getSchema'];
     }
     getDriverProxyMethods() {
         return ['is', 'getId', 'setId', 'newQuery', 'touch', 'save', 'delete', 'forceDelete', 'restore', 'fresh'];

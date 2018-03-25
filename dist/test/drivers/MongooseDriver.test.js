@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const Sinon = require("sinon");
 const najs_binding_1 = require("najs-binding");
+const najs_facade_1 = require("najs-facade");
+const mongoose_1 = require("mongoose");
 const util_1 = require("../util");
 const Eloquent_1 = require("../../lib/model/Eloquent");
 const MongooseDriver_1 = require("../../lib/drivers/MongooseDriver");
@@ -10,6 +12,8 @@ const FactoryFacade_1 = require("../../lib/facades/global/FactoryFacade");
 const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
 const MongooseQueryBuilder_1 = require("../../lib/query-builders/mongodb/MongooseQueryBuilder");
 const MongooseProviderFacade_1 = require("../../lib/facades/global/MongooseProviderFacade");
+const EloquentMetadata_1 = require("../../lib/model/EloquentMetadata");
+const SoftDelete_1 = require("../../lib/v0.x/eloquent/mongoose/SoftDelete");
 EloquentDriverProviderFacade_1.EloquentDriverProvider.register(MongooseDriver_1.MongooseDriver, 'mongoose', true);
 class User extends Eloquent_1.Eloquent {
     constructor() {
@@ -58,23 +62,185 @@ describe('MongooseDriver', function () {
         expect(driver.getClassName()).toEqual('NajsEloquent.MongooseDriver');
     });
     describe('constructor()', function () { });
-    // TODO: write more tests
     describe('.initialize()', function () {
-        it('creates metadata, and calls .initializeModelIfNeeded()', function () {
-            // const driver = new MongooseDriver(new User(), true)
-            // driver.initialize({})
-            // driver.initialize(new User())
-            const user = new User({});
-            new User(user);
+        it('creates metadata, then calls .initializeModelIfNeeded() and .createAttributesByData()', function () {
+            const model = {};
+            const driver = new MongooseDriver_1.MongooseDriver(new User(), true);
+            driver['eloquentModel'] = model;
+            const getStub = Sinon.stub(EloquentMetadata_1.EloquentMetadata, 'get');
+            getStub.returns('anything');
+            const createAttributesByDataStub = Sinon.stub(driver, 'createAttributesByData');
+            createAttributesByDataStub.callsFake(function () { });
+            const initializeModelIfNeededStub = Sinon.stub(driver, 'initializeModelIfNeeded');
+            initializeModelIfNeededStub.callsFake(function () { });
+            driver.initialize();
+            expect(getStub.calledWith(model)).toBe(true);
+            expect(initializeModelIfNeededStub.called).toBe(true);
+            expect(createAttributesByDataStub.calledWith()).toBe(true);
+            driver.initialize({});
+            expect(getStub.calledWith(model)).toBe(true);
+            expect(initializeModelIfNeededStub.called).toBe(true);
+            expect(createAttributesByDataStub.calledWith({})).toBe(true);
+            const userModel = MongooseProviderFacade_1.MongooseProvider.getMongooseInstance().model('User');
+            const user = new userModel();
+            driver.initialize(user);
+            expect(getStub.calledWith(model)).toBe(true);
+            expect(initializeModelIfNeededStub.called).toBe(true);
+            expect(createAttributesByDataStub.calledWith(user)).toBe(true);
+            initializeModelIfNeededStub.restore();
+            getStub.restore();
         });
     });
-    // TODO: write more tests
-    describe('protected .initializeModelIfNeeded()', function () { });
-    it('works', async function () {
-        // const userModel = new User()
-        // await factory(User.className).create()
-        // console.log(await userModel['count']())
-        // User.where('')
+    describe('protected .createAttributesByData()', function () {
+        it('simply assigns data to attributes if the data is instance of "mongooseModel"', function () {
+            const driver = new MongooseDriver_1.MongooseDriver(new User(), true);
+            expect(driver['attributes']).toBeUndefined();
+            const UserModel = MongooseProviderFacade_1.MongooseProvider.getMongooseInstance().model('User');
+            const user = new UserModel();
+            driver['createAttributesByData'](user);
+            expect(driver['attributes'] === user).toBe(true);
+        });
+        it('creates new instance of "mongooseModel" and does nothing if data is not an plain object', function () {
+            const driver = new MongooseDriver_1.MongooseDriver(new User(), true);
+            expect(driver['attributes']).toBeUndefined();
+            const UserModel = MongooseProviderFacade_1.MongooseProvider.getMongooseInstance().model('User');
+            driver['createAttributesByData']();
+            expect(driver['attributes']).toBeInstanceOf(UserModel);
+            expect(driver['attributes'].isNew).toBe(true);
+        });
+        it('creates new instance of "mongooseModel", call eloquentModel.fill if "isGuard" is true', function () {
+            const driver = new MongooseDriver_1.MongooseDriver(new User(), true);
+            const eloquentModel = {
+                fill() { }
+            };
+            const fillSpy = Sinon.spy(eloquentModel, 'fill');
+            driver['eloquentModel'] = eloquentModel;
+            expect(driver['attributes']).toBeUndefined();
+            const UserModel = MongooseProviderFacade_1.MongooseProvider.getMongooseInstance().model('User');
+            const data = { a: 'test' };
+            driver['createAttributesByData'](data);
+            expect(driver['attributes']).toBeInstanceOf(UserModel);
+            expect(driver['attributes'].isNew).toBe(true);
+            expect(fillSpy.calledWith(data)).toBe(true);
+        });
+        it('creates new instance of "mongooseModel", call attributes.set() if "isGuard" is false', function () {
+            const driver = new MongooseDriver_1.MongooseDriver(new User(), false);
+            const eloquentModel = {
+                fill() { }
+            };
+            const fillSpy = Sinon.spy(eloquentModel, 'fill');
+            driver['eloquentModel'] = eloquentModel;
+            expect(driver['attributes']).toBeUndefined();
+            const UserModel = MongooseProviderFacade_1.MongooseProvider.getMongooseInstance().model('User');
+            const data = { first_name: 'test' };
+            driver['createAttributesByData'](data);
+            expect(driver['attributes']).toBeInstanceOf(UserModel);
+            expect(driver['attributes'].isNew).toBe(true);
+            expect(driver['attributes'].first_name).toEqual('test');
+            expect(fillSpy.calledWith(data)).toBe(false);
+        });
+    });
+    describe('protected .initializeModelIfNeeded()', function () {
+        it('does nothing if the model is already register to mongoose', function () {
+            MongooseProviderFacade_1.MongooseProvider.createModelFromSchema('RegisteredModel', new mongoose_1.Schema({}));
+            const driver = new MongooseDriver_1.MongooseDriver(new User(), false);
+            const getMongooseSchemaSpy = Sinon.spy(driver, 'getMongooseSchema');
+            driver.modelName = 'RegisteredModel';
+            driver['initializeModelIfNeeded']();
+            expect(getMongooseSchemaSpy.called).toBe(false);
+        });
+        it('calls .getMongooseSchema(), then calls MongooseProvider.createModelFromSchema() to register model', function () {
+            const schema = {};
+            najs_facade_1.Facade(MongooseProviderFacade_1.MongooseProvider)
+                .shouldReceive('createModelFromSchema')
+                .withArgs('Test', schema);
+            const driver = new MongooseDriver_1.MongooseDriver(new User(), false);
+            driver['metadata'] = {
+                hasTimestamps() {
+                    return false;
+                },
+                hasSoftDeletes() {
+                    return false;
+                }
+            };
+            const getMongooseSchemaStub = Sinon.stub(driver, 'getMongooseSchema');
+            getMongooseSchemaStub.returns(schema);
+            driver.modelName = 'Test';
+            driver['initializeModelIfNeeded']();
+            expect(getMongooseSchemaStub.called).toBe(true);
+            najs_facade_1.FacadeContainer.verifyAndRestoreAllFacades();
+        });
+        it('calls schema.set("timestamps", metadata.timestamps()) if the metadata.hasTimestamps() returns true', function () {
+            const schema = {
+                set() { }
+            };
+            najs_facade_1.Facade(MongooseProviderFacade_1.MongooseProvider)
+                .shouldReceive('createModelFromSchema')
+                .withArgs('Test', schema);
+            const driver = new MongooseDriver_1.MongooseDriver(new User(), false);
+            driver['metadata'] = {
+                hasTimestamps() {
+                    return true;
+                },
+                timestamps() {
+                    return 'anything';
+                },
+                hasSoftDeletes() {
+                    return false;
+                }
+            };
+            const getMongooseSchemaStub = Sinon.stub(driver, 'getMongooseSchema');
+            getMongooseSchemaStub.returns(schema);
+            const setSpy = Sinon.spy(schema, 'set');
+            driver.modelName = 'Test';
+            driver['initializeModelIfNeeded']();
+            expect(setSpy.calledWith('timestamps', 'anything')).toBe(true);
+            expect(getMongooseSchemaStub.called).toBe(true);
+            najs_facade_1.FacadeContainer.verifyAndRestoreAllFacades();
+        });
+        it('calls schema.plugin(Schema, metadata.softDeletes()) if the metadata.hasSoftDeletes() returns true', function () {
+            const schema = {
+                plugin() { }
+            };
+            najs_facade_1.Facade(MongooseProviderFacade_1.MongooseProvider)
+                .shouldReceive('createModelFromSchema')
+                .withArgs('Test', schema);
+            const driver = new MongooseDriver_1.MongooseDriver(new User(), false);
+            driver['metadata'] = {
+                hasTimestamps() {
+                    return false;
+                },
+                softDeletes() {
+                    return 'anything';
+                },
+                hasSoftDeletes() {
+                    return true;
+                }
+            };
+            const getMongooseSchemaStub = Sinon.stub(driver, 'getMongooseSchema');
+            getMongooseSchemaStub.returns(schema);
+            const pluginSpy = Sinon.spy(schema, 'plugin');
+            driver.modelName = 'Test';
+            driver['initializeModelIfNeeded']();
+            expect(pluginSpy.calledWith(SoftDelete_1.SoftDelete, 'anything')).toBe(true);
+            expect(getMongooseSchemaStub.called).toBe(true);
+            najs_facade_1.FacadeContainer.verifyAndRestoreAllFacades();
+        });
+    });
+    describe('protected .getMongooseSchema()', function () {
+        it('calls "eloquentModel".getSchema() if that is a function', function () {
+            const driver = new MongooseDriver_1.MongooseDriver(new User(), false);
+            const eloquentModel = {
+                getSchema() {
+                    return new mongoose_1.Schema({});
+                }
+            };
+            driver['eloquentModel'] = eloquentModel;
+            const getSchemaSpy = Sinon.spy(eloquentModel, 'getSchema');
+            driver['getMongooseSchema']();
+            expect(getSchemaSpy.called).toBe(true);
+        });
+        it('auto creates a schema by "schema" and "options" settings from EloquentMetadata', function () { });
     });
     describe('implements IEloquentDriver', function () {
         describe('.getRecord()', function () {
@@ -170,9 +336,9 @@ describe('MongooseDriver', function () {
             });
         });
         describe('.getReservedNames()', function () {
-            it('returns reserved names = "schema, collection, options"', function () {
+            it('returns reserved names = "schema, collection, options, getSchema"', function () {
                 const driver = new MongooseDriver_1.MongooseDriver(fakeModel, true);
-                expect(driver.getReservedNames()).toEqual(['schema', 'collection', 'options']);
+                expect(driver.getReservedNames()).toEqual(['schema', 'collection', 'options', 'getSchema']);
             });
         });
         describe('.getDriverProxyMethods()', function () {

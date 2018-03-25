@@ -2,7 +2,7 @@ import { IAutoload } from 'najs-binding';
 import { Eloquent } from '../model/Eloquent';
 import { EloquentMetadata } from '../model/EloquentMetadata';
 import { IEloquentDriver } from './interfaces/IEloquentDriver';
-import { Document, Model } from 'mongoose';
+import { Document, Model, Schema } from 'mongoose';
 import { MongooseQueryBuilder } from '../query-builders/mongodb/MongooseQueryBuilder';
 export declare class MongooseDriver<T extends Object = {}> implements IAutoload, IEloquentDriver {
     attributes: Document & T;
@@ -14,8 +14,10 @@ export declare class MongooseDriver<T extends Object = {}> implements IAutoload,
     isGuarded: boolean;
     constructor(model: Eloquent<T>, isGuarded: boolean);
     getClassName(): string;
-    initialize(data?: T): void;
+    initialize(data?: any): void;
     protected initializeModelIfNeeded(): void;
+    protected getMongooseSchema(): Schema;
+    protected createAttributesByData(data?: any): void;
     getRecord(): T;
     getAttribute(name: string): any;
     setAttribute(name: string, value: any): boolean;
