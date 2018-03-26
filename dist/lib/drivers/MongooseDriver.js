@@ -7,6 +7,7 @@ const mongoose_1 = require("mongoose");
 const MongooseQueryBuilder_1 = require("../query-builders/mongodb/MongooseQueryBuilder");
 const MongooseProviderFacade_1 = require("../facades/global/MongooseProviderFacade");
 const SoftDelete_1 = require("./mongoose/SoftDelete");
+const setupTimestampMoment = require('mongoose-timestamps-moment').setupTimestamp;
 const STATIC_METHODS_WITH_ID = ['first', 'firstOrFail', 'find', 'findOrFail', 'delete', 'restore'];
 const QUERY_PROXY_METHODS_IBasicQuery = [
     'queryName',
@@ -78,8 +79,10 @@ class MongooseDriver {
         let schema = undefined;
         if (lodash_1.isFunction(this.eloquentModel['getSchema'])) {
             schema = this.eloquentModel['getSchema']();
+            Object.getPrototypeOf(schema).setupTimestamp = setupTimestampMoment;
         }
         if (!schema || !(schema instanceof mongoose_1.Schema)) {
+            mongoose_1.Schema.prototype['setupTimestamp'] = setupTimestampMoment;
             schema = new mongoose_1.Schema(this.metadata.getSettingProperty('schema', {}), Object.assign({ collection: pluralize_1.plural(lodash_1.snakeCase(this.modelName)) }, this.metadata.getSettingProperty('options', {})));
         }
         return schema;

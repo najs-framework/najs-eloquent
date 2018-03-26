@@ -8,6 +8,7 @@ import { Document, Model, Schema } from 'mongoose'
 import { MongooseQueryBuilder } from '../query-builders/mongodb/MongooseQueryBuilder'
 import { MongooseProvider } from '../facades/global/MongooseProviderFacade'
 import { SoftDelete } from './mongoose/SoftDelete'
+const setupTimestampMoment = require('mongoose-timestamps-moment').setupTimestamp
 
 const STATIC_METHODS_WITH_ID = ['first', 'firstOrFail', 'find', 'findOrFail', 'delete', 'restore']
 const QUERY_PROXY_METHODS_IBasicQuery = [
@@ -98,9 +99,11 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
     let schema: Schema | undefined = undefined
     if (isFunction(this.eloquentModel['getSchema'])) {
       schema = this.eloquentModel['getSchema']()
+      Object.getPrototypeOf(schema).setupTimestamp = setupTimestampMoment
     }
 
     if (!schema || !(schema instanceof Schema)) {
+      Schema.prototype['setupTimestamp'] = setupTimestampMoment
       schema = new Schema(
         this.metadata.getSettingProperty('schema', {}),
         Object.assign(

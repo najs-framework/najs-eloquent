@@ -1,6 +1,6 @@
 {
   "name": "najs-eloquent",
-  "version": "0.2.19",
+  "version": "0.2.20",
   "scripts": {
     "build": "npm run build-ts && npm run tslint",
     "build-ts": "tsc -d && ./script/copy-custom-definitions.js",
@@ -40,7 +40,7 @@
   },
   "peerDependencies": {
     "collect.js": "^4.0.11",
-    "moment": "^2.20.1",
+    "moment": "^2.21.0",
     "najs-binding": "^1.4.0"
   },
   "dependencies": {
@@ -55,14 +55,13 @@
     "@types/chance": "^1.0.0",
     "@types/jest": "^21.1.8",
     "@types/lodash": "^4.14.91",
-    "@types/moment": "^2.13.0",
     "@types/mongoose": "^4.7.31",
     "@types/pluralize": "^0.0.28",
     "@types/sinon": "^4.1.2",
     "collect.js": "^4.0.11",
     "coveralls": "^3.0.0",
     "jest": "^21.2.1",
-    "moment": "^2.20.1",
+    "moment": "^2.21.0",
     "mongoose": "^5.0.11",
     "najs-binding": "^1.4.0",
     "sinon": "^4.1.3",
