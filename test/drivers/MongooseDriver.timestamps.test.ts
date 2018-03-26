@@ -34,33 +34,9 @@ class User extends Eloquent<IUser> {
   getClassName() {
     return User.className
   }
-
-  get full_name() {
-    return this.attributes.first_name + ' ' + this.attributes.last_name
-  }
-
-  set full_name(value: string) {}
-
-  getFullNameAttribute() {
-    return this.attributes.first_name + ' ' + this.attributes.last_name
-  }
-
-  setFullNameAttribute(value: string) {
-    const parts = value.split(' ')
-    this.attributes['first_name'] = parts[0]
-    this.attributes['last_name'] = parts[1]
-  }
-
-  getNickNameAttribute() {
-    return this.attributes.first_name.toUpperCase()
-  }
-
-  setNickNameAttribute(value: string) {
-    this.attributes['first_name'] = value.toLowerCase()
-  }
 }
 
-describe('EloquentMongoose.Timestamps', function() {
+describe('MongooseDriver.Timestamps', function() {
   jest.setTimeout(10000)
 
   beforeAll(async function() {
@@ -71,7 +47,7 @@ describe('EloquentMongoose.Timestamps', function() {
     await delete_collection(mongoose, 'users')
     await delete_collection(mongoose, 'timestamp_model_defaults')
     await delete_collection(mongoose, 'custom_timestamp_models')
-    // await delete_collection(mongoose, 'notstatictimestampmodels')
+    await delete_collection(mongoose, 'not_static_timestamp_models')
   })
 
   class TimestampModelDefault extends Eloquent<Timestamps> {
