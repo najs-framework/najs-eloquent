@@ -11,7 +11,7 @@ import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverP
 import { MongooseQueryBuilder } from '../../lib/query-builders/mongodb/MongooseQueryBuilder'
 import { MongooseProvider } from '../../lib/facades/global/MongooseProviderFacade'
 import { EloquentMetadata } from '../../lib/model/EloquentMetadata'
-import { SoftDelete } from '../../lib/v0.x/eloquent/mongoose/SoftDelete'
+import { SoftDelete } from '../../lib/drivers/mongoose/SoftDelete'
 
 EloquentDriverProvider.register(MongooseDriver, 'mongoose', true)
 

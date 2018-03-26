@@ -1,7 +1,7 @@
 import 'jest'
 import { init_mongoose, delete_collection } from '../../util'
 import { model, Schema } from 'mongoose'
-import { SoftDelete } from '../../../../lib/v0.x/eloquent/mongoose/SoftDelete'
+import { SoftDelete } from '../../../lib/drivers/mongoose/SoftDelete'
 const Moment = require('moment')
 const mongoose = require('mongoose')
 

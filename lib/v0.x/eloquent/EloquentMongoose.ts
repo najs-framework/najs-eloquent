@@ -6,7 +6,7 @@ import { Document, Schema, Model } from 'mongoose'
 import collect, { Collection } from 'collect.js'
 import { make } from 'najs-binding'
 import { NotFoundError } from '../errors/NotFoundError'
-import { SoftDelete } from './mongoose/SoftDelete'
+import { SoftDelete } from '../../drivers/mongoose/SoftDelete'
 import { EloquentMetadata } from './EloquentMetadata'
 Schema.prototype['setupTimestamp'] = require('mongoose-timestamps-moment').setupTimestamp
 

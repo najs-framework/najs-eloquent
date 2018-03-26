@@ -7,7 +7,7 @@ import { IEloquentDriver } from './interfaces/IEloquentDriver'
 import { Document, Model, Schema } from 'mongoose'
 import { MongooseQueryBuilder } from '../query-builders/mongodb/MongooseQueryBuilder'
 import { MongooseProvider } from '../facades/global/MongooseProviderFacade'
-import { SoftDelete } from '../v0.x/eloquent/mongoose/SoftDelete'
+import { SoftDelete } from './mongoose/SoftDelete'
 
 const STATIC_METHODS_WITH_ID = ['first', 'firstOrFail', 'find', 'findOrFail', 'delete', 'restore']
 const QUERY_PROXY_METHODS_IBasicQuery = [

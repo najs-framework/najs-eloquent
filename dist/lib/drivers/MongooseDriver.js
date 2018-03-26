@@ -6,7 +6,7 @@ const EloquentMetadata_1 = require("../model/EloquentMetadata");
 const mongoose_1 = require("mongoose");
 const MongooseQueryBuilder_1 = require("../query-builders/mongodb/MongooseQueryBuilder");
 const MongooseProviderFacade_1 = require("../facades/global/MongooseProviderFacade");
-const SoftDelete_1 = require("../v0.x/eloquent/mongoose/SoftDelete");
+const SoftDelete_1 = require("./mongoose/SoftDelete");
 const STATIC_METHODS_WITH_ID = ['first', 'firstOrFail', 'find', 'findOrFail', 'delete', 'restore'];
 const QUERY_PROXY_METHODS_IBasicQuery = [
     'queryName',

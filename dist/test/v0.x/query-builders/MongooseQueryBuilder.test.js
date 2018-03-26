@@ -11,7 +11,7 @@ require("../../../lib/log/FlipFlopQueryLog");
 const Sinon = require("sinon");
 const EloquentTestBase_1 = require("../eloquent/EloquentTestBase");
 const MongooseQueryBuilder_1 = require("../../../lib/v0.x/query-builders/MongooseQueryBuilder");
-const SoftDelete_1 = require("../../../lib/v0.x/eloquent/mongoose/SoftDelete");
+const SoftDelete_1 = require("../../../lib/drivers/mongoose/SoftDelete");
 const util_1 = require("../util");
 const najs_binding_1 = require("najs-binding");
 const mongoose_1 = require("mongoose");

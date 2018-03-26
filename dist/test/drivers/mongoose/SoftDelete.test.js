@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const util_1 = require("../../util");
 const mongoose_1 = require("mongoose");
-const SoftDelete_1 = require("../../../../lib/v0.x/eloquent/mongoose/SoftDelete");
+const SoftDelete_1 = require("../../../lib/drivers/mongoose/SoftDelete");
 const Moment = require('moment');
 const mongoose = require('mongoose');
 let count = 0;

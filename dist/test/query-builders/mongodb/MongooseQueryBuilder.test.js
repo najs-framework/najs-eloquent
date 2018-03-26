@@ -6,7 +6,7 @@ require("../../../lib/facades/global/MongooseProviderFacade");
 const Sinon = require("sinon");
 const Eloquent_1 = require("../../../lib/model/Eloquent");
 const MongooseQueryBuilder_1 = require("../../../lib/query-builders/mongodb/MongooseQueryBuilder");
-const SoftDelete_1 = require("../../../lib/v0.x/eloquent/mongoose/SoftDelete");
+const SoftDelete_1 = require("../../../lib/drivers/mongoose/SoftDelete");
 const util_1 = require("../../util");
 const najs_binding_1 = require("najs-binding");
 const mongoose_1 = require("mongoose");

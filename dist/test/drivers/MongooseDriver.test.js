@@ -13,7 +13,7 @@ const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/Eloquen
 const MongooseQueryBuilder_1 = require("../../lib/query-builders/mongodb/MongooseQueryBuilder");
 const MongooseProviderFacade_1 = require("../../lib/facades/global/MongooseProviderFacade");
 const EloquentMetadata_1 = require("../../lib/model/EloquentMetadata");
-const SoftDelete_1 = require("../../lib/v0.x/eloquent/mongoose/SoftDelete");
+const SoftDelete_1 = require("../../lib/drivers/mongoose/SoftDelete");
 EloquentDriverProviderFacade_1.EloquentDriverProvider.register(MongooseDriver_1.MongooseDriver, 'mongoose', true);
 class User extends Eloquent_1.Eloquent {
     constructor() {
