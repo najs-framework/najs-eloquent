@@ -4,10 +4,14 @@
   "scripts": {
     "build": "npm run build-ts && npm run tslint",
     "build-ts": "tsc -d && ./script/copy-custom-definitions.js",
-    "coverage": "export SUPPRESS_NO_CONFIG_WARNING=0 && npm run build && jest ./dist/test --coverage --forceExit",
-    "test": "export SUPPRESS_NO_CONFIG_WARNING=0 && jest ./dist/test --forceExit",
+    "coverage": "npm run build && jest ./dist/test/**/*.js ./dist/test/**/**/*.js --coverage --forceExit",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "prepublishOnly": "tsc -d -p ./ --outDir dist"
+    "prepublishOnly": "tsc -d -p ./ --outDir dist && ./script/copy-custom-definitions.js",
+    "integration": "npm run integration-build && npm run integration-lint && npm run integration-test",
+    "integration-build": "npm run build && cd ./integration && tsc -d && cd ..",
+    "integration-lint": "cd ./integration && tslint -c tslint.json -p tsconfig.json && cd ..",
+    "integration-test": "jest ./integration/test --forceExit",
+    "test": "npm run coverage && npm run integration"
   },
   "jest": {
     "globals": {

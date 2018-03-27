@@ -1,0 +1,108 @@
+Eloquent -----------------------------------------------------------------------------
+  id: any
+  getClassName(): string
+
+  fill(data: Object): this
+  forceFill(data: Object): this
+
+  getFillable(): string[]
+  getGuarded(): string[]
+  isFillable(key: string): boolean
+  isGuarded(key: string): boolean
+
+  getVisible(): string[]
+  getHidden(): string[]
+  isVisible(key: string): boolean
+  isHidden(key: string): boolean
+
+  setAttribute(attribute: string, value: any): boolean
+  getAttribute(attribute: string): any
+  getId(): any
+  setId(id: any): void
+
+  markFillable(): this
+  markGuarded(): this
+  markVisible(): this
+  markHidden(): this
+
+  toObject(): Object
+  toJSON(): Object
+  toJson(): Object
+
+  is(model: Eloquent<any>): boolean
+
+ActiveRecords ------------------------------------------------------------------------
+  touch(): this
+  save(): Promise<any>
+  delete(): Promise<any>
+  forceDelete(): Promise<any>
+  restore(): Promise<any>
+  fresh(): Promise<this>
+
+IBasicQuery --------------------------------------------------------------------------
+  queryName(name: string): this
+
+  getPrimaryKey(): string
+
+  setLogGroup(group: string): this
+
+  select(field: string): this
+  select(fields: string[]): this
+  select(...fields: Array<string | string[]>): this
+
+  distinct(field: string): this
+  distinct(field: Array<string>): this
+  distinct(...fields: Array<string>): this
+
+  orderBy(field: string): this
+  orderBy(field: string, direction: OrderDirection): this
+  orderByAsc(field: string): this
+  orderByDesc(field: string): this
+
+  limit(record: number): this
+
+IConditionQuery ----------------------------------------------------------------------
+  where(conditionBuilder: SubCondition): this
+  where(field: string, value: any): this
+  where(field: string, operator: Operator, value: any): this
+
+  orWhere(conditionBuilder: SubCondition): this
+  orWhere(field: string, value: any): this
+  orWhere(field: string, operator: Operator, value: any): this
+
+  whereIn(field: string, values: Array<any>): this
+  whereNotIn(field: string, values: Array<any>): this
+
+  orWhereIn(field: string, values: Array<any>): this
+  orWhereNotIn(field: string, values: Array<any>): this
+
+  whereNull(field: string): this
+  whereNotNull(field: string): this
+
+  orWhereNull(field: string): this
+  orWhereNotNull(field: string): this
+
+IFetchResultQuery --------------------------------------------------------------------
+  get(): Promise<Collection<T>>
+  all(): Promise<Collection<T>>
+  find(): Promise<T | null>
+  first(): Promise<T | null>
+  count(): Promise<number>
+
+  pluck(value: string): Promise<Object>
+  pluck(value: string, key: string): Promise<Object>
+
+  update(data: Object): Promise<Object>
+  delete(): Promise<Object>
+  restore(): Promise<Object>
+  execute(): Promise<any>
+  
+ISoftDeletesQuery --------------------------------------------------------------------
+  withTrashed(): this
+  onlyTrashed(): this
+
+IUtilitiesQuery --------------------------------------------------------------------
+  findById(): Promise<this>
+  findOrFail(): Promise<this>
+  firstOrFail(): Promise<this>
+  

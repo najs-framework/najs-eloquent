@@ -49,6 +49,7 @@ exclude_patterns:
 - "script/"
 - "**/spec/"
 - "**/test/"
+- "**/integration/"
 - "**/tests/"
 - "**/vendor/"
 - "**/*.d.ts"

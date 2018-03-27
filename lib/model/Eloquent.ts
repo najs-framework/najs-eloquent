@@ -6,13 +6,6 @@ import { EloquentProxy } from './EloquentProxy'
 import { flatten, pick } from 'lodash'
 import collect, { Collection } from 'collect.js'
 
-/**
- * Base class of an Eloquent, handles proxy attributes, contains cross-driver features like
- *   - fill
- *   - touch
- *   - member Querying
- *   - static Querying
- */
 export abstract class Eloquent<Record extends Object = {}> implements IAutoload {
   protected attributes: Record
   protected driver: IEloquentDriver<Record>
@@ -54,6 +47,14 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
     // just create new instance, it's auto register and bind static Queries
     register(model)
     Reflect.construct(model, [])
+  }
+
+  static Mongoose() {
+    return <any>Eloquent
+  }
+
+  static Class() {
+    return <any>Eloquent
   }
 
   abstract getClassName(): string

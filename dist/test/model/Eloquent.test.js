@@ -20,6 +20,19 @@ function update_model_setting(property, value) {
     EloquentMetadata_1.EloquentMetadata.get(new Model(), false);
 }
 describe('Eloquent', function () {
+    describe('static .register()', function () {
+        it('calls register() and create new instance, by this way the static method are appended to class', function () { });
+    });
+    describe('static .Mongoose()', function () {
+        it('returns Eloquent class, just for syntax purpose', function () {
+            expect(Eloquent_1.Eloquent.Mongoose() === Eloquent_1.Eloquent).toBe(true);
+        });
+    });
+    describe('static .Class()', function () {
+        it('returns Eloquent class, just for syntax purpose', function () {
+            expect(Eloquent_1.Eloquent.Class() === Eloquent_1.Eloquent).toBe(true);
+        });
+    });
     describe('constructor()', function () {
         it('always creates driver via EloquentDriverProvider.create()', function () {
             const createSpy = Sinon.spy(EloquentDriverProviderFacade_1.EloquentDriverProvider, 'create');

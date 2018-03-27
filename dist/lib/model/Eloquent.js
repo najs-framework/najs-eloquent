@@ -6,13 +6,6 @@ const EloquentDriverProviderFacade_1 = require("../facades/global/EloquentDriver
 const EloquentProxy_1 = require("./EloquentProxy");
 const lodash_1 = require("lodash");
 const collect_js_1 = require("collect.js");
-/**
- * Base class of an Eloquent, handles proxy attributes, contains cross-driver features like
- *   - fill
- *   - touch
- *   - member Querying
- *   - static Querying
- */
 class Eloquent {
     constructor(data, isGuarded = true) {
         this.driver = EloquentDriverProviderFacade_1.EloquentDriverProvider.create(this, isGuarded);
@@ -29,6 +22,12 @@ class Eloquent {
         // just create new instance, it's auto register and bind static Queries
         najs_binding_1.register(model);
         Reflect.construct(model, []);
+    }
+    static Mongoose() {
+        return Eloquent;
+    }
+    static Class() {
+        return Eloquent;
     }
     getModelName() {
         return this.getClassName();

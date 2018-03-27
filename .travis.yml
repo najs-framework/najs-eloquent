@@ -30,4 +30,4 @@ install:
   - yarn install
 
 script:
-  - npm run coverage
+  - npm run test
