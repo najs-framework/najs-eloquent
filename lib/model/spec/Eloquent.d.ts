@@ -1,16 +1,9 @@
 import { Collection } from 'collect.js'
-import { MongooseQueryBuilder } from '../query-builders/mongodb/MongooseQueryBuilder'
 import { IEloquentDriver } from '../drivers/interfaces/IEloquentDriver'
-import { EloquentMongooseDefinition } from './interfaces/EloquentMongooseDefinition'
 import { EloquentTimestamps, EloquentSoftDelete } from './EloquentMetadata'
-import { OrderDirection, IBasicQuery } from '../query-builders/interfaces/IBasicQuery'
-import { SubCondition, IConditionQuery } from '../query-builders/interfaces/IConditionQuery'
-import { ISoftDeletesQuery } from '../query-builders/interfaces/ISoftDeletesQuery'
-import { IFetchResultQuery } from '../query-builders/interfaces/IFetchResultQuery'
 
-export type EloquentQuery<Model> = IBasicQuery & IConditionQuery & ISoftDeletesQuery & IFetchResultQuery<Model>
-
-export declare class Eloquent<T extends Object = {}> {
+export declare class Eloquent<T> {
+  // --- BUILD-CUT-START ---
   /**
    * The model's attributes.
    */
@@ -141,28 +134,9 @@ export declare class Eloquent<T extends Object = {}> {
    */
   isGuarded(key: string): boolean
 
-  /**
-   * Get the visible attributes for the model.
-   */
   getVisible(): string[]
-
-  /**
-   * Get the hidden attributes for the model.
-   */
   getHidden(): string[]
-
-  /**
-   * Determine if the given attribute may be included in JSON.
-   *
-   * @param {string} key
-   */
   isVisible(key: string): boolean
-
-  /**
-   * Determine if the given key hidden in JSON.
-   *
-   * @param {string} key
-   */
   isHidden(key: string): boolean
 
   setAttribute(attribute: string, value: any): boolean
@@ -201,77 +175,5 @@ export declare class Eloquent<T extends Object = {}> {
   is(model: Eloquent<T>): boolean
 
   // fireEvent(event: string): this
-
-  // Basic Query functions ---------------------------------------------------------------------------------------------
-  queryName(name: string): EloquentQuery<this & T>
-
-  select(field: string): EloquentQuery<this & T>
-  select(fields: string[]): EloquentQuery<this & T>
-  select(...fields: Array<string | string[]>): EloquentQuery<this & T>
-
-  distinct(field: string): EloquentQuery<this & T>
-  distinct(fields: string[]): EloquentQuery<this & T>
-  distinct(...fields: Array<string | string[]>): EloquentQuery<this & T>
-
-  orderBy(field: string): EloquentQuery<this & T>
-  orderBy(field: string, direction: OrderDirection): EloquentQuery<this & T>
-
-  orderByAsc(field: string): EloquentQuery<this & T>
-
-  orderByDesc(field: string): EloquentQuery<this & T>
-
-  limit(records: number): EloquentQuery<this & T>
-
-  where(conditionBuilder: SubCondition): EloquentQuery<this & T>
-  where(field: string, value: any): EloquentQuery<this & T>
-  where(field: string, operator: Operator, value: any): EloquentQuery<this & T>
-
-  orWhere(conditionBuilder: SubCondition): EloquentQuery<this & T>
-  orWhere(field: string, value: any): EloquentQuery<this & T>
-  orWhere(field: string, operator: Operator, value: any): EloquentQuery<this & T>
-
-  whereIn(field: string, values: Array<any>): EloquentQuery<this & T>
-  whereNotIn(field: string, values: Array<any>): EloquentQuery<this & T>
-
-  orWhereIn(field: string, values: Array<any>): EloquentQuery<this & T>
-  orWhereNotIn(field: string, values: Array<any>): EloquentQuery<this & T>
-
-  whereNull(field: string): EloquentQuery<this & T>
-  whereNotNull(field: string): EloquentQuery<this & T>
-
-  orWhereNull(field: string): EloquentQuery<this & T>
-  orWhereNotNull(field: string): EloquentQuery<this & T>
-
-  withTrashed(): EloquentQuery<this & T>
-  onlyTrashed(): EloquentQuery<this & T>
-
-  all(): Promise<Collection<this & T>>
-
-  get(): Promise<Collection<this & T>>
-
-  first(): Promise<this & T>
-
-  pluck(value: string): Promise<Object>
-  pluck(value: string, key: string): Promise<Object>
-
-  count(): Promise<Number>
-
-  findById(id: any): Promise<this & T | null>
-
-  findOrFail(id: any): Promise<this & T>
-
-  // Active Records functions ------------------------------------------------------------------------------------------
-  touch(): this
-  save(): Promise<any>
-  delete(): Promise<any>
-  forceDelete(): Promise<any>
-  restore(): Promise<any>
-  fresh(): Promise<this>
-
-  // Static functions --------------------------------------------------------------------------------------------------
-  static register(model: Function | typeof Eloquent): void
-
-  static Mongoose<Attribute, Class>(): EloquentMongooseDefinition<Attribute, Class>
+  // --- BUILD-CUT-END ---
 }
-
-export declare class EloquentMongoose<T> extends Eloquent<T> {}

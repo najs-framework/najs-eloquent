@@ -1,15 +1,24 @@
-import { Eloquent } from '../../../dist/lib/v1'
+import { Eloquent } from '../../dist/lib/v1'
 
 export interface IUser {
   email: string
+  password: string
   first_name: string
   last_name: string
   age: number
 }
 
-export class User extends Eloquent<IUser> implements IUser {
+/**
+ * User model, extends from Eloquent<IPost>
+ *   - supports full definitions of Eloquent<IPost>
+ *   - DO NOT SUPPORT definitions of static API
+ */
+export class User extends Eloquent implements IUser {
   static className: string = 'User'
   protected timestamps = true
+  protected softDeletes = true
+  protected fillable = ['email', 'first_name', 'last_name', 'age']
+  protected hidden = ['password']
   protected schema = {
     email: { type: String, required: true },
     first_name: { type: String, required: true },
@@ -18,6 +27,7 @@ export class User extends Eloquent<IUser> implements IUser {
   }
 
   email: string
+  password: string
   first_name: string
   last_name: string
   age: number

@@ -1,7 +1,8 @@
 import { Collection } from 'collect.js'
 import { MongooseQueryBuilder } from '../query-builders/mongodb/MongooseQueryBuilder'
 import { IEloquentDriver } from '../drivers/interfaces/IEloquentDriver'
-import { IEloquent } from './interfaces/IEloquent'
+import { EloquentMongooseDefinition } from './interfaces/EloquentMongooseDefinition'
+import { EloquentTimestamps, EloquentSoftDelete } from './EloquentMetadata'
 import { OrderDirection, IBasicQuery } from '../query-builders/interfaces/IBasicQuery'
 import { SubCondition, IConditionQuery } from '../query-builders/interfaces/IConditionQuery'
 import { ISoftDeletesQuery } from '../query-builders/interfaces/ISoftDeletesQuery'
@@ -9,7 +10,7 @@ import { IFetchResultQuery } from '../query-builders/interfaces/IFetchResultQuer
 
 export type EloquentQuery<Model> = IBasicQuery & IConditionQuery & ISoftDeletesQuery & IFetchResultQuery<Model>
 
-export declare class Eloquent<T> implements IEloquent {
+export declare class Eloquent<T extends Object = {}> {
   /**
    * The model's attributes.
    */
@@ -21,14 +22,76 @@ export declare class Eloquent<T> implements IEloquent {
   protected driver: IEloquentDriver<T>
 
   /**
+   * Temporary settings for current instance.
+   */
+  protected temporarySettings?: {
+    /**
+     * The attributes that are mass assignable for current instance.
+     */
+    fillable?: string[]
+    /**
+     * The attributes that aren't mass assignable for current instance.
+     */
+    guarded?: string[]
+    /**
+     * The attributes that should be visible in JSON for current instance.
+     */
+    visible?: string[]
+    /**
+     * The attributes that should be hidden for JSON for current instance.
+     */
+    hidden?: string[]
+  }
+
+  /**
    * The attributes that are mass assignable.
    */
   protected fillable?: string[]
 
   /**
+   * The attributes that aren't mass assignable.
+   */
+  protected guarded?: string[]
+
+  /**
+   * The attributes that should be visible in JSON.
+   */
+  protected visible?: string[]
+
+  /**
+   * The attributes that should be hidden for JSON
+   */
+  protected hidden?: string[]
+
+  /**
+   * Indicates if the model should be timestamp-ed.
+   */
+  protected timestamps?: EloquentTimestamps | boolean
+
+  /**
+   * Indicates if the model should be soft-deleted.
+   */
+  protected softDeletes?: EloquentSoftDelete | boolean
+
+  /**
    * The table associated with the model.
    */
-  protected table: string
+  protected table?: string
+
+  /**
+   * The collection associated with the model.
+   */
+  protected collection?: string
+
+  /**
+   * The schema definitions associated with the model.
+   */
+  protected schema?: Object
+
+  /**
+   * The schema options associated with the model.
+   */
+  protected options?: Object
 
   /**
    * The primary key for the model.
@@ -47,16 +110,59 @@ export declare class Eloquent<T> implements IEloquent {
    */
   fill(data: Object): this
 
+  /**
+   * Fill the model with an array of attributes. Force mass assignment.
+   *
+   * @param {Object} data
+   */
   forceFill(data: Object): this
 
+  /**
+   * Get the fillable attributes for the model.
+   */
   getFillable(): string[]
+
+  /**
+   * Get the guarded attributes for the model.
+   */
   getGuarded(): string[]
+
+  /**
+   * Determine if the given attribute may be mass assigned.
+   *
+   * @param {string} key
+   */
   isFillable(key: string): boolean
+
+  /**
+   * Determine if the given key is guarded.
+   *
+   * @param {string} key
+   */
   isGuarded(key: string): boolean
 
+  /**
+   * Get the visible attributes for the model.
+   */
   getVisible(): string[]
+
+  /**
+   * Get the hidden attributes for the model.
+   */
   getHidden(): string[]
+
+  /**
+   * Determine if the given attribute may be included in JSON.
+   *
+   * @param {string} key
+   */
   isVisible(key: string): boolean
+
+  /**
+   * Determine if the given key hidden in JSON.
+   *
+   * @param {string} key
+   */
   isHidden(key: string): boolean
 
   setAttribute(attribute: string, value: any): boolean
@@ -164,6 +270,8 @@ export declare class Eloquent<T> implements IEloquent {
 
   // Static functions --------------------------------------------------------------------------------------------------
   static register(model: Function | typeof Eloquent): void
+
+  static Mongoose<Attribute, Class>(): EloquentMongooseDefinition<Attribute, Class>
 }
 
 export declare class EloquentMongoose<T> extends Eloquent<T> {}
