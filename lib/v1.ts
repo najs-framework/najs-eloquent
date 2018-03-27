@@ -4,12 +4,10 @@ import { ChanceFaker } from './factory/FactoryManager'
 export type Faker = ChanceFaker
 export { Collection }
 
-export { Eloquent } from './model/Eloquent'
+export { Eloquent, Mongoose, EloquentMongoose } from './model/Eloquent'
 export { EloquentAttribute } from './model/EloquentAttribute'
 export { EloquentMetadata } from './model/EloquentMetadata'
 export { EloquentProxy } from './model/EloquentProxy'
-
-export { EloquentMongooseDefinition } from './model/interfaces/EloquentMongooseDefinition'
 
 export { IEloquentDriver } from './drivers/interfaces/IEloquentDriver'
 export { DummyDriver } from './drivers/DummyDriver'

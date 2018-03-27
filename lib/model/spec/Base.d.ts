@@ -2,17 +2,16 @@ import { Collection } from 'collect.js'
 import { IEloquentDriver } from '../drivers/interfaces/IEloquentDriver'
 import { EloquentTimestamps, EloquentSoftDelete } from './EloquentMetadata'
 
-export declare class Eloquent<T> {
-  // --- BUILD-CUT-START ---
+export declare class Base<Record> {
   /**
    * The model's attributes.
    */
-  protected attributes: T
+  protected attributes: Record
 
   /**
    * The driver associated with the model.
    */
-  protected driver: IEloquentDriver<T>
+  protected driver: IEloquentDriver<Record>
 
   /**
    * Temporary settings for current instance.
@@ -134,9 +133,28 @@ export declare class Eloquent<T> {
    */
   isGuarded(key: string): boolean
 
+  /**
+   * Get the visible attributes for the model.
+   */
   getVisible(): string[]
+
+  /**
+   * Get the hidden attributes for the model.
+   */
   getHidden(): string[]
+
+  /**
+   * Determine if the given attribute may be included in JSON.
+   *
+   * @param {string} key
+   */
   isVisible(key: string): boolean
+
+  /**
+   * Determine if the given key hidden in JSON.
+   *
+   * @param {string} key
+   */
   isHidden(key: string): boolean
 
   setAttribute(attribute: string, value: any): boolean
@@ -175,5 +193,12 @@ export declare class Eloquent<T> {
   is(model: Eloquent<T>): boolean
 
   // fireEvent(event: string): this
-  // --- BUILD-CUT-END ---
+
+  // Active Records functions ------------------------------------------------------------------------------------------
+  touch(): this
+  save(): Promise<any>
+  delete(): Promise<any>
+  forceDelete(): Promise<any>
+  restore(): Promise<any>
+  fresh(): Promise<this>
 }

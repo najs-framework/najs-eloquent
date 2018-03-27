@@ -1,4 +1,4 @@
-import { Eloquent, EloquentMongooseDefinition } from '../../dist/lib/v1'
+import { Eloquent, EloquentMongoose } from '../../dist/lib/v1'
 
 export interface IPost {
   user_id: string
@@ -6,7 +6,7 @@ export interface IPost {
   content: string
 }
 
-export const PostBase: EloquentMongooseDefinition<IPost, Post> = Eloquent.Mongoose<IPost, Post>()
+export const PostBase: EloquentMongoose<IPost, Post> = Eloquent.Mongoose<IPost, Post>()
 
 /**
  * Post model, extends from Eloquent.Mongoose<IPost, Post>(), supports
@@ -27,7 +27,7 @@ export class Post extends PostBase {
     return Post.className
   }
 
-  getShortContent() {
+  async getShortContent() {
     return this.content
   }
 }

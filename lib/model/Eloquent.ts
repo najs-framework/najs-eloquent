@@ -6,6 +6,10 @@ import { EloquentProxy } from './EloquentProxy'
 import { flatten, pick } from 'lodash'
 import collect, { Collection } from 'collect.js'
 
+export interface Mongoose {}
+
+export interface EloquentMongoose {}
+
 export abstract class Eloquent<Record extends Object = {}> implements IAutoload {
   protected attributes: Record
   protected driver: IEloquentDriver<Record>
