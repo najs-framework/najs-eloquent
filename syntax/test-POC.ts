@@ -1,45 +1,106 @@
-import { Eloquent, WithStatic, EloquentMongoose } from './def-POC'
+import { Eloquent, Mongoose } from './def-POC'
 
 interface IModel {
   member: string
 }
 
-class Model extends Eloquent.Mongoose<IModel>() implements IModel {
+class ClassOne extends Eloquent implements IModel {
   member: string
+
+  static findByName() {}
+
+  method() {}
 }
 
-const first = Model.first()
-first.member = 'test'
-first.method()
+class ClassOneChild extends ClassOne {}
 
-class Post extends (EloquentMongoose as WithStatic<IModel>) {
-  static firstPost(): Post {
-    return <any>{}
+class ClassTwo extends (Eloquent as Mongoose<IModel>) {
+  method() {}
+}
+
+class ClassTwoChild extends ClassOne {}
+
+class ClassThree extends Eloquent.Mongoose<IModel, ClassThree>() {
+  method() {}
+}
+
+async function test() {
+  const one = new ClassOne()
+  const result = await one.select().first()
+  if (result) {
+    result.member = 'test'
+  }
+  const oneChild = new ClassOneChild()
+  oneChild.id = 'test'
+
+  const two = new ClassTwo()
+  two.member = 'test'
+  const twoChild = new ClassTwoChild()
+  twoChild.member = 'test'
+
+  const three = new ClassThree()
+  const threeResult = await three.select().first()
+  if (threeResult) {
   }
 
-  static allPosts(): Post[] {
-    return []
+  const threeStaticResult = await ClassThree.select().first()
+  if (threeStaticResult) {
+    // threeStaticResult.
   }
 }
 
-Post.allPosts()
+test()
 
-Post.firstPost().member = 'test'
-Post.firstPost().method()
+// import { Eloquent, WithStatic, EloquentMongoose, EloquentTest } from './def-POC'
 
-const post = new Post()
-post.member = 'test'
-post.method()
+// interface IModel {
+//   member: string
+// }
 
-const firstPost = Post.first()
-firstPost.member = 'test'
-firstPost.method()
+// class Model extends Eloquent.Mongoose<IModel>() implements IModel {
+//   member: string
+// }
 
-class User extends EloquentMongoose implements IModel {
-  member: string
-}
+// const first = Model.first()
+// first.member = 'test'
+// first.method()
 
-const userInstance = new User()
-userInstance.first().member
-userInstance.member = 'test'
-userInstance.method()
+// class Post extends (EloquentMongoose as WithStatic<IModel>) {
+//   static firstPost(): Post {
+//     return <any>{}
+//   }
+
+//   static allPosts(): Post[] {
+//     return []
+//   }
+// }
+
+// Post.allPosts()
+
+// Post.firstPost().member = 'test'
+// Post.firstPost().method()
+
+// const post = new Post()
+// post.member = 'test'
+// post.method()
+
+// const firstPost = Post.first()
+// firstPost.member = 'test'
+// firstPost.method()
+
+// class User extends EloquentMongoose implements IModel {
+//   member: string
+// }
+
+// const userInstance = new User()
+// userInstance.first().member
+// userInstance.member = 'test'
+// userInstance.method()
+
+// class IClass extends EloquentTest {
+//   getSomething() {
+//     this.test = 'test'
+//   }
+// }
+// const instance = new IClass()
+// instance.getId()
