@@ -3,6 +3,7 @@ import { Query } from './spec/Query'
 import { EloquentModel } from './spec/EloquentModel'
 import { MongooseMembers } from './spec/MongooseMembers'
 import { MongooseDefinition } from './spec/MongooseDefinition'
+import { IFactoryBuilder } from '../factory/interfaces/IFactoryBuilder'
 
 declare interface Model<Attributes, Extension> {
   new (): EloquentModel<Attributes> & Attributes & Extension

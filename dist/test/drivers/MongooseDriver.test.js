@@ -442,8 +442,18 @@ describe('MongooseDriver', function () {
                 ]);
             });
         });
-        // TODO: write test
-        describe('.createStaticMethods()', function () { });
+        describe('.createStaticMethods()', function () {
+            it('should work, the tests is written in integration/test', async function () {
+                const user = new User();
+                user.forceFill({ first_name: 'test', last_name: 'test', email: 'test' });
+                await user['save']();
+                expect(await User['count']()).toBeGreaterThan(0);
+                const fresh = await User['first'](user['id']);
+                expect(fresh.toJson()).toEqual(user.toJson());
+                const firstUser = await User['first']();
+                expect(firstUser).not.toBeNull();
+            });
+        });
     });
     describe('ActiveRecord Functions', function () {
         describe('.touch()', function () {

@@ -11,7 +11,7 @@ export interface IFactoryBuilderCollection {
   raw<T = any>(attributes: Object): Collection<T>
 }
 
-export interface IFactoryBuilder {
+export interface IFactoryBuilder<Model = any> {
   times(amount: number): IFactoryBuilderCollection
 
   states(state: string): this
@@ -19,12 +19,12 @@ export interface IFactoryBuilder {
   states(...state: string[]): this
   states(...states: Array<string[]>): this
 
-  create<T = any>(): Promise<T>
-  create<T = any>(attributes: Object): Promise<T>
+  create<T = Model>(): Promise<T>
+  create<T = Model>(attributes: Object): Promise<T>
 
-  make<T = any>(): T
-  make<T = any>(attributes: Object): T
+  make<T = Model>(): T
+  make<T = Model>(attributes: Object): T
 
-  raw<T = any>(): T
-  raw<T = any>(attributes: Object): T
+  raw<T = Model>(): T
+  raw<T = Model>(attributes: Object): T
 }
