@@ -4,6 +4,9 @@ require("jest");
 const Sinon = require("sinon");
 const chance_1 = require("chance");
 const najs_facade_1 = require("najs-facade");
+const Eloquent_1 = require("../../lib/model/Eloquent");
+const DummyDriver_1 = require("../../lib/drivers/DummyDriver");
+const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
 const constants_1 = require("../../lib/constants");
 const FactoryManager_1 = require("../../lib/factory/FactoryManager");
 const FactoryBuilder_1 = require("../../lib/factory/FactoryBuilder");
@@ -17,6 +20,35 @@ describe('FactoryManager', function () {
         it('using chance library and creates faker', function () {
             const factoryManager = new FactoryManager_1.FactoryManager();
             expect(factoryManager['faker']).toBeInstanceOf(chance_1.Chance);
+        });
+    });
+    describe('protected .parseModelName()', function () {
+        it('returns if the param is a string', function () {
+            const factoryManager = new FactoryManager_1.FactoryManager();
+            expect(factoryManager['parseModelName']('Class')).toEqual('Class');
+        });
+        it("calls Eloquent.register() and return a class's name if the param is Function", function () {
+            class Class {
+            }
+            Class.className = 'Class';
+            const registerStub = Sinon.stub(Eloquent_1.Eloquent, 'register');
+            const factoryManager = new FactoryManager_1.FactoryManager();
+            expect(factoryManager['parseModelName'](Class)).toEqual('Class');
+            expect(registerStub.calledWith(Class)).toBe(true);
+            registerStub.restore();
+        });
+        it("calls Eloquent.register() and return a class's name if the param is Eloquent", function () {
+            EloquentDriverProviderFacade_1.EloquentDriverProviderFacade.register(DummyDriver_1.DummyDriver, 'dummy', true);
+            class Class extends Eloquent_1.Eloquent {
+                getClassName() {
+                    return 'Test';
+                }
+            }
+            const registerStub = Sinon.stub(Eloquent_1.Eloquent, 'register');
+            const factoryManager = new FactoryManager_1.FactoryManager();
+            expect(factoryManager['parseModelName'](Class)).toEqual('Test');
+            expect(registerStub.calledWith(Class)).toBe(true);
+            registerStub.restore();
         });
     });
     describe('.define()', function () {
@@ -35,6 +67,27 @@ describe('FactoryManager', function () {
                 }
             });
             factoryManager.define('Class', definition, 'test');
+            expect(factoryManager['definitions']).toEqual({
+                Class: {
+                    test: definition,
+                    default: definition
+                }
+            });
+        });
+        it('calls Eloquent.register() and return a className if the param is function or Eloquent', function () {
+            class Class {
+            }
+            Class.className = 'Class';
+            const definition = () => { };
+            const factoryManager = new FactoryManager_1.FactoryManager();
+            expect(factoryManager['definitions']).toEqual({});
+            factoryManager.define(Class, definition);
+            expect(factoryManager['definitions']).toEqual({
+                Class: {
+                    default: definition
+                }
+            });
+            factoryManager.define(Class, definition, 'test');
             expect(factoryManager['definitions']).toEqual({
                 Class: {
                     test: definition,

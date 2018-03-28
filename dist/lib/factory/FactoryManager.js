@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_facade_1 = require("najs-facade");
-const FactoryBuilder_1 = require("./FactoryBuilder");
 const najs_binding_1 = require("najs-binding");
+const Eloquent_1 = require("../model/Eloquent");
+const FactoryBuilder_1 = require("./FactoryBuilder");
 const chance_1 = require("chance");
 const constants_1 = require("../constants");
 class FactoryManager extends najs_facade_1.Facade {
@@ -20,21 +21,30 @@ class FactoryManager extends najs_facade_1.Facade {
             this[name][className] = {};
         }
     }
+    parseModelName(className) {
+        if (typeof className === 'function') {
+            Eloquent_1.Eloquent.register(className);
+            return najs_binding_1.getClassName(className);
+        }
+        return className;
+    }
     define(className, definition, name = 'default') {
-        this.initBagIfNeeded('definitions', className);
-        this.definitions[className][name] = definition;
+        const modelName = this.parseModelName(className);
+        this.initBagIfNeeded('definitions', modelName);
+        this.definitions[modelName][name] = definition;
         return this;
     }
     defineAs(className, name, definition) {
         return this.define(className, definition, name);
     }
     state(className, state, definition) {
-        this.initBagIfNeeded('states', className);
-        this.states[className][state] = definition;
+        const modelName = this.parseModelName(className);
+        this.initBagIfNeeded('states', modelName);
+        this.states[modelName][state] = definition;
         return this;
     }
     of(className, name = 'default') {
-        return new FactoryBuilder_1.FactoryBuilder(className, name, this.definitions, this.states, this.faker);
+        return new FactoryBuilder_1.FactoryBuilder(this.parseModelName(className), name, this.definitions, this.states, this.faker);
     }
     create(className) {
         return this.of(className).create(arguments[1]);

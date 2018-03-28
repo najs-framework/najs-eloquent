@@ -1,10 +1,11 @@
 import { Facade } from 'najs-facade'
+import { register, IAutoload, getClassName } from 'najs-binding'
+import { Eloquent } from '../model/Eloquent'
 import { FactoryBuilder } from './FactoryBuilder'
-import { register, IAutoload } from 'najs-binding'
 import { Chance } from 'chance'
 import { NajsEloquentClass } from '../constants'
 import { IFactoryBuilder } from './interfaces/IFactoryBuilder'
-import { IFactoryManager, FactoryDefinition } from './interfaces/IFactoryManager'
+import { IFactoryManager, FactoryDefinition, ModelClass } from './interfaces/IFactoryManager'
 
 export type ChanceFaker = Chance.Chance
 
@@ -26,67 +27,77 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
     return NajsEloquentClass.FactoryManager
   }
 
-  private initBagIfNeeded(name: string, className: string) {
+  protected initBagIfNeeded(name: string, className: string) {
     if (!this[name][className]) {
       this[name][className] = {}
     }
   }
 
-  define(className: string, definition: FactoryDefinition<ChanceFaker>, name: string = 'default'): this {
-    this.initBagIfNeeded('definitions', className)
-    this.definitions[className][name] = definition
+  private parseModelName(className: string | ModelClass): string {
+    if (typeof className === 'function') {
+      Eloquent.register(<any>className)
+      return getClassName(className)
+    }
+    return className
+  }
+
+  define(className: string | ModelClass, definition: FactoryDefinition<ChanceFaker>, name: string = 'default'): this {
+    const modelName = this.parseModelName(className)
+    this.initBagIfNeeded('definitions', modelName)
+    this.definitions[modelName][name] = definition
     return this
   }
 
-  defineAs(className: string, name: string, definition: FactoryDefinition<ChanceFaker>): this {
+  defineAs(className: string | ModelClass, name: string, definition: FactoryDefinition<ChanceFaker>): this {
     return this.define(className, definition, name)
   }
 
-  state(className: string, state: string, definition: FactoryDefinition<ChanceFaker>): this {
-    this.initBagIfNeeded('states', className)
-    this.states[className][state] = definition
+  state(className: string | ModelClass, state: string, definition: FactoryDefinition<ChanceFaker>): this {
+    const modelName = this.parseModelName(className)
+    this.initBagIfNeeded('states', modelName)
+    this.states[modelName][state] = definition
     return this
   }
 
-  of(className: string): IFactoryBuilder
-  of(className: string, name: string): IFactoryBuilder
-  of(className: string, name: string = 'default'): IFactoryBuilder {
-    return new FactoryBuilder(className, name, this.definitions, this.states, this.faker)
+  of(className: string | ModelClass): IFactoryBuilder
+  of(className: string | ModelClass, name: string): IFactoryBuilder
+  of(className: string | ModelClass, name: string = 'default'): IFactoryBuilder {
+    return new FactoryBuilder(this.parseModelName(className), name, this.definitions, this.states, this.faker)
   }
 
-  create<T>(className: string): T
-  create<T>(className: string, attributes: Object): T
+  create<T>(className: string | ModelClass): T
+  create<T>(className: string | ModelClass, attributes: Object): T
   create(className: any): any {
     return this.of(className).create(arguments[1])
   }
 
-  createAs<T>(className: string, name: string): T
-  createAs<T>(className: string, name: string, attributes: Object): T
+  createAs<T>(className: string | ModelClass, name: string): T
+  createAs<T>(className: string | ModelClass, name: string, attributes: Object): T
   createAs(className: any, name: any): any {
     return this.of(className, name).create(arguments[2])
   }
 
-  make<T>(className: string): T
-  make<T>(className: string, attributes: Object): T
-  make(className: string): any {
+  make<T>(className: string | ModelClass): T
+  make<T>(className: string | ModelClass, attributes: Object): T
+  make(className: any): any {
     return this.of(className).make(arguments[1])
   }
 
-  makeAs<T>(className: string, name: string): T
-  makeAs<T>(className: string, name: string, attributes: Object): T
-  makeAs(className: string, name: string): any {
+  makeAs<T>(className: string | ModelClass, name: string): T
+  makeAs<T>(className: string | ModelClass, name: string, attributes: Object): T
+  makeAs(className: any, name: string): any {
     return this.of(className, name).make(arguments[2])
   }
 
-  raw<T>(className: string): T
-  raw<T>(className: string, attributes: Object): T
-  raw(className: string): any {
+  raw<T>(className: string | ModelClass): T
+  raw<T>(className: string | ModelClass, attributes: Object): T
+  raw(className: any): any {
     return this.of(className).raw(arguments[1])
   }
 
-  rawOf<T>(className: string, name: string): T
-  rawOf<T>(className: string, name: string, attributes: Object): T
-  rawOf(className: string, name: string): any {
+  rawOf<T>(className: string | ModelClass, name: string): T
+  rawOf<T>(className: string | ModelClass, name: string, attributes: Object): T
+  rawOf(className: any, name: string): any {
     return this.of(className, name).raw(arguments[2])
   }
 }

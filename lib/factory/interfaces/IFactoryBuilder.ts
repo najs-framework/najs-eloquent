@@ -28,12 +28,3 @@ export interface IFactoryBuilder {
   raw<T = any>(): T
   raw<T = any>(attributes: Object): T
 }
-
-interface IUser {
-  first_name: string
-  last_name: string
-}
-
-const Test: IFactoryBuilder = <any>{}
-Test.make<IUser>()
-// Test.times(-1).make()

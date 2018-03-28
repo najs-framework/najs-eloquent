@@ -106,7 +106,7 @@ describe('Integration Test - Eloquent functions', function() {
 
   describe('.getAttribute()', function() {
     it('gets an attribute from the model.', async function() {
-      const user = await factory(User.className).create<User>()
+      const user = await factory(User).create<User>()
       expect(user.getAttribute('email') === user.email).toBe(true)
     })
   })
@@ -176,7 +176,7 @@ describe('Integration Test - Eloquent functions', function() {
 
   describe('.toObject()', function() {
     it('converts the model instance to a plain object, visible and hidden are not applied.', async function() {
-      const user = await factory(User.className).create<User>({ password: 'test' })
+      const user = await factory(User).create<User>({ password: 'test' })
 
       const plainObject = user.toObject()
       expect(plainObject['_id']).toEqual(user.getId())
@@ -187,7 +187,7 @@ describe('Integration Test - Eloquent functions', function() {
 
   describe('.toJSON()', function() {
     it('converts the model instance to JSON object.', async function() {
-      const user = await factory(User.className).create<User>({ password: 'test' })
+      const user = await factory(User).create<User>({ password: 'test' })
 
       const json = user.toJSON()
       expect(json).toEqual({
@@ -206,7 +206,7 @@ describe('Integration Test - Eloquent functions', function() {
 
   describe('.toJson()', function() {
     it('converts the model instance to JSON object.', async function() {
-      const user = await factory(User.className).create<User>({ password: 'test' })
+      const user = await factory(User).create<User>({ password: 'test' })
 
       const json = user.toJSON()
       expect(json).toEqual({
@@ -225,7 +225,7 @@ describe('Integration Test - Eloquent functions', function() {
 
   describe('.is()', function() {
     it('determines if two models have the same ID and belong to the same table/collection.', async function() {
-      const user = await factory(User.className).create<User>()
+      const user = await factory(User).create<User>()
       const newUser = new User()
       const freshUser = await user.where('id', user.id).first()
 
@@ -236,7 +236,7 @@ describe('Integration Test - Eloquent functions', function() {
 
   describe('.touch()', function() {
     it("updates the model's update timestamp.", async function() {
-      const user = await factory(User.className).create<User>()
+      const user = await factory(User).create<User>()
 
       const now = new Date(2000, 0, 1)
       Moment.now = () => now
@@ -249,7 +249,7 @@ describe('Integration Test - Eloquent functions', function() {
 
   describe('.save()', function() {
     it('saves the model to the database.', async function() {
-      const user = await factory(User.className).create<User>()
+      const user = await factory(User).create<User>()
 
       const now = new Date(2000, 0, 1)
       Moment.now = () => now
@@ -262,7 +262,7 @@ describe('Integration Test - Eloquent functions', function() {
 
   describe('.delete()', function() {
     it('deletes the model from the database.', async function() {
-      const user = await factory(User.className).create<User>()
+      const user = await factory(User).create<User>()
 
       expect(await user.onlyTrashed().count()).toBe(0)
       await user.delete()
@@ -273,7 +273,7 @@ describe('Integration Test - Eloquent functions', function() {
 
   describe('.forceDelete()', function() {
     it('forces a hard delete on a soft deleted model.', async function() {
-      const user = await factory(User.className).create<User>()
+      const user = await factory(User).create<User>()
 
       expect(await user.onlyTrashed().count()).toBe(0)
       await user.forceDelete()
@@ -283,7 +283,7 @@ describe('Integration Test - Eloquent functions', function() {
 
   describe('.restore()', function() {
     it('restores a soft deleted model.', async function() {
-      const user = await factory(User.className).create<User>()
+      const user = await factory(User).create<User>()
 
       expect(await user.onlyTrashed().count()).toBe(0)
       await user.delete()
@@ -295,7 +295,7 @@ describe('Integration Test - Eloquent functions', function() {
 
   describe('.fresh()', function() {
     it('reloads a fresh model instance from the database.', async function() {
-      const user = await factory(User.className).create<User>()
+      const user = await factory(User).create<User>()
       expect(user.is(await user.fresh())).toBe(true)
       expect(await new User().fresh()).toBeNull()
     })
