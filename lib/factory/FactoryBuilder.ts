@@ -66,7 +66,7 @@ export class FactoryBuilder implements IFactoryBuilder {
     }
 
     return make<Eloquent>(this.className, []).newCollection(
-      range(0, this.amount).map((item: any) => this.makeInstance(attributes))
+      range(0, this.amount).map((item: any) => this.getRawAttributes(attributes))
     )
   }
 

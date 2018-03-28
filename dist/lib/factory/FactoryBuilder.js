@@ -39,7 +39,7 @@ class FactoryBuilder {
         if (this.amount < 1) {
             return najs_binding_1.make(this.className, []).newCollection([]);
         }
-        return najs_binding_1.make(this.className, []).newCollection(lodash_1.range(0, this.amount).map((item) => this.makeInstance(attributes)));
+        return najs_binding_1.make(this.className, []).newCollection(lodash_1.range(0, this.amount).map((item) => this.getRawAttributes(attributes)));
     }
     raw(attributes) {
         if (typeof this.amount === 'undefined') {

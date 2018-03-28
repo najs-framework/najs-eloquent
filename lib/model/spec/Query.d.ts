@@ -10,23 +10,54 @@ export declare interface QueryBuilder<Result>
     IFetchResultQuery<Result> {}
 
 export declare interface Query<Result> {
+  /**
+   * Start new query with given name.
+   * @param {string} name
+   */
   queryName(name: string): QueryBuilder<this & T>
 
-  select(field: string): QueryBuilder<this & T>
-  select(fields: string[]): QueryBuilder<this & T>
+  /**
+   * Set the columns or fields to be selected.
+   *
+   * @param {string|string[]} fields
+   */
   select(...fields: Array<string | string[]>): QueryBuilder<this & T>
 
-  distinct(field: string): QueryBuilder<this & T>
-  distinct(fields: string[]): QueryBuilder<this & T>
+  /**
+   * Set the columns or fields to be applied distinct operation.
+   * @param {string|string[]} fields
+   */
   distinct(...fields: Array<string | string[]>): QueryBuilder<this & T>
 
+  /**
+   * Add an "order by" clause to the query.
+   *
+   * @param {string} field
+   * @param {string} direction
+   */
   orderBy(field: string): QueryBuilder<this & T>
   orderBy(field: string, direction: OrderDirection): QueryBuilder<this & T>
 
+  /**
+   * Add an "order by" clause to the query with direction ASC.
+   *
+   * @param {string} field
+   * @param {string} direction
+   */
   orderByAsc(field: string): QueryBuilder<this & T>
 
+  /**
+   * Add an "order by" clause to the query with direction DESC.
+   *
+   * @param {string} field
+   * @param {string} direction
+   */
   orderByDesc(field: string): QueryBuilder<this & T>
 
+  /**
+   * Set the "limit" value of the query.
+   * @param {number} records
+   */
   limit(records: number): QueryBuilder<this & T>
 
   where(conditionBuilder: SubCondition): QueryBuilder<this & T>

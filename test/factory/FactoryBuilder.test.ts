@@ -131,16 +131,16 @@ describe('FactoryBuilder', function() {
       newCollectionSpy.restore()
     })
 
-    it('calls .make().newCollection() with .makeInstance() result n times', function() {
+    it('calls .make().newCollection() with .getRawAttributes() result n times', function() {
       const builder = new FactoryBuilder('Model', 'name', {}, {}, <any>{})
       const newCollectionSpy = Sinon.spy(Model.prototype, 'newCollection')
 
-      const makeInstanceStub = Sinon.stub(builder, <any>'makeInstance')
-      makeInstanceStub.returns('anything')
+      const getRawAttributesStub = Sinon.stub(builder, <any>'getRawAttributes')
+      getRawAttributesStub.returns('anything')
 
       builder.times(3)
       expect(builder.make().count()).toEqual(3)
-      expect(makeInstanceStub.callCount).toEqual(3)
+      expect(getRawAttributesStub.callCount).toEqual(3)
 
       expect(newCollectionSpy.calledWith(['anything', 'anything', 'anything'])).toBe(true)
       newCollectionSpy.restore()

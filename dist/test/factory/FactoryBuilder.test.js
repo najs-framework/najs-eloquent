@@ -112,14 +112,14 @@ describe('FactoryBuilder', function () {
             expect(newCollectionSpy.calledWith([])).toBe(true);
             newCollectionSpy.restore();
         });
-        it('calls .make().newCollection() with .makeInstance() result n times', function () {
+        it('calls .make().newCollection() with .getRawAttributes() result n times', function () {
             const builder = new FactoryBuilder_1.FactoryBuilder('Model', 'name', {}, {}, {});
             const newCollectionSpy = Sinon.spy(Model.prototype, 'newCollection');
-            const makeInstanceStub = Sinon.stub(builder, 'makeInstance');
-            makeInstanceStub.returns('anything');
+            const getRawAttributesStub = Sinon.stub(builder, 'getRawAttributes');
+            getRawAttributesStub.returns('anything');
             builder.times(3);
             expect(builder.make().count()).toEqual(3);
-            expect(makeInstanceStub.callCount).toEqual(3);
+            expect(getRawAttributesStub.callCount).toEqual(3);
             expect(newCollectionSpy.calledWith(['anything', 'anything', 'anything'])).toBe(true);
             newCollectionSpy.restore();
         });
