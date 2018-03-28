@@ -6,6 +6,9 @@ export interface IUser {
   first_name: string
   last_name: string
   age: number
+  created_at: Date
+  updated_at: Date
+  deleted_at: Date | null
 }
 
 /**
@@ -21,6 +24,7 @@ export class User extends Eloquent implements IUser {
   protected hidden = ['password']
   protected schema = {
     email: { type: String, required: true },
+    password: { type: String, required: false },
     first_name: { type: String, required: true },
     last_name: { type: String, required: true },
     age: { type: Number, default: 0 }
@@ -31,6 +35,9 @@ export class User extends Eloquent implements IUser {
   first_name: string
   last_name: string
   age: number
+  created_at: Date
+  updated_at: Date
+  deleted_at: Date | null
 
   getClassName() {
     return User.className

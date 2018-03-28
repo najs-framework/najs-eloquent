@@ -41,7 +41,7 @@ class DummyDriver {
         return ['dummy'];
     }
     getDriverProxyMethods() {
-        return ['is', 'getId', 'setId', 'newQuery'];
+        return ['is', 'getId', 'setId', 'toObject', 'toJSON', 'newQuery'];
     }
     getQueryProxyMethods() {
         return ['where', 'orWhere'];

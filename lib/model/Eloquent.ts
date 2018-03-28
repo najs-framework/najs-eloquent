@@ -75,15 +75,7 @@ export abstract class Eloquent<Record extends Object = {}> implements IAutoload 
     return this.driver.setAttribute(name, value)
   }
 
-  toObject() {
-    return this.driver.toObject()
-  }
-
-  toJSON() {
-    return this.driver.toJSON()
-  }
-
-  toJson() {
+  toJson(): Object {
     return this.driver.toJSON()
   }
 

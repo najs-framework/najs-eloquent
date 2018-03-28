@@ -176,7 +176,7 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
   }
 
   is(model: any): boolean {
-    return this.attributes['_id'] === model['getId']()
+    return this.attributes['_id'].toString() === model['getId']().toString()
   }
 
   formatAttributeName(name: string): string {
@@ -188,7 +188,20 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
   }
 
   getDriverProxyMethods() {
-    return ['is', 'getId', 'setId', 'newQuery', 'touch', 'save', 'delete', 'forceDelete', 'restore', 'fresh']
+    return [
+      'is',
+      'toObject',
+      'toJSON',
+      'getId',
+      'setId',
+      'newQuery',
+      'touch',
+      'save',
+      'delete',
+      'forceDelete',
+      'restore',
+      'fresh'
+    ]
   }
 
   getQueryProxyMethods() {

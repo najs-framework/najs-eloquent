@@ -157,48 +157,112 @@ export declare class Base<Record> {
    */
   isHidden(key: string): boolean
 
-  setAttribute(attribute: string, value: any): boolean
+  /**
+   * Get an attribute from the model.
+   * @param {string} attribute
+   */
   getAttribute(attribute: string): any
+
+  /**
+   * Set a given attribute on the model.
+   *
+   * @param {string} attribute
+   * @param {any} value
+   */
+  setAttribute(attribute: string, value: any): boolean
+
+  /**
+   * Get the primary key for the model.
+   */
   getId(): any
+
+  /**
+   * Set the primary key for the model.
+   *
+   * @param {any} id
+   */
   setId(id: any): void
 
-  markFillable(key: string): this
-  markFillable(keys: string[]): this
-  markFillable(...keys: Array<string>): this
-  markFillable(...keys: Array<string[]>): this
-  markFillable(...args: Array<string | string[]>): this
+  /**
+   * Add temporary fillable attributes for current instance.
+   *
+   * @param {string|string[]} keys
+   */
+  markFillable(...keys: Array<string | string[]>): this
 
-  markGuarded(key: string): this
-  markGuarded(keys: string[]): this
-  markGuarded(...keys: Array<string>): this
-  markGuarded(...keys: Array<string[]>): this
-  markGuarded(...args: Array<string | string[]>): this
+  /**
+   * Add temporary guarded attributes for current instance.
+   *
+   * @param {string|string[]} keys
+   */
+  markGuarded(...keys: Array<string | string[]>): this
 
-  markVisible(key: string): this
-  markVisible(keys: string[]): this
-  markVisible(...keys: Array<string>): this
-  markVisible(...keys: Array<string[]>): this
-  markVisible(...args: Array<string | string[]>): this
+  /**
+   * Add temporary visible attributes for current instance.
+   *
+   * @param {string|string[]} keys
+   */
+  markVisible(...keys: Array<string | string[]>): this
 
-  markHidden(key: string): this
-  markHidden(keys: string[]): this
-  markHidden(...keys: Array<string>): this
-  markHidden(...keys: Array<string[]>): this
-  markHidden(...args: Array<string | string[]>): this
+  /**
+   * Add temporary hidden attributes for current instance.
+   *
+   * @param {string|string[]} keys
+   */
+  markHidden(...keys: Array<string | string[]>): this
 
+  /**
+   * Convert the model instance to a plain object, visible and hidden are not applied.
+   */
   toObject(): Object
+
+  /**
+   * Convert the model instance to JSON object.
+   */
   toJSON(): Object
+
+  /**
+   * Convert the model instance to JSON object.
+   */
   toJson(): Object
 
+  /**
+   * Determine if two models have the same ID and belong to the same table/collection.
+   * @param {Model} model
+   */
   is(model: Eloquent<T>): boolean
 
   // fireEvent(event: string): this
 
   // Active Records functions ------------------------------------------------------------------------------------------
+
+  /**
+   * Update the model's update timestamp.
+   */
   touch(): this
+
+  /**
+   * Save the model to the database.
+   */
   save(): Promise<any>
+
+  /**
+   * Delete the model from the database.
+   */
   delete(): Promise<any>
+
+  /**
+   * Force a hard delete on a soft deleted model.
+   */
   forceDelete(): Promise<any>
+
+  /**
+   * Restore a soft deleted model.
+   */
   restore(): Promise<any>
-  fresh(): Promise<this>
+
+  /**
+   * Reload a fresh model instance from the database.
+   */
+  fresh(): Promise<this | null>
 }

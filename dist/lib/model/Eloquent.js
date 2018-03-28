@@ -38,12 +38,6 @@ class Eloquent {
     setAttribute(name, value) {
         return this.driver.setAttribute(name, value);
     }
-    toObject() {
-        return this.driver.toObject();
-    }
-    toJSON() {
-        return this.driver.toJSON();
-    }
     toJson() {
         return this.driver.toJSON();
     }

@@ -292,7 +292,7 @@ describe('Eloquent', function () {
                 not_fillable: 'anything'
             });
             expect(model.getAttribute('first_name')).toEqual('john');
-            expect(model.toObject()).toEqual({ first_name: 'john' });
+            expect(model['toObject']()).toEqual({ first_name: 'john' });
         });
         it('calls setAttribute() to assign fillable attribute', function () {
             const model = new Model();
@@ -301,7 +301,7 @@ describe('Eloquent', function () {
                 first_name: 'john',
                 last_name: 'doe'
             });
-            expect(model.toJSON()).toEqual({ first_name: 'john' });
+            expect(model['toJSON']()).toEqual({ first_name: 'john' });
         });
         it('could fill any attributes by default except start with _', function () {
             const model = new Model();
@@ -311,7 +311,7 @@ describe('Eloquent', function () {
                 not_config: 'filled',
                 _test: 'will not filled'
             });
-            expect(model.toJSON()).toEqual({ not_config: 'filled' });
+            expect(model['toJSON']()).toEqual({ not_config: 'filled' });
         });
     });
     describe('.forceFill()', function () {
@@ -325,7 +325,7 @@ describe('Eloquent', function () {
             });
             expect(model.getAttribute('first_name')).toEqual('john');
             expect(model.getAttribute('last_name')).toEqual('doe');
-            expect(model.toObject()).toEqual({ first_name: 'john', last_name: 'doe' });
+            expect(model['toObject']()).toEqual({ first_name: 'john', last_name: 'doe' });
         });
         it('calls setAttribute() to assign fillable attribute', function () {
             const model = new Model();
@@ -333,7 +333,7 @@ describe('Eloquent', function () {
                 first_name: 'john',
                 last_name: 'doe'
             });
-            expect(model.toObject()).toEqual({ first_name: 'john', last_name: 'doe' });
+            expect(model['toObject']()).toEqual({ first_name: 'john', last_name: 'doe' });
         });
     });
     const makeTemporarySettingsMethods = {
@@ -366,7 +366,7 @@ describe('Eloquent', function () {
             const copy = model.newInstance({ first_name: 'john' });
             expect(copy).toBeInstanceOf(Model);
             expect(copy === model.newInstance()).toBe(false);
-            expect(copy.toObject()).toEqual({ first_name: 'john' });
+            expect(copy['toObject']()).toEqual({ first_name: 'john' });
         });
     });
     describe('.newCollection(data)', function () {
@@ -374,7 +374,7 @@ describe('Eloquent', function () {
             const model = new Model();
             const collection = model.newCollection([{ first_name: 'john' }]);
             expect(collection.items[0]).toBeInstanceOf(Model);
-            expect(collection.all().map(item => item.toObject())).toEqual([{ first_name: 'john' }]);
+            expect(collection.all().map(item => item['toObject']())).toEqual([{ first_name: 'john' }]);
         });
     });
 });

@@ -1,3 +1,4 @@
+import '../ModelFactory'
 import { Eloquent, MongooseDriver, EloquentDriverProvider, MongooseProvider } from '../../dist/lib/v1'
 import { IUser, User } from '../models/User'
 

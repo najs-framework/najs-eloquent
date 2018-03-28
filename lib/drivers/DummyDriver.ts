@@ -60,7 +60,7 @@ export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
   }
 
   getDriverProxyMethods() {
-    return ['is', 'getId', 'setId', 'newQuery']
+    return ['is', 'getId', 'setId', 'toObject', 'toJSON', 'newQuery']
   }
 
   getQueryProxyMethods() {

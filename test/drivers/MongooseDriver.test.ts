@@ -457,6 +457,8 @@ describe('MongooseDriver', function() {
         const driver = new MongooseDriver(<any>fakeModel, true)
         expect(driver.getDriverProxyMethods()).toEqual([
           'is',
+          'toObject',
+          'toJSON',
           'getId',
           'setId',
           'newQuery',

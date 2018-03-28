@@ -136,7 +136,7 @@ class MongooseDriver {
         }, {});
     }
     is(model) {
-        return this.attributes['_id'] === model['getId']();
+        return this.attributes['_id'].toString() === model['getId']().toString();
     }
     formatAttributeName(name) {
         return lodash_1.snakeCase(name);
@@ -145,7 +145,20 @@ class MongooseDriver {
         return ['schema', 'collection', 'options', 'getSchema'];
     }
     getDriverProxyMethods() {
-        return ['is', 'getId', 'setId', 'newQuery', 'touch', 'save', 'delete', 'forceDelete', 'restore', 'fresh'];
+        return [
+            'is',
+            'toObject',
+            'toJSON',
+            'getId',
+            'setId',
+            'newQuery',
+            'touch',
+            'save',
+            'delete',
+            'forceDelete',
+            'restore',
+            'fresh'
+        ];
     }
     getQueryProxyMethods() {
         return QUERY_PROXY_METHODS_IBasicQuery.concat(QUERY_PROXY_METHODS_IConditionQuery, QUERY_PROXY_METHODS_ISoftDeletesQuery, QUERY_PROXY_METHODS_MongooseQueryHelpers, QUERY_PROXY_METHODS_IFetchResultQuery);
