@@ -23,11 +23,11 @@ export declare interface Query<Result> {
    */
   select(...fields: Array<string | string[]>): QueryBuilder<this & T>
 
-  /**
-   * Set the columns or fields to be applied distinct operation.
-   * @param {string|string[]} fields
-   */
-  distinct(...fields: Array<string | string[]>): QueryBuilder<this & T>
+  // /**
+  //  * Set the columns or fields to be applied distinct operation.
+  //  * @param {string|string[]} fields
+  //  */
+  // distinct(...fields: Array<string | string[]>): QueryBuilder<this & T>
 
   /**
    * Add an "order by" clause to the query.
