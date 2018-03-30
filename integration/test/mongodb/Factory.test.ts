@@ -33,20 +33,16 @@ describe('Integration Test - Factory', function() {
     })
 
     it('used for creates an model instance', async function() {
-      const user: User = await Factory.create<User>(User.className)
-
-      const result = await user.findOrFail('test')
-      const item = (await result.all()).first()
-      item.getFirstName()
-
+      // const user: User = await Factory.create<User>(User.className)
+      // const result = await user.where('test')
+      // const item = (await result.all()).first()
+      // item.getFirstName()
       // const result = await user.select().all()
       // result.each(function(item: User) {})
       // if (result) {
       // }
       // const result = await user.select().first()
-
       // const users = await User.get()
-
       // console.log(user)
     })
   })

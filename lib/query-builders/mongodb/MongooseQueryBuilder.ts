@@ -280,7 +280,6 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
   }
 
   // Helpers -----------------------------------------------------------------------------------------------------------
-
   async findOrFail(): Promise<any> {
     const value = await this.find()
     if (!value) {

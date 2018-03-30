@@ -73,7 +73,7 @@ describe('Integration Test - Eloquent functions', function() {
           .toArray()
       ).toEqual(['c', 'b', 'a'])
       expect(
-        (await userModel.orderBy('age', 'DESC').get())
+        (await userModel.orderBy('age', 'desc').get())
           .map(function(user) {
             return user.first_name
           })
@@ -151,6 +151,189 @@ describe('Integration Test - Eloquent functions', function() {
           })
           .toArray()
       ).toEqual(['c'])
+    })
+  })
+
+  describe('.where()', function() {
+    it('adds a basic where clause to the query.', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+      const result = await userModel
+        .where('age', '>', 10)
+        .where(function(query) {
+          return query.where('first_name', 'a').orWhere('first_name', 'b')
+        })
+        .pluck('first_name', 'age')
+      expect(result).toEqual({ 50: 'a', 40: 'b' })
+    })
+  })
+
+  describe('.orWhere()', function() {
+    it('adds an "or where" clause to the query.', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+      const result = await userModel
+        .orWhere('age', 40)
+        .orWhere(function(query) {
+          return query.where('first_name', 'a').orWhere('first_name', 'b')
+        })
+        .pluck('first_name', 'age')
+      expect(result).toEqual({ 50: 'a', 40: 'b' })
+    })
+  })
+
+  describe('.whereIn()', function() {
+    it('adds a "where in" clause to the query.', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+      const result = await userModel.whereIn('age', [30, 40]).pluck('first_name', 'age')
+      expect(result).toEqual({ 30: 'c', 40: 'b' })
+    })
+  })
+
+  describe('.orWhereIn()', function() {
+    it('adds an "or where in" clause to the query.', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+      const result = await userModel
+        .where('age', 30)
+        .orWhereIn('age', [40])
+        .pluck('first_name', 'age')
+      expect(result).toEqual({ 30: 'c', 40: 'b' })
+    })
+  })
+
+  describe('.orWhereNotIn()', function() {
+    it('adds an "or where not in" clause to the query.', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+      const result = await userModel
+        .where('age', 30)
+        .orWhereNotIn('age', [40])
+        .pluck('first_name', 'age')
+      expect(result).toEqual({ 30: 'c', 50: 'a' })
+    })
+  })
+
+  describe('.whereNull()', function() {
+    it('adds a "where null" clause to the query.', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      // tslint:disable-next-line
+      await factory(User).create({ age: null, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+
+      const result = await userModel.whereNull('age').pluck('first_name', 'last_name')
+      expect(result).toEqual({ b: 'b' })
+    })
+  })
+
+  describe('.whereNotNull()', function() {
+    it('adds a "where not null" clause to the query.', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      // tslint:disable-next-line
+      await factory(User).create({ age: null, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+
+      const result = await userModel.whereNotNull('age').pluck('first_name', 'last_name')
+      expect(result).toEqual({ a: 'a', c: 'c' })
+    })
+  })
+
+  describe('.orWhereNotNull()', function() {
+    it('adds an "or where null" clause to the query.', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      // tslint:disable-next-line
+      await factory(User).create({ age: null, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+
+      const result = await userModel
+        .where('age', 50)
+        .orWhereNotNull('age')
+        .pluck('first_name', 'last_name')
+      expect(result).toEqual({ a: 'a', c: 'c' })
+    })
+  })
+
+  describe('.withTrashed()', function() {
+    it('considers all soft-deleted or not-deleted items.', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+      await (await userModel.where('age', 40).first()).delete()
+
+      const result = await userModel
+        .withTrashed()
+        .where('age', '>', 0)
+        .pluck('first_name', 'last_name')
+      expect(result).toEqual({ a: 'a', b: 'b', c: 'c' })
+    })
+  })
+
+  describe('.onlyTrashed()', function() {
+    it('considers soft-deleted items only.', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+      await (await userModel.where('age', 30).first()).delete()
+      await (await userModel.where('age', 40).first()).delete()
+
+      const result = await userModel
+        .onlyTrashed()
+        .where('age', '>', 30)
+        .pluck('first_name', 'last_name')
+      expect(result).toEqual({ b: 'b' })
+    })
+  })
+
+  describe('.all()', function() {
+    it('executes the query and return a Collection', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+
+      const result = (await userModel.all()).pluck('first_name', 'last_name').all()
+      expect(result).toEqual({ a: 'a', b: 'b', c: 'c' })
+    })
+  })
+
+  describe('.get()', function() {
+    it('executes the query and return a Collection', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+
+      const result = (await userModel.get()).pluck('first_name', 'last_name').all()
+      expect(result).toEqual({ a: 'a', b: 'b', c: 'c' })
+    })
+  })
+
+  describe('.first()', function() {
+    it('executes the query and return a Collection', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+
+      const result = (await userModel
+        .where('age', '>', 30)
+        .orderBy('age')
+        .first()).toObject()
+      expect(result.first_name).toEqual('b')
+    })
+  })
+
+  describe('.count()', function() {
+    it('retrieves the "count" result of the query.', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+
+      const result = await userModel.where('age', '<', 40).count()
+      expect(result).toEqual(1)
     })
   })
 })

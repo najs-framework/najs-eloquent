@@ -10,7 +10,7 @@ class GenericQueryBuilder {
         this.convention = this.getQueryConvention();
         this.softDelete = softDelete;
         this.isUsed = false;
-        this.addSoftDeleteCondition = softDelete ? true : false;
+        this.addSoftDeleteCondition = !!softDelete ? true : false;
     }
     getQueryConvention() {
         return {

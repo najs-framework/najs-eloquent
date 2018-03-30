@@ -1,14 +1,15 @@
 # <img src="https://raw.githubusercontent.com/najs-framework/najs-eloquent/master/najs-eloquent.png" alt="najs-eloquent">
 
+> ORM written in Typescript, inspired by Laravel Eloquent, supports Mongodb/Mongoose.
+
 [![Travis](https://img.shields.io/travis/najs-framework/najs-eloquent/master.svg?style=flat-square)](https://travis-ci.org/najs-framework/najs-eloquent/builds)
+[![Maintainability](https://img.shields.io/codeclimate/maintainability/najs-framework/najs-eloquent.svg?style=flat-square)](https://codeclimate.com/github/najs-framework/najs-eloquent/maintainability)
 [![Coverage Status](https://img.shields.io/coveralls/najs-framework/najs-eloquent/master.svg?style=flat-square)](https://coveralls.io/r/najs-framework/najs-eloquent?branch=master)
 [![node version](https://img.shields.io/node/v/najs-eloquent.svg?style=flat-square)](https://nodejs.org/en/download/)
 [![npm version](https://img.shields.io/npm/v/najs-eloquent.svg?style=flat-square)](http://badge.fury.io/js/najs-eloquent)
 [![npm downloads](https://img.shields.io/npm/dm/najs-eloquent.svg?style=flat-square)](http://badge.fury.io/js/najs-eloquent)
 [![npm license](https://img.shields.io/npm/l/najs-eloquent.svg?style=flat-square)](http://badge.fury.io/js/najs-eloquent)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-
-> ORM written in Typescript, inspired by Laravel Eloquent, supports Mongodb/Mongoose.
 
 If you are Laravel Eloquent lover and want to use it in `Node JS` you will love `Najs Eloquent`. `Najs Eloquent` is
 Laravel Eloquent, written in `Typescript` (with some helpers you can use it in Javascript for sure).
@@ -590,26 +591,6 @@ class UserRepository {
   }
 }
 ```
-
-# Versioning and Road map
-
-Current version - `0.2.17` - is targeted to Mongodb only (using ORM Mongoose as a backer). Because MongoDB is not RDB
-some features of Laravel Eloquent are removed such as relationship or scope. In the way to `2.0.0`, the `Najs Eloquent` will support full Eloquent's features with difference kinds of DB like `MySql`, `PostgreSQL` or `SqlLite`
-(use `knex` as a query builder).
-
-* `0.1.x` [Released] - Basic features of Eloquent, targeted to mongodb only
-* `0.2.x` [Released] - Advance features of Eloquent, accessor, mutator, `timestamps` and `soft-delete` queries
-* `1.2.x` [In Progress] - Refactor, solve tech-debt, add more syntax to model extends
-* `1.3.x` [Todo] - Support full static helper functions of Eloquent such as `findOrFail`, `paginate`, `chunk`
-
-I'm gonna take a break and use `1.3.x` in real world. With node applications, the stuff below seems not so important, doesn't it?
-
-* `1.4.x` [Todo] - Introduce migration strategy for Mongodb. This is not so important
-* `1.5.x` [Todo] - Use knex as a query builder, targeted to RDB such as `MySQL`, `SqlLite` without transaction
-* `1.6.x` [Todo] - Introduce Eloquent scope and relationship
-* `1.7.x` [Todo] - Support RDB transactional query
-* `1.8.x` [Todo] - Introduce migration for RDB
-* `1.9.x` [Todo] - Support other kinds of db requested by community
 
 # Contribute
 

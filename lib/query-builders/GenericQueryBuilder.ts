@@ -33,7 +33,7 @@ export class GenericQueryBuilder implements IBasicQuery, IConditionQuery, ISoftD
     this.convention = this.getQueryConvention()
     this.softDelete = softDelete
     this.isUsed = false
-    this.addSoftDeleteCondition = softDelete ? true : false
+    this.addSoftDeleteCondition = !!softDelete ? true : false
   }
 
   protected getQueryConvention(): IQueryConvention {
