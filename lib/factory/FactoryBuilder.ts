@@ -33,7 +33,7 @@ export class FactoryBuilder implements IFactoryBuilder {
   states(...state: string[]): this
   states(...states: Array<string[]>): this
   states(...states: any[]): this {
-    this.activeStates = flatten(states)
+    this.activeStates = !this.activeStates ? flatten(states) : this.activeStates.concat(flatten(states))
 
     return this
   }

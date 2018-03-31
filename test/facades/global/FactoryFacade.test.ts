@@ -18,6 +18,45 @@ describe('FactoryFacade', function() {
     it('is a shortcut to create a FactoryBuilder', function() {
       const result = factory('Test')
       expect(result).toBeInstanceOf(FactoryBuilder)
+      expect(result['className']).toEqual('Test')
+      expect(result['name']).toEqual('default')
+    })
+
+    it('can create FacadeBuilder with className and name', function() {
+      const result = factory('Test', 'name')
+      expect(result).toBeInstanceOf(FactoryBuilder)
+      expect(result['className']).toEqual('Test')
+      expect(result['name']).toEqual('name')
+    })
+
+    it('can create FacadeBuilder with className and amount', function() {
+      const result = factory('Test', 10)
+      expect(result).toBeInstanceOf(FactoryBuilder)
+      expect(result['className']).toEqual('Test')
+      expect(result['name']).toEqual('default')
+      expect(result['amount']).toEqual(10)
+    })
+
+    it('can create FacadeBuilder with className, name and amount', function() {
+      const result = factory('Test', 'name', 10)
+      expect(result).toBeInstanceOf(FactoryBuilder)
+      expect(result['className']).toEqual('Test')
+      expect(result['name']).toEqual('name')
+      expect(result['amount']).toEqual(10)
+    })
+
+    it('always call .times() even the amount is less than 1 or 0', function() {
+      const a = factory('Test', 'name', 0)
+      expect(a).toBeInstanceOf(FactoryBuilder)
+      expect(a['className']).toEqual('Test')
+      expect(a['name']).toEqual('name')
+      expect(a['amount']).toEqual(0)
+
+      const b = factory('Test', 'name', -1)
+      expect(b).toBeInstanceOf(FactoryBuilder)
+      expect(b['className']).toEqual('Test')
+      expect(b['name']).toEqual('name')
+      expect(b['amount']).toEqual(-1)
     })
   })
 })

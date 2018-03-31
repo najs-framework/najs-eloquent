@@ -46,17 +46,27 @@ describe('FactoryBuilder', function () {
         });
     });
     describe('.states()', function () {
-        it('flatten param to "activeStates"', function () {
+        it('flatten params and assign to "activeStates"', function () {
             const builder = new FactoryBuilder_1.FactoryBuilder('Class', 'name', {}, {}, {});
             expect(builder['activeStates']).toBeUndefined();
+            builder['activeStates'] = [];
             builder.states('test');
             expect(builder['activeStates']).toEqual(['test']);
+            builder['activeStates'] = [];
             builder.states('a', 'b');
             expect(builder['activeStates']).toEqual(['a', 'b']);
+            builder['activeStates'] = [];
             builder.states(['a', 'b', 'c']);
             expect(builder['activeStates']).toEqual(['a', 'b', 'c']);
+            builder['activeStates'] = [];
             builder.states(['a', 'b'], ['c', 'd']);
             expect(builder['activeStates']).toEqual(['a', 'b', 'c', 'd']);
+            builder['activeStates'] = [];
+            builder
+                .states('a', 'b')
+                .states(['c'])
+                .states(['d', 'e']);
+            expect(builder['activeStates']).toEqual(['a', 'b', 'c', 'd', 'e']);
         });
     });
     describe('.create()', function () {

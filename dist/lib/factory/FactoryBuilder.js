@@ -17,7 +17,7 @@ class FactoryBuilder {
         return this;
     }
     states(...states) {
-        this.activeStates = lodash_1.flatten(states);
+        this.activeStates = !this.activeStates ? lodash_1.flatten(states) : this.activeStates.concat(lodash_1.flatten(states));
         return this;
     }
     async create(attributes) {

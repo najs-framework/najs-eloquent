@@ -10,6 +10,17 @@ const facade = najs_facade_1.Facade.create(container_1.container, 'FactoryManage
 });
 exports.FactoryFacade = facade;
 exports.Factory = facade;
-exports.factory = function (className, name = 'default') {
-    return exports.Factory.of(className, name);
+exports.factory = function (className, arg1, arg2) {
+    let name = 'default';
+    if (typeof arg1 === 'string') {
+        name = arg1;
+    }
+    let amount = undefined;
+    if (typeof arg1 === 'number') {
+        amount = arg1;
+    }
+    if (typeof arg2 === 'number') {
+        amount = arg2;
+    }
+    return typeof amount === 'undefined' ? exports.Factory.of(className, name) : exports.Factory.of(className, name).times(amount);
 };
