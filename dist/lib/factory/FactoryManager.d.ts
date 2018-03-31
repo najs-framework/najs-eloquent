@@ -10,7 +10,7 @@ export declare class FactoryManager extends Facade implements IAutoload, IFactor
     protected states: Object;
     constructor();
     getClassName(): string;
-    protected initBagIfNeeded(name: string, className: string): void;
+    protected addDefinition(bag: string, className: any, name: string, definition: any): this;
     private parseModelName(className);
     define(className: string | ModelClass, definition: FactoryDefinition<ChanceFaker>, name?: string): this;
     defineAs(className: string | ModelClass, name: string, definition: FactoryDefinition<ChanceFaker>): this;

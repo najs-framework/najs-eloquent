@@ -5,6 +5,8 @@ import {
 } from './log/interfaces/IQueryLog'
 import { Collection } from 'collect.js'
 import { ChanceFaker } from './factory/FactoryManager'
+import { EloquentDriverProvider } from './facades/global/EloquentDriverProviderFacade'
+import { MongooseDriver } from './drivers/MongooseDriver'
 
 export type Faker = ChanceFaker
 export { Collection }
@@ -16,12 +18,13 @@ export { EloquentProxy } from './model/EloquentProxy'
 
 export { IEloquentDriver } from './drivers/interfaces/IEloquentDriver'
 export { DummyDriver } from './drivers/DummyDriver'
-export { MongooseDriver } from './drivers/MongooseDriver'
+export { MongooseDriver }
 export { SoftDelete } from './drivers/mongoose/SoftDelete'
 
 export { NotFoundError } from './errors/NotFoundError'
 
-export { EloquentDriverProviderFacade, EloquentDriverProvider } from './facades/global/EloquentDriverProviderFacade'
+export { EloquentDriverProviderFacade } from './facades/global/EloquentDriverProviderFacade'
+export { EloquentDriverProvider }
 export { FactoryFacade, Factory, factory } from './facades/global/FactoryFacade'
 export { MongooseProviderFacade, MongooseProvider } from './facades/global/MongooseProviderFacade'
 export { QueryLogFacade, QueryLog } from './facades/global/QueryLogFacade'
@@ -51,6 +54,9 @@ export { GenericQueryBuilder } from './query-builders/GenericQueryBuilder'
 export { GenericQueryCondition } from './query-builders/GenericQueryCondition'
 
 export { Seeder } from './seed/Seeder'
+
+// register mongoose driver as default driver
+EloquentDriverProvider.register(MongooseDriver, 'mongoose', true)
 
 export namespace NajsEloquent {
   // export namespace Builtin {

@@ -16,10 +16,13 @@ class FactoryManager extends najs_facade_1.Facade {
     getClassName() {
         return constants_1.NajsEloquentClass.FactoryManager;
     }
-    initBagIfNeeded(name, className) {
-        if (!this[name][className]) {
-            this[name][className] = {};
+    addDefinition(bag, className, name, definition) {
+        const modelName = this.parseModelName(className);
+        if (!this[bag][modelName]) {
+            this[bag][modelName] = {};
         }
+        this[bag][modelName][name] = definition;
+        return this;
     }
     parseModelName(className) {
         if (typeof className === 'function') {
@@ -29,19 +32,13 @@ class FactoryManager extends najs_facade_1.Facade {
         return className;
     }
     define(className, definition, name = 'default') {
-        const modelName = this.parseModelName(className);
-        this.initBagIfNeeded('definitions', modelName);
-        this.definitions[modelName][name] = definition;
-        return this;
+        return this.addDefinition('definitions', className, name, definition);
     }
     defineAs(className, name, definition) {
         return this.define(className, definition, name);
     }
     state(className, state, definition) {
-        const modelName = this.parseModelName(className);
-        this.initBagIfNeeded('states', modelName);
-        this.states[modelName][state] = definition;
-        return this;
+        return this.addDefinition('states', className, state, definition);
     }
     of(className, name = 'default') {
         return new FactoryBuilder_1.FactoryBuilder(this.parseModelName(className), name, this.definitions, this.states, this.faker);

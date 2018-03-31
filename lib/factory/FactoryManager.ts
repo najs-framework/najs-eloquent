@@ -27,10 +27,13 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
     return NajsEloquentClass.FactoryManager
   }
 
-  protected initBagIfNeeded(name: string, className: string) {
-    if (!this[name][className]) {
-      this[name][className] = {}
+  protected addDefinition(bag: string, className: any, name: string, definition: any) {
+    const modelName = this.parseModelName(className)
+    if (!this[bag][modelName]) {
+      this[bag][modelName] = {}
     }
+    this[bag][modelName][name] = definition
+    return this
   }
 
   private parseModelName(className: string | ModelClass): string {
@@ -42,10 +45,7 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
   }
 
   define(className: string | ModelClass, definition: FactoryDefinition<ChanceFaker>, name: string = 'default'): this {
-    const modelName = this.parseModelName(className)
-    this.initBagIfNeeded('definitions', modelName)
-    this.definitions[modelName][name] = definition
-    return this
+    return this.addDefinition('definitions', className, name, definition)
   }
 
   defineAs(className: string | ModelClass, name: string, definition: FactoryDefinition<ChanceFaker>): this {
@@ -53,10 +53,7 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
   }
 
   state(className: string | ModelClass, state: string, definition: FactoryDefinition<ChanceFaker>): this {
-    const modelName = this.parseModelName(className)
-    this.initBagIfNeeded('states', modelName)
-    this.states[modelName][state] = definition
-    return this
+    return this.addDefinition('states', className, state, definition)
   }
 
   of(className: string | ModelClass): IFactoryBuilder
