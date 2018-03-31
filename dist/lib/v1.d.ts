@@ -1,3 +1,4 @@
+import { IQueryLog, QueryLogTransform as QueryLogTransformType, QueryLogItem as QueryLogItemType } from './log/interfaces/IQueryLog';
 import { Collection } from 'collect.js';
 import { ChanceFaker } from './factory/FactoryManager';
 export declare type Faker = ChanceFaker;
@@ -11,7 +12,6 @@ export { DummyDriver } from './drivers/DummyDriver';
 export { MongooseDriver } from './drivers/MongooseDriver';
 export { SoftDelete } from './drivers/mongoose/SoftDelete';
 export { NotFoundError } from './errors/NotFoundError';
-export { NajsEloquent } from './facades/NajsEloquent';
 export { EloquentDriverProviderFacade, EloquentDriverProvider } from './facades/global/EloquentDriverProviderFacade';
 export { FactoryFacade, Factory, factory } from './facades/global/FactoryFacade';
 export { MongooseProviderFacade, MongooseProvider } from './facades/global/MongooseProviderFacade';
@@ -22,7 +22,6 @@ export { IFactoryManager } from './factory/interfaces/IFactoryManager';
 export { FactoryBuilder } from './factory/FactoryBuilder';
 export { FactoryManager } from './factory/FactoryManager';
 export { FlipFlopQueryLog } from './log/FlipFlopQueryLog';
-export { IQueryLog } from './log/interfaces/IQueryLog';
 export { IEloquentDriverProvider } from './providers/interfaces/IEloquentDriverProvider';
 export { IMongooseProvider } from './providers/interfaces/IMongooseProvider';
 export { BuiltinMongooseProvider } from './providers/BuiltinMongooseProvider';
@@ -38,3 +37,13 @@ export { MongooseQueryLog } from './query-builders/mongodb/MongooseQueryLog';
 export { GenericQueryBuilder } from './query-builders/GenericQueryBuilder';
 export { GenericQueryCondition } from './query-builders/GenericQueryCondition';
 export { Seeder } from './seed/Seeder';
+export declare namespace NajsEloquent {
+    namespace Contracts {
+        namespace Log {
+            type QueryLogTransform = QueryLogTransformType;
+            type QueryLogItem = QueryLogItemType;
+            interface QueryLog extends IQueryLog {
+            }
+        }
+    }
+}

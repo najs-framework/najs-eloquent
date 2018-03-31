@@ -1,11 +1,11 @@
 import '../../providers/DriverManager'
 import { make } from 'najs-binding'
 import { Facade, IFacade, IFacadeBase } from 'najs-facade'
-import { NajsEloquent } from '../NajsEloquent'
+import { container } from '../container'
 import { NajsEloquentClass } from '../../constants'
 import { IEloquentDriverProvider } from '../../providers/interfaces/IEloquentDriverProvider'
 
-const facade = Facade.create<IEloquentDriverProvider>(NajsEloquent, 'DriverManager', function() {
+const facade = Facade.create<IEloquentDriverProvider>(container, 'DriverManager', function() {
   return make<IEloquentDriverProvider>(NajsEloquentClass.DriverManager)
 })
 

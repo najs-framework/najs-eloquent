@@ -1,3 +1,8 @@
+import {
+  IQueryLog,
+  QueryLogTransform as QueryLogTransformType,
+  QueryLogItem as QueryLogItemType
+} from './log/interfaces/IQueryLog'
 import { Collection } from 'collect.js'
 import { ChanceFaker } from './factory/FactoryManager'
 
@@ -16,7 +21,6 @@ export { SoftDelete } from './drivers/mongoose/SoftDelete'
 
 export { NotFoundError } from './errors/NotFoundError'
 
-export { NajsEloquent } from './facades/NajsEloquent'
 export { EloquentDriverProviderFacade, EloquentDriverProvider } from './facades/global/EloquentDriverProviderFacade'
 export { FactoryFacade, Factory, factory } from './facades/global/FactoryFacade'
 export { MongooseProviderFacade, MongooseProvider } from './facades/global/MongooseProviderFacade'
@@ -29,7 +33,6 @@ export { FactoryBuilder } from './factory/FactoryBuilder'
 export { FactoryManager } from './factory/FactoryManager'
 
 export { FlipFlopQueryLog } from './log/FlipFlopQueryLog'
-export { IQueryLog } from './log/interfaces/IQueryLog'
 
 export { IEloquentDriverProvider } from './providers/interfaces/IEloquentDriverProvider'
 export { IMongooseProvider } from './providers/interfaces/IMongooseProvider'
@@ -48,3 +51,18 @@ export { GenericQueryBuilder } from './query-builders/GenericQueryBuilder'
 export { GenericQueryCondition } from './query-builders/GenericQueryCondition'
 
 export { Seeder } from './seed/Seeder'
+
+export namespace NajsEloquent {
+  // export namespace Builtin {
+  //   export const FactoryManager: typeof FactoryManagerClass = FactoryManagerClass
+  // }
+
+  export namespace Contracts {
+    export namespace Log {
+      export type QueryLogTransform = QueryLogTransformType
+      export type QueryLogItem = QueryLogItemType
+
+      export interface QueryLog extends IQueryLog {}
+    }
+  }
+}

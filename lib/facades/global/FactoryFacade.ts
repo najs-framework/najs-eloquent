@@ -1,14 +1,14 @@
 import '../../factory/FactoryManager'
 import { make } from 'najs-binding'
 import { Facade, IFacade, IFacadeBase } from 'najs-facade'
-import { NajsEloquent } from '../NajsEloquent'
+import { container } from '../container'
 import { NajsEloquentClass } from '../../constants'
 import { IFactoryManager, ModelClass } from '../../factory/interfaces/IFactoryManager'
 import { IFactoryBuilder } from '../../factory/interfaces/IFactoryBuilder'
 import { IFactory } from '../../factory/interfaces/IFactory'
 import { ChanceFaker } from '../../factory/FactoryManager'
 
-const facade = Facade.create<IFactoryManager<ChanceFaker>>(NajsEloquent, 'FactoryManager', function() {
+const facade = Facade.create<IFactoryManager<ChanceFaker>>(container, 'FactoryManager', function() {
   return make<IFactoryManager<ChanceFaker>>(NajsEloquentClass.FactoryManager)
 })
 
