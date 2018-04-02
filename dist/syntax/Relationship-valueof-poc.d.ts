@@ -7,12 +7,17 @@ declare const SmartProxy: {
     get: (target: any, key: any) => any;
     set: (target: any, key: any, value: any) => any;
 };
+interface IComment {
+    test: string;
+    getValue(): any;
+}
 declare class PostModel {
-    comments: any;
+    comments: IComment;
     loaded: Object;
     constructor();
-    hasMany(): HasManyRelationship;
+    hasMany(): any;
     setLoaded(relationship: string): void;
+    getComments(): any;
 }
 declare const notLoaded: PostModel;
 declare const loaded: PostModel;

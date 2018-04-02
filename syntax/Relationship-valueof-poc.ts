@@ -30,20 +30,30 @@ const SmartProxy = {
   }
 }
 
+interface IComment {
+  test: string
+
+  getValue(): any
+}
+
 class PostModel {
-  comments: any = this.hasMany()
+  comments: IComment = this.hasMany()
   loaded: Object = {}
 
   constructor() {
     return new Proxy(this, SmartProxy)
   }
 
-  hasMany() {
+  hasMany(): any {
     return new HasManyRelationship()
   }
 
   setLoaded(relationship: string) {
     this.loaded[relationship] = true
+  }
+
+  getComments(): any {
+    this.loaded = true
   }
 }
 
@@ -57,11 +67,16 @@ if (notLoaded.comments) {
 const loaded = new PostModel()
 loaded.setLoaded('comments')
 
-if (loaded) {
+if (loaded.comments) {
   console.log('if (loaded) returns true')
 } else {
   console.log('if (loaded) returns false')
 }
 
-console.log(loaded.comments.getValue())
-console.log(notLoaded.comments.getValue())
+if (!loaded.comments) {
+  loaded.comments = loaded.getComments()
+}
+loaded.comments && loaded.comments.getValue()
+
+// console.log(loaded.comments.getValue())
+// console.log(notLoaded.comments.getValue())
