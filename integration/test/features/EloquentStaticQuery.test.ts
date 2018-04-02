@@ -1,7 +1,7 @@
 import { QueryLog, factory } from '../../../dist/lib/v1'
 import { Post, init_mongoose, delete_collection } from '../../mongodb/index'
 
-describe('Integration Test - Eloquent static query', function() {
+describe('Integration Test - Eloquent Static (2nd way) querying', function() {
   beforeAll(async function() {
     await init_mongoose('integration_eloquent_static_query')
   })

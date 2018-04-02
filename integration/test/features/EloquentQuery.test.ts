@@ -1,7 +1,7 @@
 import { QueryLog, factory } from '../../../dist/lib/v1'
 import { User, init_mongoose, delete_collection } from '../../mongodb/index'
 
-describe('Integration Test - Eloquent functions', function() {
+describe('Integration Test - Eloquent (1st way) querying', function() {
   beforeAll(async function() {
     await init_mongoose('integration_eloquent_query')
   })

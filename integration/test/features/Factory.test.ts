@@ -2,7 +2,7 @@ import 'jest'
 import { Faker, Factory } from '../../../dist/lib/v1'
 import { User, init_mongoose, delete_collection } from '../../mongodb/index'
 
-describe('Integration Test - Factory', function() {
+describe('Integration Test - Factory usage', function() {
   beforeAll(async function() {
     await init_mongoose('integration_factory')
   })

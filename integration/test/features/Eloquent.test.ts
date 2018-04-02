@@ -2,7 +2,7 @@ import { factory } from '../../../dist/lib/v1'
 import { User, init_mongoose, delete_collection } from '../../mongodb/index'
 const Moment = require('moment')
 
-describe('Integration Test - Eloquent functions', function() {
+describe('Integration Test - Eloquent model functions', function() {
   beforeAll(async function() {
     await init_mongoose('integration_eloquent')
   })
