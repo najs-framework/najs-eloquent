@@ -1,4 +1,5 @@
 "use strict";
+/// <reference types="chance" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_facade_1 = require("najs-facade");
 const najs_binding_1 = require("najs-binding");

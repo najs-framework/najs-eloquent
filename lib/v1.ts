@@ -1,8 +1,8 @@
+import { Chance } from 'chance'
 import { Collection } from 'collect.js'
-import { ChanceFaker } from './factory/FactoryManager'
 import { EloquentDriverProvider } from './facades/global/EloquentDriverProviderFacade'
 import { MongooseDriver } from './drivers/MongooseDriver'
-import { FactoryManager as FactoryManagerClass } from './factory/FactoryManager'
+import { ChanceFaker, FactoryManager as FactoryManagerClass } from './factory/FactoryManager'
 import { FactoryBuilder as FactoryBuilderClass } from './factory/FactoryBuilder'
 import { FlipFlopQueryLog as FlipFlopQueryLogClass } from './log/FlipFlopQueryLog'
 import { GenericQueryBuilder as GenericQueryBuilderClass } from './query-builders/GenericQueryBuilder'
@@ -53,6 +53,10 @@ export { ISoftDeletesQuery } from './query-builders/interfaces/ISoftDeletesQuery
 
 // register mongoose driver as default driver
 EloquentDriverProvider.register(MongooseDriver, 'mongoose', true)
+// @ts-ignore
+function getFaker(): Faker {
+  return new Chance()
+}
 
 // Builtin classes and contracts ---------------------------------------------------------------------------------------
 

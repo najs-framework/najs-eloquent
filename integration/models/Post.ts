@@ -4,6 +4,7 @@ export interface IPost {
   user_id: string
   title: string
   content: string
+  view: number
 }
 
 export const PostBase: EloquentMongoose<IPost, Post> = Eloquent.Mongoose<IPost, Post>()
@@ -15,19 +16,16 @@ export const PostBase: EloquentMongoose<IPost, Post> = Eloquent.Mongoose<IPost, 
  */
 export class Post extends PostBase {
   static className: string = 'Post'
-  protected timestamps = true
-  protected softDeletes = false
-  protected schema = {
+  protected static timestamps = true
+  protected static softDeletes = true
+  protected static schema = {
     user_id: { type: String, required: true },
     title: { type: String, required: true },
-    content: { type: String, required: true }
+    content: { type: String, required: true },
+    view: { type: Number, required: false }
   }
 
   getClassName() {
     return Post.className
-  }
-
-  async getShortContent() {
-    return this.content
   }
 }

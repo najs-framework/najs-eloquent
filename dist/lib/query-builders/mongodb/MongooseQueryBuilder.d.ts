@@ -7,7 +7,7 @@ import { IFetchResultQuery } from '../interfaces/IFetchResultQuery';
 import { Collection } from 'collect.js';
 import { Model, Document, DocumentQuery } from 'mongoose';
 export declare type MongooseQuery<T> = DocumentQuery<Document & T | null, Document & T> | DocumentQuery<(Document & T)[] | null, Document & T>;
-export declare class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBuilder implements IBasicQuery, IFetchResultQuery<Document & T> {
+export declare class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBuilder implements IBasicQuery, IFetchResultQuery<T> {
     static className: string;
     protected mongooseModel: Model<Document & T>;
     protected mongooseQuery: MongooseQuery<T>;
@@ -26,10 +26,10 @@ export declare class MongooseQueryBuilder<T extends Object = {}> extends Generic
     native(handler: (native: Model<Document & T> | MongooseQuery<T>) => MongooseQuery<T>): IFetchResultQuery<T>;
     toObject(): Object;
     protected getQueryConvention(): IQueryConvention;
-    get(): Promise<Collection<any>>;
-    all(): Promise<Collection<any>>;
-    find(): Promise<any | null>;
-    first(): Promise<any | null>;
+    get(): Promise<Collection<T>>;
+    all(): Promise<Collection<T>>;
+    find(): Promise<T | null>;
+    first(): Promise<T | null>;
     pluck(value: string): Promise<Object>;
     pluck(value: string, key: string): Promise<Object>;
     count(): Promise<number>;

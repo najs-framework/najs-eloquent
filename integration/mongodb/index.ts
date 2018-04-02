@@ -1,12 +1,15 @@
 import '../ModelFactory'
 import { Eloquent, MongooseDriver, EloquentDriverProvider, MongooseProvider } from '../../dist/lib/v1'
 import { IUser, User } from '../models/User'
+import { IPost, Post } from '../models/Post'
 
 EloquentDriverProvider.register(MongooseDriver, 'mongoose', true)
 
 Eloquent.register(User)
+Eloquent.register(Post)
 
 export { IUser, User }
+export { IPost, Post }
 
 export function init_mongoose(name: string): Promise<any> {
   return new Promise(resolve => {

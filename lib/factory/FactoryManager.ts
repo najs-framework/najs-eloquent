@@ -1,3 +1,5 @@
+/// <reference types="chance" />
+
 import { Facade } from 'najs-facade'
 import { register, IAutoload, getClassName } from 'najs-binding'
 import { Eloquent } from '../model/Eloquent'

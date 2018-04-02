@@ -1,3 +1,4 @@
+/// <reference types="chance" />
 import { Facade } from 'najs-facade';
 import { IAutoload } from 'najs-binding';
 import { IFactoryBuilder } from './interfaces/IFactoryBuilder';

@@ -464,10 +464,12 @@ describe('MongooseQueryBuilder', function () {
                 const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
                 const findSpy = Sinon.spy(query, 'find');
                 const user = await query.first();
-                const result = await query.where('id', user.id).findOrFail();
-                expect(result.id).toEqual(user.id);
-                expect(findSpy.called).toBe(true);
-                findSpy.restore();
+                if (user) {
+                    const result = await query.where('id', user['id']).findOrFail();
+                    expect(result.id).toEqual(user['id']);
+                    expect(findSpy.called).toBe(true);
+                    findSpy.restore();
+                }
             });
             it('throws NotFoundError if model not found', async function () {
                 const query = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');

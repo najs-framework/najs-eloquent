@@ -18,7 +18,7 @@ export type MongooseQuery<T> =
   | DocumentQuery<(Document & T)[] | null, Document & T>
 
 export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBuilder
-  implements IBasicQuery, IFetchResultQuery<Document & T> {
+  implements IBasicQuery, IFetchResultQuery<T> {
   static className: string = 'MongooseQueryBuilder'
   protected mongooseModel: Model<Document & T>
   protected mongooseQuery: MongooseQuery<T>
@@ -141,7 +141,7 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
 
   // -------------------------------------------------------------------------------------------------------------------
 
-  async get(): Promise<Collection<any>> {
+  async get(): Promise<Collection<T>> {
     const logger = MongooseQueryLog.create(this)
     const query = this.createQuery(false, logger)
     logger
@@ -151,16 +151,16 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
     const result = await query.exec()
     if (result && !isEmpty(result)) {
       const eloquent = make<Eloquent<T>>(this.mongooseModel.modelName)
-      return eloquent.newCollection(result)
+      return <any>eloquent.newCollection(result)
     }
     return collect([])
   }
 
-  async all(): Promise<Collection<any>> {
+  async all(): Promise<Collection<T>> {
     return this.get()
   }
 
-  async find(): Promise<any | null> {
+  async find(): Promise<T | null> {
     const logger = MongooseQueryLog.create(this)
     const query = this.passDataToMongooseQuery(this.getQuery(true, logger), logger)
     // change mongoose query operator from find to findOne if needed
@@ -175,13 +175,13 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
       .end()
     const result = await (query as DocumentQuery<(Document & T) | null, Document & T>).exec()
     if (result) {
-      return make<Eloquent<T>>(this.mongooseModel.modelName).newInstance(result)
+      return <any>make<Eloquent<T>>(this.mongooseModel.modelName).newInstance(result)
     }
     // tslint:disable-next-line
     return null
   }
 
-  async first(): Promise<any | null> {
+  async first(): Promise<T | null> {
     return this.find()
   }
 

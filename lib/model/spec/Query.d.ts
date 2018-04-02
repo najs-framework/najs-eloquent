@@ -33,9 +33,14 @@ export declare interface Query<Result> {
    * Add an "order by" clause to the query.
    *
    * @param {string} field
-   * @param {string} direction
    */
   orderBy(field: string): QueryBuilder<this & T>
+  /**
+   * Add an "order by" clause to the query.
+   *
+   * @param {string} field
+   * @param {string} direction
+   */
   orderBy(field: string, direction: OrderDirection): QueryBuilder<this & T>
 
   /**
@@ -184,10 +189,16 @@ export declare interface Query<Result> {
    */
   get(): Promise<Collection<this & T>>
 
+  // TODO: missing .find()
+  // /**
+  //  * Execute the query and return a Eloquent instance.
+  //  */
+  // find(): Promise<this & T | null>
+
   /**
    * Execute the query and return a Eloquent instance.
    */
-  first(): Promise<this & T>
+  first(): Promise<this & T | null>
 
   /**
    * Get an array with the values of a given column.
