@@ -49,15 +49,18 @@
   },
   "dependencies": {
     "chance": "^1.0.13",
+    "knex": "^0.14.4",
     "lodash": "^4.17.4",
     "mongoose": "^5.0.11",
     "mongoose-timestamps-moment": "^1.0.0",
+    "mysql": "^2.15.0",
     "najs-facade": "^1.1.1",
     "pluralize": "^7.0.0"
   },
   "devDependencies": {
     "@types/chance": "^1.0.0",
     "@types/jest": "^21.1.8",
+    "@types/knex": "^0.14.9",
     "@types/lodash": "^4.14.91",
     "@types/mongoose": "^4.7.31",
     "@types/pluralize": "^0.0.28",
