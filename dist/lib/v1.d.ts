@@ -11,7 +11,7 @@ import { DriverManager as DriverManagerClass } from './providers/DriverManager';
 import { MongooseQueryLog as MongooseQueryLogClass } from './query-builders/mongodb/MongooseQueryLog';
 import { MongodbConditionConverter as MongodbConditionConverterClass } from './query-builders/mongodb/MongodbConditionConverter';
 import { MongooseQueryBuilder as MongooseQueryBuilderClass } from './query-builders/mongodb/MongooseQueryBuilder';
-import { IQueryLog, QueryLogTransform as QueryLogTransformType, QueryLogItem as QueryLogItemType } from './log/interfaces/IQueryLog';
+import { IQueryLog, IQueryLogTransform, IQueryLogItem } from './log/interfaces/IQueryLog';
 export declare type Faker = ChanceFaker;
 export { Collection };
 export { Eloquent, Mongoose, EloquentMongoose } from './model/Eloquent';
@@ -58,8 +58,10 @@ export declare namespace NajsEloquent {
         namespace Driver {
         }
         namespace Log {
-            type QueryLogTransform = QueryLogTransformType;
-            type QueryLogItem = QueryLogItemType;
+            interface QueryLogTransform extends IQueryLogTransform {
+            }
+            interface QueryLogItem extends IQueryLogItem {
+            }
             interface QueryLog extends IQueryLog {
             }
         }

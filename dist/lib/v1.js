@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const chance_1 = require("chance");
 const collect_js_1 = require("collect.js");
 exports.Collection = collect_js_1.Collection;
 const EloquentDriverProviderFacade_1 = require("./facades/global/EloquentDriverProviderFacade");
@@ -39,10 +38,6 @@ exports.QueryLogFacade = QueryLogFacade_1.QueryLogFacade;
 exports.QueryLog = QueryLogFacade_1.QueryLog;
 // register mongoose driver as default driver
 EloquentDriverProviderFacade_1.EloquentDriverProvider.register(MongooseDriver_1.MongooseDriver, 'mongoose', true);
-// @ts-ignore
-function getFaker() {
-    return new chance_1.Chance();
-}
 // Builtin classes and contracts ---------------------------------------------------------------------------------------
 var NajsEloquent;
 (function (NajsEloquent) {

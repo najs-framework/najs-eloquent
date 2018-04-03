@@ -1,4 +1,3 @@
-import { Chance } from 'chance'
 import { Collection } from 'collect.js'
 import { EloquentDriverProvider } from './facades/global/EloquentDriverProviderFacade'
 import { MongooseDriver } from './drivers/MongooseDriver'
@@ -12,16 +11,12 @@ import { DriverManager as DriverManagerClass } from './providers/DriverManager'
 import { MongooseQueryLog as MongooseQueryLogClass } from './query-builders/mongodb/MongooseQueryLog'
 import { MongodbConditionConverter as MongodbConditionConverterClass } from './query-builders/mongodb/MongodbConditionConverter'
 import { MongooseQueryBuilder as MongooseQueryBuilderClass } from './query-builders/mongodb/MongooseQueryBuilder'
-import {
-  IQueryLog,
-  QueryLogTransform as QueryLogTransformType,
-  QueryLogItem as QueryLogItemType
-} from './log/interfaces/IQueryLog'
+import { IQueryLog, IQueryLogTransform, IQueryLogItem } from './log/interfaces/IQueryLog'
 
 // Public classes ------------------------------------------------------------------------------------------------------
 export type Faker = ChanceFaker
-
 export { Collection }
+
 export { Eloquent, Mongoose, EloquentMongoose } from './model/Eloquent'
 export { NajsEloquentClass } from './constants'
 
@@ -53,10 +48,6 @@ export { ISoftDeletesQuery } from './query-builders/interfaces/ISoftDeletesQuery
 
 // register mongoose driver as default driver
 EloquentDriverProvider.register(MongooseDriver, 'mongoose', true)
-// @ts-ignore
-function getFaker(): Faker {
-  return new Chance()
-}
 
 // Builtin classes and contracts ---------------------------------------------------------------------------------------
 
@@ -64,6 +55,7 @@ export namespace NajsEloquent {
   export namespace Builtin {
     export const FactoryManager: typeof FactoryManagerClass = FactoryManagerClass
     export const FactoryBuilder: typeof FactoryBuilderClass = FactoryBuilderClass
+
     export const FlipFlopQueryLog: typeof FlipFlopQueryLogClass = FlipFlopQueryLogClass
 
     export const GenericQueryBuilder: typeof GenericQueryBuilderClass = GenericQueryBuilderClass
@@ -94,9 +86,8 @@ export namespace NajsEloquent {
     }
 
     export namespace Log {
-      export type QueryLogTransform = QueryLogTransformType
-      export type QueryLogItem = QueryLogItemType
-
+      export interface QueryLogTransform extends IQueryLogTransform {}
+      export interface QueryLogItem extends IQueryLogItem {}
       export interface QueryLog extends IQueryLog {}
     }
   }

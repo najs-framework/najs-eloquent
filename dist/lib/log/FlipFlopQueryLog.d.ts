@@ -1,10 +1,10 @@
 import { IAutoload } from 'najs-binding';
 import { Facade } from 'najs-facade';
-import { IQueryLog, QueryLogItem } from './interfaces/IQueryLog';
+import { IQueryLog, IQueryLogItem } from './interfaces/IQueryLog';
 export declare class FlipFlopQueryLog extends Facade implements IQueryLog, IAutoload {
     static className: string;
-    protected flip: QueryLogItem[];
-    protected flop: QueryLogItem[];
+    protected flip: IQueryLogItem[];
+    protected flop: IQueryLogItem[];
     protected circle: 'flip' | 'flop';
     protected enabled: boolean;
     constructor();

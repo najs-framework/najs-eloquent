@@ -2,13 +2,13 @@ import * as Moment from 'moment'
 import { register, IAutoload } from 'najs-binding'
 import { Facade } from 'najs-facade'
 import { NajsEloquentClass } from '../constants'
-import { IQueryLog, QueryLogItem } from './interfaces/IQueryLog'
+import { IQueryLog, IQueryLogItem } from './interfaces/IQueryLog'
 import { isString, isFunction } from 'lodash'
 
 export class FlipFlopQueryLog extends Facade implements IQueryLog, IAutoload {
   static className: string = NajsEloquentClass.QueryLog
-  protected flip: QueryLogItem[]
-  protected flop: QueryLogItem[]
+  protected flip: IQueryLogItem[]
+  protected flop: IQueryLogItem[]
   protected circle: 'flip' | 'flop'
   protected enabled: boolean
 
@@ -108,8 +108,8 @@ export class FlipFlopQueryLog extends Facade implements IQueryLog, IAutoload {
     const pullingPipe = this.circle
     this.circle = pullingPipe === 'flip' ? 'flop' : 'flip'
     const args = this.parsePullArguments(arguments)
-    const result: QueryLogItem[] = []
-    this[pullingPipe].forEach((item: QueryLogItem) => {
+    const result: IQueryLogItem[] = []
+    this[pullingPipe].forEach((item: IQueryLogItem) => {
       let match = true
       if (args['group']) {
         match = item.group === args['group']
@@ -127,7 +127,7 @@ export class FlipFlopQueryLog extends Facade implements IQueryLog, IAutoload {
       this[this.circle].push(item) // put not matched item back to the other pipe
     })
     this[pullingPipe] = []
-    return result.sort(function(a: QueryLogItem, b: QueryLogItem) {
+    return result.sort(function(a: IQueryLogItem, b: IQueryLogItem) {
       return a.when.toDate().getTime() - b.when.toDate().getTime()
     })
   }
