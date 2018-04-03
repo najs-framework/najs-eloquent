@@ -1,16 +1,55 @@
-export interface IEloquent {
+export interface IModel {
+  /**
+   * The primary key for the model.
+   */
   id: any
 
+  /**
+   * Get class name of model.
+   */
   getClassName(): string
 
+  /**
+   * Fill the model with an array of attributes.
+   *
+   * @param {Object} data
+   */
   fill(data: Object): this
+
+  /**
+   * Fill the model with an array of attributes. Force mass assignment.
+   *
+   * @param {Object} data
+   */
   forceFill(data: Object): this
 
+  /**
+   * Get the fillable attributes for the model.
+   */
   getFillable(): string[]
+
+  /**
+   * Get the guarded attributes for the model.
+   */
   getGuarded(): string[]
+
+  /**
+   * Determine if the given attribute may be mass assigned.
+   *
+   * @param {string} key
+   */
   isFillable(key: string): boolean
+
+  /**
+   * Determine if the given key is guarded.
+   *
+   * @param {string} key
+   */
   isGuarded(key: string): boolean
 
+  /**
+   * Get the visible attributes for the model.
+   */
   getVisible(): string[]
   getHidden(): string[]
   isVisible(key: string): boolean
@@ -49,5 +88,5 @@ export interface IEloquent {
   toJSON(): Object
   toJson(): Object
 
-  is(model: IEloquent): boolean
+  is(model: IModel): boolean
 }

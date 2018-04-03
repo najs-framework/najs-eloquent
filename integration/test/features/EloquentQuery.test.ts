@@ -264,7 +264,7 @@ describe('Integration Test - Eloquent (1st way) querying', function() {
       await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
       await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
       await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
-      await (await userModel.where('age', 40).first()).delete()
+      await ((await userModel.where('age', 40).first()) as User).delete()
 
       const result = await userModel
         .withTrashed()
@@ -279,8 +279,8 @@ describe('Integration Test - Eloquent (1st way) querying', function() {
       await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
       await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
       await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
-      await (await userModel.where('age', 30).first()).delete()
-      await (await userModel.where('age', 40).first()).delete()
+      await ((await userModel.where('age', 30).first()) as User).delete()
+      await ((await userModel.where('age', 40).first()) as User).delete()
 
       const result = await userModel
         .onlyTrashed()
@@ -318,11 +318,11 @@ describe('Integration Test - Eloquent (1st way) querying', function() {
       await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
       await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
 
-      const result = (await userModel
+      const result = ((await userModel
         .where('age', '>', 30)
         .orderBy('age')
-        .first()).toObject()
-      expect(result.first_name).toEqual('b')
+        .first()) as User).toObject()
+      expect(result['first_name']).toEqual('b')
     })
   })
 

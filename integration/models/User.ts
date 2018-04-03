@@ -43,7 +43,9 @@ export class User extends Eloquent implements IUser {
     return User.className
   }
 
-  getFirstName() {
-    return this.getAttribute('first_name')
+  getHashedPassword() {
+    return this.password
   }
+
+  setRawPassword(password: string) {}
 }

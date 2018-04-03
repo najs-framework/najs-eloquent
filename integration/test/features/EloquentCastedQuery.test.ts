@@ -264,7 +264,7 @@ describe('Integration Test - Eloquent Casted (3rd way) querying', function() {
       await factory(Comment).create({ like: 50, name: 'a', email: 'a' })
       await factory(Comment).create({ like: 40, name: 'b', email: 'b' })
       await factory(Comment).create({ like: 30, name: 'c', email: 'c' })
-      await (await commentModel.where('like', 40).first()).delete()
+      await ((await commentModel.where('like', 40).first()) as Comment).delete()
 
       const result = await commentModel
         .withTrashed()
@@ -279,8 +279,8 @@ describe('Integration Test - Eloquent Casted (3rd way) querying', function() {
       await factory(Comment).create({ like: 50, name: 'a', email: 'a' })
       await factory(Comment).create({ like: 40, name: 'b', email: 'b' })
       await factory(Comment).create({ like: 30, name: 'c', email: 'c' })
-      await (await commentModel.where('like', 30).first()).delete()
-      await (await commentModel.where('like', 40).first()).delete()
+      await ((await commentModel.where('like', 30).first()) as Comment).delete()
+      await ((await commentModel.where('like', 40).first()) as Comment).delete()
 
       const result = await commentModel
         .onlyTrashed()
@@ -318,11 +318,11 @@ describe('Integration Test - Eloquent Casted (3rd way) querying', function() {
       await factory(Comment).create({ like: 40, name: 'b', email: 'b' })
       await factory(Comment).create({ like: 30, name: 'c', email: 'c' })
 
-      const result = (await commentModel
+      const result = ((await commentModel
         .where('like', '>', 30)
         .orderBy('like')
-        .first()).toObject()
-      expect(result.name).toEqual('b')
+        .first()) as Comment).toObject()
+      expect(result['name']).toEqual('b')
     })
   })
 

@@ -3,13 +3,13 @@ import { Operator, SubCondition, IConditionQuery } from '../../query-builders/in
 import { ISoftDeletesQuery } from '../../query-builders/interfaces/ISoftDeletesQuery'
 import { IFetchResultQuery } from '../../query-builders/interfaces/IFetchResultQuery'
 
-export declare interface QueryBuilder<Result>
+export declare interface QueryBuilder<T>
   extends IBasicQuery,
     IConditionQuery,
     ISoftDeletesQuery,
-    IFetchResultQuery<Result> {}
+    IFetchResultQuery<T> {}
 
-export declare interface Query<Result> {
+export declare interface Query<T> {
   /**
    * Start new query with given name.
    * @param {string} name
