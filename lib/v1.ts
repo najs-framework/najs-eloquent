@@ -17,6 +17,7 @@ import { IFactoryBuilder, IFactoryBuilderCollection } from './factory/interfaces
 import { IFactoryManager } from './factory/interfaces/IFactoryManager'
 import { IEloquentDriverProvider } from './providers/interfaces/IEloquentDriverProvider'
 import { IBasicQuery } from './query-builders/interfaces/IBasicQuery'
+import { IConditionQuery } from './query-builders/interfaces/IConditionQuery'
 
 // Public classes ------------------------------------------------------------------------------------------------------
 export type Faker = ChanceFaker
@@ -40,7 +41,6 @@ export { QueryLogFacade, QueryLog } from './facades/global/QueryLogFacade'
 
 export { IMongooseProvider } from './providers/interfaces/IMongooseProvider'
 
-export { IConditionQuery } from './query-builders/interfaces/IConditionQuery'
 export { IFetchResultQuery } from './query-builders/interfaces/IFetchResultQuery'
 export { IQueryConvention } from './query-builders/interfaces/IQueryConvention'
 export { ISoftDeletesQuery } from './query-builders/interfaces/ISoftDeletesQuery'
@@ -77,6 +77,7 @@ export namespace NajsEloquent {
 
     export namespace QueryBuilder {
       export interface BasicQuery extends IBasicQuery {}
+      export interface ConditionQuery extends IConditionQuery {}
     }
 
     export namespace Provider {
