@@ -12,6 +12,9 @@ import { MongooseQueryLog as MongooseQueryLogClass } from './query-builders/mong
 import { MongodbConditionConverter as MongodbConditionConverterClass } from './query-builders/mongodb/MongodbConditionConverter';
 import { MongooseQueryBuilder as MongooseQueryBuilderClass } from './query-builders/mongodb/MongooseQueryBuilder';
 import { IQueryLog, IQueryLogTransform, IQueryLogItem } from './log/interfaces/IQueryLog';
+import { IFactory } from './factory/interfaces/IFactory';
+import { IFactoryBuilder, IFactoryBuilderCollection } from './factory/interfaces/IFactoryBuilder';
+import { IFactoryManager } from './factory/interfaces/IFactoryManager';
 export declare type Faker = ChanceFaker;
 export { Collection };
 export { Eloquent, Mongoose, EloquentMongoose } from './model/Eloquent';
@@ -25,9 +28,6 @@ export { EloquentDriverProviderFacade } from './facades/global/EloquentDriverPro
 export { FactoryFacade, Factory, factory } from './facades/global/FactoryFacade';
 export { MongooseProviderFacade, MongooseProvider } from './facades/global/MongooseProviderFacade';
 export { QueryLogFacade, QueryLog } from './facades/global/QueryLogFacade';
-export { IFactory } from './factory/interfaces/IFactory';
-export { IFactoryBuilder } from './factory/interfaces/IFactoryBuilder';
-export { IFactoryManager } from './factory/interfaces/IFactoryManager';
 export { IEloquentDriverProvider } from './providers/interfaces/IEloquentDriverProvider';
 export { IMongooseProvider } from './providers/interfaces/IMongooseProvider';
 export { IBasicQuery } from './query-builders/interfaces/IBasicQuery';
@@ -50,6 +50,14 @@ export declare namespace NajsEloquent {
     }
     namespace Contracts {
         namespace Factory {
+            interface Factory<T> extends IFactory<T> {
+            }
+            interface FactoryBuilder<T> extends IFactoryBuilder<T> {
+            }
+            interface FactoryBuilderCollection<T> extends IFactoryBuilderCollection<T> {
+            }
+            interface FactoryManager<T> extends IFactoryManager<T> {
+            }
         }
         namespace QueryBuilder {
         }

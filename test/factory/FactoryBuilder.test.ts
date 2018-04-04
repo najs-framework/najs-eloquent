@@ -140,8 +140,12 @@ describe('FactoryBuilder', function() {
       const builder = new FactoryBuilder('Model', 'name', {}, {}, <any>{})
       const newCollectionSpy = Sinon.spy(Model.prototype, 'newCollection')
 
-      builder.times(0)
-      expect(builder.make().count()).toEqual(0)
+      expect(
+        builder
+          .times(0)
+          .make()
+          .count()
+      ).toEqual(0)
       expect(newCollectionSpy.calledWith([])).toBe(true)
       newCollectionSpy.restore()
     })
@@ -153,8 +157,12 @@ describe('FactoryBuilder', function() {
       const getRawAttributesStub = Sinon.stub(builder, <any>'getRawAttributes')
       getRawAttributesStub.returns('anything')
 
-      builder.times(3)
-      expect(builder.make().count()).toEqual(3)
+      expect(
+        builder
+          .times(3)
+          .make()
+          .count()
+      ).toEqual(3)
       expect(getRawAttributesStub.callCount).toEqual(3)
 
       expect(newCollectionSpy.calledWith(['anything', 'anything', 'anything'])).toBe(true)
@@ -178,8 +186,12 @@ describe('FactoryBuilder', function() {
 
     it('returns empty collection if "amount" < 1', function() {
       const builder = new FactoryBuilder('Class', 'name', {}, {}, <any>{})
-      builder.times(0)
-      expect(builder.raw().count()).toEqual(0)
+      expect(
+        builder
+          .times(0)
+          .raw()
+          .count()
+      ).toEqual(0)
     })
 
     it('returns a Collection which wraps .getRawAttributes() result n times', function() {

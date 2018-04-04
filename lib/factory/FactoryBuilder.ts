@@ -3,9 +3,10 @@ import { range, flatten, isFunction, isPlainObject } from 'lodash'
 import collect from 'collect.js'
 import { ChanceFaker } from './FactoryManager'
 import { Eloquent } from '../model/Eloquent'
-import { IFactoryBuilder } from './interfaces/IFactoryBuilder'
+import { IFactoryBuilder, IFactoryBuilderCollection } from './interfaces/IFactoryBuilder'
+import { Collection } from 'collect.js'
 
-export class FactoryBuilder implements IFactoryBuilder {
+export class FactoryBuilder<T extends Eloquent> implements IFactoryBuilder<T> {
   protected className: string
   protected name: string
   protected definitions: Object
@@ -22,7 +23,7 @@ export class FactoryBuilder implements IFactoryBuilder {
     this.faker = faker
   }
 
-  times(amount: number): this {
+  times(amount: number): IFactoryBuilderCollection<T> {
     this.amount = amount
 
     return this
@@ -38,24 +39,23 @@ export class FactoryBuilder implements IFactoryBuilder {
     return this
   }
 
-  async create<T = any>(): Promise<T>
-  async create<T = any>(attributes: Object): Promise<T>
-  async create<T = any>(attributes?: Object): Promise<T> {
-    const result = this.make(<any>attributes)
+  async create<T>(): Promise<T>
+  async create<T>(attributes: Object): Promise<T>
+  async create(attributes?: Object): Promise<any> {
+    const result = this.make<T>(<any>attributes)
 
     if (result instanceof Eloquent) {
       await result['save']()
-    } else {
-      result.each(async (item: Eloquent) => {
-        await item['save']()
-      })
+      return result
     }
 
-    return result
+    return (result as Collection<T>).each(async (item: Eloquent) => {
+      await item['save']()
+    })
   }
 
-  make<T = any>(): T
-  make<T = any>(attributes: Object): T
+  make<T>(): T
+  make<T>(attributes: Object): T
   make(attributes?: Object): any {
     if (typeof this.amount === 'undefined') {
       return this.makeInstance(attributes)
@@ -70,8 +70,8 @@ export class FactoryBuilder implements IFactoryBuilder {
     )
   }
 
-  raw<T = any>(): T
-  raw<T = any>(attributes: Object): T
+  raw<T>(): T
+  raw<T>(attributes: Object): T
   raw(attributes?: Object): any {
     if (typeof this.amount === 'undefined') {
       return this.getRawAttributes(attributes)

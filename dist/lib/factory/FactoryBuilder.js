@@ -24,13 +24,11 @@ class FactoryBuilder {
         const result = this.make(attributes);
         if (result instanceof Eloquent_1.Eloquent) {
             await result['save']();
+            return result;
         }
-        else {
-            result.each(async (item) => {
-                await item['save']();
-            });
-        }
-        return result;
+        return result.each(async (item) => {
+            await item['save']();
+        });
     }
     make(attributes) {
         if (typeof this.amount === 'undefined') {

@@ -1,19 +1,21 @@
 import { IFactoryBuilder } from './IFactoryBuilder'
 import { Eloquent } from '../../model/Eloquent'
 
-export type FactoryDefinition<Faker> = (faker: Faker, attributes?: Object) => Object
-
 export type ModelClass = typeof Eloquent | Function
 
+export interface IFactoryDefinition<Faker> {
+  (faker: Faker, attributes?: Object): Object
+}
+
 export interface IFactoryManager<Faker> {
-  define(className: string | ModelClass, definition: FactoryDefinition<Faker>): this
+  define(className: string | ModelClass, definition: IFactoryDefinition<Faker>): this
 
-  defineAs(className: string | ModelClass, name: string, definition: FactoryDefinition<Faker>): this
+  defineAs(className: string | ModelClass, name: string, definition: IFactoryDefinition<Faker>): this
 
-  state(className: string | ModelClass, state: string, definition: FactoryDefinition<Faker>): this
+  state(className: string | ModelClass, state: string, definition: IFactoryDefinition<Faker>): this
 
-  of(className: string | ModelClass): IFactoryBuilder
-  of(className: string | ModelClass, name: string): IFactoryBuilder
+  of<T>(className: string | ModelClass): IFactoryBuilder<T>
+  of<T>(className: string | ModelClass, name: string): IFactoryBuilder<T>
 
   create<T = any>(className: string | ModelClass): Promise<T>
   create<T = any>(className: string | ModelClass, attributes: Object): Promise<T>

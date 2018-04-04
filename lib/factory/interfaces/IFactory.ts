@@ -1,7 +1,7 @@
 import { IFactoryBuilder, IFactoryBuilderCollection } from './IFactoryBuilder'
 import { ModelClass } from './IFactoryManager'
 
-export interface IFactory<T = any> {
+export interface IFactory<T> {
   (className: string | ModelClass): IFactoryBuilder<T>
   (className: string | ModelClass, name: string): IFactoryBuilder<T>
   (className: string | ModelClass, amount: number): IFactoryBuilderCollection<T>

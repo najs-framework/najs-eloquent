@@ -12,6 +12,9 @@ import { MongooseQueryLog as MongooseQueryLogClass } from './query-builders/mong
 import { MongodbConditionConverter as MongodbConditionConverterClass } from './query-builders/mongodb/MongodbConditionConverter'
 import { MongooseQueryBuilder as MongooseQueryBuilderClass } from './query-builders/mongodb/MongooseQueryBuilder'
 import { IQueryLog, IQueryLogTransform, IQueryLogItem } from './log/interfaces/IQueryLog'
+import { IFactory } from './factory/interfaces/IFactory'
+import { IFactoryBuilder, IFactoryBuilderCollection } from './factory/interfaces/IFactoryBuilder'
+import { IFactoryManager } from './factory/interfaces/IFactoryManager'
 
 // Public classes ------------------------------------------------------------------------------------------------------
 export type Faker = ChanceFaker
@@ -32,10 +35,6 @@ export { EloquentDriverProviderFacade } from './facades/global/EloquentDriverPro
 export { FactoryFacade, Factory, factory } from './facades/global/FactoryFacade'
 export { MongooseProviderFacade, MongooseProvider } from './facades/global/MongooseProviderFacade'
 export { QueryLogFacade, QueryLog } from './facades/global/QueryLogFacade'
-
-export { IFactory } from './factory/interfaces/IFactory'
-export { IFactoryBuilder } from './factory/interfaces/IFactoryBuilder'
-export { IFactoryManager } from './factory/interfaces/IFactoryManager'
 
 export { IEloquentDriverProvider } from './providers/interfaces/IEloquentDriverProvider'
 export { IMongooseProvider } from './providers/interfaces/IMongooseProvider'
@@ -70,7 +69,10 @@ export namespace NajsEloquent {
 
   export namespace Contracts {
     export namespace Factory {
-
+      export interface Factory<T> extends IFactory<T> {}
+      export interface FactoryBuilder<T> extends IFactoryBuilder<T> {}
+      export interface FactoryBuilderCollection<T> extends IFactoryBuilderCollection<T> {}
+      export interface FactoryManager<T> extends IFactoryManager<T> {}
     }
 
     export namespace QueryBuilder {

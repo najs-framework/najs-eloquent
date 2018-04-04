@@ -13,7 +13,7 @@ const facade = Facade.create<IFactoryManager<ChanceFaker>>(container, 'FactoryMa
 
 export const FactoryFacade: IFactoryManager<ChanceFaker> & IFacade = facade
 export const Factory: IFactoryManager<ChanceFaker> & IFacadeBase = facade
-export const factory: IFactory = <any>function(className: string | ModelClass, arg1: any, arg2: any): any {
+export const factory: IFactory<any> = <any>function(className: string | ModelClass, arg1: any, arg2: any): any {
   let name: string = 'default'
   if (typeof arg1 === 'string') {
     name = arg1

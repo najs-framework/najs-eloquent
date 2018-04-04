@@ -7,7 +7,7 @@ import { FactoryBuilder } from './FactoryBuilder'
 import { Chance } from 'chance'
 import { NajsEloquentClass } from '../constants'
 import { IFactoryBuilder } from './interfaces/IFactoryBuilder'
-import { IFactoryManager, FactoryDefinition, ModelClass } from './interfaces/IFactoryManager'
+import { IFactoryManager, IFactoryDefinition, ModelClass } from './interfaces/IFactoryManager'
 
 export type ChanceFaker = Chance.Chance
 
@@ -46,21 +46,21 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
     return className
   }
 
-  define(className: string | ModelClass, definition: FactoryDefinition<ChanceFaker>, name: string = 'default'): this {
+  define(className: string | ModelClass, definition: IFactoryDefinition<ChanceFaker>, name: string = 'default'): this {
     return this.addDefinition('definitions', className, name, definition)
   }
 
-  defineAs(className: string | ModelClass, name: string, definition: FactoryDefinition<ChanceFaker>): this {
+  defineAs(className: string | ModelClass, name: string, definition: IFactoryDefinition<ChanceFaker>): this {
     return this.define(className, definition, name)
   }
 
-  state(className: string | ModelClass, state: string, definition: FactoryDefinition<ChanceFaker>): this {
+  state(className: string | ModelClass, state: string, definition: IFactoryDefinition<ChanceFaker>): this {
     return this.addDefinition('states', className, state, definition)
   }
 
-  of(className: string | ModelClass): IFactoryBuilder
-  of(className: string | ModelClass, name: string): IFactoryBuilder
-  of(className: string | ModelClass, name: string = 'default'): IFactoryBuilder {
+  of<T>(className: string | ModelClass): IFactoryBuilder<T>
+  of<T>(className: string | ModelClass, name: string): IFactoryBuilder<T>
+  of(className: string | ModelClass, name: string = 'default'): IFactoryBuilder<any> {
     return new FactoryBuilder(this.parseModelName(className), name, this.definitions, this.states, this.faker)
   }
 

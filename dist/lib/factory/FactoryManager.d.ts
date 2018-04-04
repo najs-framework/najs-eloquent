@@ -2,7 +2,7 @@
 import { Facade } from 'najs-facade';
 import { IAutoload } from 'najs-binding';
 import { IFactoryBuilder } from './interfaces/IFactoryBuilder';
-import { IFactoryManager, FactoryDefinition, ModelClass } from './interfaces/IFactoryManager';
+import { IFactoryManager, IFactoryDefinition, ModelClass } from './interfaces/IFactoryManager';
 export declare type ChanceFaker = Chance.Chance;
 export declare class FactoryManager extends Facade implements IAutoload, IFactoryManager<ChanceFaker> {
     static className: string;
@@ -13,11 +13,11 @@ export declare class FactoryManager extends Facade implements IAutoload, IFactor
     getClassName(): string;
     protected addDefinition(bag: string, className: any, name: string, definition: any): this;
     private parseModelName(className);
-    define(className: string | ModelClass, definition: FactoryDefinition<ChanceFaker>, name?: string): this;
-    defineAs(className: string | ModelClass, name: string, definition: FactoryDefinition<ChanceFaker>): this;
-    state(className: string | ModelClass, state: string, definition: FactoryDefinition<ChanceFaker>): this;
-    of(className: string | ModelClass): IFactoryBuilder;
-    of(className: string | ModelClass, name: string): IFactoryBuilder;
+    define(className: string | ModelClass, definition: IFactoryDefinition<ChanceFaker>, name?: string): this;
+    defineAs(className: string | ModelClass, name: string, definition: IFactoryDefinition<ChanceFaker>): this;
+    state(className: string | ModelClass, state: string, definition: IFactoryDefinition<ChanceFaker>): this;
+    of<T>(className: string | ModelClass): IFactoryBuilder<T>;
+    of<T>(className: string | ModelClass, name: string): IFactoryBuilder<T>;
     create<T>(className: string | ModelClass): T;
     create<T>(className: string | ModelClass, attributes: Object): T;
     createAs<T>(className: string | ModelClass, name: string): T;

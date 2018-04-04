@@ -1,5 +1,5 @@
 import { Collection } from 'collect.js';
-export interface IFactoryBuilderCollection<Model = any> {
+export interface IFactoryBuilderCollection<Model> {
     states(state: string): this;
     states(states: string[]): this;
     states(...state: string[]): this;
@@ -11,8 +11,8 @@ export interface IFactoryBuilderCollection<Model = any> {
     raw<T = Model>(): Collection<T>;
     raw<T = Model>(attributes: Object): Collection<T>;
 }
-export interface IFactoryBuilder<Model = any> {
-    times(amount: number): IFactoryBuilderCollection;
+export interface IFactoryBuilder<Model> {
+    times(amount: number): IFactoryBuilderCollection<Model>;
     states(state: string): this;
     states(states: string[]): this;
     states(...state: string[]): this;
