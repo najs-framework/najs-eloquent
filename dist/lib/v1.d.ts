@@ -16,6 +16,7 @@ import { IFactory } from './factory/interfaces/IFactory';
 import { IFactoryBuilder, IFactoryBuilderCollection } from './factory/interfaces/IFactoryBuilder';
 import { IFactoryManager } from './factory/interfaces/IFactoryManager';
 import { IEloquentDriverProvider } from './providers/interfaces/IEloquentDriverProvider';
+import { IBasicQuery } from './query-builders/interfaces/IBasicQuery';
 export declare type Faker = ChanceFaker;
 export { Collection };
 export { Eloquent, Mongoose, EloquentMongoose } from './model/Eloquent';
@@ -30,7 +31,6 @@ export { FactoryFacade, Factory, factory } from './facades/global/FactoryFacade'
 export { MongooseProviderFacade, MongooseProvider } from './facades/global/MongooseProviderFacade';
 export { QueryLogFacade, QueryLog } from './facades/global/QueryLogFacade';
 export { IMongooseProvider } from './providers/interfaces/IMongooseProvider';
-export { IBasicQuery } from './query-builders/interfaces/IBasicQuery';
 export { IConditionQuery } from './query-builders/interfaces/IConditionQuery';
 export { IFetchResultQuery } from './query-builders/interfaces/IFetchResultQuery';
 export { IQueryConvention } from './query-builders/interfaces/IQueryConvention';
@@ -60,6 +60,8 @@ export declare namespace NajsEloquent {
             }
         }
         namespace QueryBuilder {
+            interface BasicQuery extends IBasicQuery {
+            }
         }
         namespace Provider {
             interface EloquentDriverProvider extends IEloquentDriverProvider {
