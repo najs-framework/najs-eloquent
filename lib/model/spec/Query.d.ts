@@ -189,16 +189,23 @@ export declare interface Query<T> {
    */
   get(): Promise<Collection<this & T>>
 
-  // TODO: missing .find()
-  // /**
-  //  * Execute the query and return a Eloquent instance.
-  //  */
-  // find(): Promise<this & T | null>
+  /**
+   * Execute the query and return an Eloquent instance.
+   */
+  find(): Promise<this & T | null>
+  /**
+   * Find by id of model and return an Eloquent instance.
+   */
+  find(id: any): Promise<this & T | null>
 
   /**
    * Execute the query and return a Eloquent instance.
    */
   first(): Promise<this & T | null>
+  /**
+   * Find by id of model and return an Eloquent instance.
+   */
+  first(id: any): Promise<this & T | null>
 
   /**
    * Get an array with the values of a given column.

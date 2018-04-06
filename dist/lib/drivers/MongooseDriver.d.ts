@@ -39,4 +39,6 @@ export declare class MongooseDriver<T extends Object = {}> implements IAutoload,
     forceDelete(): Promise<any>;
     restore(): Promise<any>;
     fresh(): Promise<T | null>;
+    find(id?: any): Promise<T | null>;
+    first(id?: any): Promise<T | null>;
 }

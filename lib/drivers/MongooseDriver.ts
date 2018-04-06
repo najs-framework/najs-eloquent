@@ -39,8 +39,8 @@ const QUERY_PROXY_METHODS_IFetchResultQuery = [
   // IFetchResultQuery
   'get',
   'all',
-  'find',
-  'first',
+  // 'find', removed because driver .find() will handle .find(id) case
+  // 'first', removed because we add .find() will handle .find(id) case
   'count',
   'pluck',
   'update'
@@ -200,7 +200,9 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
       'delete',
       'forceDelete',
       'restore',
-      'fresh'
+      'fresh',
+      'find',
+      'first'
     ]
   }
 
@@ -215,7 +217,7 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
 
   createStaticMethods(eloquent: typeof Eloquent) {
     this.getQueryProxyMethods()
-      .concat(['delete', 'restore'])
+      .concat(['delete', 'restore', 'find', 'first'])
       .forEach(function(method) {
         if (!!eloquent[method]) {
           return
@@ -274,5 +276,19 @@ export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloque
     }
     const query = this.newQuery()
     return query.where(query.getPrimaryKey(), this.attributes._id).first()
+  }
+
+  // IHelperQuery ------------------------------------------------------------------------------------------------------
+  find(id?: any): Promise<T | null> {
+    if (typeof id !== 'undefined') {
+      return this.newQuery()
+        .where('id', id)
+        .find()
+    }
+    return this.newQuery().find()
+  }
+
+  first(id?: any): Promise<T | null> {
+    return this.find(id)
   }
 }

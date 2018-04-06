@@ -313,7 +313,7 @@ describe('Integration Test - Eloquent (1st way) querying', function() {
   })
 
   describe('.first()', function() {
-    it('executes the query and return a Collection', async function() {
+    it('executes the query and return an instance of Model', async function() {
       await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
       await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
       await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
@@ -322,6 +322,38 @@ describe('Integration Test - Eloquent (1st way) querying', function() {
         .where('age', '>', 30)
         .orderBy('age')
         .first()) as User).toObject()
+      expect(result['first_name']).toEqual('b')
+    })
+
+    it('executes the query and return an instance of Model', async function() {
+      await factory(User).create<User>({ age: 50, first_name: 'a', last_name: 'a' })
+      const userB = await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+
+      const result = ((await userModel.first(userB.id)) as User).toObject()
+      expect(result['first_name']).toEqual('b')
+    })
+  })
+
+  describe('.find()', function() {
+    it('executes the query and return an instance of Model', async function() {
+      await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
+      await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+
+      const result = ((await userModel
+        .where('age', '>', 30)
+        .orderBy('age')
+        .find()) as User).toObject()
+      expect(result['first_name']).toEqual('b')
+    })
+
+    it('executes the query and return an instance of Model', async function() {
+      await factory(User).create<User>({ age: 50, first_name: 'a', last_name: 'a' })
+      const userB = await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
+      await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
+
+      const result = ((await userModel.find(userB.id)) as User).toObject()
       expect(result['first_name']).toEqual('b')
     })
   })

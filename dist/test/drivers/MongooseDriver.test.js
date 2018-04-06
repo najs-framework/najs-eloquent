@@ -394,7 +394,9 @@ describe('MongooseDriver', function () {
                     'delete',
                     'forceDelete',
                     'restore',
-                    'fresh'
+                    'fresh',
+                    'find',
+                    'first'
                 ]);
             });
         });
@@ -431,8 +433,8 @@ describe('MongooseDriver', function () {
                     // IFetchResultQuery
                     'get',
                     'all',
-                    'find',
-                    'first',
+                    // 'find', removed because driver .find() will handle .find(id) case
+                    // 'first', removed because we add .find() will handle .find(id) case
                     'count',
                     'pluck',
                     'update'
@@ -610,6 +612,55 @@ describe('MongooseDriver', function () {
                 user.first_name = 'test';
                 const fresh = await user.fresh();
                 expect(fresh.first_name).toEqual(originalFirstName);
+            });
+        });
+    });
+    describe('Helper Query Functions', function () {
+        describe('.find()', function () {
+            it('calls .newQuery().find() if id is not provided', function () {
+                const driver = new MongooseDriver_1.MongooseDriver(fakeModel, true);
+                const query = {
+                    where() {
+                        return this;
+                    },
+                    find() { }
+                };
+                const whereSpy = Sinon.spy(query, 'where');
+                const findSpy = Sinon.spy(query, 'find');
+                const newQueryStub = Sinon.stub(driver, 'newQuery');
+                newQueryStub.returns(query);
+                driver.find();
+                expect(newQueryStub.called).toBe(true);
+                expect(whereSpy.called).toBe(false);
+                expect(findSpy.called).toBe(true);
+            });
+            it('calls .newQuery().where(id, id).find() if id is provide', function () {
+                const driver = new MongooseDriver_1.MongooseDriver(fakeModel, true);
+                const query = {
+                    where() {
+                        return this;
+                    },
+                    find() { }
+                };
+                const whereSpy = Sinon.spy(query, 'where');
+                const findSpy = Sinon.spy(query, 'find');
+                const newQueryStub = Sinon.stub(driver, 'newQuery');
+                newQueryStub.returns(query);
+                driver.find('test');
+                expect(newQueryStub.called).toBe(true);
+                expect(whereSpy.calledWith('id', 'test')).toBe(true);
+                expect(findSpy.called).toBe(true);
+            });
+        });
+        describe('.first()', function () {
+            it('is an alias of .find()', function () {
+                const driver = new MongooseDriver_1.MongooseDriver(fakeModel, true);
+                const findStub = Sinon.stub(driver, 'find');
+                findStub.returns('anything');
+                expect(driver.first()).toEqual('anything');
+                expect(findStub.calledWith()).toBe(true);
+                expect(driver.first('test')).toEqual('anything');
+                expect(findStub.calledWith('test')).toBe(true);
             });
         });
     });
