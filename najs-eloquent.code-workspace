@@ -26,9 +26,7 @@
     "editor.tabSize": 2,
     "editor.codeLens": false,
     "editor.formatOnSave": true,
-    "editor.rulers": [
-      120
-    ],
+    "editor.rulers": [120],
     "editor.tabCompletion": true,
     "typescript.referencesCodeLens.enabled": true,
     "tslint.ignoreDefinitionFiles": false,
@@ -50,7 +48,11 @@
       "Queueable",
       "deserialize",
       "timestamps",
-      "mutators"
+      "mutators",
+      "proxify",
+      "proxied",
+      "chainable",
+      "bson"
     ],
     "search.exclude": {
       "**/.git": true,

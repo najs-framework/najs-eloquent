@@ -18,16 +18,16 @@ You can take a look on [full documentation and usage](https://najs-framework.git
 
 # Installation
 
-Add `najs-binding`, `najs-eloquent`
+Add `najs-binding`, `moment`, `najs-eloquent`
 
 ```bash
-yarn add najs-binding najs-eloquent
+yarn add najs-binding moment najs-eloquent
 ```
 
 or
 
 ```bash
-npm install najs-binding najs-eloquent
+npm install najs-binding moment najs-eloquent
 ```
 
 By default `najs-eloquent` uses a builtin mongoose instance and require `mongodb` running at port 27017. If you want
@@ -61,15 +61,16 @@ register(CustomMongooseProvider)
 // binding your custom class to replace the builtin class
 bind('NajsEloquent.Provider.MongooseProvider', CustomMongooseProvider.className)
 
-// reload configuration
-MongooseProviderFacade.reload()
+// reload mongoose provider instance
+// ensure that this file is loaded before any files which use najs-eloquent
+MongooseProviderFacade.reloadFacadeRoot()
 ```
 
 That's it.
 
 # Quick Usage
 
-This is a quick usage only, you can see [Full Documentation in here](https://najs-framework.github.io/docs/najs-eloquent/getting-started/) _(in progress, please help me finish it)_.
+This is a quick usage only, you can see [Full Documentation in here](https://najs-framework.github.io/docs/najs-eloquent/getting-started/) _(in progress, please give me a hand if you have time)_.
 
 ## I. Defining Models
 
