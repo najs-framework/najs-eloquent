@@ -1,22 +1,27 @@
-import { Base } from './spec/Base'
-import { Query } from './spec/Query'
-import { EloquentModel } from './spec/EloquentModel'
-import { MongooseMembers } from './spec/MongooseMembers'
-import { MongooseDefinition } from './spec/MongooseDefinition'
-import { IFactoryBuilder } from '../factory/interfaces/IFactoryBuilder'
-
-declare interface Model<Attributes, Extension> {
-  new (): EloquentModel<Attributes> & Attributes & Extension
-  new (data: Object): EloquentModel<Attributes> & Attributes & Extension
-  new (data: Attributes): EloquentModel<Attributes> & Attributes & Extension
-
-  Mongoose<Attribute, Class>(): MongooseDefinition<Attribute, Class>
-
-  register(model: Function | typeof Eloquent): void
+/// <reference path="interfaces/IModel.d.ts" />
+/// <reference path="interfaces/IModelQuery.d.ts" />
+/// <reference path="interfaces/static/IMongooseStatic.d.ts" />
+import { Model } from './Model';
+import { MongooseQueryBuilderWrapper } from '../wrappers/MongooseQueryBuilderWrapper';
+export interface EloquentStaticMongoose<T> extends NajsEloquent.Model.Static.IMongooseStatic<T, MongooseQueryBuilderWrapper<Model<T> & T>> {
 }
-
-export declare type EloquentMongoose<A, C> = MongooseDefinition<A, C>
-
-export declare interface Mongoose<T extends Object> extends Model<T, MongooseMembers> {}
-
-export declare const Eloquent: Model<{}, {}>
+export interface Eloquent<T extends Object = {}> extends NajsEloquent.Model.IModelQuery<T, NajsEloquent.Wrapper.IQueryBuilderWrapper<Model<T> & T>> {
+}
+export declare class Eloquent<T extends Object = {}> extends Model<T> {
+    /**
+     * Model constructor.
+     *
+     * @param {Object|undefined} data
+     */
+    constructor(data?: Object, isGuarded?: boolean);
+    /**
+     * Register given model.
+     *
+     * @param {Eloquent} model
+     */
+    static register(model: {
+        new (): Eloquent<any> | Model<any> | NajsEloquent.Model.IModel<any>;
+    }): void;
+    static Mongoose<T>(): EloquentStaticMongoose<T>;
+    static Class<T>(): EloquentStaticMongoose<T>;
+}

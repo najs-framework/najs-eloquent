@@ -80,7 +80,7 @@ class FactoryBuilder {
                 attributes[name] = attributes[name].call(undefined, attributes);
             }
             if (attributes[name] instanceof Eloquent_1.Eloquent) {
-                attributes[name] = attributes[name].getId();
+                attributes[name] = attributes[name].getPrimaryKey();
             }
             if (lodash_1.isPlainObject(attributes[name])) {
                 this.triggerReferenceAttributes(attributes[name]);

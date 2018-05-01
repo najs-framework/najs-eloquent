@@ -1,12 +1,19 @@
 import { QueryLog } from '../../facades/global/QueryLogFacade'
-import { MongooseQueryBuilder } from './MongooseQueryBuilder'
+import { NajsEloquent } from '../../constants'
+import { IAutoload, register } from 'najs-binding'
 import { flatten } from 'lodash'
-export class MongooseQueryLog {
+
+export class MongooseQueryLog implements IAutoload {
+  static className: string = NajsEloquent.QueryBuilder.MongooseQueryLog
   protected data: Object
 
-  protected constructor(data: Object) {
+  constructor(data: Object) {
     this.data = data
     this.data['raw'] = ''
+  }
+
+  getClassName() {
+    return NajsEloquent.QueryBuilder.MongooseQueryLog
   }
 
   action(action: string): this {
@@ -31,10 +38,5 @@ export class MongooseQueryLog {
   end(): void {
     QueryLog.push(this.data)
   }
-
-  static create(queryBuilder: MongooseQueryBuilder): MongooseQueryLog {
-    const log = new MongooseQueryLog(queryBuilder.toObject())
-    log.data['builder'] = MongooseQueryBuilder.className
-    return log
-  }
 }
+register(MongooseQueryLog)

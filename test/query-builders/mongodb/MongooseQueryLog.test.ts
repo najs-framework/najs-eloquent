@@ -1,5 +1,5 @@
 import 'jest'
-import '../../../lib/log/FlipFlopQueryLog'
+import '../../../lib/query-log/FlipFlopQueryLog'
 import { MongooseProvider } from '../../../lib/facades/global/MongooseProviderFacade'
 import { QueryLog } from '../../../lib/facades/global/QueryLogFacade'
 import { MongooseQueryBuilder } from '../../../lib/query-builders/mongodb/MongooseQueryBuilder'
@@ -18,6 +18,8 @@ const UserSchema: Schema = new Schema(
 MongooseProvider.createModelFromSchema('User', UserSchema)
 
 describe('MongooseQueryLog', function() {
+  // TODO: write test
+
   beforeEach(function() {
     QueryLog.clear().enable()
   })
@@ -28,9 +30,10 @@ describe('MongooseQueryLog', function() {
       builder
         .select()
         .where('first_name', 'test')
+        .limit(10)
         .get()
-      const log = QueryLog.pull()[0]
-      console.log(log)
+      // const log = QueryLog.pull()[0]
+      // console.log(log)
       // expect(log.query.raw).toEqual('User.find({"first_name":"test"}).exec()')
     })
   })
@@ -39,32 +42,17 @@ describe('MongooseQueryLog', function() {
     it('should work', function() {
       const builder = new MongooseQueryBuilder('User')
       builder.where('first_name', 'test').count()
-      const log = QueryLog.pull()[0]
-      console.log(log)
+      // const log = QueryLog.pull()[0]
+      // console.log(log)
     })
   })
 
   describe('.find()', function() {
     it('should work', function() {
       const builder = new MongooseQueryBuilder('User')
-      builder
-        .distinct('first_name')
-        .where('first_name', 'test')
-        .find()
-      const log = QueryLog.pull()[0]
-      console.log(log)
-    })
-  })
-
-  describe('.pluck()', function() {
-    it('should work', function() {
-      const builder = new MongooseQueryBuilder('User')
-      builder
-        .limit(10)
-        .where('first_name', '!=', 'test')
-        .pluck('first_name')
-      const log = QueryLog.pull()[0]
-      console.log(log)
+      builder.where('first_name', 'test').first()
+      // const log = QueryLog.pull()[0]
+      // console.log(log)
     })
   })
 
@@ -72,8 +60,8 @@ describe('MongooseQueryLog', function() {
     it('should work', function() {
       const builder = new MongooseQueryBuilder('User')
       builder.where('id', '000000000000000000000000').update({ test: 'anything' })
-      const log = QueryLog.pull()[0]
-      console.log(log)
+      // const log = QueryLog.pull()[0]
+      // console.log(log)
     })
   })
 
@@ -81,8 +69,8 @@ describe('MongooseQueryLog', function() {
     it('should work', function() {
       const builder = new MongooseQueryBuilder('User')
       builder.where('id', '000000000000000000000000').delete()
-      const log = QueryLog.pull()[0]
-      console.log(log)
+      // const log = QueryLog.pull()[0]
+      // console.log(log)
     })
   })
 
@@ -91,8 +79,8 @@ describe('MongooseQueryLog', function() {
       const builder = new MongooseQueryBuilder('User')
       builder['softDelete'] = { deletedAt: 'deleted_at' }
       builder.where('id', '000000000000000000000000').restore()
-      const log = QueryLog.pull()[0]
-      console.log(log)
+      // const log = QueryLog.pull()[0]
+      // console.log(log)
     })
   })
 
@@ -100,8 +88,8 @@ describe('MongooseQueryLog', function() {
     it('should work', function() {
       const builder = new MongooseQueryBuilder('User')
       builder.where('id', '000000000000000000000000').execute()
-      const log = QueryLog.pull()[0]
-      console.log(log)
+      // const log = QueryLog.pull()[0]
+      // console.log(log)
     })
   })
 })

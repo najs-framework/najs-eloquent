@@ -14,7 +14,7 @@ describe('FactoryManager', function () {
     it('extends Facade and implements IAutoload', function () {
         const factoryManager = new FactoryManager_1.FactoryManager();
         expect(factoryManager).toBeInstanceOf(najs_facade_1.Facade);
-        expect(factoryManager.getClassName()).toEqual(constants_1.NajsEloquentClass.FactoryManager);
+        expect(factoryManager.getClassName()).toEqual(constants_1.NajsEloquent.Factory.FactoryManager);
     });
     describe('constructor()', function () {
         it('using chance library and creates faker', function () {

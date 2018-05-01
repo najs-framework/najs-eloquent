@@ -1,75 +1,106 @@
+/// <reference path="../contracts/Driver.ts" />
+
+import { register } from 'najs-binding'
+import { NajsEloquent } from '../constants'
 import { snakeCase } from 'lodash'
-import { Eloquent } from '../model/Eloquent'
-import { IEloquentDriver } from './interfaces/IEloquentDriver'
 
-export class DummyDriver<T extends Object = {}> implements IEloquentDriver<T> {
-  static className: string = 'NajsEloquent.DummyDriver'
+export class DummyDriver implements Najs.Contracts.Eloquent.Driver<Object> {
+  static className: string = NajsEloquent.Driver.DummyDriver
   attributes: Object = {}
-  isGuarded: boolean
 
-  constructor()
-  constructor(model: Eloquent)
-  constructor(model: Eloquent, isGuarded: boolean)
-  constructor(model?: Eloquent, isGuarded: boolean = true) {
-    this.isGuarded = isGuarded
+  getClassName(): string {
+    return NajsEloquent.Driver.DummyDriver
   }
 
-  initialize(data?: T): void {
+  initialize(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: Object): void {
     this.attributes = data || {}
   }
 
-  getRecord(): T {
-    return <T>this.attributes
+  getRecordName(): string {
+    return ''
   }
 
-  getAttribute(name: string): any {
+  getRecord(): Object {
+    return this.attributes
+  }
+
+  setRecord(value: any): void {
+    this.attributes = value
+  }
+
+  useEloquentProxy() {
+    return false
+  }
+
+  shouldBeProxied(key: string) {
+    return false
+  }
+
+  proxify(type: 'get' | 'set', target: any, key: string, value?: any): any {
+    if (type === 'get') {
+      return target[key]
+    }
+    target[key] = value
+    return true
+  }
+
+  hasAttribute(name: string): boolean {
+    return false
+  }
+
+  getAttribute<T>(name: string): T {
     return this.attributes[name]
   }
 
-  setAttribute(name: string, value: any): boolean {
+  setAttribute<T>(name: string, value: T): boolean {
     this.attributes[name] = value
     return true
   }
 
-  getId(): any {
-    return this.getAttribute('id')
-  }
-
-  setId(id: any): void {
-    this.setAttribute('id', id)
-  }
-
-  newQuery(): any {
-    return {}
+  getPrimaryKeyName(): string {
+    return 'id'
   }
 
   toObject(): Object {
     return this.attributes
   }
 
-  toJSON(): Object {
-    return this.attributes
+  newQuery(): any {
+    return {}
   }
 
-  is(model: Eloquent<T>): boolean {
-    return this.attributes['id'] === model['driver']['attributes']['id']
+  async delete(softDeletes: boolean): Promise<boolean> {
+    return true
   }
 
-  getReservedNames(): string[] {
-    return ['dummy']
+  async restore(): Promise<any> {
+    return true
   }
 
-  getDriverProxyMethods() {
-    return ['is', 'getId', 'setId', 'toObject', 'toJSON', 'newQuery']
+  async save(): Promise<any> {
+    return true
   }
 
-  getQueryProxyMethods() {
-    return ['where', 'orWhere']
+  isNew(): boolean {
+    return true
   }
 
-  createStaticMethods(model: any) {}
+  isSoftDeleted(): boolean {
+    return false
+  }
+
+  markModified(name: string): void {}
+
+  getModelComponentName(): string | undefined {
+    return undefined
+  }
+
+  getModelComponentOrder(components: string[]): string[] {
+    return components
+  }
 
   formatAttributeName(name: string): string {
     return snakeCase(name)
   }
 }
+register(DummyDriver)

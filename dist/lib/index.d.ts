@@ -1,16 +1,24 @@
-import { EloquentMongoose } from './v0.x/eloquent/EloquentMongoose';
-import { EloquentMongooseSpec } from './v0.x/specs/EloquentMongooseSpec';
-export declare const Mongoose: typeof EloquentMongoose;
-export declare const Eloquent: {
-    Mongoose<T, R>(): EloquentMongooseSpec<T, R>;
-};
-export default Eloquent;
-export { FactoryFacade, Factory, factory } from './facades/global/FactoryFacade';
+/// <reference path="../../lib/collect.js/index.d.ts" />
+/// <reference path="contracts/Driver.d.ts" />
+/// <reference path="contracts/DriverProvider.d.ts" />
+/// <reference path="contracts/Component.d.ts" />
+/// <reference path="contracts/ComponentProvider.d.ts" />
+/// <reference path="contracts/QueryLog.d.ts" />
+/// <reference path="contracts/MongooseProvider.d.ts" />
+/// <reference path="model/interfaces/IModel.d.ts" />
+/// <reference path="model/interfaces/IModelQuery.d.ts" />
+import { BuiltinClasses } from './builtin';
+import { ChanceFaker } from './factory/FactoryManager';
+export declare type Faker = ChanceFaker;
 export { QueryLogFacade, QueryLog } from './facades/global/QueryLogFacade';
-export { EloquentBase } from './v0.x/eloquent/EloquentBase';
-export { EloquentMetadata, EloquentTimestamps, EloquentSoftDelete } from './v0.x/eloquent/EloquentMetadata';
-export { IMongooseProvider } from './v0.x/interfaces/IMongooseProvider';
-export { IBasicQueryConditionGrammar, IBasicQueryGrammar } from './v0.x/interfaces/IBasicQueryGrammar';
-export { IEloquent } from './v0.x/interfaces/IEloquent';
-export { IQueryFetchResult } from './v0.x/interfaces/IQueryFetchResult';
-export { EloquentMongooseSpec } from './v0.x/specs/EloquentMongooseSpec';
+export { EloquentDriverProviderFacade, EloquentDriverProvider } from './facades/global/EloquentDriverProviderFacade';
+export { EloquentComponentProviderFacade, EloquentComponentProvider } from './facades/global/EloquentComponentProviderFacade';
+export { MongooseProviderFacade, MongooseProvider } from './facades/global/MongooseProviderFacade';
+export { FactoryFacade, Factory, factory } from './facades/global/FactoryFacade';
+export { NotFoundError } from './errors/NotFoundError';
+export { Model } from './model/Model';
+export { Eloquent, EloquentStaticMongoose } from './model/Eloquent';
+export { EloquentMongoose } from './model/EloquentMongoose';
+export { DummyDriver } from './drivers/DummyDriver';
+export { MongooseDriver } from './drivers/MongooseDriver';
+export declare const NajsEloquent: BuiltinClasses;

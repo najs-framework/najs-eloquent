@@ -1,4 +1,4 @@
-import { QueryLog, factory } from '../../../dist/lib/v1'
+import { QueryLog, factory } from '../../../dist/lib'
 import { Comment, init_mongoose, delete_collection } from '../../mongodb/index'
 
 describe('Integration Test - Eloquent Casted (3rd way) querying', function() {
@@ -15,7 +15,7 @@ describe('Integration Test - Eloquent Casted (3rd way) querying', function() {
   describe('.queryName()', function() {
     it('starts new query with given name.', async function() {
       const query = commentModel.queryName('You can name the query what ever you want')
-      expect(query['name']).toEqual('You can name the query what ever you want')
+      expect(query['queryBuilder']['name']).toEqual('You can name the query what ever you want')
 
       QueryLog.enable()
       await query.where('email', 'test').get()
@@ -36,29 +36,6 @@ describe('Integration Test - Eloquent Casted (3rd way) querying', function() {
       }
     })
   })
-
-  // describe('.distinct()', function() {
-  //   it('sets the columns or fields to be applied distinct operation.', async function() {
-  //     await factory(Comment)
-  //       .times(2)
-  //       .create({ like: 20 })
-
-  //     QueryLog.enable()
-  //     const comments = await commentModel
-  //       .distinct('like')
-  //       .where('like', 20)
-  //       .all()
-
-  //     console.log(QueryLog.pull())
-  //     QueryLog.disable()
-  //     console.log(comments)
-
-  //     for (const comment of comments) {
-  //       const result = comment.toObject()
-  //       console.log(result)
-  //     }
-  //   })
-  // })
 
   describe('.orderBy()', function() {
     it('adds an "order by" clause to the query.', async function() {
@@ -175,7 +152,7 @@ describe('Integration Test - Eloquent Casted (3rd way) querying', function() {
       await factory(Comment).create({ like: 40, name: 'b', email: 'b' })
       await factory(Comment).create({ like: 30, name: 'c', email: 'c' })
       const result = await commentModel
-        .orWhere('like', 40)
+        .where('like', 40)
         .orWhere(function(query) {
           return query.where('name', 'a').orWhere('name', 'b')
         })
@@ -262,9 +239,9 @@ describe('Integration Test - Eloquent Casted (3rd way) querying', function() {
   describe('.withTrashed()', function() {
     it('considers all soft-deleted or not-deleted items.', async function() {
       await factory(Comment).create({ like: 50, name: 'a', email: 'a' })
-      await factory(Comment).create({ like: 40, name: 'b', email: 'b' })
+      const b = await factory(Comment).create({ like: 40, name: 'b', email: 'b' })
       await factory(Comment).create({ like: 30, name: 'c', email: 'c' })
-      await ((await commentModel.where('like', 40).first()) as Comment).delete()
+      await ((await commentModel.findOrFail(b.id)) as Comment).delete()
 
       const result = await commentModel
         .withTrashed()
@@ -277,10 +254,10 @@ describe('Integration Test - Eloquent Casted (3rd way) querying', function() {
   describe('.onlyTrashed()', function() {
     it('considers soft-deleted items only.', async function() {
       await factory(Comment).create({ like: 50, name: 'a', email: 'a' })
-      await factory(Comment).create({ like: 40, name: 'b', email: 'b' })
-      await factory(Comment).create({ like: 30, name: 'c', email: 'c' })
-      await ((await commentModel.where('like', 30).first()) as Comment).delete()
-      await ((await commentModel.where('like', 40).first()) as Comment).delete()
+      const b = await factory(Comment).create({ like: 40, name: 'b', email: 'b' })
+      const c = await factory(Comment).create({ like: 30, name: 'c', email: 'c' })
+      await (await commentModel.findOrFail(b.id)).delete()
+      await (await commentModel.findOrFail(c.id)).delete()
 
       const result = await commentModel
         .onlyTrashed()
@@ -318,10 +295,11 @@ describe('Integration Test - Eloquent Casted (3rd way) querying', function() {
       await factory(Comment).create({ like: 40, name: 'b', email: 'b' })
       await factory(Comment).create({ like: 30, name: 'c', email: 'c' })
 
-      const result = ((await commentModel
+      const user = await commentModel
         .where('like', '>', 30)
         .orderBy('like')
-        .first()) as Comment).toObject()
+        .first()
+      const result = user ? user.toObject() : {}
       expect(result['name']).toEqual('b')
     })
   })

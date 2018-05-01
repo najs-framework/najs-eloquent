@@ -1,12 +1,15 @@
-import { IQueryConvention } from './interfaces/IQueryConvention'
-import { IConditionQuery, SubCondition, Operator } from './interfaces/IConditionQuery'
-import { isFunction } from 'lodash'
+/// <reference path="interfaces/IQueryConvention.ts" />
+/// <reference path="interfaces/IConditionQuery.ts" />
 
-export class GenericQueryCondition implements IConditionQuery {
-  convention: IQueryConvention
+import { isFunction } from 'lodash'
+import { GenericQueryConditionHelpers } from './GenericQueryConditionHelpers'
+
+export interface GenericQueryCondition extends NajsEloquent.QueryBuilder.IConditionQuery {}
+export class GenericQueryCondition implements NajsEloquent.QueryBuilder.IConditionQuery {
+  convention: NajsEloquent.QueryBuilder.IQueryConvention
   isSubQuery: boolean
   bool: 'and' | 'or'
-  operator: Operator
+  operator: NajsEloquent.QueryBuilder.Operator
   field: string
   value: string
   queries: GenericQueryCondition[]
@@ -17,10 +20,10 @@ export class GenericQueryCondition implements IConditionQuery {
   }
 
   static create(
-    convention: IQueryConvention,
+    convention: NajsEloquent.QueryBuilder.IQueryConvention,
     operator: 'and' | 'or',
-    arg0: string | SubCondition,
-    arg1: Operator | any,
+    arg0: string | NajsEloquent.QueryBuilder.SubCondition,
+    arg1: NajsEloquent.QueryBuilder.Operator | any,
     arg2: any
   ): GenericQueryCondition {
     const condition = new GenericQueryCondition()
@@ -46,7 +49,12 @@ export class GenericQueryCondition implements IConditionQuery {
     return result
   }
 
-  protected buildQuery(bool: 'and' | 'or', arg0: string | SubCondition, arg1: Operator | any, arg2: any): this {
+  protected buildQuery(
+    bool: 'and' | 'or',
+    arg0: string | NajsEloquent.QueryBuilder.SubCondition,
+    arg1: NajsEloquent.QueryBuilder.Operator | any,
+    arg2: any
+  ): this {
     let queryCondition
     if (this.isSubQuery) {
       queryCondition = new GenericQueryCondition()
@@ -86,49 +94,22 @@ export class GenericQueryCondition implements IConditionQuery {
     return this
   }
 
-  where(conditionBuilder: SubCondition): this
+  where(conditionBuilder: NajsEloquent.QueryBuilder.SubCondition): this
   where(field: string, value: any): this
-  where(field: string, operator: Operator, value: any): this
+  where(field: string, operator: NajsEloquent.QueryBuilder.Operator, value: any): this
   where(arg0: any, arg1?: any, arg2?: any): this {
     return this.buildQuery('and', arg0, arg1, arg2)
   }
 
-  orWhere(conditionBuilder: SubCondition): this
+  orWhere(conditionBuilder: NajsEloquent.QueryBuilder.SubCondition): this
   orWhere(field: string, value: any): this
-  orWhere(field: string, operator: Operator, value: any): this
+  orWhere(field: string, operator: NajsEloquent.QueryBuilder.Operator, value: any): this
   orWhere(arg0: any, arg1?: any, arg2?: any): this {
     return this.buildQuery('or', arg0, arg1, arg2)
   }
+}
 
-  whereIn(field: string, values: Array<any>): this {
-    return this.buildQuery('and', field, 'in', values)
-  }
-
-  whereNotIn(field: string, values: Array<any>): this {
-    return this.buildQuery('and', field, 'not-in', values)
-  }
-
-  orWhereIn(field: string, values: Array<any>): this {
-    return this.buildQuery('or', field, 'in', values)
-  }
-
-  orWhereNotIn(field: string, values: Array<any>): this {
-    return this.buildQuery('or', field, 'not-in', values)
-  }
-
-  whereNull(field: string) {
-    return this.buildQuery('and', field, '=', this.convention.getNullValueFor(field))
-  }
-
-  whereNotNull(field: string) {
-    return this.buildQuery('and', field, '<>', this.convention.getNullValueFor(field))
-  }
-
-  orWhereNull(field: string) {
-    return this.buildQuery('or', field, '=', this.convention.getNullValueFor(field))
-  }
-
-  orWhereNotNull(field: string) {
-    return this.buildQuery('or', field, '<>', this.convention.getNullValueFor(field))
-  }
+// implicit implements the other .where... condition
+for (const fn of GenericQueryConditionHelpers.FUNCTIONS) {
+  GenericQueryCondition.prototype[fn] = GenericQueryConditionHelpers.prototype[fn]
 }

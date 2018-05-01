@@ -1,13 +1,14 @@
-import '../../log/FlipFlopQueryLog'
+/// <reference path="../../contracts/QueryLog.ts" />
+
+import '../../query-log/FlipFlopQueryLog'
 import { make } from 'najs-binding'
 import { Facade, IFacade, IFacadeBase } from 'najs-facade'
 import { container } from '../container'
-import { NajsEloquentClass } from '../../constants'
-import { IQueryLog } from '../../log/interfaces/IQueryLog'
+import { NajsEloquent } from '../../constants'
 
-const facade = Facade.create<IQueryLog>(container, 'QueryLog', function() {
-  return make<IQueryLog>(NajsEloquentClass.QueryLog)
+const facade = Facade.create<Najs.Contracts.Eloquent.QueryLog>(container, 'QueryLog', function() {
+  return make<Najs.Contracts.Eloquent.QueryLog>(NajsEloquent.QueryLog.FlipFlopQueryLog)
 })
 
-export const QueryLogFacade: IQueryLog & IFacade = facade
-export const QueryLog: IQueryLog & IFacadeBase = facade
+export const QueryLogFacade: Najs.Contracts.Eloquent.QueryLog & IFacade = facade
+export const QueryLog: Najs.Contracts.Eloquent.QueryLog & IFacadeBase = facade

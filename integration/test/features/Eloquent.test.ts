@@ -1,4 +1,4 @@
-import { factory } from '../../../dist/lib/v1'
+import { factory } from '../../../dist/lib'
 import { User, init_mongoose, delete_collection } from '../../mongodb/index'
 const Moment = require('moment')
 
@@ -114,23 +114,23 @@ describe('Integration Test - Eloquent model functions', function() {
   describe('.setAttribute()', function() {
     it('sets a given attribute on the model.', async function() {
       const user = new User()
-      expect(user.setAttribute('email', 'test')).toBe(true)
+      user.setAttribute('email', 'test')
       expect(user.email).toEqual('test')
     })
   })
 
-  describe('.getId()', function() {
+  describe('.getPrimaryKey()', function() {
     it('gets the primary key for the model.', async function() {
       const user = new User()
-      expect(user.getId().toString()).toEqual(user.id)
+      expect(user.getPrimaryKey().toString()).toEqual(user.id)
     })
   })
 
-  describe('.setId()', function() {
+  describe('.setPrimaryKey()', function() {
     it('sets the primary key for the model.', async function() {
       // setId() only works for mongoose scheme with option { _id: false }
       const user = new User()
-      user.setId('test')
+      user.setPrimaryKey('test')
     })
   })
 
@@ -146,11 +146,10 @@ describe('Integration Test - Eloquent model functions', function() {
 
   describe('.markGuarded()', function() {
     it('adds temporary guarded attributes for current instance.', async function() {
-      const user = new User()
       const instance = new User()
 
       instance.markGuarded('password')
-      expect(instance.getGuarded()).toEqual(user.getGuarded().concat(['password']))
+      expect(instance.getGuarded()).toEqual(['password'])
     })
   })
 
@@ -177,9 +176,8 @@ describe('Integration Test - Eloquent model functions', function() {
   describe('.toObject()', function() {
     it('converts the model instance to a plain object, visible and hidden are not applied.', async function() {
       const user = await factory(User).create<User>({ password: 'test' })
-
       const plainObject = user.toObject()
-      expect(plainObject['_id']).toEqual(user.getId())
+      expect(plainObject['_id']).toEqual(user.getPrimaryKey())
       expect(plainObject['__v']).not.toBeUndefined()
       expect(plainObject['password']).not.toBeUndefined()
     })
@@ -191,7 +189,7 @@ describe('Integration Test - Eloquent model functions', function() {
 
       const json = user.toJSON()
       expect(json).toEqual({
-        id: user.getId(),
+        id: user.getPrimaryKey().toString(),
         email: user.email,
         first_name: user.first_name,
         last_name: user.last_name,
@@ -210,7 +208,7 @@ describe('Integration Test - Eloquent model functions', function() {
 
       const json = user.toJSON()
       expect(json).toEqual({
-        id: user.getId(),
+        id: user.getPrimaryKey().toString(),
         email: user.email,
         first_name: user.first_name,
         last_name: user.last_name,
@@ -227,7 +225,7 @@ describe('Integration Test - Eloquent model functions', function() {
     it('determines if two models have the same ID and belong to the same table/collection.', async function() {
       const user = await factory(User).create<User>()
       const newUser = new User()
-      const freshUser = await user.where('id', user.id).first()
+      const freshUser = await user.firstOrFail(user.id)
 
       expect(user.is(newUser)).toBe(false)
       expect(user.is(freshUser)).toBe(true)
@@ -262,7 +260,7 @@ describe('Integration Test - Eloquent model functions', function() {
 
   describe('.delete()', function() {
     it('deletes the model from the database.', async function() {
-      const user = await factory(User).create<User>()
+      const user = await factory(User).create()
 
       expect(await user.onlyTrashed().count()).toBe(0)
       await user.delete()
@@ -296,7 +294,7 @@ describe('Integration Test - Eloquent model functions', function() {
   describe('.fresh()', function() {
     it('reloads a fresh model instance from the database.', async function() {
       const user = await factory(User).create<User>()
-      expect(user.is(await user.fresh())).toBe(true)
+      expect(user.is(<User>await user.fresh())).toBe(true)
       expect(await new User().fresh()).toBeNull()
     })
   })

@@ -1,294 +1,202 @@
-import { IAutoload } from 'najs-binding'
-import { isFunction, snakeCase } from 'lodash'
-import { plural } from 'pluralize'
-import { Eloquent } from '../model/Eloquent'
-import { EloquentMetadata } from '../model/EloquentMetadata'
-import { IEloquentDriver } from './interfaces/IEloquentDriver'
-import { Document, Model, Schema } from 'mongoose'
-import { MongooseQueryBuilder } from '../query-builders/mongodb/MongooseQueryBuilder'
+/// <reference path="../contracts/Driver.ts" />
+/// <reference path="../model/interfaces/IModel.ts" />
+/// <reference path="../model/interfaces/IModelSetting.ts" />
+
+import '../wrappers/MongooseQueryBuilderWrapper'
+import '../query-builders/mongodb/MongooseQueryBuilder'
+import { make } from 'najs-binding'
+import { NajsEloquent } from '../constants'
 import { MongooseProvider } from '../facades/global/MongooseProviderFacade'
 import { SoftDelete } from './mongoose/SoftDelete'
+import { Document, Model, Schema, SchemaDefinition, SchemaOptions } from 'mongoose'
+import { isFunction, snakeCase } from 'lodash'
+import { plural } from 'pluralize'
 const setupTimestampMoment = require('mongoose-timestamps-moment').setupTimestamp
 
-const STATIC_METHODS_WITH_ID = ['first', 'firstOrFail', 'find', 'findOrFail', 'delete', 'restore']
-const QUERY_PROXY_METHODS_IBasicQuery = [
-  'queryName',
-  'select',
-  'distinct',
-  'orderBy',
-  'orderByAsc',
-  'orderByDesc',
-  'limit'
-]
-const QUERY_PROXY_METHODS_IConditionQuery = [
-  'where',
-  'orWhere',
-  'whereIn',
-  'whereNotIn',
-  'orWhereIn',
-  'orWhereNotIn',
-  'whereNull',
-  'whereNotNull',
-  'orWhereNull',
-  'orWhereNotNull',
-  'native'
-]
-const QUERY_PROXY_METHODS_ISoftDeletesQuery = ['withTrashed', 'onlyTrashed']
-const QUERY_PROXY_METHODS_MongooseQueryHelpers = ['findOrFail', 'firstOrFail']
-const QUERY_PROXY_METHODS_IFetchResultQuery = [
-  // IFetchResultQuery
-  'get',
-  'all',
-  // 'find', removed because driver .find() will handle .find(id) case
-  // 'first', removed because we add .find() will handle .find(id) case
-  'count',
-  'pluck',
-  'update'
-  // 'delete', conflict to .getDriverProxyMethods() then it should be removed
-  // 'restore', conflict to .getDriverProxyMethods() then it should be removed
-  // 'execute', removed because it could not run alone
-]
+export class MongooseDriver<Record extends Object> implements Najs.Contracts.Eloquent.Driver<Record> {
+  static className: string = NajsEloquent.Driver.MongooseDriver
 
-export class MongooseDriver<T extends Object = {}> implements IAutoload, IEloquentDriver {
-  static className: string = 'NajsEloquent.MongooseDriver'
-  protected attributes: Document & T
-  protected metadata: EloquentMetadata
-  protected eloquentModel: Eloquent<T>
-  protected mongooseModel: Model<Document & T>
+  protected attributes: Document & Record
   protected queryLogGroup: string
   protected modelName: string
-  protected isGuarded: boolean
+  protected mongooseModel: Model<Document & Record>
+  protected schema: SchemaDefinition
+  protected options: SchemaOptions
+  protected softDeletesSetting?: NajsEloquent.Model.ISoftDeletesSetting
 
-  constructor(model: Eloquent<T>, isGuarded: boolean) {
-    this.eloquentModel = model
+  constructor(model: NajsEloquent.Model.IModel<any> & NajsEloquent.Model.IModelSetting) {
     this.modelName = model.getModelName()
     this.queryLogGroup = 'all'
-    this.isGuarded = isGuarded
+    this.schema = model.getSettingProperty('schema', {})
+    this.options = model.getSettingProperty('options', {})
+    // we need softDeletesSetting to initialize softDeletes option in query builder
+    if (model.hasSoftDeletes()) {
+      this.softDeletesSetting = model.getSoftDeletesSetting()
+    }
   }
 
   getClassName() {
-    return MongooseDriver.className
+    return NajsEloquent.Driver.MongooseDriver
   }
 
-  initialize(data?: any): void {
-    this.metadata = EloquentMetadata.get(this.eloquentModel)
-    this.initializeModelIfNeeded()
-    this.createAttributesByData(data)
+  initialize(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: any): void {
+    this.initializeModelIfNeeded(model)
+    this.createAttributesByData(model, isGuarded, data)
   }
 
-  protected initializeModelIfNeeded() {
+  protected initializeModelIfNeeded(model: NajsEloquent.Model.IModel<any>) {
     // prettier-ignore
     if (MongooseProvider.getMongooseInstance().modelNames().indexOf(this.modelName) !== -1) {
       return
     }
 
-    const schema = this.getMongooseSchema()
+    const schema = this.getMongooseSchema(model)
 
-    if (this.metadata.hasTimestamps()) {
-      schema.set('timestamps', this.metadata.timestamps())
+    if (model.hasTimestamps()) {
+      schema.set('timestamps', model.getTimestampsSetting())
     }
 
-    if (this.metadata.hasSoftDeletes()) {
-      schema.plugin(SoftDelete, this.metadata.softDeletes())
+    if (model.hasSoftDeletes()) {
+      this.softDeletesSetting = model.getSoftDeletesSetting()
+      schema.plugin(SoftDelete, this.softDeletesSetting)
     }
 
     MongooseProvider.createModelFromSchema(this.modelName, schema)
   }
 
-  protected getMongooseSchema(): Schema {
+  protected getMongooseSchema(model: NajsEloquent.Model.IModel<any>): Schema {
     let schema: Schema | undefined = undefined
-    if (isFunction(this.eloquentModel['getSchema'])) {
-      schema = this.eloquentModel['getSchema']()
+    if (isFunction(model['getSchema'])) {
+      schema = model['getSchema']()
       Object.getPrototypeOf(schema).setupTimestamp = setupTimestampMoment
     }
 
     if (!schema || !(schema instanceof Schema)) {
       Schema.prototype['setupTimestamp'] = setupTimestampMoment
-      schema = new Schema(
-        this.metadata.getSettingProperty('schema', {}),
-        Object.assign(
-          { collection: plural(snakeCase(this.modelName)) },
-          this.metadata.getSettingProperty('options', {})
-        )
-      )
+      schema = new Schema(this.schema, Object.assign({ collection: this.getCollectionName() }, this.options))
     }
     return schema
   }
 
-  protected createAttributesByData(data?: any) {
+  protected createAttributesByData(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: any) {
     this.mongooseModel = MongooseProvider.getMongooseInstance().model(this.modelName)
     if (data instanceof this.mongooseModel) {
-      this.attributes = <Document & T>data
+      this.attributes = <Document & Record>data
       return
     }
 
     this.attributes = new this.mongooseModel()
     if (typeof data === 'object') {
-      if (this.isGuarded) {
-        this.eloquentModel.fill(data)
+      if (isGuarded) {
+        model.fill(data)
       } else {
         this.attributes.set(data)
       }
     }
   }
 
-  getRecord(): T {
+  protected getCollectionName(): string {
+    return plural(snakeCase(this.modelName))
+  }
+
+  getRecordName(): string {
+    return this.attributes ? this.attributes.collection.name : this.getCollectionName()
+  }
+
+  getRecord(): Record {
     return this.attributes
   }
 
-  getAttribute(name: string): any {
-    return this.attributes[name]
+  setRecord(value: Document & Record): void {
+    this.attributes = value
   }
 
-  setAttribute(name: string, value: any): boolean {
-    this.attributes[name] = value
+  useEloquentProxy() {
     return true
   }
 
-  getId(): any {
-    return this.attributes._id
+  shouldBeProxied(key: string): boolean {
+    if (key === 'schema' || key === 'options') {
+      return false
+    }
+    return true
   }
 
-  setId(id: any): void {
-    this.attributes._id = id
+  proxify(type: 'get' | 'set', target: any, key: string, value?: any): any {
+    if (type === 'get') {
+      return this.getAttribute(key)
+    }
+    return this.setAttribute(key, value)
   }
 
-  newQuery(): MongooseQueryBuilder<T> {
-    return new MongooseQueryBuilder<T>(
-      this.modelName,
-      this.metadata.hasSoftDeletes() ? this.metadata.softDeletes() : undefined
-    ).setLogGroup(this.queryLogGroup)
+  hasAttribute(name: string): boolean {
+    return typeof this.schema[name] !== 'undefined'
+  }
+
+  getAttribute<T>(name: string): T {
+    return this.attributes.get(name)
+  }
+
+  setAttribute<T>(name: string, value: T): boolean {
+    this.attributes.set(name, value)
+    return true
+  }
+
+  getPrimaryKeyName(): string {
+    return '_id'
   }
 
   toObject(): Object {
-    return this.attributes.toObject()
+    return this.attributes.toObject({ virtuals: true })
   }
 
-  toJSON(): Object {
-    const data = this.toObject()
-    return Object.getOwnPropertyNames(data).reduce((memo, name) => {
-      const key = name === '_id' ? 'id' : name
-      if (this.eloquentModel.isVisible(key)) {
-        memo[key] = data[name]
-      }
-      return memo
-    }, {})
+  newQuery<T>(): NajsEloquent.Wrapper.IQueryBuilderWrapper<T> {
+    return make(NajsEloquent.Wrapper.MongooseQueryBuilderWrapper, [
+      this.modelName,
+      this.getRecordName(),
+      make(NajsEloquent.QueryBuilder.MongooseQueryBuilder, [this.modelName, this.softDeletesSetting])
+    ])
   }
 
-  is(model: any): boolean {
-    return this.attributes['_id'].toString() === model['getId']().toString()
-  }
-
-  formatAttributeName(name: string): string {
-    return snakeCase(name)
-  }
-
-  getReservedNames(): string[] {
-    return ['schema', 'collection', 'options', 'getSchema']
-  }
-
-  getDriverProxyMethods() {
-    return [
-      'is',
-      'toObject',
-      'toJSON',
-      'getId',
-      'setId',
-      'newQuery',
-      'touch',
-      'save',
-      'delete',
-      'forceDelete',
-      'restore',
-      'fresh',
-      'find',
-      'first'
-    ]
-  }
-
-  getQueryProxyMethods() {
-    return QUERY_PROXY_METHODS_IBasicQuery.concat(
-      QUERY_PROXY_METHODS_IConditionQuery,
-      QUERY_PROXY_METHODS_ISoftDeletesQuery,
-      QUERY_PROXY_METHODS_MongooseQueryHelpers,
-      QUERY_PROXY_METHODS_IFetchResultQuery
-    )
-  }
-
-  createStaticMethods(eloquent: typeof Eloquent) {
-    this.getQueryProxyMethods()
-      .concat(['delete', 'restore', 'find', 'first'])
-      .forEach(function(method) {
-        if (!!eloquent[method]) {
-          return
-        }
-
-        if (STATIC_METHODS_WITH_ID.indexOf(method) !== -1) {
-          eloquent[method] = function() {
-            const query = Reflect.construct(eloquent, []).newQuery()
-            if (arguments.length === 1) {
-              query.where('id', arguments[0])
-            }
-            return query[method]()
-          }
-        } else {
-          eloquent[method] = function() {
-            const query = Reflect.construct(eloquent, []).newQuery()
-            return query[method](...arguments)
-          }
-        }
-      })
-  }
-
-  touch() {
-    if (this.metadata.hasTimestamps()) {
-      const opts = this.metadata.timestamps()
-      this.attributes.markModified(opts.updatedAt)
+  async delete(softDeletes: boolean): Promise<any> {
+    if (softDeletes) {
+      return this.attributes['delete']()
     }
-    return this.eloquentModel
+    return this.attributes.remove()
+  }
+
+  async restore(): Promise<any> {
+    return this.attributes['restore']()
   }
 
   async save(): Promise<any> {
     return this.attributes.save()
   }
 
-  async delete(): Promise<any> {
-    if (this.metadata.hasSoftDeletes()) {
-      return this.attributes['delete']()
+  markModified(name: string): void {
+    this.attributes.markModified(name)
+  }
+
+  isNew(): boolean {
+    return this.attributes.isNew
+  }
+
+  isSoftDeleted(): boolean {
+    if (this.softDeletesSetting) {
+      return this.attributes.get(this.softDeletesSetting.deletedAt) !== null
     }
-    return this.attributes.remove()
+    return false
   }
 
-  async forceDelete(): Promise<any> {
-    return this.attributes.remove()
+  formatAttributeName(name: string): string {
+    return snakeCase(name)
   }
 
-  async restore(): Promise<any> {
-    if (this.metadata.hasSoftDeletes()) {
-      return this.attributes['restore']()
-    }
+  getModelComponentName(): string | undefined {
+    return undefined
   }
 
-  async fresh(): Promise<T | null> {
-    if (this.attributes.isNew) {
-      // tslint:disable-next-line
-      return null
-    }
-    const query = this.newQuery()
-    return query.where(query.getPrimaryKey(), this.attributes._id).first()
-  }
-
-  // IHelperQuery ------------------------------------------------------------------------------------------------------
-  find(id?: any): Promise<T | null> {
-    if (typeof id !== 'undefined') {
-      return this.newQuery()
-        .where('id', id)
-        .find()
-    }
-    return this.newQuery().find()
-  }
-
-  first(id?: any): Promise<T | null> {
-    return this.find(id)
+  getModelComponentOrder(components: string[]): string[] {
+    return components
   }
 }

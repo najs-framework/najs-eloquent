@@ -14,35 +14,38 @@
 If you are Laravel Eloquent lover and want to use it in `Node JS` you will love `Najs Eloquent`. `Najs Eloquent` is
 Laravel Eloquent, written in `Typescript` (with some helpers you can use it in Javascript for sure).
 
-You can take a look on fully setup example in [najs-eloquent-example](https://github.com/najs-framework/najs-eloquent-example) repository.
+You can take a look on [full documentation and usage](https://najs-framework.github.io/docs/najs-eloquent/getting-started/) or setup example in [najs-eloquent-example](https://github.com/najs-framework/najs-eloquent-example) repository.
 
 # Installation
 
-Add `najs`, `najs-eloquent` and `mongoose` to dependencies
+Add `najs-binding`, `najs-eloquent`
 
 ```bash
-yarn add najs najs-eloquent mongoose
-
-# or
-
-npm install najs najs-eloquent mongoose
+yarn add najs-binding najs-eloquent
 ```
 
-Register `MongooseProvider`. WARNING: Class name is so important, it must be MongooseProvider
+or
+
+```bash
+npm install najs-binding najs-eloquent
+```
+
+By default `najs-eloquent` uses a builtin mongoose instance and require `mongodb` running at port 27017. If you want
+to use `mongoose` with your own instance you have to provide a custom class implements `Najs.Contracts.Eloquent.MongooseProvider` contract.
 
 ```typescript
-// file: MongooseProvider.ts
-import { register } from 'najs-binding'
-import { IMongooseProvider } from 'najs-eloquent'
+/// <reference types="najs-eloquent" />
+
+import { register, bind } from 'najs-binding'
+import { MongooseProviderFacade } from 'najs-eloquent'
 import { Schema, Document, Model, model } from 'mongoose'
 const mongoose = require('mongoose')
 
-@register() // register MongooseProvider with 'MongooseProvider' name
-export class MongooseProvider implements IMongooseProvider {
-  static className: string = 'MongooseProvider'
+export class CustomMongooseProvider implements Najs.Contracts.Eloquent.MongooseProvider {
+  static className: string = 'CustomMongooseProvider'
 
   getClassName() {
-    return MongooseProvider.className
+    return CustomMongooseProvider.className
   }
 
   getMongooseInstance() {
@@ -53,43 +56,20 @@ export class MongooseProvider implements IMongooseProvider {
     return model<T>(modelName, schema)
   }
 }
+register(CustomMongooseProvider)
+
+// binding your custom class to replace the builtin class
+bind('NajsEloquent.Provider.MongooseProvider', CustomMongooseProvider.className)
+
+// reload configuration
+MongooseProviderFacade.reload()
 ```
 
-You can use another class but is must implement IMongooseProvider and register under "**MongooseProvider**" name,
-for example
+That's it.
 
-```typescript
-// file: CustomClass.ts
-import { register } from 'najs-binding'
-import { IMongooseProvider } from 'najs-eloquent'
-import { Schema, Document, Model, model } from 'mongoose'
-const mongoose = require('mongoose')
+# Quick Usage
 
-class CustomClass implements IMongooseProvider {
-  static className: string = 'CustomClass'
-
-  getClassName() {
-    return CustomClass.className
-  }
-
-  getMongooseInstance() {
-    return mongoose
-  }
-
-  createModelFromSchema<T extends Document>(modelName: string, schema: Schema): Model<T> {
-    return model<T>(modelName, schema)
-  }
-}
-
-// It must be registered under name "MongooseProvider"
-register(CustomClass, 'MongooseProvider')
-```
-
-# Example
-
-Please checkout fully setup example in [najs-eloquent-example](https://github.com/najs-framework/najs-eloquent-example) repository.
-
-# Usage
+This is a quick usage only, you can see [Full Documentation in here](https://najs-framework.github.io/docs/najs-eloquent/getting-started/) _(in progress, please help me finish it)_.
 
 ## I. Defining Models
 
@@ -107,7 +87,8 @@ export interface IUser {
   last_name: string
 }
 
-export class User extends Eloquent.Mongoose<IUser, User>() {
+export interface User extends IUser {}
+export class User extends Eloquent.Mongoose<IUser>() {
   static className: string = 'User'
 
   getClassName() {
@@ -505,42 +486,6 @@ describe('Custom now value', function() {
     console.log(user.deleted_at) // -> 01/01/2010
   })
 })
-```
-
-## VI. Inheritance
-
-If you want to extend models, just use `[ParentModel].Class()` instead of `Eloquent.Mongoose()`
-
-```typescript
-// file: AdminUser.ts
-import { User } from 'najs-eloquent'
-
-// This interface can be shared between Server-side and Client-side
-export interface IAdminUser {
-  id?: string
-  is_admin: true
-}
-
-export class AdminUser extends User.Class<IAdminUser, User>() {
-  static className: string = 'AdminUser'
-
-  // using the same collection as User model
-  getModelName() {
-    return super.getModelName()
-  }
-
-  getClassName() {
-    return AdminUser.className
-  }
-
-  getSchema() {
-    const schema = super.getSchema()
-    schema.add({
-      is_admin: { type: Boolean }
-    })
-    return schema
-  }
-}
 ```
 
 ## VII. Put them all together in Repository

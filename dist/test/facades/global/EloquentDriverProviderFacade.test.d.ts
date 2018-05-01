@@ -1,2 +1,2 @@
 import 'jest';
-import '../../../lib/providers/DriverManager';
+import '../../../lib/providers/DriverProvider';

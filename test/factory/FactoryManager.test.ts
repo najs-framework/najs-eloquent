@@ -5,7 +5,7 @@ import { Facade } from 'najs-facade'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { DummyDriver } from '../../lib/drivers/DummyDriver'
 import { EloquentDriverProviderFacade } from '../../lib/facades/global/EloquentDriverProviderFacade'
-import { NajsEloquentClass } from '../../lib/constants'
+import { NajsEloquent } from '../../lib/constants'
 import { FactoryManager } from '../../lib/factory/FactoryManager'
 import { FactoryBuilder } from '../../lib/factory/FactoryBuilder'
 
@@ -13,7 +13,7 @@ describe('FactoryManager', function() {
   it('extends Facade and implements IAutoload', function() {
     const factoryManager = new FactoryManager()
     expect(factoryManager).toBeInstanceOf(Facade)
-    expect(factoryManager.getClassName()).toEqual(NajsEloquentClass.FactoryManager)
+    expect(factoryManager.getClassName()).toEqual(NajsEloquent.Factory.FactoryManager)
   })
 
   describe('constructor()', function() {
@@ -36,7 +36,7 @@ describe('FactoryManager', function() {
       const registerStub = Sinon.stub(Eloquent, 'register')
 
       const factoryManager = new FactoryManager()
-      expect(factoryManager['parseModelName'](Class)).toEqual('Class')
+      expect(factoryManager['parseModelName'](<any>Class)).toEqual('Class')
       expect(registerStub.calledWith(Class)).toBe(true)
 
       registerStub.restore()
@@ -92,13 +92,13 @@ describe('FactoryManager', function() {
       const definition = () => {}
       const factoryManager = new FactoryManager()
       expect(factoryManager['definitions']).toEqual({})
-      factoryManager.define(Class, <any>definition)
+      factoryManager.define(<any>Class, <any>definition)
       expect(factoryManager['definitions']).toEqual({
         Class: {
           default: definition
         }
       })
-      factoryManager.define(Class, <any>definition, 'test')
+      factoryManager.define(<any>Class, <any>definition, 'test')
       expect(factoryManager['definitions']).toEqual({
         Class: {
           test: definition,

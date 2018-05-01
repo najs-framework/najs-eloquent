@@ -1,14 +1,17 @@
-import { EloquentSoftDelete } from '../../model/EloquentMetadata'
+/// <reference path="../../model/interfaces/IModelSoftDeletes.ts" />
+
 import { Schema, Model } from 'mongoose'
 import { isObject } from 'lodash'
 import * as Moment from 'moment'
 
 // tslint:disable-next-line
 const NOT_DELETED_VALUE = null
-const DEFAULT_OPTIONS: EloquentSoftDelete = { deletedAt: 'deleted_at', overrideMethods: false }
+const DEFAULT_OPTIONS: NajsEloquent.Model.ISoftDeletesSetting = { deletedAt: 'deleted_at', overrideMethods: false }
 
-export function SoftDelete(schema: Schema, options: EloquentSoftDelete | boolean) {
-  const opts: EloquentSoftDelete = isObject(options) ? Object.assign({}, DEFAULT_OPTIONS, options) : DEFAULT_OPTIONS
+export function SoftDelete(schema: Schema, options: NajsEloquent.Model.ISoftDeletesSetting | boolean) {
+  const opts: NajsEloquent.Model.ISoftDeletesSetting = isObject(options)
+    ? Object.assign({}, DEFAULT_OPTIONS, options)
+    : DEFAULT_OPTIONS
 
   schema.add({
     [opts.deletedAt]: { type: Date, default: NOT_DELETED_VALUE }
@@ -29,12 +32,12 @@ export function SoftDelete(schema: Schema, options: EloquentSoftDelete | boolean
   }
 }
 
-function find_override_methods(opts: EloquentSoftDelete): string[] {
+function find_override_methods(opts: NajsEloquent.Model.ISoftDeletesSetting): string[] {
   const overridableMethods: string[] = ['count', 'find', 'findOne']
   let finalList: string[] = []
 
   if (
-    (typeof opts.overrideMethods === 'string' || opts.overrideMethods instanceof String) &&
+    (typeof opts.overrideMethods === 'string' || <any>opts.overrideMethods instanceof String) &&
     opts.overrideMethods === 'all'
   ) {
     finalList = overridableMethods
@@ -54,7 +57,7 @@ function find_override_methods(opts: EloquentSoftDelete): string[] {
   return finalList
 }
 
-function apply_override_methods(schema: Schema, opts: EloquentSoftDelete) {
+function apply_override_methods(schema: Schema, opts: NajsEloquent.Model.ISoftDeletesSetting) {
   find_override_methods(opts).forEach(function(method) {
     schema.statics[method] = function() {
       return Model[method]

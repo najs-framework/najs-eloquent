@@ -1,13 +1,16 @@
 "use strict";
+/// <reference path="../interfaces/IQueryConvention.ts" />
+/// <reference path="../interfaces/IFetchResultQuery.ts" />
+/// <reference path="../../collect.js/index.d.ts" />
+/// <reference path="../../model/interfaces/IModel.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const MongooseProviderFacade_1 = require("../../facades/global/MongooseProviderFacade");
-const MongooseQueryLog_1 = require("./MongooseQueryLog");
 const GenericQueryBuilder_1 = require("../GenericQueryBuilder");
+const MongooseQueryLog_1 = require("./MongooseQueryLog");
 const MongodbConditionConverter_1 = require("./MongodbConditionConverter");
+const constants_1 = require("../../constants");
 const najs_binding_1 = require("najs-binding");
 const lodash_1 = require("lodash");
-const collect_js_1 = require("collect.js");
-const NotFoundError_1 = require("../../errors/NotFoundError");
 class MongooseQueryBuilder extends GenericQueryBuilder_1.GenericQueryBuilder {
     constructor(modelName, softDelete, primaryKey = '_id') {
         super(softDelete);
@@ -18,9 +21,12 @@ class MongooseQueryBuilder extends GenericQueryBuilder_1.GenericQueryBuilder {
         }
         this.mongooseModel = mongoose.model(modelName);
     }
+    getClassName() {
+        return constants_1.NajsEloquent.QueryBuilder.MongooseQueryBuilder;
+    }
     getQuery(isFindOne = false, logger) {
         if (!this.hasMongooseQuery) {
-            const conditions = new MongodbConditionConverter_1.MongodbConditionConverter(this.getConditions()).convert();
+            const conditions = this.resolveMongodbConditionConverter().convert();
             this.mongooseQuery = isFindOne
                 ? this.mongooseModel.findOne(conditions)
                 : (this.mongooseQuery = this.mongooseModel.find(conditions));
@@ -71,25 +77,6 @@ class MongooseQueryBuilder extends GenericQueryBuilder_1.GenericQueryBuilder {
     createQuery(findOne, logger) {
         return this.passDataToMongooseQuery(this.getQuery(findOne, logger), logger);
     }
-    getPrimaryKey() {
-        return this.primaryKey;
-    }
-    native(handler) {
-        this.mongooseQuery = handler.call(undefined, this.isUsed ? this.createQuery(false) : this.mongooseModel);
-        this.hasMongooseQuery = true;
-        return this;
-    }
-    toObject() {
-        const conditions = new MongodbConditionConverter_1.MongodbConditionConverter(this.getConditions()).convert();
-        return {
-            name: this.name ? this.name : undefined,
-            select: !lodash_1.isEmpty(this.fields.select) ? this.fields.select : undefined,
-            distinct: !lodash_1.isEmpty(this.fields.distinct) ? this.fields.distinct : undefined,
-            limit: this.limitNumber,
-            orderBy: !lodash_1.isEmpty(this.ordering) ? this.ordering : undefined,
-            conditions: !lodash_1.isEmpty(conditions) ? conditions : undefined
-        };
-    }
     getQueryConvention() {
         return {
             formatFieldName(name) {
@@ -104,26 +91,36 @@ class MongooseQueryBuilder extends GenericQueryBuilder_1.GenericQueryBuilder {
             }
         };
     }
+    getPrimaryKey() {
+        return this.primaryKey;
+    }
+    toObject() {
+        const conditions = this.resolveMongodbConditionConverter().convert();
+        return {
+            name: this.name ? this.name : undefined,
+            select: !lodash_1.isEmpty(this.fields.select) ? this.fields.select : undefined,
+            limit: this.limitNumber,
+            orderBy: !lodash_1.isEmpty(this.ordering) ? this.ordering : undefined,
+            conditions: !lodash_1.isEmpty(conditions) ? conditions : undefined
+        };
+    }
     // -------------------------------------------------------------------------------------------------------------------
+    native(handler) {
+        this.mongooseQuery = handler.call(undefined, this.isUsed ? this.createQuery(false) : this.mongooseModel);
+        this.hasMongooseQuery = true;
+        return this;
+    }
     async get() {
-        const logger = MongooseQueryLog_1.MongooseQueryLog.create(this);
+        const logger = this.resolveMongooseQueryLog();
         const query = this.createQuery(false, logger);
         logger
             .raw('.exec()')
             .action('get')
             .end();
-        const result = await query.exec();
-        if (result && !lodash_1.isEmpty(result)) {
-            const eloquent = najs_binding_1.make(this.mongooseModel.modelName);
-            return eloquent.newCollection(result);
-        }
-        return collect_js_1.default([]);
+        return (await query.exec());
     }
-    async all() {
-        return this.get();
-    }
-    async find() {
-        const logger = MongooseQueryLog_1.MongooseQueryLog.create(this);
+    async first() {
+        const logger = this.resolveMongooseQueryLog();
         const query = this.passDataToMongooseQuery(this.getQuery(true, logger), logger);
         // change mongoose query operator from find to findOne if needed
         if (query['op'] === 'find') {
@@ -134,37 +131,10 @@ class MongooseQueryBuilder extends GenericQueryBuilder_1.GenericQueryBuilder {
             .raw('.exec()')
             .action('find')
             .end();
-        const result = await query.exec();
-        if (result) {
-            return najs_binding_1.make(this.mongooseModel.modelName).newInstance(result);
-        }
-        // tslint:disable-next-line
-        return null;
-    }
-    async first() {
-        return this.find();
-    }
-    async pluck(value, key) {
-        const logger = MongooseQueryLog_1.MongooseQueryLog.create(this);
-        this.selectedFields = [];
-        const keyName = key ? key : this.primaryKey;
-        this.select(value, keyName);
-        const query = this.createQuery(false, logger);
-        logger
-            .raw('.exec()')
-            .action('pluck')
-            .end();
-        const result = await query.exec();
-        if (result && !lodash_1.isEmpty(result)) {
-            return result.reduce(function (memo, item) {
-                memo[item[keyName]] = item[value];
-                return memo;
-            }, {});
-        }
-        return {};
+        return await query.exec();
     }
     async count() {
-        const logger = MongooseQueryLog_1.MongooseQueryLog.create(this).action('count');
+        const logger = this.resolveMongooseQueryLog().action('count');
         this.selectedFields = [];
         this.select(this.primaryKey);
         const query = this.createQuery(false, logger);
@@ -173,11 +143,11 @@ class MongooseQueryBuilder extends GenericQueryBuilder_1.GenericQueryBuilder {
         return result;
     }
     async update(data) {
-        const conditions = new MongodbConditionConverter_1.MongodbConditionConverter(this.getConditions()).convert();
+        const conditions = this.resolveMongodbConditionConverter().convert();
         const query = this.mongooseModel.update(conditions, data, {
             multi: true
         });
-        MongooseQueryLog_1.MongooseQueryLog.create(this)
+        this.resolveMongooseQueryLog()
             .action('update')
             .raw(this.mongooseModel.modelName)
             .raw(`.update(${JSON.stringify(conditions)}, ${JSON.stringify(data)}, {multi: true})`)
@@ -190,7 +160,7 @@ class MongooseQueryBuilder extends GenericQueryBuilder_1.GenericQueryBuilder {
         if (conditions === false) {
             return { n: 0, ok: 1 };
         }
-        MongooseQueryLog_1.MongooseQueryLog.create(this)
+        this.resolveMongooseQueryLog()
             .raw(this.mongooseModel.modelName)
             .raw('.remove(', conditions, ')', '.exec()')
             .end();
@@ -209,7 +179,7 @@ class MongooseQueryBuilder extends GenericQueryBuilder_1.GenericQueryBuilder {
             $set: { [this.softDelete.deletedAt]: this.convention.getNullValueFor(this.softDelete.deletedAt) }
         };
         const query = this.mongooseModel.update(conditions, updateData, { multi: true });
-        MongooseQueryLog_1.MongooseQueryLog.create(this)
+        this.resolveMongooseQueryLog()
             .action('restore')
             .raw(this.mongooseModel.modelName)
             .raw('.update(', conditions, ',', updateData, ', ', { multi: true }, ')')
@@ -218,7 +188,7 @@ class MongooseQueryBuilder extends GenericQueryBuilder_1.GenericQueryBuilder {
         return query.exec();
     }
     async execute() {
-        const logger = MongooseQueryLog_1.MongooseQueryLog.create(this);
+        const logger = this.resolveMongooseQueryLog();
         const query = this.getQuery(false, logger);
         logger
             .raw('.exec()')
@@ -226,27 +196,25 @@ class MongooseQueryBuilder extends GenericQueryBuilder_1.GenericQueryBuilder {
             .end();
         return query.exec();
     }
-    // Helpers -----------------------------------------------------------------------------------------------------------
-    async findOrFail() {
-        const value = await this.find();
-        if (!value) {
-            throw new NotFoundError_1.NotFoundError(this.mongooseModel.modelName);
-        }
-        return value;
-    }
-    async firstOrFail() {
-        return this.findOrFail();
-    }
     isNotUsedOrEmptyCondition() {
         if (!this.isUsed) {
             return false;
         }
-        const conditions = new MongodbConditionConverter_1.MongodbConditionConverter(this.getConditions()).convert();
+        const conditions = this.resolveMongodbConditionConverter().convert();
         if (lodash_1.isEmpty(conditions)) {
             return false;
         }
         return conditions;
     }
+    resolveMongodbConditionConverter() {
+        return najs_binding_1.make(MongodbConditionConverter_1.MongodbConditionConverter.className, [this.getConditions()]);
+    }
+    resolveMongooseQueryLog() {
+        const data = this.toObject();
+        data['builder'] = this.getClassName();
+        return najs_binding_1.make(MongooseQueryLog_1.MongooseQueryLog.className, [data]);
+    }
 }
-MongooseQueryBuilder.className = 'MongooseQueryBuilder';
+MongooseQueryBuilder.className = constants_1.NajsEloquent.QueryBuilder.MongooseQueryBuilder;
 exports.MongooseQueryBuilder = MongooseQueryBuilder;
+najs_binding_1.register(MongooseQueryBuilder);

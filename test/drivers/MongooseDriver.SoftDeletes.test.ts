@@ -1,5 +1,6 @@
 import 'jest'
-import '../../lib/log/FlipFlopQueryLog'
+import '../../lib/query-log/FlipFlopQueryLog'
+import { register } from 'najs-binding'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverProviderFacade'
 import { MongooseDriver } from '../../lib/drivers/MongooseDriver'
@@ -58,7 +59,7 @@ describe('MongooseDriver.SoftDeletes', function() {
   })
 
   describe('SoftDeletes', function() {
-    class SoftDeleteModel extends Eloquent<SoftDelete> {
+    class SoftDeleteModel extends Eloquent.Mongoose<SoftDelete>() {
       static softDeletes: boolean = true
       protected schema = { name: String }
 
@@ -66,6 +67,7 @@ describe('MongooseDriver.SoftDeletes', function() {
         return 'SoftDeleteModel'
       }
     }
+    register(SoftDeleteModel)
 
     class SoftDeleteUseMemberPropertyModel extends Eloquent<SoftDelete> {
       softDeletes: boolean = true
@@ -78,7 +80,7 @@ describe('MongooseDriver.SoftDeletes', function() {
 
     it('does not load plugin SoftDelete with deleted_at by default', async function() {
       const model = new User()
-      expect(model['newQuery']()['softDelete']).toBeUndefined()
+      expect(model.newQuery()['softDelete']).toBeUndefined()
     })
 
     it('loads plugin SoftDelete with deleted_at by default', async function() {
@@ -94,7 +96,7 @@ describe('MongooseDriver.SoftDeletes', function() {
       const model = new SoftDelete1()
       expect(model['attributes']['schema'].path('deleted_at')['instance']).toEqual('Date')
       expect(model['attributes']['schema'].path('deleted_at')['defaultValue']).toBeDefined()
-      expect(model['newQuery']()['softDelete']).toMatchObject({
+      expect(model.newQuery()['queryBuilder']['softDelete']).toMatchObject({
         deletedAt: 'deleted_at'
       })
     })
@@ -113,7 +115,7 @@ describe('MongooseDriver.SoftDeletes', function() {
       expect(model['attributes']['schema'].path('any')['instance']).toEqual('Date')
       expect(model['attributes']['schema'].path('any')['defaultValue']).toBeDefined()
       expect(model['attributes']['schema'].path('deleted_at')).toBeUndefined()
-      expect(model['newQuery']()['softDelete']).toMatchObject({
+      expect(model.newQuery()['queryBuilder']['softDelete']).toMatchObject({
         deletedAt: 'any'
       })
     })
@@ -125,13 +127,13 @@ describe('MongooseDriver.SoftDeletes', function() {
       const model = new SoftDeleteModel({
         name: 'test'
       })
-      await model['delete']()
+      await model.delete()
       expect(model['deleted_at']).toEqual(now)
 
-      await model['restore']()
+      await model.restore()
       expect(model['deleted_at']).toBeNull()
 
-      await model['forceDelete']()
+      await model.forceDelete()
     })
 
     it('works with settings as a member property', async function() {
@@ -141,13 +143,13 @@ describe('MongooseDriver.SoftDeletes', function() {
       const model = new SoftDeleteUseMemberPropertyModel({
         name: 'test'
       })
-      await model['delete']()
+      await model.delete()
       expect(model['deleted_at']).toEqual(now)
 
-      await model['restore']()
+      await model.restore()
       expect(model['deleted_at']).toBeNull()
 
-      await model['forceDelete']()
+      await model.forceDelete()
     })
 
     it('works with static functions', async function() {
@@ -157,44 +159,49 @@ describe('MongooseDriver.SoftDeletes', function() {
       const notDeletedModel = new SoftDeleteModel({
         name: 'test'
       })
-      await notDeletedModel['save']()
+      await notDeletedModel.save()
 
       const deletedModel = new SoftDeleteModel({
         name: 'test'
       })
-      await deletedModel['delete']()
+      await deletedModel.delete()
 
       expect(await SoftDeleteModel['count']()).toEqual(1)
       expect(await SoftDeleteModel['withTrashed']().count()).toEqual(2)
       expect(await SoftDeleteModel['onlyTrashed']().count()).toEqual(1)
-      await notDeletedModel['forceDelete']()
-      await deletedModel['forceDelete']()
+      await notDeletedModel.forceDelete()
+      await deletedModel.forceDelete()
     })
 
     it('does not override .find or .findOne when use .native()', async function() {
+      const model = new SoftDeleteModel()
+
       const now = new Date(1988, 4, 16)
       Moment.now = () => now
 
       const notDeletedModel = new SoftDeleteModel({
         name: 'test'
       })
-      await notDeletedModel['save']()
+      await notDeletedModel.save()
 
       const deletedModel = new SoftDeleteModel({
         name: 'test'
       })
-      await deletedModel['delete']()
+      await deletedModel.delete()
 
-      expect(await SoftDeleteModel['count']()).toEqual(1)
-      expect(await SoftDeleteModel['withTrashed']().count()).toEqual(2)
-      expect(await SoftDeleteModel['onlyTrashed']().count()).toEqual(1)
+      expect(await model.count()).toEqual(1)
+      expect(await model.withTrashed().count()).toEqual(2)
+      expect(await model.onlyTrashed().count()).toEqual(1)
       expect(
-        await SoftDeleteModel['native'](function(model: any) {
-          return model.find()
-        }).count()
+        await model
+          .newQuery()
+          .native(function(model: any) {
+            return model.find()
+          })
+          .count()
       ).toEqual(2)
-      await notDeletedModel['forceDelete']()
-      await deletedModel['forceDelete']()
+      await notDeletedModel.forceDelete()
+      await deletedModel.forceDelete()
     })
   })
 })

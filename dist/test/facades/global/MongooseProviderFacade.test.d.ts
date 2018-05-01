@@ -1,2 +1,2 @@
 import 'jest';
-import '../../../lib/providers/BuiltinMongooseProvider';
+import '../../../lib/providers/MongooseProvider';

@@ -126,7 +126,7 @@ export class FactoryBuilder<T extends Eloquent> implements IFactoryBuilder<T> {
       }
 
       if (attributes[name] instanceof Eloquent) {
-        attributes[name] = attributes[name].getId()
+        attributes[name] = attributes[name].getPrimaryKey()
       }
 
       if (isPlainObject(attributes[name])) {

@@ -15,7 +15,7 @@ class FactoryManager extends najs_facade_1.Facade {
         this.states = {};
     }
     getClassName() {
-        return constants_1.NajsEloquentClass.FactoryManager;
+        return constants_1.NajsEloquent.Factory.FactoryManager;
     }
     addDefinition(bag, className, name, definition) {
         const modelName = this.parseModelName(className);
@@ -63,6 +63,6 @@ class FactoryManager extends najs_facade_1.Facade {
         return this.of(className, name).raw(arguments[2]);
     }
 }
-FactoryManager.className = constants_1.NajsEloquentClass.FactoryManager;
+FactoryManager.className = constants_1.NajsEloquent.Factory.FactoryManager;
 exports.FactoryManager = FactoryManager;
 najs_binding_1.register(FactoryManager);

@@ -1,5 +1,5 @@
 import '../ModelFactory'
-import { Eloquent, MongooseDriver, EloquentDriverProvider, MongooseProvider } from '../../dist/lib/v1'
+import { Eloquent, MongooseDriver, EloquentDriverProvider, MongooseProvider } from '../../dist/lib'
 import { IUser, User } from '../models/User'
 import { IPost, Post } from '../models/Post'
 import { IComment, Comment } from '../models/Comment'

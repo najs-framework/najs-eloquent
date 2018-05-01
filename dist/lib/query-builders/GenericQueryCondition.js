@@ -1,6 +1,9 @@
 "use strict";
+/// <reference path="interfaces/IQueryConvention.ts" />
+/// <reference path="interfaces/IConditionQuery.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = require("lodash");
+const GenericQueryConditionHelpers_1 = require("./GenericQueryConditionHelpers");
 class GenericQueryCondition {
     constructor() {
         this.isSubQuery = false;
@@ -73,29 +76,9 @@ class GenericQueryCondition {
     orWhere(arg0, arg1, arg2) {
         return this.buildQuery('or', arg0, arg1, arg2);
     }
-    whereIn(field, values) {
-        return this.buildQuery('and', field, 'in', values);
-    }
-    whereNotIn(field, values) {
-        return this.buildQuery('and', field, 'not-in', values);
-    }
-    orWhereIn(field, values) {
-        return this.buildQuery('or', field, 'in', values);
-    }
-    orWhereNotIn(field, values) {
-        return this.buildQuery('or', field, 'not-in', values);
-    }
-    whereNull(field) {
-        return this.buildQuery('and', field, '=', this.convention.getNullValueFor(field));
-    }
-    whereNotNull(field) {
-        return this.buildQuery('and', field, '<>', this.convention.getNullValueFor(field));
-    }
-    orWhereNull(field) {
-        return this.buildQuery('or', field, '=', this.convention.getNullValueFor(field));
-    }
-    orWhereNotNull(field) {
-        return this.buildQuery('or', field, '<>', this.convention.getNullValueFor(field));
-    }
 }
 exports.GenericQueryCondition = GenericQueryCondition;
+// implicit implements the other .where... condition
+for (const fn of GenericQueryConditionHelpers_1.GenericQueryConditionHelpers.FUNCTIONS) {
+    GenericQueryCondition.prototype[fn] = GenericQueryConditionHelpers_1.GenericQueryConditionHelpers.prototype[fn];
+}

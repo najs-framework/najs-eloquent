@@ -1,5 +1,5 @@
-import { Eloquent } from './Eloquent';
 export declare const EloquentProxy: {
-    get(target: Eloquent<any>, key: any): any;
-    set(target: Eloquent<any>, key: any, value: any): any;
+    shouldProxy(target: any, key: any): any;
+    get(target: any, key: string): any;
+    set(target: any, key: string, value: any): boolean;
 };

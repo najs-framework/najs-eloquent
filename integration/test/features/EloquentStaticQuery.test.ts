@@ -1,4 +1,4 @@
-import { QueryLog, factory } from '../../../dist/lib/v1'
+import { QueryLog, factory } from '../../../dist/lib'
 import { Post, init_mongoose, delete_collection } from '../../mongodb/index'
 
 describe('Integration Test - Eloquent Static (2nd way) querying', function() {
@@ -13,7 +13,7 @@ describe('Integration Test - Eloquent Static (2nd way) querying', function() {
   describe('.queryName()', function() {
     it('starts new query with given name.', async function() {
       const query = Post.queryName('You can name the query what ever you want')
-      expect(query['name']).toEqual('You can name the query what ever you want')
+      expect(query['queryBuilder']['name']).toEqual('You can name the query what ever you want')
 
       QueryLog.enable()
       await query.where('title', 'test').get()
@@ -34,29 +34,6 @@ describe('Integration Test - Eloquent Static (2nd way) querying', function() {
       })
     })
   })
-
-  // describe('.distinct()', function() {
-  //   it('sets the columns or fields to be applied distinct operation.', async function() {
-  //     await factory(Post)
-  //       .times(2)
-  //       .create({ view: 20 })
-
-  //     QueryLog.enable()
-  //     const users = await Post
-  //       .distinct('view')
-  //       .where('view', 20)
-  //       .all()
-
-  //     console.log(QueryLog.pull())
-  //     QueryLog.disable()
-  //     console.log(users)
-
-  //     for (const user of users) {
-  //       const result = user.toObject()
-  //       console.log(result)
-  //     }
-  //   })
-  // })
 
   describe('.orderBy()', function() {
     it('adds an "order by" clause to the query.', async function() {
@@ -169,7 +146,7 @@ describe('Integration Test - Eloquent Static (2nd way) querying', function() {
       await factory(Post).create({ view: 50, title: 'a', content: 'a' })
       await factory(Post).create({ view: 40, title: 'b', content: 'b' })
       await factory(Post).create({ view: 30, title: 'c', content: 'c' })
-      const result = await Post.orWhere('view', 40)
+      const result = await Post.where('view', 40)
         .orWhere(function(query) {
           return query.where('title', 'a').orWhere('title', 'b')
         })
@@ -253,9 +230,9 @@ describe('Integration Test - Eloquent Static (2nd way) querying', function() {
   describe('.withTrashed()', function() {
     it('considers all soft-deleted or not-deleted items.', async function() {
       await factory(Post).create({ view: 50, title: 'a', content: 'a' })
-      await factory(Post).create({ view: 40, title: 'b', content: 'b' })
+      const b = await factory(Post).create({ view: 40, title: 'b', content: 'b' })
       await factory(Post).create({ view: 30, title: 'c', content: 'c' })
-      await ((await Post.where('view', 40).first()) as Post).delete()
+      await b.delete()
 
       const result = await Post.withTrashed()
         .where('view', '>', 0)
@@ -267,10 +244,10 @@ describe('Integration Test - Eloquent Static (2nd way) querying', function() {
   describe('.onlyTrashed()', function() {
     it('considers soft-deleted items only.', async function() {
       await factory(Post).create({ view: 50, title: 'a', content: 'a' })
-      await factory(Post).create({ view: 40, title: 'b', content: 'b' })
-      await factory(Post).create({ view: 30, title: 'c', content: 'c' })
-      await ((await Post.where('view', 30).first()) as Post).delete()
-      await ((await Post.where('view', 40).first()) as Post).delete()
+      const b = await factory(Post).create({ view: 40, title: 'b', content: 'b' })
+      const c = await factory(Post).create({ view: 30, title: 'c', content: 'c' })
+      await b.delete()
+      await c.delete()
 
       const result = await Post.onlyTrashed()
         .where('view', '>', 30)

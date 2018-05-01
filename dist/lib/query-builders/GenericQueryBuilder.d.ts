@@ -1,12 +1,14 @@
+/// <reference path="interfaces/IBasicQuery.d.ts" />
+/// <reference path="interfaces/IConditionQuery.d.ts" />
+/// <reference path="interfaces/ISoftDeleteQuery.d.ts" />
+/// <reference path="interfaces/IQueryConvention.d.ts" />
 import { GenericQueryCondition } from './GenericQueryCondition';
-import { IQueryConvention } from './interfaces/IQueryConvention';
-import { IBasicQuery, OrderDirection } from './interfaces/IBasicQuery';
-import { IConditionQuery, SubCondition, Operator } from './interfaces/IConditionQuery';
-import { ISoftDeletesQuery } from './interfaces/ISoftDeletesQuery';
 export declare type QueryBuilderSoftDelete = {
     deletedAt: string;
 };
-export declare class GenericQueryBuilder implements IBasicQuery, IConditionQuery, ISoftDeletesQuery {
+export interface GenericQueryBuilder extends NajsEloquent.QueryBuilder.IConditionQuery {
+}
+export declare class GenericQueryBuilder implements NajsEloquent.QueryBuilder.IBasicQuery, NajsEloquent.QueryBuilder.ISoftDeleteQuery {
     protected isUsed: boolean;
     protected name: string;
     protected fields: {
@@ -18,42 +20,31 @@ export declare class GenericQueryBuilder implements IBasicQuery, IConditionQuery
     protected ordering: Object;
     protected limitNumber: number;
     protected conditions: GenericQueryCondition[];
-    protected convention: IQueryConvention;
+    protected convention: NajsEloquent.QueryBuilder.IQueryConvention;
     protected softDelete?: QueryBuilderSoftDelete;
     protected addSoftDeleteCondition: boolean;
     protected logGroup: string;
     constructor(softDelete?: QueryBuilderSoftDelete);
-    protected getQueryConvention(): IQueryConvention;
+    protected getQueryConvention(): NajsEloquent.QueryBuilder.IQueryConvention;
     protected getConditions(): Object[];
     protected flattenFieldNames(type: string, fields: ArrayLike<any>): this;
     queryName(name: string): this;
-    getPrimaryKey(): string;
+    getPrimaryKeyName(): string;
     setLogGroup(group: string): this;
     select(field: string): this;
     select(fields: string[]): this;
     select(...fields: Array<string | string[]>): this;
-    distinct(field: string): this;
-    distinct(fields: string[]): this;
-    distinct(...fields: Array<string | string[]>): this;
-    orderBy(field: string, direction?: OrderDirection): this;
+    orderBy(field: string, direction?: 'asc' | 'desc'): this;
     orderByAsc(field: string): this;
     orderByDesc(field: string): this;
     limit(records: number): this;
-    protected createConditionQuery(operator: 'and' | 'or', arg0: string | SubCondition, arg1?: Operator | any, arg2?: any): this;
-    where(conditionBuilder: SubCondition): this;
+    protected createConditionQuery(operator: 'and' | 'or', arg0: string | NajsEloquent.QueryBuilder.SubCondition, arg1?: NajsEloquent.QueryBuilder.Operator | any, arg2?: any): this;
+    where(conditionBuilder: NajsEloquent.QueryBuilder.SubCondition): this;
     where(field: string, value: any): this;
-    where(field: string, operator: Operator, value: any): this;
-    orWhere(conditionBuilder: SubCondition): this;
+    where(field: string, operator: NajsEloquent.QueryBuilder.Operator, value: any): this;
+    orWhere(conditionBuilder: NajsEloquent.QueryBuilder.SubCondition): this;
     orWhere(field: string, value: any): this;
-    orWhere(field: string, operator: Operator, value: any): this;
-    whereIn(field: string, values: Array<any>): this;
-    whereNotIn(field: string, values: Array<any>): this;
-    orWhereIn(field: string, values: Array<any>): this;
-    orWhereNotIn(field: string, values: Array<any>): this;
-    whereNull(field: string): this;
-    whereNotNull(field: string): this;
-    orWhereNull(field: string): this;
-    orWhereNotNull(field: string): this;
+    orWhere(field: string, operator: NajsEloquent.QueryBuilder.Operator, value: any): this;
     withTrashed(): this;
     onlyTrashed(): this;
 }

@@ -1,12 +1,12 @@
 {
   "name": "najs-eloquent",
-  "version": "0.2.21",
+  "version": "0.3.0-alpha.1",
   "scripts": {
     "build": "npm run build-ts && npm run tslint",
-    "build-ts": "tsc -d && ./script/copy-custom-definitions.js",
+    "build-ts": "tsc -d",
     "coverage": "npm run build && jest ./dist/test/**/*.js ./dist/test/**/**/*.js --coverage --forceExit",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "prepublishOnly": "tsc -d -p ./ --outDir dist && ./script/copy-custom-definitions.js",
+    "prepublishOnly": "tsc -d -p ./ --outDir dist",
     "integration": "npm run integration-build && npm run integration-lint && npm run integration-test",
     "integration-build": "npm run build && cd ./integration && tsc -d && cd ..",
     "integration-lint": "cd ./integration && tslint -c tslint.json -p tsconfig.json && cd ..",
@@ -20,14 +20,23 @@
         "skipBabel": true
       }
     },
-    "moduleFileExtensions": ["js", "ts", "json"],
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "json"
+    ],
     "transform": {
       "^.+\\.(ts|tsx)$": "./node_modules/ts-jest/preprocessor.js"
     },
-    "testMatch": ["**/test/**/*.test.ts", "**/test/**/*.test.js"],
+    "testMatch": [
+      "**/test/**/*.test.ts",
+      "**/test/**/*.test.js"
+    ],
     "testEnvironment": "node"
   },
-  "files": ["dist/**/*"],
+  "files": [
+    "dist/**/*"
+  ],
   "main": "./dist/lib/index.js",
   "types": "./dist/lib/index.d.ts",
   "repository": {
@@ -40,12 +49,12 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=8.7"
+    "node": ">=8.7 <10.0.0"
   },
   "peerDependencies": {
     "collect.js": "^4.0.11",
     "moment": "^2.21.0",
-    "najs-binding": "^1.4.0"
+    "najs-binding": "^1.8.0"
   },
   "dependencies": {
     "chance": "^1.0.13",
@@ -69,7 +78,7 @@
     "coveralls": "^3.0.0",
     "jest": "^21.2.1",
     "moment": "^2.21.0",
-    "najs-binding": "^1.4.0",
+    "najs-binding": "^1.8.0",
     "sinon": "^4.1.3",
     "ts-jest": "^21.2.3",
     "tslint": "^5.8.0",

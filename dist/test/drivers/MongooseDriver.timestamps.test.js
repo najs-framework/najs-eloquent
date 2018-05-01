@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
-require("../../lib/log/FlipFlopQueryLog");
+require("../../lib/query-log/FlipFlopQueryLog");
 const Sinon = require("sinon");
 const Eloquent_1 = require("../../lib/model/Eloquent");
 const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
@@ -51,7 +51,7 @@ describe('MongooseDriver.Timestamps', function () {
             return now;
         };
         const model = new TimestampModelDefault();
-        await model['save']();
+        await model.save();
         expect(model.created_at).toEqual(now);
         expect(model.updated_at).toEqual(now);
     });
@@ -59,31 +59,32 @@ describe('MongooseDriver.Timestamps', function () {
         const createdAt = new Date(1988, 4, 16);
         Moment.now = () => createdAt;
         const model = new TimestampModelDefault();
-        await model['save']();
+        await model.save();
         const updatedAt = new Date(2000, 0, 1);
         Moment.now = () => updatedAt;
         model.name = 'updated';
-        await model['save']();
-        const updatedModel = await TimestampModelDefault['find'](model['getId']());
+        await model.save();
+        const updatedModel = await model.fresh();
         expect(updatedModel.updated_at).toEqual(updatedAt);
     });
     it('works with QueryBuilder.update(), one document', async function () {
         const createdAt = new Date(1988, 4, 16);
         Moment.now = () => createdAt;
         const model = new TimestampModelDefault();
-        await model['save']();
+        await model.save();
         const updatedAt = new Date(2000, 0, 1);
         Moment.now = () => updatedAt;
-        await TimestampModelDefault['where']('_id', model['id'])['update']({});
-        const updatedModel = await TimestampModelDefault['find'](model['id']);
+        await model.where('id', model['id']).update({});
+        const updatedModel = await model.findOrFail(model.id);
         expect(updatedModel.updated_at).toEqual(updatedAt);
     });
     it('works with QueryBuilder.update(), multiple documents', async function () {
+        const model = new TimestampModelDefault();
         const now = new Date(2010, 0, 1);
         Moment.now = () => now;
-        const idList = await TimestampModelDefault['pluck']('id');
-        await TimestampModelDefault['whereIn']('id', Object.keys(idList)).update({});
-        const documents = await TimestampModelDefault['all']();
+        const idList = await model.pluck('id');
+        await model.whereIn('id', Object.keys(idList)).update({});
+        const documents = await model.get();
         expect(documents.map((item) => item.updated_at).all()).toEqual([now, now, now]);
     });
     class CustomTimestampModel extends Eloquent_1.Eloquent {
@@ -103,9 +104,9 @@ describe('MongooseDriver.Timestamps', function () {
         const now = new Date(1988, 4, 16);
         Moment.now = () => now;
         const model = new CustomTimestampModel();
-        await model['save']();
-        expect(model['createdAt']).toEqual(now);
-        expect(model['updatedAt']).toEqual(now);
+        await model.save();
+        expect(model.createdAt).toEqual(now);
+        expect(model.updatedAt).toEqual(now);
     });
     class NotStaticTimestampModel extends Eloquent_1.Eloquent {
         constructor() {
@@ -121,7 +122,7 @@ describe('MongooseDriver.Timestamps', function () {
         const now = new Date(1988, 4, 16);
         Moment.now = () => now;
         const model = new NotStaticTimestampModel();
-        await model['save']();
+        await model.save();
         expect(model.created_at).toEqual(now);
         expect(model.updated_at).toEqual(now);
     });
@@ -129,27 +130,27 @@ describe('MongooseDriver.Timestamps', function () {
         it('does nothing with not supported Timestamp Model', async function () {
             const user = new User();
             const markModifiedSpy = Sinon.spy(user['attributes'], 'markModified');
-            user['touch']();
+            user.touch();
             expect(markModifiedSpy.called).toBe(false);
         });
         it('updates timestamps by calling markModified', async function () {
             let now = new Date(1988, 4, 16);
             Moment.now = () => now;
             const defaultSettings = new TimestampModelDefault();
-            await defaultSettings['save']();
-            defaultSettings['touch']();
+            await defaultSettings.save();
+            defaultSettings.touch();
             expect(defaultSettings.created_at).toEqual(now);
             expect(defaultSettings.updated_at).toEqual(now);
             const model = new CustomTimestampModel();
             const markModifiedSpy = Sinon.spy(model['attributes'], 'markModified');
-            await model['save']();
-            expect(model['createdAt']).toEqual(now);
-            expect(model['updatedAt']).toEqual(now);
+            await model.save();
+            expect(model.createdAt).toEqual(now);
+            expect(model.updatedAt).toEqual(now);
             now = new Date(2000, 1, 1);
             model['touch']();
             expect(markModifiedSpy.calledWith('updatedAt')).toBe(true);
-            await model['save']();
-            expect(model['updatedAt']).toEqual(now);
+            await model.save();
+            expect(model.updatedAt).toEqual(now);
         });
     });
 });

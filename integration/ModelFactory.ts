@@ -1,4 +1,4 @@
-import { Factory, Faker } from '../dist/lib/v1'
+import { Factory, Faker } from '../dist/lib'
 import { User } from './models/User'
 import { Post } from './models/Post'
 import { Comment } from './models/Comment'

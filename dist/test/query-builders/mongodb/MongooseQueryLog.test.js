@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
-require("../../../lib/log/FlipFlopQueryLog");
+require("../../../lib/query-log/FlipFlopQueryLog");
 const MongooseProviderFacade_1 = require("../../../lib/facades/global/MongooseProviderFacade");
 const QueryLogFacade_1 = require("../../../lib/facades/global/QueryLogFacade");
 const MongooseQueryBuilder_1 = require("../../../lib/query-builders/mongodb/MongooseQueryBuilder");
@@ -15,6 +15,7 @@ const UserSchema = new mongoose_1.Schema({
 });
 MongooseProviderFacade_1.MongooseProvider.createModelFromSchema('User', UserSchema);
 describe('MongooseQueryLog', function () {
+    // TODO: write test
     beforeEach(function () {
         QueryLogFacade_1.QueryLog.clear().enable();
     });
@@ -24,9 +25,10 @@ describe('MongooseQueryLog', function () {
             builder
                 .select()
                 .where('first_name', 'test')
+                .limit(10)
                 .get();
-            const log = QueryLogFacade_1.QueryLog.pull()[0];
-            console.log(log);
+            // const log = QueryLog.pull()[0]
+            // console.log(log)
             // expect(log.query.raw).toEqual('User.find({"first_name":"test"}).exec()')
         });
     });
@@ -34,46 +36,32 @@ describe('MongooseQueryLog', function () {
         it('should work', function () {
             const builder = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
             builder.where('first_name', 'test').count();
-            const log = QueryLogFacade_1.QueryLog.pull()[0];
-            console.log(log);
+            // const log = QueryLog.pull()[0]
+            // console.log(log)
         });
     });
     describe('.find()', function () {
         it('should work', function () {
             const builder = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
-            builder
-                .distinct('first_name')
-                .where('first_name', 'test')
-                .find();
-            const log = QueryLogFacade_1.QueryLog.pull()[0];
-            console.log(log);
-        });
-    });
-    describe('.pluck()', function () {
-        it('should work', function () {
-            const builder = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
-            builder
-                .limit(10)
-                .where('first_name', '!=', 'test')
-                .pluck('first_name');
-            const log = QueryLogFacade_1.QueryLog.pull()[0];
-            console.log(log);
+            builder.where('first_name', 'test').first();
+            // const log = QueryLog.pull()[0]
+            // console.log(log)
         });
     });
     describe('.update()', function () {
         it('should work', function () {
             const builder = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
             builder.where('id', '000000000000000000000000').update({ test: 'anything' });
-            const log = QueryLogFacade_1.QueryLog.pull()[0];
-            console.log(log);
+            // const log = QueryLog.pull()[0]
+            // console.log(log)
         });
     });
     describe('.delete()', function () {
         it('should work', function () {
             const builder = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
             builder.where('id', '000000000000000000000000').delete();
-            const log = QueryLogFacade_1.QueryLog.pull()[0];
-            console.log(log);
+            // const log = QueryLog.pull()[0]
+            // console.log(log)
         });
     });
     describe('.restore()', function () {
@@ -81,16 +69,16 @@ describe('MongooseQueryLog', function () {
             const builder = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
             builder['softDelete'] = { deletedAt: 'deleted_at' };
             builder.where('id', '000000000000000000000000').restore();
-            const log = QueryLogFacade_1.QueryLog.pull()[0];
-            console.log(log);
+            // const log = QueryLog.pull()[0]
+            // console.log(log)
         });
     });
     describe('.execute()', function () {
         it('should work', function () {
             const builder = new MongooseQueryBuilder_1.MongooseQueryBuilder('User');
             builder.where('id', '000000000000000000000000').execute();
-            const log = QueryLogFacade_1.QueryLog.pull()[0];
-            console.log(log);
+            // const log = QueryLog.pull()[0]
+            // console.log(log)
         });
     });
 });

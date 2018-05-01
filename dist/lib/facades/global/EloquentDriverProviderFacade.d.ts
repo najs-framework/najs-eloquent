@@ -1,5 +1,5 @@
-import '../../providers/DriverManager';
+/// <reference path="../../contracts/DriverProvider.d.ts" />
+import '../../providers/DriverProvider';
 import { IFacade, IFacadeBase } from 'najs-facade';
-import { IEloquentDriverProvider } from '../../providers/interfaces/IEloquentDriverProvider';
-export declare const EloquentDriverProviderFacade: IEloquentDriverProvider & IFacade;
-export declare const EloquentDriverProvider: IEloquentDriverProvider & IFacadeBase;
+export declare const EloquentDriverProviderFacade: Najs.Contracts.Eloquent.DriverProvider & IFacade;
+export declare const EloquentDriverProvider: Najs.Contracts.Eloquent.DriverProvider & IFacadeBase;

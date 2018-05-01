@@ -3,6 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const MongodbConditionConverter_1 = require("../../../lib/query-builders/mongodb/MongodbConditionConverter");
 describe('MongodbConditionConverter', function () {
+    it('implements IAutoload and returns "NajsEloquent.QueryBuilder.Mongodb.MongodbConditionConverter" as className', function () {
+        const query = new MongodbConditionConverter_1.MongodbConditionConverter([]);
+        expect(query.getClassName()).toEqual('NajsEloquent.QueryBuilder.Mongodb.MongodbConditionConverter');
+    });
     describe('protected convertSimpleCondition()', function () {
         const equalsOperatorDataset = {
             'equals case #1': {
@@ -227,6 +231,15 @@ describe('MongodbConditionConverter', function () {
                 input: [{ bool: 'and', field: 'a', operator: '=', value: 1 }],
                 expected: {
                     a: 1
+                }
+            },
+            'case "query.where(a).where(a)': {
+                input: [
+                    { bool: 'and', field: 'a', operator: '>=', value: 1 },
+                    { bool: 'and', field: 'a', operator: '<=', value: 10 }
+                ],
+                expected: {
+                    $and: [{ a: { $gte: 1 } }, { a: { $lte: 10 } }]
                 }
             },
             'case "query.orWhere(a).where(b)': {

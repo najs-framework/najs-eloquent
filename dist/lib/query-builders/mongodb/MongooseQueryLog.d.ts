@@ -1,10 +1,11 @@
-import { MongooseQueryBuilder } from './MongooseQueryBuilder';
-export declare class MongooseQueryLog {
+import { IAutoload } from 'najs-binding';
+export declare class MongooseQueryLog implements IAutoload {
+    static className: string;
     protected data: Object;
-    protected constructor(data: Object);
+    constructor(data: Object);
+    getClassName(): string;
     action(action: string): this;
     raw(raw: any): this;
     raw(...raw: any[]): this;
     end(): void;
-    static create(queryBuilder: MongooseQueryBuilder): MongooseQueryLog;
 }

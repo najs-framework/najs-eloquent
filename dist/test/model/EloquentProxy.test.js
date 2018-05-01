@@ -1,137 +1,95 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
-require("../../lib/providers/DriverManager");
 const Sinon = require("sinon");
-const najs_binding_1 = require("najs-binding");
-const DummyDriver_1 = require("../../lib/drivers/DummyDriver");
-const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
-const Eloquent_1 = require("../../lib/model/Eloquent");
-EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
+const EloquentProxy_1 = require("../../lib/model/EloquentProxy");
 describe('EloquentProxy', function () {
-    describe('proxy:get', function () {
-        class GetProxy extends Eloquent_1.Eloquent {
-            get getter_attribute() {
-                return this.attributes['getter_attribute'];
-            }
-            getMutatorAttribute(value) {
-                return this.attributes['accessor'];
-            }
-            getClassName() {
-                return 'GetProxy';
-            }
-            driverProxyMethod(...args) {
-                return 'method in model ' + args.join(',');
-            }
-            queryProxyMethod(...args) {
-                return 'method in model ' + args.join(',');
-            }
-        }
-        najs_binding_1.register(GetProxy);
-        it('returns an bound function which belongs to driver if the key defined in driver.getDriverProxyMethods()', function () {
-            const model = new GetProxy({ defined_attribute: 'test' });
-            const fakeDriver = {
-                getDriverProxyMethods() {
-                    return ['driverProxyMethod'];
-                },
-                driverProxyMethod(...args) {
-                    return 'method in driver ' + args.join(',');
+    describe('.shouldProxy()', function () {
+        it('always return false if the given key is Symbol', function () {
+            expect(EloquentProxy_1.EloquentProxy.shouldProxy({}, Symbol.for('anything'))).toEqual(false);
+        });
+        it('returns false if the key is defined in "target.knownAttributes"', function () {
+            const target = {
+                knownAttributes: ['a', 'b'],
+                driver: {
+                    shouldBeProxied() {
+                        return true;
+                    }
                 }
             };
-            model['driver'] = fakeDriver;
-            expect(model.driverProxyMethod()).toEqual('method in driver ');
-            expect(model.driverProxyMethod('a')).toEqual('method in driver a');
-            expect(model.driverProxyMethod('a', 'b')).toEqual('method in driver a,b');
-            expect(model.driverProxyMethod('a', 'b', 'c')).toEqual('method in driver a,b,c');
-            const spy = Sinon.spy(fakeDriver, 'driverProxyMethod');
-            expect(model.driverProxyMethod('test')).toEqual('method in driver test');
-            expect(spy.lastCall.thisValue === fakeDriver).toBe(true);
-            expect(spy.lastCall.calledWith('test')).toBe(true);
+            expect(EloquentProxy_1.EloquentProxy.shouldProxy(target, 'a')).toEqual(false);
+            expect(EloquentProxy_1.EloquentProxy.shouldProxy(target, 'b')).toEqual(false);
+            expect(EloquentProxy_1.EloquentProxy.shouldProxy(target, 'B')).toEqual(true);
+            expect(EloquentProxy_1.EloquentProxy.shouldProxy(target, 'c')).toEqual(true);
         });
-        it('returns an bound function which belongs to driver.newQuery() if the key defined in driver.getQueryProxyMethods()', function () {
-            const model = new GetProxy({ defined_attribute: 'test' });
-            const fakeQuery = {
-                queryProxyMethod(...args) {
-                    return 'method in query ' + args.join(',');
+        it('returns false if the "target.driver.shouldBeProxied()" returns false', function () {
+            const target = {
+                knownAttributes: ['a', 'b'],
+                driver: {
+                    shouldBeProxied(key) {
+                        if (key === 'c') {
+                            return false;
+                        }
+                        return true;
+                    }
                 }
             };
-            const fakeDriver = {
-                newQuery() {
-                    return fakeQuery;
-                },
-                getDriverProxyMethods() {
-                    return [];
-                },
-                getQueryProxyMethods() {
-                    return ['queryProxyMethod'];
-                }
-            };
-            model['driver'] = fakeDriver;
-            expect(model.queryProxyMethod()).toEqual('method in query ');
-            expect(model.queryProxyMethod('a')).toEqual('method in query a');
-            expect(model.queryProxyMethod('a', 'b')).toEqual('method in query a,b');
-            expect(model.queryProxyMethod('a', 'b', 'c')).toEqual('method in query a,b,c');
-            const spy = Sinon.spy(fakeQuery, 'queryProxyMethod');
-            expect(model.queryProxyMethod('test')).toEqual('method in query test');
-            expect(spy.lastCall.thisValue === fakeQuery).toBe(true);
-            expect(spy.lastCall.calledWith('test')).toBe(true);
-        });
-        it('calls EloquentAttribute.getAttribute() if the attribute is dynamic, works with defined attribute', function () {
-            const model = new GetProxy({ defined_attribute: 'test' });
-            expect(model.defined_attribute).toEqual('test');
-        });
-        it('calls EloquentAttribute.getAttribute() if the attribute is dynamic, works with getter attribute', function () {
-            const model = new GetProxy({ getter_attribute: 'test' });
-            expect(model.getter_attribute).toEqual('test');
-        });
-        it('calls EloquentAttribute.getAttribute() if the attribute is dynamic, works with accessor', function () {
-            const model = new GetProxy({ accessor: 'test' });
-            expect(model.accessor).toEqual('test');
-        });
-        it('simply returns value if that is a known attribute', function () {
-            const model = new GetProxy();
-            model['guarded'] = ['test'];
-            expect(model['guarded']).toEqual(['test']);
-            expect(typeof model.getClassName === 'function').toBe(true);
+            expect(EloquentProxy_1.EloquentProxy.shouldProxy(target, 'a')).toEqual(false);
+            expect(EloquentProxy_1.EloquentProxy.shouldProxy(target, 'b')).toEqual(false);
+            expect(EloquentProxy_1.EloquentProxy.shouldProxy(target, 'B')).toEqual(true);
+            expect(EloquentProxy_1.EloquentProxy.shouldProxy(target, 'c')).toEqual(false);
         });
     });
-    describe('proxy:set', function () {
-        class SetProxy extends Eloquent_1.Eloquent {
-            set setter_attribute(value) {
-                this.attributes['setter_attribute'] = value;
-            }
-            setMutatorAttribute(value) {
-                this.attributes['mutator'] = value;
-            }
-            getClassName() {
-                return 'SetProxy';
-            }
-        }
-        najs_binding_1.register(SetProxy);
-        it('calls EloquentAttribute.setAttribute() if the attribute is dynamic, works with defined attribute', function () {
-            const model = new SetProxy();
-            model.defined_attribute = 'test';
-            expect(model['attributes']).toEqual({ defined_attribute: 'test' });
-            expect(model['driver']['attributes']).toEqual({ defined_attribute: 'test' });
+    describe('.get()', function () {
+        it('simply get the value of target with given key if the .shouldProxy() returns false', function () {
+            const target = { test: 'value' };
+            const shouldProxyStub = Sinon.stub(EloquentProxy_1.EloquentProxy, 'shouldProxy');
+            shouldProxyStub.returns(false);
+            expect(EloquentProxy_1.EloquentProxy.get(target, 'test')).toEqual('value');
+            expect(EloquentProxy_1.EloquentProxy.get(target, 'not_found')).toBeUndefined();
+            shouldProxyStub.restore();
         });
-        it('calls EloquentAttribute.setAttribute() if the attribute is dynamic, works with setter attribute', function () {
-            const model = new SetProxy();
-            model.setter_attribute = 'test';
-            expect(model['attributes']).toEqual({ setter_attribute: 'test' });
-            expect(model['driver']['attributes']).toEqual({ setter_attribute: 'test' });
+        it('passes all params to driver.proxify() if .shouldProxy() return true', function () {
+            const driver = {
+                proxify() {
+                    return 'anything';
+                }
+            };
+            const target = {
+                driver: driver
+            };
+            const proxifySpy = Sinon.spy(driver, 'proxify');
+            const shouldProxyStub = Sinon.stub(EloquentProxy_1.EloquentProxy, 'shouldProxy');
+            shouldProxyStub.returns(true);
+            expect(EloquentProxy_1.EloquentProxy.get(target, 'test')).toEqual('anything');
+            expect(proxifySpy.calledWith('get', target, 'test'));
+            shouldProxyStub.restore();
         });
-        it('calls EloquentAttribute.setAttribute() if the attribute is dynamic, works with mutator', function () {
-            const model = new SetProxy();
-            model.mutator = 'test';
-            expect(model['attributes']).toEqual({ mutator: 'test' });
-            expect(model['driver']['attributes']).toEqual({ mutator: 'test' });
+    });
+    describe('.set()', function () {
+        it('simply assign the value to target with given key if the .shouldProxy() returns false', function () {
+            const target = {};
+            const shouldProxyStub = Sinon.stub(EloquentProxy_1.EloquentProxy, 'shouldProxy');
+            shouldProxyStub.returns(false);
+            EloquentProxy_1.EloquentProxy.set(target, 'test', 'value');
+            expect(target).toEqual({ test: 'value' });
+            shouldProxyStub.restore();
         });
-        it('simply grants value if that is a known attribute', function () {
-            const model = new SetProxy();
-            model['guarded'] = ['test'];
-            expect(model['guarded']).toEqual(['test']);
-            expect(model['attributes']).toEqual({});
-            expect(model['driver']['attributes']).toEqual({});
+        it('passes all params to driver.proxify() if .shouldProxy() return true', function () {
+            const driver = {
+                proxify() {
+                    return 'anything';
+                }
+            };
+            const target = {
+                driver: driver
+            };
+            const proxifySpy = Sinon.spy(driver, 'proxify');
+            const shouldProxyStub = Sinon.stub(EloquentProxy_1.EloquentProxy, 'shouldProxy');
+            shouldProxyStub.returns(true);
+            expect(EloquentProxy_1.EloquentProxy.set(target, 'test', 'value')).toEqual('anything');
+            expect(proxifySpy.calledWith('set', target, 'test', 'value'));
+            shouldProxyStub.restore();
         });
     });
 });

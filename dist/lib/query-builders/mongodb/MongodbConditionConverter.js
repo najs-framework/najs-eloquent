@@ -1,9 +1,15 @@
 "use strict";
+/// <reference path="../interfaces/IConditionQuery.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
+const najs_binding_1 = require("najs-binding");
+const constants_1 = require("../../constants");
 const lodash_1 = require("lodash");
 class MongodbConditionConverter {
     constructor(queryConditions) {
         this.queryConditions = queryConditions;
+    }
+    getClassName() {
+        return constants_1.NajsEloquent.QueryBuilder.MongodbConditionConverter;
     }
     convert() {
         return this.convertConditions(this.queryConditions);
@@ -132,4 +138,6 @@ class MongodbConditionConverter {
         }
     }
 }
+MongodbConditionConverter.className = constants_1.NajsEloquent.QueryBuilder.MongodbConditionConverter;
 exports.MongodbConditionConverter = MongodbConditionConverter;
+najs_binding_1.register(MongodbConditionConverter);

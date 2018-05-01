@@ -11,13 +11,13 @@ const TestConvention = {
   }
 }
 
-describe('QueryBuilder', function() {
+describe('GenericQueryBuilder', function() {
   describe('implements IBasicQuery', function() {
-    describe('.getPrimaryKey()', function() {
+    describe('.getPrimaryKeyName()', function() {
       it('calls and returns convention.formatFieldName("id") by default', function() {
         const query = new GenericQueryBuilder()
         const formatFieldNameSpy = Sinon.spy(query['convention'], <any>'formatFieldName')
-        expect(query.getPrimaryKey()).toEqual('id')
+        expect(query.getPrimaryKeyName()).toEqual('id')
         expect(formatFieldNameSpy.calledWith('id')).toBe(true)
       })
     })
@@ -63,31 +63,6 @@ describe('QueryBuilder', function() {
 
         query.select('1', ['2', '3', '4'], ['5', '6'], '5', '7', '7')
         expect(query['fields']['select']).toEqual(['1', '2', '3', '4', '5', '6', '7'])
-      })
-    })
-
-    describe('.distinct()', function() {
-      it('is chain-able', function() {
-        const query = new GenericQueryBuilder()
-        expect(query['isUsed']).toBe(false)
-        expect(query.distinct('a')).toEqual(query)
-        expect(query['isUsed']).toBe(true)
-      })
-
-      it('calls .flattenFieldNames() and assign to "distinct"', function() {
-        const query = new GenericQueryBuilder()
-
-        query.distinct('1')
-        expect(query['fields']['distinct']).toEqual(['1'])
-
-        query.distinct(['1', '2', '3'])
-        expect(query['fields']['distinct']).toEqual(['1', '2', '3'])
-
-        query.distinct(['1', '2', '3'], '4')
-        expect(query['fields']['distinct']).toEqual(['1', '2', '3', '4'])
-
-        query.distinct('1', ['2', '3', '4'], ['5', '6'], '5', '7', '7')
-        expect(query['fields']['distinct']).toEqual(['1', '2', '3', '4', '5', '6', '7'])
       })
     })
 
@@ -255,6 +230,33 @@ describe('QueryBuilder', function() {
       })
     })
 
+    describe('.andWhere()', function() {
+      it('is an alias of .where()', function() {
+        const query = new GenericQueryBuilder()
+        const whereStub = Sinon.stub(query, 'where')
+        whereStub.returns('anything')
+        expect(query.andWhere('a', 'b')).toEqual('anything')
+        expect(whereStub.calledWith('a', 'b')).toBe(true)
+      })
+
+      it('can be used in sub query', function() {
+        const query = new GenericQueryBuilder()
+        query.where('a', 1).where(function(subQuery) {
+          subQuery.where('b', 2).andWhere('c', 3)
+        })
+        expect(query['getConditions']()).toEqual([
+          { bool: 'and', field: 'a', operator: '=', value: 1 },
+          {
+            bool: 'and',
+            queries: [
+              { bool: 'and', field: 'b', operator: '=', value: 2 },
+              { bool: 'and', field: 'c', operator: '=', value: 3 }
+            ]
+          }
+        ])
+      })
+    })
+
     describe('.orWhere()', function() {
       it('is chain-able', function() {
         const query = new GenericQueryBuilder()
@@ -354,6 +356,93 @@ describe('QueryBuilder', function() {
       })
     })
 
+    describe('.whereNot()', function() {
+      it('is chain-able', function() {
+        const query = new GenericQueryBuilder()
+        expect(query['isUsed']).toBe(false)
+        expect(query.whereNot('a', 1)).toEqual(query)
+        expect(query['isUsed']).toBe(true)
+      })
+
+      it('calls where() with operator "<>"', function() {
+        const query = new GenericQueryBuilder()
+        const whereSpy = Sinon.spy(query, 'where')
+        query.whereNot('a', 1)
+        expect(whereSpy.calledWith('a', '<>', 1)).toBe(true)
+      })
+
+      it('calls QueryCondition.buildQuery with "and" + operator "<>"', function() {
+        const query = new GenericQueryBuilder()
+        query.where('a', true).where(function(query) {
+          query.whereNot('b', 1)
+        })
+        expect(query['getConditions']()).toEqual([
+          { bool: 'and', field: 'a', operator: '=', value: true },
+          {
+            bool: 'and',
+            queries: [{ bool: 'and', field: 'b', operator: '<>', value: 1 }]
+          }
+        ])
+      })
+    })
+
+    describe('.andWhereNot()', function() {
+      it('is an alias of .whereNot()', function() {
+        const query = new GenericQueryBuilder()
+        const whereNotStub = Sinon.stub(query, 'whereNot')
+        whereNotStub.returns('anything')
+        expect(query.andWhereNot('a', 'b')).toEqual('anything')
+        expect(whereNotStub.calledWith('a', 'b')).toBe(true)
+      })
+
+      it('can be used in sub query', function() {
+        const query = new GenericQueryBuilder()
+        query.where('a', 1).where(function(subQuery) {
+          subQuery.where('b', 2).andWhereNot('c', 3)
+        })
+        expect(query['getConditions']()).toEqual([
+          { bool: 'and', field: 'a', operator: '=', value: 1 },
+          {
+            bool: 'and',
+            queries: [
+              { bool: 'and', field: 'b', operator: '=', value: 2 },
+              { bool: 'and', field: 'c', operator: '<>', value: 3 }
+            ]
+          }
+        ])
+      })
+    })
+
+    describe('.orWhereNot()', function() {
+      it('is chain-able', function() {
+        const query = new GenericQueryBuilder()
+        expect(query['isUsed']).toBe(false)
+        expect(query.orWhereNot('a', 1)).toEqual(query)
+        expect(query['isUsed']).toBe(true)
+      })
+
+      it('calls orWhere() with operator "<>"', function() {
+        const query = new GenericQueryBuilder()
+        const orWhereSpy = Sinon.spy(query, 'orWhere')
+        query.orWhereNot('a', 1)
+        expect(orWhereSpy.calledWith('a', '<>', 1)).toBe(true)
+      })
+
+      it('calls QueryCondition.buildQuery with "or" + operator "in"', function() {
+        const query = new GenericQueryBuilder()
+        query.where('a', true).where(function(subQuery) {
+          subQuery.orWhereNot('b', 1)
+        })
+        expect(query['getConditions']()).toEqual([
+          { bool: 'and', field: 'a', operator: '=', value: true },
+          {
+            bool: 'and',
+            queries: [{ bool: 'or', field: 'b', operator: '<>', value: 1 }]
+          }
+        ])
+      })
+    })
+
     describe('.whereIn()', function() {
       it('is chain-able', function() {
         const query = new GenericQueryBuilder()
@@ -379,6 +468,63 @@ describe('QueryBuilder', function() {
           {
             bool: 'and',
             queries: [{ bool: 'and', field: 'b', operator: 'in', value: [0] }]
+          }
+        ])
+      })
+    })
+
+    describe('.andWhereIn()', function() {
+      it('is an alias of .whereIn()', function() {
+        const query = new GenericQueryBuilder()
+        const whereInStub = Sinon.stub(query, 'whereIn')
+        whereInStub.returns('anything')
+        expect(query.andWhereIn('a', ['b'])).toEqual('anything')
+        expect(whereInStub.calledWith('a', ['b'])).toBe(true)
+      })
+
+      it('can be used in sub query', function() {
+        const query = new GenericQueryBuilder()
+        query.where('a', 1).where(function(subQuery) {
+          subQuery.where('b', 2).andWhereIn('c', [3])
+        })
+        expect(query['getConditions']()).toEqual([
+          { bool: 'and', field: 'a', operator: '=', value: 1 },
+          {
+            bool: 'and',
+            queries: [
+              { bool: 'and', field: 'b', operator: '=', value: 2 },
+              { bool: 'and', field: 'c', operator: 'in', value: [3] }
+            ]
+          }
+        ])
+      })
+    })
+
+    describe('.orWhereIn()', function() {
+      it('is chain-able', function() {
+        const query = new GenericQueryBuilder()
+        expect(query['isUsed']).toBe(false)
+        expect(query.orWhereIn('a', [0])).toEqual(query)
+        expect(query['isUsed']).toBe(true)
+      })
+
+      it('calls orWhere() with operator "in"', function() {
+        const query = new GenericQueryBuilder()
+        const whereSpy = Sinon.spy(query, 'orWhere')
+        query.orWhereIn('a', [0])
+        expect(whereSpy.calledWith('a', 'in', [0])).toBe(true)
+      })
+
+      it('calls QueryCondition.buildQuery with "or" + operator "in"', function() {
+        const query = new GenericQueryBuilder()
+        query.where('a', true).where(function(subQuery) {
+          subQuery.orWhereIn('b', [0])
+        })
+        expect(query['getConditions']()).toEqual([
+          { bool: 'and', field: 'a', operator: '=', value: true },
+          {
+            bool: 'and',
+            queries: [{ bool: 'or', field: 'b', operator: 'in', value: [0] }]
           }
         ])
       })
@@ -414,31 +560,28 @@ describe('QueryBuilder', function() {
       })
     })
 
-    describe('.orWhereIn()', function() {
-      it('is chain-able', function() {
+    describe('.andWhereNotIn()', function() {
+      it('is an alias of .whereNotIn()', function() {
         const query = new GenericQueryBuilder()
-        expect(query['isUsed']).toBe(false)
-        expect(query.orWhereIn('a', [0])).toEqual(query)
-        expect(query['isUsed']).toBe(true)
+        const whereNotInStub = Sinon.stub(query, 'whereNotIn')
+        whereNotInStub.returns('anything')
+        expect(query.andWhereNotIn('a', ['b'])).toEqual('anything')
+        expect(whereNotInStub.calledWith('a', ['b'])).toBe(true)
       })
 
-      it('calls orWhere() with operator "in"', function() {
+      it('can be used in sub query', function() {
         const query = new GenericQueryBuilder()
-        const whereSpy = Sinon.spy(query, 'orWhere')
-        query.orWhereIn('a', [0])
-        expect(whereSpy.calledWith('a', 'in', [0])).toBe(true)
-      })
-
-      it('calls QueryCondition.buildQuery with "or" + operator "in"', function() {
-        const query = new GenericQueryBuilder()
-        query.where('a', true).where(function(subQuery) {
-          subQuery.orWhereIn('b', [0])
+        query.where('a', 1).where(function(subQuery) {
+          subQuery.where('b', 2).andWhereNotIn('c', [3])
         })
         expect(query['getConditions']()).toEqual([
-          { bool: 'and', field: 'a', operator: '=', value: true },
+          { bool: 'and', field: 'a', operator: '=', value: 1 },
           {
             bool: 'and',
-            queries: [{ bool: 'or', field: 'b', operator: 'in', value: [0] }]
+            queries: [
+              { bool: 'and', field: 'b', operator: '=', value: 2 },
+              { bool: 'and', field: 'c', operator: 'not-in', value: [3] }
+            ]
           }
         ])
       })
@@ -482,13 +625,13 @@ describe('QueryBuilder', function() {
         expect(query['isUsed']).toBe(true)
       })
 
-      it('calls where() with operator "=" and value from "convention.getNullValue()"', function() {
+      it('calls where() with operator "=" and value from "convention.getNullValueFor)"', function() {
         const query = new GenericQueryBuilder()
         const whereSpy = Sinon.spy(query, 'where')
         const getNullValueForSpy = Sinon.spy(query['convention'], <any>'getNullValueFor')
         query.whereNull('a')
         // tslint:disable-next-line
-        expect(whereSpy.calledWith('a', null)).toBe(true)
+        expect(whereSpy.calledWith('a', '=', null)).toBe(true)
         expect(getNullValueForSpy.calledWith('a')).toBe(true)
       })
 
@@ -503,6 +646,68 @@ describe('QueryBuilder', function() {
           {
             bool: 'and',
             queries: [{ bool: 'and', field: 'formatted:b', operator: '=', value: 'NULL' }]
+          }
+        ])
+      })
+    })
+
+    describe('.andWhereNull()', function() {
+      it('is an alias of .whereNull()', function() {
+        const query = new GenericQueryBuilder()
+        const whereNullStub = Sinon.stub(query, 'whereNull')
+        whereNullStub.returns('anything')
+        expect(query.andWhereNull('a')).toEqual('anything')
+        expect(whereNullStub.calledWith('a')).toBe(true)
+      })
+
+      it('can be used in sub query', function() {
+        const query = new GenericQueryBuilder()
+        query['convention'] = TestConvention
+        query.where('a', 1).where(function(subQuery) {
+          subQuery.where('b', 2).andWhereNull('c')
+        })
+        expect(query['getConditions']()).toEqual([
+          { bool: 'and', field: 'formatted:a', operator: '=', value: 1 },
+          {
+            bool: 'and',
+            queries: [
+              { bool: 'and', field: 'formatted:b', operator: '=', value: 2 },
+              { bool: 'and', field: 'formatted:c', operator: '=', value: 'NULL' }
+            ]
+          }
+        ])
+      })
+    })
+
+    describe('.orWhereNull()', function() {
+      it('is chain-able', function() {
+        const query = new GenericQueryBuilder()
+        expect(query['isUsed']).toBe(false)
+        expect(query.orWhereNull('a')).toEqual(query)
+        expect(query['isUsed']).toBe(true)
+      })
+
+      it('calls orWhere() with operator "=" and value from "convention.getNullValueFor()"', function() {
+        const query = new GenericQueryBuilder()
+        const orWhereSpy = Sinon.spy(query, 'orWhere')
+        const getNullValueForSpy = Sinon.spy(query['convention'], <any>'getNullValueFor')
+        query.orWhereNull('a')
+        // tslint:disable-next-line
+        expect(orWhereSpy.calledWith('a', '=', null)).toBe(true)
+        expect(getNullValueForSpy.calledWith('a')).toBe(true)
+      })
+
+      it('calls QueryCondition.buildQuery with "or" + operator "=" and value from convention', function() {
+        const query = new GenericQueryBuilder()
+        query['convention'] = TestConvention
+        query.where('a', true).where(function(query) {
+          query.orWhereNull('b')
+        })
+        expect(query['getConditions']()).toEqual([
+          { bool: 'and', field: 'formatted:a', operator: '=', value: true },
+          {
+            bool: 'and',
+            queries: [{ bool: 'or', field: 'formatted:b', operator: '=', value: 'NULL' }]
           }
         ])
       })
@@ -542,35 +747,29 @@ describe('QueryBuilder', function() {
       })
     })
 
-    describe('.orWhereNull()', function() {
-      it('is chain-able', function() {
+    describe('.andWhereNotNull()', function() {
+      it('is an alias of .whereNotNull()', function() {
         const query = new GenericQueryBuilder()
-        expect(query['isUsed']).toBe(false)
-        expect(query.orWhereNull('a')).toEqual(query)
-        expect(query['isUsed']).toBe(true)
+        const whereNotNullStub = Sinon.stub(query, 'whereNotNull')
+        whereNotNullStub.returns('anything')
+        expect(query.andWhereNotNull('a')).toEqual('anything')
+        expect(whereNotNullStub.calledWith('a')).toBe(true)
       })
 
-      it('calls orWhere() with operator "=" and value from "convention.getNullValueFor()"', function() {
-        const query = new GenericQueryBuilder()
-        const orWhereSpy = Sinon.spy(query, 'orWhere')
-        const getNullValueForSpy = Sinon.spy(query['convention'], <any>'getNullValueFor')
-        query.orWhereNull('a')
-        // tslint:disable-next-line
-        expect(orWhereSpy.calledWith('a', null)).toBe(true)
-        expect(getNullValueForSpy.calledWith('a')).toBe(true)
-      })
-
-      it('calls QueryCondition.buildQuery with "or" + operator "=" and value from convention', function() {
+      it('can be used in sub query', function() {
         const query = new GenericQueryBuilder()
         query['convention'] = TestConvention
-        query.where('a', true).where(function(query) {
-          query.orWhereNull('b')
+        query.where('a', 1).where(function(subQuery) {
+          subQuery.where('b', 2).andWhereNotNull('c')
         })
         expect(query['getConditions']()).toEqual([
-          { bool: 'and', field: 'formatted:a', operator: '=', value: true },
+          { bool: 'and', field: 'formatted:a', operator: '=', value: 1 },
           {
             bool: 'and',
-            queries: [{ bool: 'or', field: 'formatted:b', operator: '=', value: 'NULL' }]
+            queries: [
+              { bool: 'and', field: 'formatted:b', operator: '=', value: 2 },
+              { bool: 'and', field: 'formatted:c', operator: '<>', value: 'NULL' }
+            ]
           }
         ])
       })
@@ -608,6 +807,248 @@ describe('QueryBuilder', function() {
           }
         ])
       })
+    })
+
+    describe('.whereBetween()', function() {
+      it('is chain-able', function() {
+        const query = new GenericQueryBuilder()
+        expect(query['isUsed']).toBe(false)
+        expect(query.whereBetween('a', [1, 10])).toEqual(query)
+        expect(query['isUsed']).toBe(true)
+      })
+
+      it('calls where() twice with operator ">=" & "<="', function() {
+        const query = new GenericQueryBuilder()
+        const whereSpy = Sinon.spy(query, 'where')
+        query.whereBetween('a', [1, 10])
+        expect(whereSpy.calledTwice).toBe(true)
+        expect(whereSpy.firstCall.calledWith('a', '>=', 1)).toBe(true)
+        expect(whereSpy.secondCall.calledWith('a', '<=', 10)).toBe(true)
+      })
+
+      it('can be used in sub-query', function() {
+        const query = new GenericQueryBuilder()
+        query.where('a', true).where(function(query) {
+          query.whereBetween('b', [1, 10])
+        })
+        expect(query['getConditions']()).toEqual([
+          { bool: 'and', field: 'a', operator: '=', value: true },
+          {
+            bool: 'and',
+            queries: [
+              { bool: 'and', field: 'b', operator: '>=', value: 1 },
+              { bool: 'and', field: 'b', operator: '<=', value: 10 }
+            ]
+          }
+        ])
+      })
+    })
+
+    describe('.andWhereBetween()', function() {
+      it('is an alias of .whereBetween()', function() {
+        const query = new GenericQueryBuilder()
+        const whereBetweenStub = Sinon.stub(query, 'whereBetween')
+        whereBetweenStub.returns('anything')
+        expect(query.andWhereBetween('a', [1, 10])).toEqual('anything')
+        expect(whereBetweenStub.calledWith('a', [1, 10])).toBe(true)
+      })
+
+      it('can be used in sub query', function() {
+        const query = new GenericQueryBuilder()
+        query.where('a', 1).where(function(subQuery) {
+          subQuery.where('b', 2).andWhereBetween('c', [3, 30])
+        })
+        expect(query['getConditions']()).toEqual([
+          { bool: 'and', field: 'a', operator: '=', value: 1 },
+          {
+            bool: 'and',
+            queries: [
+              { bool: 'and', field: 'b', operator: '=', value: 2 },
+              { bool: 'and', field: 'c', operator: '>=', value: 3 },
+              { bool: 'and', field: 'c', operator: '<=', value: 30 }
+            ]
+          }
+        ])
+      })
+    })
+
+    describe('.orWhereBetween()', function() {
+      it('is chain-able', function() {
+        const query = new GenericQueryBuilder()
+        expect(query['isUsed']).toBe(false)
+        expect(query.orWhereBetween('a', [1, 10])).toEqual(query)
+        expect(query['isUsed']).toBe(true)
+      })
+
+      it('calls orWhere() with sub-query which calls .where() twice with operator ">=" & "<="', function() {
+        const query = new GenericQueryBuilder()
+        const orWhereSpy = Sinon.spy(query, 'orWhere')
+        query.orWhereBetween('a', [1, 10])
+        expect(orWhereSpy.calledOnce).toBe(true)
+        expect(query['getConditions']()).toEqual([
+          {
+            bool: 'or',
+            queries: [
+              { bool: 'and', field: 'a', operator: '>=', value: 1 },
+              { bool: 'and', field: 'a', operator: '<=', value: 10 }
+            ]
+          }
+        ])
+      })
+
+      it('can be used in sub-query', function() {
+        const query = new GenericQueryBuilder()
+        query.where('a', true).where(function(subQuery) {
+          subQuery.where('b', 1).orWhereBetween('c', [1, 10])
+        })
+        expect(query['getConditions']()).toEqual([
+          { bool: 'and', field: 'a', operator: '=', value: true },
+          {
+            bool: 'and',
+            queries: [
+              { bool: 'and', field: 'b', operator: '=', value: 1 },
+              {
+                bool: 'or',
+                queries: [
+                  { bool: 'and', field: 'c', operator: '>=', value: 1 },
+                  { bool: 'and', field: 'c', operator: '<=', value: 10 }
+                ]
+              }
+            ]
+          }
+        ])
+      })
+    })
+  })
+
+  describe('.whereNotBetween()', function() {
+    it('is chain-able', function() {
+      const query = new GenericQueryBuilder()
+      expect(query['isUsed']).toBe(false)
+      expect(query.whereNotBetween('a', [1, 10])).toEqual(query)
+      expect(query['isUsed']).toBe(true)
+    })
+
+    it('calls where() with sub-query which calls .where() + .orWhere() with operator "<" || ">"', function() {
+      const query = new GenericQueryBuilder()
+      const whereSpy = Sinon.spy(query, 'where')
+      query.whereNotBetween('a', [1, 10]).andWhere('b', 2)
+      expect(whereSpy.called).toBe(true)
+      expect(query['getConditions']()).toEqual([
+        {
+          bool: 'and',
+          queries: [
+            { bool: 'and', field: 'a', operator: '<', value: 1 },
+            { bool: 'or', field: 'a', operator: '>', value: 10 }
+          ]
+        },
+        { bool: 'and', field: 'b', operator: '=', value: 2 }
+      ])
+    })
+
+    it('can be used in sub-query', function() {
+      const query = new GenericQueryBuilder()
+      query.where('a', true).where(function(subQuery) {
+        subQuery.where('b', 1).whereNotBetween('c', [1, 10])
+      })
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'a', operator: '=', value: true },
+        {
+          bool: 'and',
+          queries: [
+            { bool: 'and', field: 'b', operator: '=', value: 1 },
+            {
+              bool: 'and',
+              queries: [
+                { bool: 'and', field: 'c', operator: '<', value: 1 },
+                { bool: 'or', field: 'c', operator: '>', value: 10 }
+              ]
+            }
+          ]
+        }
+      ])
+    })
+  })
+
+  describe('.andWhereNotBetween()', function() {
+    it('is an alias of .whereNotBetween()', function() {
+      const query = new GenericQueryBuilder()
+      const whereNotBetweenStub = Sinon.stub(query, 'whereNotBetween')
+      whereNotBetweenStub.returns('anything')
+      expect(query.andWhereNotBetween('a', [1, 10])).toEqual('anything')
+      expect(whereNotBetweenStub.calledWith('a', [1, 10])).toBe(true)
+    })
+
+    it('can be used in sub query', function() {
+      const query = new GenericQueryBuilder()
+      query.where('a', 1).where(function(subQuery) {
+        subQuery.where('b', 2).andWhereNotBetween('c', [3, 30])
+      })
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'a', operator: '=', value: 1 },
+        {
+          bool: 'and',
+          queries: [
+            { bool: 'and', field: 'b', operator: '=', value: 2 },
+            {
+              bool: 'and',
+              queries: [
+                { bool: 'and', field: 'c', operator: '<', value: 3 },
+                { bool: 'or', field: 'c', operator: '>', value: 30 }
+              ]
+            }
+          ]
+        }
+      ])
+    })
+  })
+
+  describe('.orWhereNotBetween()', function() {
+    it('is chain-able', function() {
+      const query = new GenericQueryBuilder()
+      expect(query['isUsed']).toBe(false)
+      expect(query.orWhereNotBetween('a', [1, 10])).toEqual(query)
+      expect(query['isUsed']).toBe(true)
+    })
+
+    it('calls orWhere() with sub-query which calls .where() + .orWhere() with operator "<" || ">"', function() {
+      const query = new GenericQueryBuilder()
+      const whereSpy = Sinon.spy(query, 'where')
+      query.where('b', 2).orWhereNotBetween('a', [1, 10])
+      expect(whereSpy.called).toBe(true)
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'b', operator: '=', value: 2 },
+        {
+          bool: 'or',
+          queries: [
+            { bool: 'and', field: 'a', operator: '<', value: 1 },
+            { bool: 'or', field: 'a', operator: '>', value: 10 }
+          ]
+        }
+      ])
+    })
+
+    it('can be used in sub-query', function() {
+      const query = new GenericQueryBuilder()
+      query.where('a', true).where(function(subQuery) {
+        subQuery.where('b', 1).orWhereNotBetween('c', [1, 10])
+      })
+      expect(query['getConditions']()).toEqual([
+        { bool: 'and', field: 'a', operator: '=', value: true },
+        {
+          bool: 'and',
+          queries: [
+            { bool: 'and', field: 'b', operator: '=', value: 1 },
+            {
+              bool: 'or',
+              queries: [
+                { bool: 'and', field: 'c', operator: '<', value: 1 },
+                { bool: 'or', field: 'c', operator: '>', value: 10 }
+              ]
+            }
+          ]
+        }
+      ])
     })
   })
 

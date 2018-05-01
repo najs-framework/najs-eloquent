@@ -1,7 +1,13 @@
 "use strict";
+/// <reference path="interfaces/IBasicQuery.ts" />
+/// <reference path="interfaces/IConditionQuery.ts" />
+/// <reference path="interfaces/ISoftDeleteQuery.ts" />
+/// <reference path="interfaces/IQueryConvention.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const GenericQueryCondition_1 = require("./GenericQueryCondition");
+const GenericQueryConditionHelpers_1 = require("./GenericQueryConditionHelpers");
 const lodash_1 = require("lodash");
+const functions_1 = require("../util/functions");
 class GenericQueryBuilder {
     constructor(softDelete) {
         this.fields = {};
@@ -31,14 +37,14 @@ class GenericQueryBuilder {
     }
     flattenFieldNames(type, fields) {
         this.isUsed = true;
-        this.fields[type] = Array.from(new Set(lodash_1.flatten(fields))).map(this.convention.formatFieldName);
+        this.fields[type] = functions_1.array_unique(lodash_1.flatten(fields)).map(this.convention.formatFieldName);
         return this;
     }
     queryName(name) {
         this.name = name;
         return this;
     }
-    getPrimaryKey() {
+    getPrimaryKeyName() {
         return this.convention.formatFieldName('id');
     }
     setLogGroup(group) {
@@ -47,9 +53,6 @@ class GenericQueryBuilder {
     }
     select() {
         return this.flattenFieldNames('select', arguments);
-    }
-    distinct() {
-        return this.flattenFieldNames('distinct', arguments);
     }
     orderBy(field, direction = 'asc') {
         this.isUsed = true;
@@ -78,30 +81,6 @@ class GenericQueryBuilder {
     orWhere(arg0, arg1, arg2) {
         return this.createConditionQuery('or', arg0, arg1, arg2);
     }
-    whereIn(field, values) {
-        return this.where(field, 'in', values);
-    }
-    whereNotIn(field, values) {
-        return this.where(field, 'not-in', values);
-    }
-    orWhereIn(field, values) {
-        return this.orWhere(field, 'in', values);
-    }
-    orWhereNotIn(field, values) {
-        return this.orWhere(field, 'not-in', values);
-    }
-    whereNull(field) {
-        return this.where(field, this.convention.getNullValueFor(field));
-    }
-    whereNotNull(field) {
-        return this.where(field, '<>', this.convention.getNullValueFor(field));
-    }
-    orWhereNull(field) {
-        return this.orWhere(field, this.convention.getNullValueFor(field));
-    }
-    orWhereNotNull(field) {
-        return this.orWhere(field, '<>', this.convention.getNullValueFor(field));
-    }
     withTrashed() {
         if (this.softDelete) {
             this.addSoftDeleteCondition = false;
@@ -119,3 +98,7 @@ class GenericQueryBuilder {
     }
 }
 exports.GenericQueryBuilder = GenericQueryBuilder;
+// implicit implements the other .where... condition
+for (const fn of GenericQueryConditionHelpers_1.GenericQueryConditionHelpers.FUNCTIONS) {
+    GenericQueryBuilder.prototype[fn] = GenericQueryConditionHelpers_1.GenericQueryConditionHelpers.prototype[fn];
+}

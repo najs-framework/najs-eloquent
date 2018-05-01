@@ -53,6 +53,3 @@ exclude_patterns:
 - "**/tests/"
 - "**/vendor/"
 - "**/*.d.ts"
-- "lib/v0.x/"
-- "syntax/"
-- "example/"

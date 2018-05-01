@@ -1,34 +1,34 @@
+/// <reference path="../interfaces/IQueryConvention.ts" />
+/// <reference path="../interfaces/IFetchResultQuery.ts" />
+/// <reference path="../../collect.js/index.d.ts" />
+/// <reference path="../../model/interfaces/IModel.ts" />
+
 import { MongooseProvider } from '../../facades/global/MongooseProviderFacade'
-import { IQueryConvention } from '../interfaces/IQueryConvention'
-import { MongooseQueryLog } from './MongooseQueryLog'
-import { MongooseQuery } from './MongooseQueryBuilder'
-import { GenericQueryBuilder, QueryBuilderSoftDelete } from '../GenericQueryBuilder'
-import { MongodbConditionConverter } from './MongodbConditionConverter'
-import { IBasicQuery } from '../interfaces/IBasicQuery'
-import { IFetchResultQuery } from '../interfaces/IFetchResultQuery'
-import { Eloquent } from '../../model/Eloquent'
-import { make } from 'najs-binding'
-import { isEmpty } from 'lodash'
-import collect, { Collection } from 'collect.js'
+import { GenericQueryBuilder } from '../GenericQueryBuilder'
 import { Model, Document, DocumentQuery, Mongoose } from 'mongoose'
-import { NotFoundError } from '../../errors/NotFoundError'
+import { MongooseQueryLog } from './MongooseQueryLog'
+import { MongodbConditionConverter } from './MongodbConditionConverter'
+import { NajsEloquent as NajsEloquentClasses } from '../../constants'
+import { register, make } from 'najs-binding'
+import { isEmpty } from 'lodash'
 
 export type MongooseQuery<T> =
   | DocumentQuery<Document & T | null, Document & T>
   | DocumentQuery<(Document & T)[] | null, Document & T>
 
-export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBuilder
-  implements IBasicQuery, IFetchResultQuery<T> {
-  static className: string = 'MongooseQueryBuilder'
+export class MongooseQueryBuilder<T> extends GenericQueryBuilder
+  implements NajsEloquent.QueryBuilder.IFetchResultQuery<T> {
+  static className: string = NajsEloquentClasses.QueryBuilder.MongooseQueryBuilder
+
   protected mongooseModel: Model<Document & T>
   protected mongooseQuery: MongooseQuery<T>
   protected hasMongooseQuery: boolean
   protected primaryKey: string
 
   constructor(modelName: string)
-  constructor(modelName: string, softDelete: QueryBuilderSoftDelete | undefined)
-  constructor(modelName: string, softDelete: QueryBuilderSoftDelete | undefined, primaryKey: string)
-  constructor(modelName: string, softDelete?: QueryBuilderSoftDelete, primaryKey: string = '_id') {
+  constructor(modelName: string, softDelete: NajsEloquent.Model.ISoftDeletesSetting | undefined)
+  constructor(modelName: string, softDelete: NajsEloquent.Model.ISoftDeletesSetting | undefined, primaryKey: string)
+  constructor(modelName: string, softDelete?: NajsEloquent.Model.ISoftDeletesSetting, primaryKey: string = '_id') {
     super(softDelete)
     this.primaryKey = primaryKey
     const mongoose: Mongoose = MongooseProvider.getMongooseInstance()
@@ -39,9 +39,13 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
     this.mongooseModel = mongoose.model(modelName)
   }
 
+  getClassName() {
+    return NajsEloquentClasses.QueryBuilder.MongooseQueryBuilder
+  }
+
   protected getQuery(isFindOne: boolean = false, logger?: MongooseQueryLog): MongooseQuery<T> {
     if (!this.hasMongooseQuery) {
-      const conditions = new MongodbConditionConverter(this.getConditions()).convert()
+      const conditions = this.resolveMongodbConditionConverter().convert()
       this.mongooseQuery = isFindOne
         ? this.mongooseModel.findOne(conditions)
         : (this.mongooseQuery = this.mongooseModel.find(conditions))
@@ -102,29 +106,7 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
     >
   }
 
-  getPrimaryKey(): string {
-    return this.primaryKey
-  }
-
-  native(handler: (native: Model<Document & T> | MongooseQuery<T>) => MongooseQuery<T>): IFetchResultQuery<T> {
-    this.mongooseQuery = handler.call(undefined, this.isUsed ? this.createQuery(false) : this.mongooseModel)
-    this.hasMongooseQuery = true
-    return this
-  }
-
-  toObject(): Object {
-    const conditions = new MongodbConditionConverter(this.getConditions()).convert()
-    return {
-      name: this.name ? this.name : undefined,
-      select: !isEmpty(this.fields.select) ? this.fields.select : undefined,
-      distinct: !isEmpty(this.fields.distinct) ? this.fields.distinct : undefined,
-      limit: this.limitNumber,
-      orderBy: !isEmpty(this.ordering) ? this.ordering : undefined,
-      conditions: !isEmpty(conditions) ? conditions : undefined
-    }
-  }
-
-  protected getQueryConvention(): IQueryConvention {
+  protected getQueryConvention(): NajsEloquent.QueryBuilder.IQueryConvention {
     return {
       formatFieldName(name: any) {
         if (name === 'id') {
@@ -139,29 +121,43 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
     }
   }
 
+  getPrimaryKey(): string {
+    return this.primaryKey
+  }
+
+  toObject(): Object {
+    const conditions = this.resolveMongodbConditionConverter().convert()
+    return {
+      name: this.name ? this.name : undefined,
+      select: !isEmpty(this.fields.select) ? this.fields.select : undefined,
+      limit: this.limitNumber,
+      orderBy: !isEmpty(this.ordering) ? this.ordering : undefined,
+      conditions: !isEmpty(conditions) ? conditions : undefined
+    }
+  }
+
   // -------------------------------------------------------------------------------------------------------------------
 
-  async get(): Promise<Collection<T>> {
-    const logger = MongooseQueryLog.create(this)
+  native(
+    handler: (native: Model<Document & T> | MongooseQuery<T>) => MongooseQuery<T>
+  ): NajsEloquent.QueryBuilder.IFetchResultQuery<T> {
+    this.mongooseQuery = handler.call(undefined, this.isUsed ? this.createQuery(false) : this.mongooseModel)
+    this.hasMongooseQuery = true
+    return this
+  }
+
+  async get(): Promise<Array<Document & T>> {
+    const logger = this.resolveMongooseQueryLog()
     const query = this.createQuery(false, logger)
     logger
       .raw('.exec()')
       .action('get')
       .end()
-    const result = await query.exec()
-    if (result && !isEmpty(result)) {
-      const eloquent = make<Eloquent<T>>(this.mongooseModel.modelName)
-      return <any>eloquent.newCollection(result)
-    }
-    return collect([])
+    return (await query.exec()) as Array<Document & T>
   }
 
-  async all(): Promise<Collection<T>> {
-    return this.get()
-  }
-
-  async find(): Promise<T | null> {
-    const logger = MongooseQueryLog.create(this)
+  async first(): Promise<T | null> {
+    const logger = this.resolveMongooseQueryLog()
     const query = this.passDataToMongooseQuery(this.getQuery(true, logger), logger)
     // change mongoose query operator from find to findOne if needed
     if (query['op'] === 'find') {
@@ -173,43 +169,12 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
       .raw('.exec()')
       .action('find')
       .end()
-    const result = await (query as DocumentQuery<(Document & T) | null, Document & T>).exec()
-    if (result) {
-      return <any>make<Eloquent<T>>(this.mongooseModel.modelName).newInstance(result)
-    }
-    // tslint:disable-next-line
-    return null
-  }
 
-  async first(): Promise<T | null> {
-    return this.find()
-  }
-
-  async pluck(value: string): Promise<Object>
-  async pluck(value: string, key: string): Promise<Object>
-  async pluck(value: string, key?: string): Promise<Object> {
-    const logger = MongooseQueryLog.create(this)
-    this.selectedFields = []
-    const keyName = key ? key : this.primaryKey
-    this.select(value, keyName)
-    const query = this.createQuery(false, logger)
-
-    logger
-      .raw('.exec()')
-      .action('pluck')
-      .end()
-    const result: Array<Document & T> | null = await query.exec()
-    if (result && !isEmpty(result)) {
-      return result.reduce(function(memo: Object, item: Document) {
-        memo[item[keyName]] = item[value]
-        return memo
-      }, {})
-    }
-    return {}
+    return await (query as DocumentQuery<(Document & T) | null, Document & T>).exec()
   }
 
   async count(): Promise<number> {
-    const logger = MongooseQueryLog.create(this).action('count')
+    const logger = this.resolveMongooseQueryLog().action('count')
     this.selectedFields = []
     this.select(this.primaryKey)
     const query = this.createQuery(false, logger)
@@ -219,12 +184,12 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
   }
 
   async update(data: Object): Promise<Object> {
-    const conditions = new MongodbConditionConverter(this.getConditions()).convert()
+    const conditions = this.resolveMongodbConditionConverter().convert()
     const query = this.mongooseModel.update(conditions, data, {
       multi: true
     })
 
-    MongooseQueryLog.create(this)
+    this.resolveMongooseQueryLog()
       .action('update')
       .raw(this.mongooseModel.modelName)
       .raw(`.update(${JSON.stringify(conditions)}, ${JSON.stringify(data)}, {multi: true})`)
@@ -238,7 +203,7 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
     if (conditions === false) {
       return { n: 0, ok: 1 }
     }
-    MongooseQueryLog.create(this)
+    this.resolveMongooseQueryLog()
       .raw(this.mongooseModel.modelName)
       .raw('.remove(', conditions, ')', '.exec()')
       .end()
@@ -260,7 +225,7 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
       $set: { [this.softDelete.deletedAt]: this.convention.getNullValueFor(this.softDelete.deletedAt) }
     }
     const query = this.mongooseModel.update(conditions, updateData, { multi: true })
-    MongooseQueryLog.create(this)
+    this.resolveMongooseQueryLog()
       .action('restore')
       .raw(this.mongooseModel.modelName)
       .raw('.update(', conditions, ',', updateData, ', ', { multi: true }, ')')
@@ -270,7 +235,7 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
   }
 
   async execute(): Promise<any> {
-    const logger = MongooseQueryLog.create(this)
+    const logger = this.resolveMongooseQueryLog()
     const query: any = this.getQuery(false, logger)
     logger
       .raw('.exec()')
@@ -279,27 +244,25 @@ export class MongooseQueryBuilder<T extends Object = {}> extends GenericQueryBui
     return query.exec()
   }
 
-  // Helpers -----------------------------------------------------------------------------------------------------------
-  async findOrFail(): Promise<any> {
-    const value = await this.find()
-    if (!value) {
-      throw new NotFoundError(this.mongooseModel.modelName)
-    }
-    return value
-  }
-
-  async firstOrFail(): Promise<any> {
-    return this.findOrFail()
-  }
-
   private isNotUsedOrEmptyCondition(): false | Object {
     if (!this.isUsed) {
       return false
     }
-    const conditions = new MongodbConditionConverter(this.getConditions()).convert()
+    const conditions = this.resolveMongodbConditionConverter().convert()
     if (isEmpty(conditions)) {
       return false
     }
     return conditions
   }
+
+  private resolveMongodbConditionConverter(): MongodbConditionConverter {
+    return make<MongodbConditionConverter>(MongodbConditionConverter.className, [this.getConditions()])
+  }
+
+  private resolveMongooseQueryLog(): MongooseQueryLog {
+    const data = this.toObject()
+    data['builder'] = this.getClassName()
+    return make<MongooseQueryLog>(MongooseQueryLog.className, [data])
+  }
 }
+register(MongooseQueryBuilder)

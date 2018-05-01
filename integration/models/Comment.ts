@@ -1,4 +1,4 @@
-import { Eloquent, Mongoose } from '../../dist/lib/v1'
+import { EloquentMongoose } from '../../dist/lib'
 
 export interface IComment {
   user_id?: string
@@ -8,7 +8,8 @@ export interface IComment {
   like: number
 }
 
-export class Comment extends (Eloquent as Mongoose<IComment>) {
+export interface Comment extends IComment {}
+export class Comment extends EloquentMongoose<IComment> {
   static className: string = 'Comment'
   protected static timestamps = true
   protected static softDeletes = true

@@ -1,4 +1,4 @@
-import { QueryLog, factory } from '../../../dist/lib/v1'
+import { QueryLog, factory } from '../../../dist/lib'
 import { User, init_mongoose, delete_collection } from '../../mongodb/index'
 
 describe('Integration Test - Eloquent (1st way) querying', function() {
@@ -15,7 +15,7 @@ describe('Integration Test - Eloquent (1st way) querying', function() {
   describe('.queryName()', function() {
     it('starts new query with given name.', async function() {
       const query = userModel.queryName('You can name the query what ever you want')
-      expect(query['name']).toEqual('You can name the query what ever you want')
+      expect(query['queryBuilder']['name']).toEqual('You can name the query what ever you want')
 
       QueryLog.enable()
       await query.where('email', 'test').get()
@@ -36,29 +36,6 @@ describe('Integration Test - Eloquent (1st way) querying', function() {
       }
     })
   })
-
-  // describe('.distinct()', function() {
-  //   it('sets the columns or fields to be applied distinct operation.', async function() {
-  //     await factory(User)
-  //       .times(2)
-  //       .create({ age: 20 })
-
-  //     QueryLog.enable()
-  //     const users = await userModel
-  //       .distinct('age')
-  //       .where('age', 20)
-  //       .all()
-
-  //     console.log(QueryLog.pull())
-  //     QueryLog.disable()
-  //     console.log(users)
-
-  //     for (const user of users) {
-  //       const result = user.toObject()
-  //       console.log(result)
-  //     }
-  //   })
-  // })
 
   describe('.orderBy()', function() {
     it('adds an "order by" clause to the query.', async function() {
@@ -175,7 +152,7 @@ describe('Integration Test - Eloquent (1st way) querying', function() {
       await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
       await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
       const result = await userModel
-        .orWhere('age', 40)
+        .where('age', 40)
         .orWhere(function(query) {
           return query.where('first_name', 'a').orWhere('first_name', 'b')
         })
@@ -264,7 +241,10 @@ describe('Integration Test - Eloquent (1st way) querying', function() {
       await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
       await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
       await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
-      await ((await userModel.where('age', 40).first()) as User).delete()
+      const user = await userModel.where('age', 40).first()
+      if (user) {
+        await user.delete()
+      }
 
       const result = await userModel
         .withTrashed()
@@ -279,8 +259,14 @@ describe('Integration Test - Eloquent (1st way) querying', function() {
       await factory(User).create({ age: 50, first_name: 'a', last_name: 'a' })
       await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
       await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
-      await ((await userModel.where('age', 30).first()) as User).delete()
-      await ((await userModel.where('age', 40).first()) as User).delete()
+      const userTwo = await userModel.where('age', 40).first()
+      if (userTwo) {
+        await userTwo.delete()
+      }
+      const userThree = await userModel.where('age', 30).first()
+      if (userThree) {
+        await userThree.delete()
+      }
 
       const result = await userModel
         .onlyTrashed()
@@ -318,10 +304,11 @@ describe('Integration Test - Eloquent (1st way) querying', function() {
       await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
       await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
 
-      const result = ((await userModel
+      const user = await userModel
         .where('age', '>', 30)
         .orderBy('age')
-        .first()) as User).toObject()
+        .first()
+      const result = user ? user.toObject() : {}
       expect(result['first_name']).toEqual('b')
     })
 
@@ -341,10 +328,11 @@ describe('Integration Test - Eloquent (1st way) querying', function() {
       await factory(User).create({ age: 40, first_name: 'b', last_name: 'b' })
       await factory(User).create({ age: 30, first_name: 'c', last_name: 'c' })
 
-      const result = ((await userModel
+      const user = await userModel
         .where('age', '>', 30)
         .orderBy('age')
-        .find()) as User).toObject()
+        .find()
+      const result = user ? user.toObject() : {}
       expect(result['first_name']).toEqual('b')
     })
 

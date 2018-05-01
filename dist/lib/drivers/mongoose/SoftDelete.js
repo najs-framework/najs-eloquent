@@ -1,4 +1,5 @@
 "use strict";
+/// <reference path="../../model/interfaces/IModelSoftDeletes.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const lodash_1 = require("lodash");
@@ -7,7 +8,9 @@ const Moment = require("moment");
 const NOT_DELETED_VALUE = null;
 const DEFAULT_OPTIONS = { deletedAt: 'deleted_at', overrideMethods: false };
 function SoftDelete(schema, options) {
-    const opts = lodash_1.isObject(options) ? Object.assign({}, DEFAULT_OPTIONS, options) : DEFAULT_OPTIONS;
+    const opts = lodash_1.isObject(options)
+        ? Object.assign({}, DEFAULT_OPTIONS, options)
+        : DEFAULT_OPTIONS;
     schema.add({
         [opts.deletedAt]: { type: Date, default: NOT_DELETED_VALUE }
     });

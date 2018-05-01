@@ -2,95 +2,165 @@ import 'jest'
 import { DummyDriver } from '../../lib/drivers/DummyDriver'
 
 describe('DummyDriver', function() {
-  describe('.initialize()', function() {
-    it('assigns data to attributes', function() {
-      const attributes = { a: 'test' }
-      const dummy = new DummyDriver()
-      dummy.initialize(attributes)
-      expect(dummy.attributes === attributes).toBe(true)
+  describe('.getClassName()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.getClassName()
+    })
+  })
 
-      const empty = new DummyDriver()
-      empty.initialize()
-      expect(empty.attributes).toEqual({})
+  describe('.initialize()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.initialize(<any>{}, false)
+    })
+  })
+
+  describe('.getRecordName()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.getRecordName()
+    })
+  })
+
+  describe('.getRecord()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.getRecord()
+    })
+  })
+
+  describe('.setRecord()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.setRecord({})
+    })
+  })
+
+  describe('.useEloquentProxy()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.useEloquentProxy()
+    })
+  })
+
+  describe('.shouldBeProxied()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.shouldBeProxied('test')
+    })
+  })
+
+  describe('.proxify()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.proxify('get', {}, 'test')
+      driver.proxify('set', {}, 'test', 'value')
+    })
+  })
+
+  describe('.hasAttribute()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.hasAttribute('a')
     })
   })
 
   describe('.getAttribute()', function() {
-    it('returns attributes[name]', function() {
-      const attributes = { a: 'test' }
-      const dummy = new DummyDriver()
-      dummy.initialize(attributes)
-      expect(dummy.getAttribute('a')).toEqual('test')
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.getAttribute('a')
     })
   })
 
   describe('.setAttribute()', function() {
-    it('calls attributes[name]', function() {
-      const attributes = {}
-      const dummy = new DummyDriver()
-      dummy.initialize(attributes)
-      dummy.setAttribute('a', 'test')
-      expect(dummy.attributes).toEqual({ a: 'test' })
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.setAttribute('a', 'test')
     })
   })
 
-  describe('.getId()', function() {
-    it('returns id in attributes variable', function() {
-      const attributes = {
-        id: 'test'
-      }
-      const dummy = new DummyDriver()
-      dummy.initialize(attributes)
-      expect(dummy.getId()).toEqual('test')
-    })
-  })
-
-  describe('.setId()', function() {
-    it('sets id to attributes variable', function() {
-      const attributes = {}
-      const dummy = new DummyDriver()
-      dummy.initialize(attributes)
-      dummy.setId('test')
-      expect(dummy.attributes).toEqual({ id: 'test' })
-    })
-  })
-
-  describe('.newQuery()', function() {
-    it('returns empty object', function() {
-      const dummy = new DummyDriver()
-      expect(dummy.newQuery()).toEqual({})
+  describe('.getPrimaryKeyName()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.getPrimaryKeyName()
     })
   })
 
   describe('.toObject()', function() {
-    it('returns attributes', function() {
-      const attributes = {}
-      const dummy = new DummyDriver()
-      dummy.initialize(attributes)
-      expect(dummy.toObject() === dummy.attributes).toBe(true)
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.toObject()
     })
   })
 
-  describe('.toJSON()', function() {
-    it('returns attributes', function() {
-      const attributes = {}
-      const dummy = new DummyDriver()
-      dummy.initialize(attributes)
-      expect(dummy.toJSON() === dummy.attributes).toBe(true)
+  describe('.newQuery()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.newQuery()
     })
   })
 
-  describe('.is()', function() {
-    it('returns true if id in attribute is equal', function() {
-      const attributes = { id: 'test' }
-      const dummy = new DummyDriver()
-      dummy.initialize(attributes)
+  describe('.delete()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.delete(true)
+    })
+  })
 
-      const comparedDriver = new DummyDriver()
-      comparedDriver.initialize({ id: 'test' })
-      const model = { driver: comparedDriver }
+  describe('.restore()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.restore()
+    })
+  })
 
-      expect(dummy.is(<any>model)).toBe(true)
+  describe('.save()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.save()
+    })
+  })
+
+  describe('.isSoftDeleted()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.isSoftDeleted()
+    })
+  })
+
+  describe('.isNew()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.isNew()
+    })
+  })
+
+  describe('.markModified()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.markModified('test')
+    })
+  })
+
+  describe('.getModelComponentName()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.getModelComponentName()
+    })
+  })
+
+  describe('.getModelComponentOrder()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.getModelComponentOrder([])
+    })
+  })
+
+  describe('.formatAttributeName()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.formatAttributeName('test')
     })
   })
 })

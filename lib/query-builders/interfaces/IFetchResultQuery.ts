@@ -1,23 +1,42 @@
-import { Collection } from 'collect.js'
+/// <reference path="../../collect.js/index.d.ts" />
 
-export interface IFetchResultQuery<T = {}> {
-  get(): Promise<Collection<T>>
-  all(): Promise<Collection<T>>
+namespace NajsEloquent.QueryBuilder {
+  export interface IFetchResultQuery<T extends Object = {}> {
+    /**
+     * Execute query and return the records as a Collection.
+     */
+    get(): Promise<T[]>
 
-  find(): Promise<T | null>
-  find(id: any): Promise<T | null>
+    /**
+     * Execute query and returns the first record.
+     */
+    first(): Promise<T | null>
 
-  first(): Promise<T | null>
-  first(id: any): Promise<T | null>
+    /**
+     * Execute query and returns count of records.
+     */
+    count(): Promise<number>
 
-  count(): Promise<number>
+    /**
+     * Update records which match the query with data.
+     *
+     * @param {Object} data
+     */
+    update(data: Object): Promise<Object>
 
-  pluck(value: string): Promise<Object>
-  pluck(value: string, key: string): Promise<Object>
+    /**
+     * Delete all records which match the query.
+     */
+    delete(): Promise<Object>
 
-  update(data: Object): Promise<Object>
-  delete(): Promise<Object>
-  restore(): Promise<Object>
+    /**
+     * Restore all records which match the query.
+     */
+    restore(): Promise<Object>
 
-  execute(): Promise<any>
+    /**
+     * Execute query and returns raw result.
+     */
+    execute(): Promise<any>
+  }
 }

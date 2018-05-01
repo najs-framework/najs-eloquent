@@ -1,13 +1,17 @@
-// export interface IRelation<Result, Relation> {
-//   isLoaded(): boolean
+/// <reference path="./IRelationQuery.ts" />
 
-//   load(): Promise<Result>
+namespace NajsEloquent.Relation {
+  export interface IRelation<T> {
+    getName(): string
 
-//   getRelation(): Relation
-// }
+    isLoaded(): boolean
 
-export interface IRelation<Result> {
-  isLoaded(): boolean
+    load(): Promise<T>
 
-  load(): Promise<Result>
+    getEager(): void
+
+    setEager(): void
+
+    getRelation(): IRelationQuery
+  }
 }
