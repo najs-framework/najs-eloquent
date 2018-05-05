@@ -24,7 +24,7 @@ declare namespace NajsEloquent.Model {
          */
         protected settings?: Object;
     }
-    interface IModel<T> extends IModelAttribute, IModelDynamicAttribute, IModelFillable, IModelSerialization, IModelActiveRecord, IModelTimestamps, IModelSoftDeletes, IModelRelation {
+    interface IModel<T> extends IModelAttribute, IModelDynamicAttribute, IModelFillable, IModelSerialization, IModelActiveRecord, IModelTimestamps, IModelSoftDeletes {
         /**
          * Get class name of the model.
          */

@@ -35,8 +35,7 @@ namespace NajsEloquent.Model {
       IModelSerialization,
       IModelActiveRecord,
       IModelTimestamps,
-      IModelSoftDeletes,
-      IModelRelation {
+      IModelSoftDeletes {
     /**
      * Get class name of the model.
      */

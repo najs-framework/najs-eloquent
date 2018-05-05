@@ -1,17 +1,43 @@
+/// <reference path="../../model/interfaces/IModel.ts" />
 /// <reference path="./IRelationQuery.ts" />
 
 namespace NajsEloquent.Relation {
-  export interface IRelation<T> {
-    getName(): string
+  export interface IRelation {
+    /**
+     * Get the relation name.
+     */
+    getRelationName(): string
 
+    /**
+     * Get new query based on the relation.
+     */
+    getRelation(): IRelationQuery
+
+    /**
+     * Determine the relationship is loaded or not.
+     */
     isLoaded(): boolean
 
-    load(): Promise<T>
+    /**
+     * Lazy load relation data.
+     */
+    lazyLoad<T>(parentModel: Model.IModel<T>): Promise<any>
 
-    getEager(): void
+    /**
+     * Lazy load relation data.
+     */
+    eagerLoad<T>(parentModel: Model.IModel<T>): Promise<any>
 
-    setEager(): void
+    /**
+     * Get RelationDataBucket which contains eager data.
+     */
+    getDataBucket(): IRelationDataBucket
 
-    getRelation(): IRelationQuery
+    /**
+     * Set RelationDataBucket which contains eager data.
+     *
+     * @param {IRelationDataBucket} bucket
+     */
+    setDataBucket(bucket: IRelationDataBucket): this
   }
 }

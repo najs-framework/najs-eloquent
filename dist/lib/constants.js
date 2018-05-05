@@ -20,7 +20,8 @@ exports.NajsEloquent = {
             ModelTimestamps: 'NajsEloquent.Model.Component.ModelTimestamps',
             ModelSerialization: 'NajsEloquent.Model.Component.ModelSerialization',
             ModelSoftDeletes: 'NajsEloquent.Model.Component.ModelSoftDeletes',
-            ModelActiveRecord: 'NajsEloquent.Model.Component.ModelActiveRecord'
+            ModelActiveRecord: 'NajsEloquent.Model.Component.ModelActiveRecord',
+            ModelRelation: 'NajsEloquent.Model.Component.ModelRelation'
         }
     },
     QueryBuilder: {

@@ -51,5 +51,6 @@ describe('NajsEloquent', function () {
         });
         expect(filtered.first() === a).toBe(true);
         expect(filtered.last() === b).toBe(true);
+        collection.push({ name: 'e', index: 4, id: 14 });
     });
 });

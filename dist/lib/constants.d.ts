@@ -18,6 +18,7 @@ export declare const NajsEloquent: {
             ModelSerialization: string;
             ModelSoftDeletes: string;
             ModelActiveRecord: string;
+            ModelRelation: string;
         };
     };
     QueryBuilder: {
