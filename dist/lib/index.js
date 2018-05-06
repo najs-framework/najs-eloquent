@@ -52,8 +52,6 @@ exports.factory = FactoryFacade_1.factory;
 var NotFoundError_1 = require("./errors/NotFoundError");
 exports.NotFoundError = NotFoundError_1.NotFoundError;
 // package model
-var Model_1 = require("./model/Model");
-exports.Model = Model_1.Model;
 var Eloquent_1 = require("./model/Eloquent");
 exports.Eloquent = Eloquent_1.Eloquent;
 var EloquentMongoose_1 = require("./model/EloquentMongoose");

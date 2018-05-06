@@ -34,6 +34,10 @@ import { QueryBuilderWrapper } from './wrappers/QueryBuilderWrapper'
 import { MongooseQueryBuilderWrapper } from './wrappers/MongooseQueryBuilderWrapper'
 
 export type Faker = ChanceFaker
+export type Model<T> = NajsEloquent.Model.IModel<T> & T
+export type ModelAsync<T> = Promise<NajsEloquent.Model.IModel<T> & T>
+export type Collection<T> = CollectJs.Collection<NajsEloquent.Model.IModel<T> & T>
+export type CollectionAsync<T> = Promise<CollectJs.Collection<NajsEloquent.Model.IModel<T> & T>>
 
 // package facades
 export { QueryLogFacade, QueryLog } from './facades/global/QueryLogFacade'
@@ -49,7 +53,6 @@ export { FactoryFacade, Factory, factory } from './facades/global/FactoryFacade'
 export { NotFoundError } from './errors/NotFoundError'
 
 // package model
-export { Model } from './model/Model'
 export { Eloquent, EloquentStaticMongoose } from './model/Eloquent'
 export { EloquentMongoose } from './model/EloquentMongoose'
 
