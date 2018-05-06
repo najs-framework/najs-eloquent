@@ -1,14 +1,16 @@
 /// <reference path="../../relations/interfaces/IRelationDataBucket.ts" />
-/// <reference path="../../relations/types/HasOne.ts" />
+/// <reference path="../../relations/interfaces/IRelationFactory.ts" />
 
 namespace NajsEloquent.Model {
-  export type ModelDefinition<T> = string | { new (): IModel<T> }
-
   export declare class IModelRelation {
     /**
      * Relation data bucket which is used for eager load
      */
     protected relationDataBucket: Relation.IRelationDataBucket
+
+    protected relations: {
+      [key: string]: Relation.IRelation
+    }
   }
 
   export interface IModelRelation {
@@ -26,52 +28,11 @@ namespace NajsEloquent.Model {
     getRelationByName(name: string): Relation.IRelation
 
     /**
-     * Has one relationship
+     * Define a relation property by name
      *
-     * @param {string|ModelDefinition} model
+     * @param {string} name
      */
-    hasOne<T>(model: ModelDefinition<T>): Relation.IHasOne<T>
-
-    /**
-     * Has one relationship
-     *
-     * @param {string|ModelDefinition} model
-     * @param {string} foreignKey
-     */
-    hasOne<T>(model: ModelDefinition<T>, foreignKey: string): Relation.IHasOne<T>
-
-    /**
-     * Has one relationship
-     *
-     * @param {string|ModelDefinition} model
-     * @param {string} foreignKey
-     * @param {string} localKey
-     */
-    hasOne<T>(model: ModelDefinition<T>, foreignKey: string, localKey: string): Relation.IHasOne<T>
-
-    /**
-     * Has one inverse relationship
-     *
-     * @param {string|ModelDefinition} model
-     */
-    belongsTo<T>(model: ModelDefinition<T>): Relation.IHasOne<T>
-
-    /**
-     * Has one inverse relationship
-     *
-     * @param {string|ModelDefinition} model
-     * @param {string} foreignKey
-     */
-    belongsTo<T>(model: ModelDefinition<T>, foreignKey: string): Relation.IHasOne<T>
-
-    /**
-     * Has one inverse relationship
-     *
-     * @param {string|ModelDefinition} model
-     * @param {string} foreignKey
-     * @param {string} localKey
-     */
-    belongsTo<T>(model: ModelDefinition<T>, foreignKey: string, localKey: string): Relation.IHasOne<T>
+    defineRelationProperty(name: string): Relation.IRelationFactory
   }
 
   export interface IModelRelationQuery {

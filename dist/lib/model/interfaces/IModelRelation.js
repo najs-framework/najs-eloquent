@@ -1,5 +1,5 @@
 /// <reference path="../../relations/interfaces/IRelationDataBucket.ts" />
-/// <reference path="../../relations/types/HasOne.ts" />
+/// <reference path="../../relations/interfaces/IRelationFactory.ts" />
 var NajsEloquent;
 (function (NajsEloquent) {
     var Model;

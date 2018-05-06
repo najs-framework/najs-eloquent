@@ -1,6 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
+const Eloquent_1 = require("../../lib/model/Eloquent");
+const DummyDriver_1 = require("../../lib/drivers/DummyDriver");
+const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
+const najs_binding_1 = require("najs-binding");
+EloquentDriverProviderFacade_1.EloquentDriverProviderFacade.register(DummyDriver_1.DummyDriver, 'dummy', true);
 describe('Relation PoC', function () {
     it.skip('first proposal', async function () {
         // The first proposal: integrate model + relationship
@@ -55,5 +60,79 @@ describe('Relation PoC', function () {
         }
         // working with relationship
         instance.postsRelation().attach();
+    });
+    it('define relation', function () {
+        class Relation {
+        }
+        class User extends Eloquent_1.Eloquent {
+            getPostRelation() {
+                return this.defineRelationProperty('post').hasOne();
+            }
+            defineRelationProperty(name) {
+                if (!this['relations']) {
+                    this['relations'] = {};
+                }
+                this['relations'][name] = 'defined';
+                return this;
+            }
+            hasOne() {
+                return new Relation();
+            }
+        }
+        User.className = 'User';
+        najs_binding_1.register(User);
+        // class DefineRelationPropertyTracker {
+        //   sample: Object
+        //   name: string
+        //   start: boolean
+        //   constructor(sample: Object, name: string) {
+        //     this.sample = sample
+        //     this.name = name
+        //     this.start = false
+        //   }
+        //   getDefinedName() {
+        //     const proxy = new Proxy(this.sample, {
+        //       get: (target, key) => {
+        //         console.log(key)
+        //         if (key === this.name) {
+        //           this.start = true
+        //           return target[this.name]
+        //         }
+        //         console.log(this.start)
+        //         if (this.start && typeof target[key] === 'function') {
+        //           return function(this: any) {
+        //             // const result = target[key].apply(this, arguments)
+        //             // console.log(result)
+        //             console.log(arguments)
+        //             // return result
+        //           }
+        //         }
+        //         return target[this.name]
+        //       }
+        //     })
+        //     // fake calls
+        //     console.log(proxy[this.name].call(proxy))
+        //   }
+        // }
+        const user = new User();
+        const prototype = User.prototype;
+        const descriptors = Object.getOwnPropertyDescriptors(prototype);
+        for (const name in descriptors) {
+            if (name === 'constructor' || name === 'hasOne') {
+                continue;
+            }
+            const descriptor = descriptors[name];
+            if (typeof descriptor.value === 'function') {
+                const value = descriptor.value.call(user);
+                if (value instanceof Relation) {
+                    const freshInstance = user.newInstance();
+                    freshInstance[name]();
+                    console.log(Object.getOwnPropertyNames(freshInstance['relations']));
+                    // const tracker = new DefineRelationPropertyTracker(user, name)
+                    // tracker.getDefinedName()
+                }
+            }
+        }
+        // user.post!.title
     });
 });

@@ -10,6 +10,9 @@
 /// <reference path="IModelRelation.d.ts" />
 /// <reference path="IModelDynamicAttribute.d.ts" />
 declare namespace NajsEloquent.Model {
+    type ModelDefinition<T> = string | {
+        new (): IModel<T>;
+    };
     class IModel<T> {
         /**
          * The model's attributes.
