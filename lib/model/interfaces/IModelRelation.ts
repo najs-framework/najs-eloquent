@@ -30,7 +30,7 @@ namespace NajsEloquent.Model {
      *
      * @param {string|ModelDefinition} model
      */
-    hasOne<T>(model: ModelDefinition<T>): Relation.HasOne<T>
+    hasOne<T>(model: ModelDefinition<T>): Relation.IHasOne<T>
 
     /**
      * Has one relationship
@@ -38,7 +38,7 @@ namespace NajsEloquent.Model {
      * @param {string|ModelDefinition} model
      * @param {string} foreignKey
      */
-    hasOne<T>(model: ModelDefinition<T>, foreignKey: string): Relation.HasOne<T>
+    hasOne<T>(model: ModelDefinition<T>, foreignKey: string): Relation.IHasOne<T>
 
     /**
      * Has one relationship
@@ -47,14 +47,14 @@ namespace NajsEloquent.Model {
      * @param {string} foreignKey
      * @param {string} localKey
      */
-    hasOne<T>(model: ModelDefinition<T>, foreignKey: string, localKey: string): Relation.HasOne<T>
+    hasOne<T>(model: ModelDefinition<T>, foreignKey: string, localKey: string): Relation.IHasOne<T>
 
     /**
      * Has one inverse relationship
      *
      * @param {string|ModelDefinition} model
      */
-    belongsTo<T>(model: ModelDefinition<T>): Relation.HasOne<T>
+    belongsTo<T>(model: ModelDefinition<T>): Relation.IHasOne<T>
 
     /**
      * Has one inverse relationship
@@ -62,7 +62,7 @@ namespace NajsEloquent.Model {
      * @param {string|ModelDefinition} model
      * @param {string} foreignKey
      */
-    belongsTo<T>(model: ModelDefinition<T>, foreignKey: string): Relation.HasOne<T>
+    belongsTo<T>(model: ModelDefinition<T>, foreignKey: string): Relation.IHasOne<T>
 
     /**
      * Has one inverse relationship
@@ -71,7 +71,7 @@ namespace NajsEloquent.Model {
      * @param {string} foreignKey
      * @param {string} localKey
      */
-    belongsTo<T>(model: ModelDefinition<T>, foreignKey: string, localKey: string): Relation.HasOne<T>
+    belongsTo<T>(model: ModelDefinition<T>, foreignKey: string, localKey: string): Relation.IHasOne<T>
   }
 
   export interface IModelRelationQuery {

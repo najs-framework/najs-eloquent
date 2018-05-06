@@ -1,15 +1,14 @@
 /// <reference path="../../model/interfaces/IModel.d.ts" />
-/// <reference path="IRelationQuery.d.ts" />
 declare namespace NajsEloquent.Relation {
     interface IRelation {
         /**
          * Get the relation name.
          */
-        getRelationName(): string;
+        getAttachedPropertyName(): string;
         /**
          * Get new query based on the relation.
          */
-        getRelation(): IRelationQuery;
+        getData<T>(): T | null;
         /**
          * Determine the relationship is loaded or not.
          */
