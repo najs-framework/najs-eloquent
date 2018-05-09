@@ -9,7 +9,10 @@ namespace NajsEloquent.Model {
     protected relationDataBucket: Relation.IRelationDataBucket
 
     protected relations: {
-      [key: string]: Relation.IRelation
+      [name: string]: {
+        mapTo: string
+        type: 'getter' | 'function'
+      }
     }
   }
 
@@ -32,7 +35,7 @@ namespace NajsEloquent.Model {
      *
      * @param {string} name
      */
-    defineRelationProperty(name: string): Relation.IRelationFactory
+    defineRelationProperty(name: string): Relation.IRelationFactory | undefined
   }
 
   export interface IModelRelationQuery {

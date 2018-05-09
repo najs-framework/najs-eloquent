@@ -1,8 +1,8 @@
 import 'jest'
-import { Eloquent } from '../../lib/model/Eloquent'
+// import { Eloquent } from '../../lib/model/Eloquent'
 import { DummyDriver } from '../../lib/drivers/DummyDriver'
 import { EloquentDriverProviderFacade } from '../../lib/facades/global/EloquentDriverProviderFacade'
-import { register } from 'najs-binding'
+// import { register } from 'najs-binding'
 
 EloquentDriverProviderFacade.register(DummyDriver, 'dummy', true)
 
@@ -82,51 +82,41 @@ describe('Relation PoC', function() {
   })
 
   it('define relation', function() {
-    interface IPost {
-      title: string
-    }
-
-    interface IUser {
-      first_name: string
-    }
-
-    class Relation {}
-
-    interface User extends IUser {}
-    class User extends Eloquent<IUser> {
-      static className = 'User'
-
-      post?: IPost
-
-      getPostRelation() {
-        return this.defineRelationProperty('post').hasOne()
-      }
-
-      defineRelationProperty(name: string): this {
-        if (!this['relations']) {
-          this['relations'] = {}
-        }
-        this['relations'][name] = 'defined'
-        return this
-      }
-
-      hasOne<T>(): T | any {
-        return new Relation()
-      }
-    }
-    register(User)
-
+    // interface IPost {
+    //   title: string
+    // }
+    // interface IUser {
+    //   first_name: string
+    // }
+    // class Relation {}
+    // interface User extends IUser {}
+    // class User extends Eloquent<IUser> {
+    //   static className = 'User'
+    //   post?: IPost
+    //   getPostRelation() {
+    //     return this.defineRelationProperty('post').hasOne()
+    //   }
+    //   defineRelationProperty(name: string): this {
+    //     if (!this['relations']) {
+    //       this['relations'] = {}
+    //     }
+    //     this['relations'][name] = 'defined'
+    //     return this
+    //   }
+    //   hasOne<T>(): T | any {
+    //     return new Relation()
+    //   }
+    // }
+    // register(User)
     // class DefineRelationPropertyTracker {
     //   sample: Object
     //   name: string
     //   start: boolean
-
     //   constructor(sample: Object, name: string) {
     //     this.sample = sample
     //     this.name = name
     //     this.start = false
     //   }
-
     //   getDefinedName() {
     //     const proxy = new Proxy(this.sample, {
     //       get: (target, key) => {
@@ -135,7 +125,6 @@ describe('Relation PoC', function() {
     //           this.start = true
     //           return target[this.name]
     //         }
-
     //         console.log(this.start)
     //         if (this.start && typeof target[key] === 'function') {
     //           return function(this: any) {
@@ -152,27 +141,25 @@ describe('Relation PoC', function() {
     //     console.log(proxy[this.name].call(proxy))
     //   }
     // }
-
-    const user = new User()
-    const prototype = User.prototype
-    const descriptors = Object.getOwnPropertyDescriptors(prototype)
-    for (const name in descriptors) {
-      if (name === 'constructor' || name === 'hasOne') {
-        continue
-      }
-      const descriptor = descriptors[name]
-      if (typeof descriptor.value === 'function') {
-        const value = descriptor.value!.call(user)
-        if (value instanceof Relation) {
-          const freshInstance = user.newInstance()
-          freshInstance[name]()
-          console.log(Object.getOwnPropertyNames(freshInstance['relations']))
-          // const tracker = new DefineRelationPropertyTracker(user, name)
-          // tracker.getDefinedName()
-        }
-      }
-    }
-
+    // const user = new User()
+    // const prototype = User.prototype
+    // const descriptors = Object.getOwnPropertyDescriptors(prototype)
+    // for (const name in descriptors) {
+    //   if (name === 'constructor' || name === 'hasOne') {
+    //     continue
+    //   }
+    //   const descriptor = descriptors[name]
+    //   if (typeof descriptor.value === 'function') {
+    //     const value = descriptor.value!.call(user)
+    //     if (value instanceof Relation) {
+    //       const freshInstance = user.newInstance()
+    //       freshInstance[name]()
+    //       console.log(Object.getOwnPropertyNames(freshInstance['relations']))
+    //       // const tracker = new DefineRelationPropertyTracker(user, name)
+    //       // tracker.getDefinedName()
+    //     }
+    //   }
+    // }
     // user.post!.title
   })
 })
