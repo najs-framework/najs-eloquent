@@ -20,12 +20,18 @@ class ClassSetting {
         replicated.instance = instance;
         return replicated;
     }
-    static of(instance, cache = true) {
+    static get(instance, cache = true) {
         const className = najs_binding_1.getClassName(instance);
         if (!this.samples[className] || !cache) {
-            this.samples[className] = new ClassSetting(najs_binding_1.make(className, [exports.CREATE_SAMPLE]));
+            const sample = najs_binding_1.make(className, [exports.CREATE_SAMPLE]);
+            sample['__sample'] = true;
+            this.samples[className] = new ClassSetting(sample);
+            this.samples[className];
         }
-        return this.samples[className].clone(instance);
+        return this.samples[className];
+    }
+    static of(instance, cache = true) {
+        return this.get(instance, cache).clone(instance);
     }
 }
 /**

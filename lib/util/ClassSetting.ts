@@ -39,16 +39,23 @@ export class ClassSetting {
    */
   protected static samples: Object = {}
 
+  static get(instance: Object, cache: boolean = true): ClassSetting {
+    const className = getClassName(instance)
+    if (!this.samples[className] || !cache) {
+      const sample = make(className, [CREATE_SAMPLE])
+      sample['__sample'] = true
+      this.samples[className] = new ClassSetting(sample)
+      this.samples[className]
+    }
+    return this.samples[className]
+  }
+
   /**
    * get ClassSetting Reader of an instance with instance's value
    */
   static of(instance: Object): ClassSetting
   static of(instance: Object, cache: boolean): ClassSetting
   static of(instance: Object, cache: boolean = true): ClassSetting {
-    const className = getClassName(instance)
-    if (!this.samples[className] || !cache) {
-      this.samples[className] = new ClassSetting(make(className, [CREATE_SAMPLE]))
-    }
-    return (this.samples[className] as ClassSetting).clone(instance)
+    return this.get(instance, cache).clone(instance)
   }
 }

@@ -12,6 +12,7 @@ export declare class ClassSetting {
      * store ClassSetting instance with "sample"
      */
     protected static samples: Object;
+    static get(instance: Object, cache?: boolean): ClassSetting;
     /**
      * get ClassSetting Reader of an instance with instance's value
      */

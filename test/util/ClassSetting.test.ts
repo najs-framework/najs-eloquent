@@ -17,8 +17,50 @@ describe('ClassSetting', function() {
   }
   register(One)
 
+  describe('static get()', function() {
+    it('creates an sample instance with param "CREATE_SAMPLE" if there is no instance in samples cache', function() {
+      ClassSetting['samples'] = {}
+
+      expect(ClassSetting['samples']).toEqual({})
+
+      const makeSpy = Sinon.spy(NajsBinding, 'make')
+
+      const instance = new One()
+
+      ClassSetting.get(instance)
+
+      expect(ClassSetting['samples']['One']).toBeInstanceOf(ClassSetting)
+      expect(makeSpy.calledWith('One', [CREATE_SAMPLE])).toBe(true)
+      expect(ClassSetting['samples']['One'].sample.param).toEqual(CREATE_SAMPLE)
+      expect(instance['param']).toBeUndefined()
+
+      makeSpy.restore()
+    })
+
+    it('skips create ClassSetting if there is a samples cache', function() {
+      const makeSpy = Sinon.spy(NajsBinding, 'make')
+      const instance = new One()
+
+      const cached = ClassSetting.get(instance)
+      expect(cached === ClassSetting['samples']['One']).toBe(true)
+      expect(makeSpy.called).toBe(false)
+
+      expect(ClassSetting.get(instance, false) === cached).toBe(false)
+      makeSpy.restore()
+    })
+
+    it('assign __sample to sample instance', function() {
+      const instance = new One()
+      const settings = ClassSetting.get(instance, false)
+      expect(settings['sample']['__sample']).toBe(true)
+      expect(instance['__sample']).toBeUndefined()
+    })
+  })
+
   describe('static of()', function() {
     it('creates an sample instance with param "CREATE_SAMPLE" if there is no instance in samples cache', function() {
+      ClassSetting['samples'] = {}
+
       expect(ClassSetting['samples']).toEqual({})
 
       const cloneSpy = Sinon.spy(ClassSetting.prototype, <any>'clone')
@@ -26,7 +68,7 @@ describe('ClassSetting', function() {
 
       const instance = new One()
 
-      ClassSetting.of(instance)
+      ClassSetting.of(instance, false)
 
       expect(ClassSetting['samples']['One']).toBeInstanceOf(ClassSetting)
       expect(makeSpy.calledWith('One', [CREATE_SAMPLE])).toBe(true)
