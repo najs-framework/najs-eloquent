@@ -18,12 +18,32 @@ export class ClassSetting {
     }
   }
 
+  /**
+   * Read the setting with given property and the setting reader callback.
+   *
+   * @param {string} property
+   * @param {Function} reader
+   */
   read<T>(property: string, reader: NajsEloquent.Util.ISettingReader<T>): T {
     return reader(
       this.definition[property] ? this.definition[property] : undefined,
       this.sample[property] ? this.sample[property] : undefined,
       this.instance[property] ? this.instance[property] : undefined
     )
+  }
+
+  /**
+   * Get the "sample" instance.
+   */
+  getSample<T extends Object>(): T {
+    return <T>this.sample
+  }
+
+  /**
+   * Get definition of the class.
+   */
+  getDefinition(): Function {
+    return this.definition
   }
 
   private clone(instance: Object): ClassSetting {

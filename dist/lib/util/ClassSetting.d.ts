@@ -6,7 +6,21 @@ export declare class ClassSetting {
     protected instance: Object;
     private constructor();
     private constructor();
+    /**
+     * Read the setting with given property and the setting reader callback.
+     *
+     * @param {string} property
+     * @param {Function} reader
+     */
     read<T>(property: string, reader: NajsEloquent.Util.ISettingReader<T>): T;
+    /**
+     * Get the "sample" instance.
+     */
+    getSample<T extends Object>(): T;
+    /**
+     * Get definition of the class.
+     */
+    getDefinition(): Function;
     private clone(instance);
     /**
      * store ClassSetting instance with "sample"

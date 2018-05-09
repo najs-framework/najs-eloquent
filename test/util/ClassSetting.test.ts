@@ -185,6 +185,28 @@ describe('ClassSetting', function() {
     })
   })
 
+  describe('.getSample()', function() {
+    it('returns cached sample instance', function() {
+      const instance = new One()
+      const settingOne = ClassSetting.of(instance)
+      const settingTwo = ClassSetting.of(instance)
+
+      expect(settingOne === settingTwo).toBe(false)
+      expect(settingOne.getSample() === settingTwo.getSample()).toBe(true)
+    })
+  })
+
+  describe('.getDefinition()', function() {
+    it('returns definition of the class which represent by instance', function() {
+      const instance = new One()
+      const settingOne = ClassSetting.of(instance)
+      const settingTwo = ClassSetting.of(instance)
+
+      expect(settingOne === settingTwo).toBe(false)
+      expect(settingOne.getDefinition() === settingTwo.getDefinition()).toBe(true)
+    })
+  })
+
   describe('private .clone()', function() {
     it('creates a replica and assign instance to it', function() {
       const instanceA = new One()

@@ -10,8 +10,26 @@ class ClassSetting {
             this.definition = Object.getPrototypeOf(sample).constructor;
         }
     }
+    /**
+     * Read the setting with given property and the setting reader callback.
+     *
+     * @param {string} property
+     * @param {Function} reader
+     */
     read(property, reader) {
         return reader(this.definition[property] ? this.definition[property] : undefined, this.sample[property] ? this.sample[property] : undefined, this.instance[property] ? this.instance[property] : undefined);
+    }
+    /**
+     * Get the "sample" instance.
+     */
+    getSample() {
+        return this.sample;
+    }
+    /**
+     * Get definition of the class.
+     */
+    getDefinition() {
+        return this.definition;
     }
     clone(instance) {
         const replicated = new ClassSetting();
