@@ -30,7 +30,7 @@ declare namespace NajsEloquent.Model {
          *
          * @param {string} name
          */
-        defineRelationProperty(name: string): Relation.IRelationFactory | undefined;
+        defineRelationProperty(name: string): Relation.IRelationFactory;
     }
     interface IModelRelationQuery {
         /**

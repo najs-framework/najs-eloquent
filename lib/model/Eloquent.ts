@@ -8,6 +8,7 @@ import { CREATE_SAMPLE } from '../util/ClassSetting'
 import { DynamicAttribute } from './components/DynamicAttribute'
 import { ModelQuery } from './components/ModelQuery'
 import { StaticQuery } from './components/StaticQuery'
+import { ModelRelation } from './components/ModelRelation'
 import { EloquentProxy } from './EloquentProxy'
 import { EloquentComponentProvider } from '../facades/global/EloquentComponentProviderFacade'
 import { MongooseQueryBuilderWrapper } from '../wrappers/MongooseQueryBuilderWrapper'
@@ -53,7 +54,11 @@ export class Eloquent<T extends Object = {}> extends Model<T> {
   }
 }
 
-const defaultComponents: Najs.Contracts.Eloquent.Component[] = [make(ModelQuery.className), make(StaticQuery.className)]
+const defaultComponents: Najs.Contracts.Eloquent.Component[] = [
+  make(ModelQuery.className),
+  make(StaticQuery.className),
+  make(ModelRelation.className)
+]
 for (const component of defaultComponents) {
   component.extend(Eloquent.prototype, [], <any>{})
 }

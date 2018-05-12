@@ -25,3 +25,14 @@ function array_unique(...array) {
     return Array.from(new Set(lodash_1.flatten(array)));
 }
 exports.array_unique = array_unique;
+function find_base_prototypes(prototype, root) {
+    const bases = [];
+    let count = 0;
+    do {
+        prototype = Object.getPrototypeOf(prototype);
+        bases.push(prototype);
+        count++;
+    } while (count < 100 && (typeof prototype === 'undefined' || prototype !== root));
+    return bases;
+}
+exports.find_base_prototypes = find_base_prototypes;

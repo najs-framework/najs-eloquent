@@ -27,18 +27,8 @@ class ComponentProvider extends najs_facade_1.Facade {
                 continue;
             }
             this.extended[className].push(component.getClassName());
-            component.extend(prototype, this.findBasePrototypes(prototype), driver);
+            component.extend(prototype, functions_1.find_base_prototypes(prototype, Object.prototype), driver);
         }
-    }
-    findBasePrototypes(prototype) {
-        const bases = [];
-        let count = 0;
-        do {
-            prototype = Object.getPrototypeOf(prototype);
-            bases.push(prototype);
-            count++;
-        } while (count < 100 && (typeof prototype === 'undefined' || prototype !== Object.prototype));
-        return bases;
     }
     resolveComponents(model, driver) {
         const modelComponents = this.getComponents(najs_binding_1.getClassName(model));

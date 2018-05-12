@@ -3,7 +3,7 @@
 import { make, register, getClassName } from 'najs-binding'
 import { Facade } from 'najs-facade'
 import { NajsEloquent } from '../constants'
-import { array_unique } from '../util/functions'
+import { array_unique, find_base_prototypes } from '../util/functions'
 
 export class ComponentProvider extends Facade implements Najs.Contracts.Eloquent.ComponentProvider {
   static className: string = NajsEloquent.Provider.ComponentProvider
@@ -41,19 +41,8 @@ export class ComponentProvider extends Facade implements Najs.Contracts.Eloquent
         continue
       }
       this.extended[className].push(component.getClassName())
-      component.extend(prototype, this.findBasePrototypes(prototype), driver)
+      component.extend(prototype, find_base_prototypes(prototype, Object.prototype), driver)
     }
-  }
-
-  private findBasePrototypes(prototype: Object): Object[] {
-    const bases: Object[] = []
-    let count = 0
-    do {
-      prototype = Object.getPrototypeOf(prototype)
-      bases.push(prototype)
-      count++
-    } while (count < 100 && (typeof prototype === 'undefined' || prototype !== Object.prototype))
-    return bases
   }
 
   private resolveComponents(

@@ -9,6 +9,7 @@ const ClassSetting_1 = require("../util/ClassSetting");
 const DynamicAttribute_1 = require("./components/DynamicAttribute");
 const ModelQuery_1 = require("./components/ModelQuery");
 const StaticQuery_1 = require("./components/StaticQuery");
+const ModelRelation_1 = require("./components/ModelRelation");
 const EloquentProxy_1 = require("./EloquentProxy");
 const EloquentComponentProviderFacade_1 = require("../facades/global/EloquentComponentProviderFacade");
 class Eloquent extends Model_1.Model {
@@ -43,7 +44,11 @@ class Eloquent extends Model_1.Model {
     }
 }
 exports.Eloquent = Eloquent;
-const defaultComponents = [najs_binding_1.make(ModelQuery_1.ModelQuery.className), najs_binding_1.make(StaticQuery_1.StaticQuery.className)];
+const defaultComponents = [
+    najs_binding_1.make(ModelQuery_1.ModelQuery.className),
+    najs_binding_1.make(StaticQuery_1.StaticQuery.className),
+    najs_binding_1.make(ModelRelation_1.ModelRelation.className)
+];
 for (const component of defaultComponents) {
     component.extend(Eloquent.prototype, [], {});
 }

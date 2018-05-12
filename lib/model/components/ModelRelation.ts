@@ -3,14 +3,76 @@
 
 import { register } from 'najs-binding'
 import { NajsEloquent } from '../../constants'
-// import { flatten } from 'lodash'
+import { Relation } from './../../relations/Relation'
+import { RelationFactory } from '../../relations/RelationFactory'
+import { Eloquent } from '../Eloquent'
+import { find_base_prototypes } from '../../util/functions'
+// // import { flatten } from 'lodash'
 
-// function find_relations_in_prototype(prototype: Object, relations: Object) {}
+function get_value_and_type_of_property(descriptor: PropertyDescriptor, instance: Object) {
+  // perform getter or function for sample, the sample will contains "relationName"
+  const sample = instance['getClassSetting']().getSample()
 
-// export function findRelationsForModel(model: NajsEloquent.Model.IModel<any>) {
-//   const relations = {}
-//   find_relations_in_prototype(Object.getPrototypeOf(model), relations)
-// }
+  if (typeof descriptor.value === 'function') {
+    descriptor.value!.call(sample)
+    return {
+      value: descriptor.value!.call(instance),
+      relationName: sample.relationName,
+      type: 'function'
+    }
+  }
+
+  if (typeof descriptor.get === 'function') {
+    descriptor.get.call(sample)
+    return {
+      value: descriptor.get.call(instance),
+      relationName: sample.relationName,
+      type: 'getter'
+    }
+  }
+
+  return undefined
+}
+
+function find_relations_in_prototype(instance: Object, prototype: Object, relations: Object) {
+  const descriptors = Object.getOwnPropertyDescriptors(prototype)
+  for (const name in descriptors) {
+    if (name === 'constructor' || name === 'hasAttribute') {
+      continue
+    }
+
+    try {
+      const result = get_value_and_type_of_property(descriptors[name], instance)
+      if (!result || !(result['value'] instanceof Relation)) {
+        continue
+      }
+
+      relations[result['relationName']] = {
+        mappedTo: name,
+        type: result['type']
+      }
+    } catch (error) {
+      continue
+    }
+  }
+}
+
+export function findRelationsForModel(model: NajsEloquent.Model.IModel<any>) {
+  const relations = {}
+  const modelPrototype = Object.getPrototypeOf(model)
+  find_relations_in_prototype(model, modelPrototype, relations)
+
+  const basePrototypes = find_base_prototypes(modelPrototype, Eloquent.prototype)
+  for (const prototype of basePrototypes) {
+    if (prototype !== Eloquent.prototype) {
+      find_relations_in_prototype(model, prototype, relations)
+    }
+  }
+  
+  Object.defineProperty(modelPrototype, 'relations', {
+    value: relations
+  })
+}
 
 export class ModelRelation implements Najs.Contracts.Eloquent.Component {
   static className = NajsEloquent.Model.Component.ModelRelation
@@ -53,12 +115,13 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
     return model[mapping.mapTo].call(model)
   }
 
-  static defineRelationProperty: NajsEloquent.Model.ModelMethod<any> = async function(name: string) {
+  static defineRelationProperty: NajsEloquent.Model.ModelMethod<any> = function(name: string) {
     console.warn('Relation feature is not available until v0.4.0')
     if (this['__sample']) {
       this['relationName'] = name
     }
     // TODO: always returns RelationFactory
+    return new RelationFactory()
   }
 }
 register(ModelRelation)

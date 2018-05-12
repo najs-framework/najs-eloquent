@@ -12,7 +12,6 @@ const ModelSerialization_1 = require("./components/ModelSerialization");
 const ModelActiveRecord_1 = require("./components/ModelActiveRecord");
 const ModelTimestamps_1 = require("./components/ModelTimestamps");
 const ModelSoftDeletes_1 = require("./components/ModelSoftDeletes");
-const ModelRelation_1 = require("./components/ModelRelation");
 const collect = require('collect.js');
 class Model {
     /**
@@ -56,8 +55,7 @@ const defaultComponents = [
     najs_binding_1.make(ModelSerialization_1.ModelSerialization.className),
     najs_binding_1.make(ModelActiveRecord_1.ModelActiveRecord.className),
     najs_binding_1.make(ModelTimestamps_1.ModelTimestamps.className),
-    najs_binding_1.make(ModelSoftDeletes_1.ModelSoftDeletes.className),
-    najs_binding_1.make(ModelRelation_1.ModelRelation.className)
+    najs_binding_1.make(ModelSoftDeletes_1.ModelSoftDeletes.className)
 ];
 for (const component of defaultComponents) {
     component.extend(Model.prototype, [], {});

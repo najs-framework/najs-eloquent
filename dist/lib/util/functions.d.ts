@@ -11,3 +11,4 @@ export declare function in_array<T>(key: T, ...args: T[][]): boolean;
  * @param {mixed[]} array
  */
 export declare function array_unique<T>(...array: Array<T[] | ArrayLike<any>>): T[];
+export declare function find_base_prototypes(prototype: Object, root: Object): Object[];

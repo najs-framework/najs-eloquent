@@ -1,5 +1,6 @@
 /// <reference path="../../contracts/Component.d.ts" />
 /// <reference path="../interfaces/IModel.d.ts" />
+export declare function findRelationsForModel(model: NajsEloquent.Model.IModel<any>): void;
 export declare class ModelRelation implements Najs.Contracts.Eloquent.Component {
     static className: string;
     getClassName(): string;

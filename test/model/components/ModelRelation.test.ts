@@ -2,8 +2,7 @@ import 'jest'
 // import * as Sinon from 'sinon'
 import { ClassSetting } from '../../../lib/util/ClassSetting'
 import { Eloquent } from '../../../lib/model/Eloquent'
-import { ModelRelation } from '../../../lib/model/components/ModelRelation'
-// import { ModelSetting } from '../../../lib/model/components/ModelSetting'
+import { ModelRelation, findRelationsForModel } from '../../../lib/model/components/ModelRelation'
 import { DummyDriver } from '../../../lib/drivers/DummyDriver'
 import { EloquentDriverProvider } from '../../../lib/facades/global/EloquentDriverProviderFacade'
 
@@ -119,6 +118,101 @@ describe('ModelRelation', function() {
 
       it('always return a RelationFactory instance', function() {
         // TODO: here
+      })
+    })
+
+    describe('findRelationsForModel()', function() {
+      it('looks all relations definition in Model and create an "relations" object in prototype', function() {
+        class A extends Eloquent {
+          static className: string = 'A'
+
+          getBabyRelation() {
+            return this.defineRelationProperty('baby').hasOne('test')
+          }
+        }
+
+        const instance = new A()
+        findRelationsForModel(instance)
+        expect(instance['relations']).toEqual({
+          baby: { mappedTo: 'getBabyRelation', type: 'function' }
+        })
+        expect(A.prototype['relations'] === instance['relations']).toBe(true)
+      })
+
+      it('also works with relation defined in getter', function() {
+        class B extends Eloquent {
+          static className: string = 'B'
+
+          get babyRelation() {
+            return this.defineRelationProperty('baby').hasOne('test')
+          }
+        }
+
+        const instance = new B()
+        findRelationsForModel(instance)
+
+        expect(instance['relations']).toEqual({
+          baby: { mappedTo: 'babyRelation', type: 'getter' }
+        })
+        expect(B.prototype['relations'] === instance['relations']).toBe(true)
+      })
+
+      it('skip if the model has no relation definition', function() {
+        class C extends Eloquent {
+          static className: string = 'C'
+
+          getBaby() {
+            return 'invalid'
+          }
+        }
+
+        const instance = new C()
+        findRelationsForModel(instance)
+
+        expect(instance['relations']).toEqual({})
+        expect(C.prototype['relations'] === instance['relations']).toBe(true)
+      })
+
+      it('handles any error could happen when try to read defined relations', function() {
+        class D extends Eloquent {
+          static className: string = 'D'
+
+          getSomething() {
+            throw Error()
+          }
+        }
+
+        const instance = new D()
+        findRelationsForModel(instance)
+
+        expect(instance['relations']).toEqual({})
+        expect(D.prototype['relations'] === instance['relations']).toBe(true)
+      })
+
+      it('also works with inheritance relations', function() {
+        class E extends Eloquent {
+          static className: string = 'E'
+
+          get babyRelation() {
+            return this.defineRelationProperty('baby').hasOne('test')
+          }
+        }
+        class F extends E {
+          static className: string = 'F'
+
+          getCindyRelation() {
+            return this.defineRelationProperty('cindy').hasOne('test')
+          }
+        }
+
+        const instance = new F()
+        findRelationsForModel(instance)
+
+        expect(instance['relations']).toEqual({
+          baby: { mappedTo: 'babyRelation', type: 'getter' },
+          cindy: { mappedTo: 'getCindyRelation', type: 'function' }
+        })
+        expect(F.prototype['relations'] === instance['relations']).toBe(true)
       })
     })
   })
