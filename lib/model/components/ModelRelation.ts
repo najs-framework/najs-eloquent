@@ -34,26 +34,25 @@ function get_value_and_type_of_property(descriptor: PropertyDescriptor, instance
   return undefined
 }
 
+function find_relation_by_descriptor(name: string, descriptor: PropertyDescriptor, instance: Object, relations: Object) {
+  try {
+    const result = get_value_and_type_of_property(descriptor, instance)
+    if (result && result['value'] instanceof Relation) {
+      relations[result['relationName']] = {
+        mappedTo: name,
+        type: result['type']
+      }
+    }
+  } catch (error) {}
+}
+
 function find_relations_in_prototype(instance: Object, prototype: Object, relations: Object) {
   const descriptors = Object.getOwnPropertyDescriptors(prototype)
   for (const name in descriptors) {
     if (name === 'constructor' || name === 'hasAttribute') {
       continue
     }
-
-    try {
-      const result = get_value_and_type_of_property(descriptors[name], instance)
-      if (!result || !(result['value'] instanceof Relation)) {
-        continue
-      }
-
-      relations[result['relationName']] = {
-        mappedTo: name,
-        type: result['type']
-      }
-    } catch (error) {
-      continue
-    }
+    find_relation_by_descriptor(name, descriptors[name], instance, relations)
   }
 }
 
@@ -68,7 +67,7 @@ export function findRelationsForModel(model: NajsEloquent.Model.IModel<any>) {
       find_relations_in_prototype(model, prototype, relations)
     }
   }
-  
+
   Object.defineProperty(modelPrototype, 'relations', {
     value: relations
   })

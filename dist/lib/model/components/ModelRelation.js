@@ -30,25 +30,25 @@ function get_value_and_type_of_property(descriptor, instance) {
     }
     return undefined;
 }
+function find_relation_by_descriptor(name, descriptor, instance, relations) {
+    try {
+        const result = get_value_and_type_of_property(descriptor, instance);
+        if (result && result['value'] instanceof Relation_1.Relation) {
+            relations[result['relationName']] = {
+                mappedTo: name,
+                type: result['type']
+            };
+        }
+    }
+    catch (error) { }
+}
 function find_relations_in_prototype(instance, prototype, relations) {
     const descriptors = Object.getOwnPropertyDescriptors(prototype);
     for (const name in descriptors) {
         if (name === 'constructor' || name === 'hasAttribute') {
             continue;
         }
-        try {
-            const result = get_value_and_type_of_property(descriptors[name], instance);
-            if (!result || !(result['value'] instanceof Relation_1.Relation)) {
-                continue;
-            }
-            relations[result['relationName']] = {
-                mappedTo: name,
-                type: result['type']
-            };
-        }
-        catch (error) {
-            continue;
-        }
+        find_relation_by_descriptor(name, descriptors[name], instance, relations);
     }
 }
 function findRelationsForModel(model) {
