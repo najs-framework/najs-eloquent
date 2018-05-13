@@ -1,10 +1,12 @@
+import { Relation } from './Relation'
+
 export type RelationInfo = {
   model: string
   table: string
   key: string
 }
 
-export class HasOneOrMany {
+export class HasOneOrMany extends Relation {
   /**
    * Store local RelationInfo, it always has 1 record
    */
@@ -18,7 +20,11 @@ export class HasOneOrMany {
    */
   protected is1v1: boolean
 
-  constructor(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo) {
+  getClassName(): string {
+    return 'HasOneOrMany'
+  }
+
+  setup(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo) {
     this.is1v1 = oneToOne
     this.local = local
     this.foreign = foreign
@@ -30,6 +36,14 @@ export class HasOneOrMany {
     }
     return this.loadByForeign(model)
   }
+
+  protected buildData() {
+    return undefined
+  }
+
+  async lazyLoad() {}
+
+  async eagerLoad() {}
 
   loadByLocal(localModel: any) {
     const foreignModel = <any>{}

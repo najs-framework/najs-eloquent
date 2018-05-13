@@ -1,5 +1,15 @@
 /// <reference path="../../model/interfaces/IModel.d.ts" />
 declare namespace NajsEloquent.Relation {
+    type RelationMap = {
+        mapTo: string;
+        type: 'getter' | 'function';
+    };
+    type RelationData = {
+        factory: IRelationFactory;
+        isLoaded?: boolean;
+        loadType?: 'lazy' | 'eager';
+        data?: any;
+    };
     interface IRelation {
         /**
          * Get the relation name.
@@ -8,7 +18,7 @@ declare namespace NajsEloquent.Relation {
         /**
          * Get new query based on the relation.
          */
-        getData<T>(): T | null;
+        getData<T>(): T | undefined;
         /**
          * Determine the relationship is loaded or not.
          */
@@ -16,20 +26,14 @@ declare namespace NajsEloquent.Relation {
         /**
          * Lazy load relation data.
          */
-        lazyLoad<T>(parentModel: Model.IModel<T>): Promise<any>;
+        lazyLoad(): Promise<void>;
         /**
          * Lazy load relation data.
          */
-        eagerLoad<T>(parentModel: Model.IModel<T>): Promise<any>;
+        eagerLoad(): Promise<void>;
         /**
          * Get RelationDataBucket which contains eager data.
          */
         getDataBucket(): IRelationDataBucket;
-        /**
-         * Set RelationDataBucket which contains eager data.
-         *
-         * @param {IRelationDataBucket} bucket
-         */
-        setDataBucket(bucket: IRelationDataBucket): this;
     }
 }

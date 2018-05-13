@@ -30,39 +30,39 @@ function get_value_and_type_of_property(descriptor, instance) {
     }
     return undefined;
 }
-function find_relation_by_descriptor(name, descriptor, instance, relations) {
+function find_relation(name, descriptor, instance, relationsMap) {
     try {
         const result = get_value_and_type_of_property(descriptor, instance);
         if (result && result['value'] instanceof Relation_1.Relation) {
-            relations[result['relationName']] = {
-                mappedTo: name,
+            relationsMap[result['relationName']] = {
+                mapTo: name,
                 type: result['type']
             };
         }
     }
     catch (error) { }
 }
-function find_relations_in_prototype(instance, prototype, relations) {
+function find_relations_in_prototype(instance, prototype, relationsMap) {
     const descriptors = Object.getOwnPropertyDescriptors(prototype);
     for (const name in descriptors) {
         if (name === 'constructor' || name === 'hasAttribute') {
             continue;
         }
-        find_relation_by_descriptor(name, descriptors[name], instance, relations);
+        find_relation(name, descriptors[name], instance, relationsMap);
     }
 }
 function findRelationsForModel(model) {
-    const relations = {};
+    const relationsMap = {};
     const modelPrototype = Object.getPrototypeOf(model);
-    find_relations_in_prototype(model, modelPrototype, relations);
+    find_relations_in_prototype(model, modelPrototype, relationsMap);
     const basePrototypes = functions_1.find_base_prototypes(modelPrototype, Eloquent_1.Eloquent.prototype);
     for (const prototype of basePrototypes) {
         if (prototype !== Eloquent_1.Eloquent.prototype) {
-            find_relations_in_prototype(model, prototype, relations);
+            find_relations_in_prototype(model, prototype, relationsMap);
         }
     }
-    Object.defineProperty(modelPrototype, 'relations', {
-        value: relations
+    Object.defineProperty(modelPrototype, 'relationsMap', {
+        value: relationsMap
     });
 }
 exports.findRelationsForModel = findRelationsForModel;
@@ -76,10 +76,10 @@ class ModelRelation {
         prototype['defineRelationProperty'] = ModelRelation.defineRelationProperty;
     }
     static callMappedRelationByName(model, name) {
-        if (typeof model['relations'] === 'undefined' || typeof model['relations'][name] === 'undefined') {
+        if (typeof model['relationsMap'] === 'undefined' || typeof model['relationsMap'][name] === 'undefined') {
             throw new Error(`Relation "${name}" is not found in model "${model.getModelName()}".`);
         }
-        const mapping = model['relations'][name];
+        const mapping = model['relationsMap'][name];
         if (mapping.type === 'getter') {
             return model[mapping.mapTo];
         }
@@ -109,7 +109,7 @@ ModelRelation.defineRelationProperty = function (name) {
         this['relationName'] = name;
     }
     // TODO: always returns RelationFactory
-    return new RelationFactory_1.RelationFactory();
+    return new RelationFactory_1.RelationFactory(this, name);
 };
 exports.ModelRelation = ModelRelation;
 najs_binding_1.register(ModelRelation);

@@ -1,7 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class HasOneOrMany {
-    constructor(oneToOne, local, foreign) {
+const Relation_1 = require("./Relation");
+class HasOneOrMany extends Relation_1.Relation {
+    getClassName() {
+        return 'HasOneOrMany';
+    }
+    setup(oneToOne, local, foreign) {
         this.is1v1 = oneToOne;
         this.local = local;
         this.foreign = foreign;
@@ -12,6 +16,11 @@ class HasOneOrMany {
         }
         return this.loadByForeign(model);
     }
+    buildData() {
+        return undefined;
+    }
+    async lazyLoad() { }
+    async eagerLoad() { }
     loadByLocal(localModel) {
         const foreignModel = {};
         const query = foreignModel.newQuery().where(this.foreign.key, localModel.getAttribute(this.local.key));

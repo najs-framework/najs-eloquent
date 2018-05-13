@@ -3,14 +3,20 @@
 declare namespace NajsEloquent.Model {
     class IModelRelation {
         /**
-         * Relation data bucket which is used for eager load
+         * Relation data bucket which is used for eager load.
          */
         protected relationDataBucket: Relation.IRelationDataBucket;
+        /**
+         * Relations mapping information, this is shared for all instances.
+         */
+        protected relationsMap: {
+            [name: string]: Relation.RelationMap;
+        };
+        /**
+         * Relation information, which store relations data for each model instance.
+         */
         protected relations: {
-            [name: string]: {
-                mapTo: string;
-                type: 'getter' | 'function';
-            };
+            [name: string]: Relation.RelationData;
         };
     }
     interface IModelRelation {

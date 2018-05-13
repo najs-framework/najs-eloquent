@@ -44,7 +44,7 @@ describe('ModelRelation', function () {
             });
         });
         describe('.getRelationByName()', function () {
-            it('throws an Error if there is no "relations" variable', function () {
+            it('throws an Error if there is no "relationsMap" variable', function () {
                 try {
                     const user = new User();
                     user.getRelationByName('post');
@@ -55,10 +55,10 @@ describe('ModelRelation', function () {
                 }
                 expect('Should not reach this line').toEqual('Hmm');
             });
-            it('throws an Error if there is no relation configuration in this."relations"', function () {
+            it('throws an Error if there is no relation configuration in this."relationsMap"', function () {
                 try {
                     const user = new User();
-                    user['relations'] = {};
+                    user['relationsMap'] = {};
                     user.getRelationByName('post');
                 }
                 catch (error) {
@@ -75,12 +75,12 @@ describe('ModelRelation', function () {
                 }
                 ModelA.className = 'ModelA';
                 const model = new ModelA();
-                model['relations'] = {
+                model['relationsMap'] = {
                     user: { mapTo: 'userRelation', type: 'getter' }
                 };
                 expect(model.getRelationByName('user')).toEqual('user-relation');
             });
-            it('returns result of function if mapping relations has type "function"', function () {
+            it('returns result of function if mapping relationsMap has type "function"', function () {
                 class ModelA extends Eloquent_1.Eloquent {
                     getUserRelation() {
                         return 'user-relation';
@@ -88,7 +88,7 @@ describe('ModelRelation', function () {
                 }
                 ModelA.className = 'ModelA';
                 const model = new ModelA();
-                model['relations'] = {
+                model['relationsMap'] = {
                     user: { mapTo: 'getUserRelation', type: 'function' }
                 };
                 expect(model.getRelationByName('user')).toEqual('user-relation');
@@ -108,7 +108,7 @@ describe('ModelRelation', function () {
             });
         });
         describe('findRelationsForModel()', function () {
-            it('looks all relations definition in Model and create an "relations" object in prototype', function () {
+            it('looks all relationsMap definition in Model and create an "relationsMap" object in prototype', function () {
                 class A extends Eloquent_1.Eloquent {
                     getBabyRelation() {
                         return this.defineRelationProperty('baby').hasOne('test');
@@ -117,10 +117,10 @@ describe('ModelRelation', function () {
                 A.className = 'A';
                 const instance = new A();
                 ModelRelation_1.findRelationsForModel(instance);
-                expect(instance['relations']).toEqual({
-                    baby: { mappedTo: 'getBabyRelation', type: 'function' }
+                expect(instance['relationsMap']).toEqual({
+                    baby: { mapTo: 'getBabyRelation', type: 'function' }
                 });
-                expect(A.prototype['relations'] === instance['relations']).toBe(true);
+                expect(A.prototype['relationsMap'] === instance['relationsMap']).toBe(true);
             });
             it('also works with relation defined in getter', function () {
                 class B extends Eloquent_1.Eloquent {
@@ -131,10 +131,10 @@ describe('ModelRelation', function () {
                 B.className = 'B';
                 const instance = new B();
                 ModelRelation_1.findRelationsForModel(instance);
-                expect(instance['relations']).toEqual({
-                    baby: { mappedTo: 'babyRelation', type: 'getter' }
+                expect(instance['relationsMap']).toEqual({
+                    baby: { mapTo: 'babyRelation', type: 'getter' }
                 });
-                expect(B.prototype['relations'] === instance['relations']).toBe(true);
+                expect(B.prototype['relationsMap'] === instance['relationsMap']).toBe(true);
             });
             it('skip if the model has no relation definition', function () {
                 class C extends Eloquent_1.Eloquent {
@@ -145,8 +145,8 @@ describe('ModelRelation', function () {
                 C.className = 'C';
                 const instance = new C();
                 ModelRelation_1.findRelationsForModel(instance);
-                expect(instance['relations']).toEqual({});
-                expect(C.prototype['relations'] === instance['relations']).toBe(true);
+                expect(instance['relationsMap']).toEqual({});
+                expect(C.prototype['relationsMap'] === instance['relationsMap']).toBe(true);
             });
             it('handles any error could happen when try to read defined relations', function () {
                 class D extends Eloquent_1.Eloquent {
@@ -157,8 +157,8 @@ describe('ModelRelation', function () {
                 D.className = 'D';
                 const instance = new D();
                 ModelRelation_1.findRelationsForModel(instance);
-                expect(instance['relations']).toEqual({});
-                expect(D.prototype['relations'] === instance['relations']).toBe(true);
+                expect(instance['relationsMap']).toEqual({});
+                expect(D.prototype['relationsMap'] === instance['relationsMap']).toBe(true);
             });
             it('also works with inheritance relations', function () {
                 class E extends Eloquent_1.Eloquent {
@@ -175,11 +175,11 @@ describe('ModelRelation', function () {
                 F.className = 'F';
                 const instance = new F();
                 ModelRelation_1.findRelationsForModel(instance);
-                expect(instance['relations']).toEqual({
-                    baby: { mappedTo: 'babyRelation', type: 'getter' },
-                    cindy: { mappedTo: 'getCindyRelation', type: 'function' }
+                expect(instance['relationsMap']).toEqual({
+                    baby: { mapTo: 'babyRelation', type: 'getter' },
+                    cindy: { mapTo: 'getCindyRelation', type: 'function' }
                 });
-                expect(F.prototype['relations'] === instance['relations']).toBe(true);
+                expect(F.prototype['relationsMap'] === instance['relationsMap']).toBe(true);
             });
         });
     });
