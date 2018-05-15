@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
-// import * as Sinon from 'sinon'
 const ClassSetting_1 = require("../../../lib/util/ClassSetting");
 const Eloquent_1 = require("../../../lib/model/Eloquent");
 const ModelRelation_1 = require("../../../lib/model/components/ModelRelation");
 const DummyDriver_1 = require("../../../lib/drivers/DummyDriver");
 const EloquentDriverProviderFacade_1 = require("../../../lib/facades/global/EloquentDriverProviderFacade");
+const RelationFactory_1 = require("../../../lib/relations/RelationFactory");
 EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy', true);
 describe('ModelRelation', function () {
     describe('Unit', function () {
@@ -55,43 +55,25 @@ describe('ModelRelation', function () {
                 }
                 expect('Should not reach this line').toEqual('Hmm');
             });
-            it('throws an Error if there is no relation configuration in this."relationsMap"', function () {
-                try {
-                    const user = new User();
-                    user['relationsMap'] = {};
-                    user.getRelationByName('post');
-                }
-                catch (error) {
-                    expect(error.message).toEqual('Relation "post" is not found in model "User".');
-                    return;
-                }
-                expect('Should not reach this line').toEqual('Hmm');
-            });
             it('returns the property if mapping relations has type "getter"', function () {
                 class ModelA extends Eloquent_1.Eloquent {
-                    get userRelation() {
-                        return 'user-relation';
+                    get postRelation() {
+                        return this.defineRelationProperty('post').hasOne('Test');
                     }
                 }
                 ModelA.className = 'ModelA';
                 const model = new ModelA();
-                model['relationsMap'] = {
-                    user: { mapTo: 'userRelation', type: 'getter' }
-                };
-                expect(model.getRelationByName('user')).toEqual('user-relation');
+                expect(model.getRelationByName('post').getAttachedPropertyName()).toEqual('post');
             });
             it('returns result of function if mapping relationsMap has type "function"', function () {
                 class ModelA extends Eloquent_1.Eloquent {
                     getUserRelation() {
-                        return 'user-relation';
+                        return this.defineRelationProperty('post').hasOne('Test');
                     }
                 }
                 ModelA.className = 'ModelA';
                 const model = new ModelA();
-                model['relationsMap'] = {
-                    user: { mapTo: 'getUserRelation', type: 'function' }
-                };
-                expect(model.getRelationByName('user')).toEqual('user-relation');
+                expect(model.getRelationByName('post').getAttachedPropertyName()).toEqual('post');
             });
         });
         describe('.defineRelationProperty()', function () {
@@ -103,8 +85,13 @@ describe('ModelRelation', function () {
                 sample.defineRelationProperty('test');
                 expect(sample['relationName']).toEqual('test');
             });
-            it('always return a RelationFactory instance', function () {
-                // TODO: here
+            it('always returns a RelationFactory instance which cached in "relations"', function () {
+                const user = new User();
+                const relationFactory = user.defineRelationProperty('test');
+                expect(relationFactory).toBeInstanceOf(RelationFactory_1.RelationFactory);
+                expect(user['relations']['test'].factory === relationFactory).toBe(true);
+                expect(user.defineRelationProperty('test') === relationFactory).toBe(true);
+                expect(user.defineRelationProperty('other') === relationFactory).toBe(false);
             });
         });
         describe('findRelationsForModel()', function () {
@@ -116,7 +103,6 @@ describe('ModelRelation', function () {
                 }
                 A.className = 'A';
                 const instance = new A();
-                ModelRelation_1.findRelationsForModel(instance);
                 expect(instance['relationsMap']).toEqual({
                     baby: { mapTo: 'getBabyRelation', type: 'function' }
                 });
@@ -130,7 +116,6 @@ describe('ModelRelation', function () {
                 }
                 B.className = 'B';
                 const instance = new B();
-                ModelRelation_1.findRelationsForModel(instance);
                 expect(instance['relationsMap']).toEqual({
                     baby: { mapTo: 'babyRelation', type: 'getter' }
                 });
@@ -144,7 +129,6 @@ describe('ModelRelation', function () {
                 }
                 C.className = 'C';
                 const instance = new C();
-                ModelRelation_1.findRelationsForModel(instance);
                 expect(instance['relationsMap']).toEqual({});
                 expect(C.prototype['relationsMap'] === instance['relationsMap']).toBe(true);
             });
@@ -156,7 +140,6 @@ describe('ModelRelation', function () {
                 }
                 D.className = 'D';
                 const instance = new D();
-                ModelRelation_1.findRelationsForModel(instance);
                 expect(instance['relationsMap']).toEqual({});
                 expect(D.prototype['relationsMap'] === instance['relationsMap']).toBe(true);
             });
@@ -174,7 +157,6 @@ describe('ModelRelation', function () {
                 }
                 F.className = 'F';
                 const instance = new F();
-                ModelRelation_1.findRelationsForModel(instance);
                 expect(instance['relationsMap']).toEqual({
                     baby: { mapTo: 'babyRelation', type: 'getter' },
                     cindy: { mapTo: 'getCindyRelation', type: 'function' }

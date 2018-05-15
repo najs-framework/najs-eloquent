@@ -51,7 +51,7 @@ function find_relations_in_prototype(instance, prototype, relationsMap) {
         find_relation(name, descriptors[name], instance, relationsMap);
     }
 }
-function findRelationsForModel(model) {
+function findRelationsMapForModel(model) {
     const relationsMap = {};
     const modelPrototype = Object.getPrototypeOf(model);
     find_relations_in_prototype(model, modelPrototype, relationsMap);
@@ -65,7 +65,7 @@ function findRelationsForModel(model) {
         value: relationsMap
     });
 }
-exports.findRelationsForModel = findRelationsForModel;
+exports.findRelationsMapForModel = findRelationsMapForModel;
 class ModelRelation {
     getClassName() {
         return constants_1.NajsEloquent.Model.Component.ModelRelation;
@@ -108,8 +108,12 @@ ModelRelation.defineRelationProperty = function (name) {
     if (this['__sample']) {
         this['relationName'] = name;
     }
-    // TODO: always returns RelationFactory
-    return new RelationFactory_1.RelationFactory(this, name);
+    if (typeof this['relations'][name] === 'undefined') {
+        this['relations'][name] = {
+            factory: new RelationFactory_1.RelationFactory(this, name)
+        };
+    }
+    return this['relations'][name].factory;
 };
 exports.ModelRelation = ModelRelation;
 najs_binding_1.register(ModelRelation);

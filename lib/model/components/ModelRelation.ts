@@ -56,7 +56,7 @@ function find_relations_in_prototype(instance: Object, prototype: Object, relati
   }
 }
 
-export function findRelationsForModel(model: NajsEloquent.Model.IModel<any>) {
+export function findRelationsMapForModel(model: NajsEloquent.Model.IModel<any>) {
   const relationsMap = {}
   const modelPrototype = Object.getPrototypeOf(model)
   find_relations_in_prototype(model, modelPrototype, relationsMap)
@@ -119,8 +119,13 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
     if (this['__sample']) {
       this['relationName'] = name
     }
-    // TODO: always returns RelationFactory
-    return new RelationFactory(this, name)
+
+    if (typeof this['relations'][name] === 'undefined') {
+      this['relations'][name] = {
+        factory: new RelationFactory(this, name)
+      }
+    }
+    return this['relations'][name].factory
   }
 }
 register(ModelRelation)
