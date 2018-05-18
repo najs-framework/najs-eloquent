@@ -100,7 +100,7 @@ namespace NajsEloquent.Model {
      * @param {string} field
      * @param {mixed} value
      */
-    whereNot(field: string, value: any): this
+    whereNot(field: string, value: any): QueryBuilderWrapper
 
     /**
      * Add a "where in" clause to the query.
