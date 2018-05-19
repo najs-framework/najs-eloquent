@@ -11,6 +11,12 @@ class User extends Model_1.Model {
 }
 User.className = 'User';
 describe('NajsEloquent', function () {
+    describe('.getDriver()', function () {
+        it('returns this.driver', function () {
+            const model = new User();
+            expect(model.getDriver() === model['driver']).toBe(true);
+        });
+    });
     describe('.getRecordName()', function () {
         it('returns this.driver.getRecordName()', function () {
             const model = new User();

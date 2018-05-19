@@ -9,6 +9,7 @@ export declare class Model<T = any> {
      * @param {boolean|undefined} isGuarded
      */
     constructor(data?: Object, isGuarded?: boolean);
+    getDriver(): Najs.Contracts.Eloquent.Driver<T>;
     getModelName(): string;
     getRecordName(): string;
     is(model: this | NajsEloquent.Model.IModel<T>): boolean;

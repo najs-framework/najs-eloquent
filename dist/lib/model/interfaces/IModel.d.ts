@@ -33,6 +33,10 @@ declare namespace NajsEloquent.Model {
          */
         getClassName(): string;
         /**
+         * Get driver attached with the model.
+         */
+        getDriver(): Najs.Contracts.Eloquent.Driver<T>;
+        /**
          * Get model name of the model, returns .getClassName() by default.
          */
         getModelName(): string;

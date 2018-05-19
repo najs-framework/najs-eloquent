@@ -4,7 +4,7 @@ export declare abstract class Relation {
     protected rootModel: NajsEloquent.Model.IModel<any>;
     protected name: string;
     constructor(rootModel: NajsEloquent.Model.IModel<any>, name: string);
-    protected abstract buildData<T>(): T | undefined;
+    abstract buildData<T>(): T | undefined;
     abstract getClassName(): string;
     abstract lazyLoad(): Promise<void>;
     abstract eagerLoad(): Promise<void>;

@@ -43,7 +43,9 @@ function find_relation(name: string, descriptor: PropertyDescriptor, instance: O
         type: result['type']
       }
     }
-  } catch (error) {}
+  } catch (error) {
+    // console.error(error)
+  }
 }
 
 function find_relations_in_prototype(instance: Object, prototype: Object, relationsMap: Object) {
@@ -86,7 +88,7 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
   }
 
   static load: NajsEloquent.Model.ModelMethod<any> = async function() {
-    console.warn('Relation feature is not available until v0.4.0')
+    ModelRelation.warningNotAvailableUntilVersion4()
     // const relations: string[] = flatten(arguments)
     // for (const relationName of relations) {
     //   this.getRelationByName(relationName).lazyLoad(this)
@@ -95,7 +97,7 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
   }
 
   static getRelationByName: NajsEloquent.Model.ModelMethod<any> = function(name: string) {
-    console.warn('Relation feature is not available until v0.4.0')
+    ModelRelation.warningNotAvailableUntilVersion4()
     // const relationNames = name.split('.')
     // for (const relationName of relationNames) {
     //   return this[relationName]
@@ -115,17 +117,22 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
   }
 
   static defineRelationProperty: NajsEloquent.Model.ModelMethod<any> = function(name: string) {
-    console.warn('Relation feature is not available until v0.4.0')
+    ModelRelation.warningNotAvailableUntilVersion4()
     if (this['__sample']) {
       this['relationName'] = name
+      return new RelationFactory(this, name, true)
     }
 
     if (typeof this['relations'][name] === 'undefined') {
       this['relations'][name] = {
-        factory: new RelationFactory(this, name)
+        factory: new RelationFactory(this, name, false)
       }
     }
     return this['relations'][name].factory
+  }
+
+  static warningNotAvailableUntilVersion4() {
+    console.warn('Relation feature is not available until v0.4.0')
   }
 }
 register(ModelRelation)

@@ -7,6 +7,7 @@ const ModelRelation_1 = require("../../../lib/model/components/ModelRelation");
 const DummyDriver_1 = require("../../../lib/drivers/DummyDriver");
 const EloquentDriverProviderFacade_1 = require("../../../lib/facades/global/EloquentDriverProviderFacade");
 const RelationFactory_1 = require("../../../lib/relations/RelationFactory");
+const najs_binding_1 = require("najs-binding");
 EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy', true);
 describe('ModelRelation', function () {
     describe('Unit', function () {
@@ -37,6 +38,10 @@ describe('ModelRelation', function () {
         class User extends Eloquent_1.Eloquent {
         }
         User.className = 'User';
+        class Test extends Eloquent_1.Eloquent {
+        }
+        Test.className = 'Test';
+        najs_binding_1.register(Test);
         describe('.load()', function () {
             it('does nothing for now', function () {
                 const user = new User();
@@ -58,7 +63,7 @@ describe('ModelRelation', function () {
             it('returns the property if mapping relations has type "getter"', function () {
                 class ModelA extends Eloquent_1.Eloquent {
                     get postRelation() {
-                        return this.defineRelationProperty('post').hasOne('Test');
+                        return this.defineRelationProperty('post').hasOne(Test);
                     }
                 }
                 ModelA.className = 'ModelA';
@@ -98,7 +103,7 @@ describe('ModelRelation', function () {
             it('looks all relationsMap definition in Model and create an "relationsMap" object in prototype', function () {
                 class A extends Eloquent_1.Eloquent {
                     getBabyRelation() {
-                        return this.defineRelationProperty('baby').hasOne('test');
+                        return this.defineRelationProperty('baby').hasOne('Test');
                     }
                 }
                 A.className = 'A';
@@ -111,7 +116,7 @@ describe('ModelRelation', function () {
             it('also works with relation defined in getter', function () {
                 class B extends Eloquent_1.Eloquent {
                     get babyRelation() {
-                        return this.defineRelationProperty('baby').hasOne('test');
+                        return this.defineRelationProperty('baby').hasOne('Test');
                     }
                 }
                 B.className = 'B';
@@ -146,13 +151,13 @@ describe('ModelRelation', function () {
             it('also works with inheritance relations', function () {
                 class E extends Eloquent_1.Eloquent {
                     get babyRelation() {
-                        return this.defineRelationProperty('baby').hasOne('test');
+                        return this.defineRelationProperty('baby').hasOne('Test');
                     }
                 }
                 E.className = 'E';
                 class F extends E {
                     getCindyRelation() {
-                        return this.defineRelationProperty('cindy').hasOne('test');
+                        return this.defineRelationProperty('cindy').hasOne('Test');
                     }
                 }
                 F.className = 'F';

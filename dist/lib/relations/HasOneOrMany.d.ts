@@ -5,6 +5,7 @@ export declare type RelationInfo = {
     key: string;
 };
 export declare class HasOneOrMany extends Relation {
+    static className: string;
     /**
      * Store local RelationInfo, it always has 1 record
      */
@@ -19,10 +20,7 @@ export declare class HasOneOrMany extends Relation {
     protected is1v1: boolean;
     getClassName(): string;
     setup(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo): void;
-    load(model: any): any;
-    protected buildData(): undefined;
+    buildData(): undefined;
     lazyLoad(): Promise<void>;
     eagerLoad(): Promise<void>;
-    loadByLocal(localModel: any): any;
-    loadByForeign(foreignModel: any): any;
 }

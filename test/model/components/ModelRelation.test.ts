@@ -5,6 +5,7 @@ import { ModelRelation } from '../../../lib/model/components/ModelRelation'
 import { DummyDriver } from '../../../lib/drivers/DummyDriver'
 import { EloquentDriverProvider } from '../../../lib/facades/global/EloquentDriverProviderFacade'
 import { RelationFactory } from '../../../lib/relations/RelationFactory'
+import { register } from 'najs-binding'
 
 EloquentDriverProvider.register(DummyDriver, 'dummy', true)
 
@@ -40,6 +41,11 @@ describe('ModelRelation', function() {
       static className: string = 'User'
     }
 
+    class Test extends Eloquent {
+      static className: string = 'Test'
+    }
+    register(Test)
+
     describe('.load()', function() {
       it('does nothing for now', function() {
         const user = new User()
@@ -64,7 +70,7 @@ describe('ModelRelation', function() {
           static className: string = 'ModelA'
 
           get postRelation() {
-            return this.defineRelationProperty('post').hasOne('Test')
+            return this.defineRelationProperty('post').hasOne(Test)
           }
         }
         const model = new ModelA()
@@ -112,7 +118,7 @@ describe('ModelRelation', function() {
           static className: string = 'A'
 
           getBabyRelation() {
-            return this.defineRelationProperty('baby').hasOne('test')
+            return this.defineRelationProperty('baby').hasOne('Test')
           }
         }
 
@@ -128,7 +134,7 @@ describe('ModelRelation', function() {
           static className: string = 'B'
 
           get babyRelation() {
-            return this.defineRelationProperty('baby').hasOne('test')
+            return this.defineRelationProperty('baby').hasOne('Test')
           }
         }
 
@@ -175,14 +181,14 @@ describe('ModelRelation', function() {
           static className: string = 'E'
 
           get babyRelation() {
-            return this.defineRelationProperty('baby').hasOne('test')
+            return this.defineRelationProperty('baby').hasOne('Test')
           }
         }
         class F extends E {
           static className: string = 'F'
 
           getCindyRelation() {
-            return this.defineRelationProperty('cindy').hasOne('test')
+            return this.defineRelationProperty('cindy').hasOne('Test')
           }
         }
 

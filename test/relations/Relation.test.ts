@@ -100,7 +100,7 @@ describe('Relation', function() {
         async lazyLoad() {}
         async eagerLoad() {}
 
-        protected buildData<T>(): T | undefined {
+        buildData<T>(): T | undefined {
           return <any>'build-data'
         }
       }

@@ -10,7 +10,7 @@ export abstract class Relation {
     this.name = name
   }
 
-  protected abstract buildData<T>(): T | undefined
+  abstract buildData<T>(): T | undefined
   abstract getClassName(): string
   abstract lazyLoad(): Promise<void>
   abstract eagerLoad(): Promise<void>

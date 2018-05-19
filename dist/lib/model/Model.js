@@ -31,6 +31,9 @@ class Model {
             this.attributes = this.driver.getRecord();
         }
     }
+    getDriver() {
+        return this.driver;
+    }
     getModelName() {
         return najs_binding_2.getClassName(this);
     }

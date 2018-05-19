@@ -40,7 +40,9 @@ function find_relation(name, descriptor, instance, relationsMap) {
             };
         }
     }
-    catch (error) { }
+    catch (error) {
+        // console.error(error)
+    }
 }
 function find_relations_in_prototype(instance, prototype, relationsMap) {
     const descriptors = Object.getOwnPropertyDescriptors(prototype);
@@ -85,10 +87,13 @@ class ModelRelation {
         }
         return model[mapping.mapTo].call(model);
     }
+    static warningNotAvailableUntilVersion4() {
+        console.warn('Relation feature is not available until v0.4.0');
+    }
 }
 ModelRelation.className = constants_1.NajsEloquent.Model.Component.ModelRelation;
 ModelRelation.load = async function () {
-    console.warn('Relation feature is not available until v0.4.0');
+    ModelRelation.warningNotAvailableUntilVersion4();
     // const relations: string[] = flatten(arguments)
     // for (const relationName of relations) {
     //   this.getRelationByName(relationName).lazyLoad(this)
@@ -96,7 +101,7 @@ ModelRelation.load = async function () {
     // return this
 };
 ModelRelation.getRelationByName = function (name) {
-    console.warn('Relation feature is not available until v0.4.0');
+    ModelRelation.warningNotAvailableUntilVersion4();
     // const relationNames = name.split('.')
     // for (const relationName of relationNames) {
     //   return this[relationName]
@@ -104,13 +109,14 @@ ModelRelation.getRelationByName = function (name) {
     return ModelRelation.callMappedRelationByName(this, name);
 };
 ModelRelation.defineRelationProperty = function (name) {
-    console.warn('Relation feature is not available until v0.4.0');
+    ModelRelation.warningNotAvailableUntilVersion4();
     if (this['__sample']) {
         this['relationName'] = name;
+        return new RelationFactory_1.RelationFactory(this, name, true);
     }
     if (typeof this['relations'][name] === 'undefined') {
         this['relations'][name] = {
-            factory: new RelationFactory_1.RelationFactory(this, name)
+            factory: new RelationFactory_1.RelationFactory(this, name, false)
         };
     }
     return this['relations'][name].factory;

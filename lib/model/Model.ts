@@ -34,6 +34,10 @@ export class Model<T = any> {
     }
   }
 
+  getDriver() {
+    return this.driver
+  }
+
   getModelName() {
     return getClassName(this)
   }

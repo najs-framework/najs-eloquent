@@ -1,38 +1,29 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const najs_binding_1 = require("najs-binding");
 const Relation_1 = require("./Relation");
+const constants_1 = require("../constants");
 class HasOneOrMany extends Relation_1.Relation {
     getClassName() {
-        return 'HasOneOrMany';
+        return constants_1.NajsEloquent.Relation.HasOneOrMany;
     }
     setup(oneToOne, local, foreign) {
         this.is1v1 = oneToOne;
         this.local = local;
         this.foreign = foreign;
     }
-    load(model) {
-        if (model.getModelName() === this.local.model) {
-            return this.loadByLocal(model);
-        }
-        return this.loadByForeign(model);
-    }
+    // load(model: any): any {
+    //   if (model.getModelName() === this.local.model) {
+    //     return this.loadByLocal(model)
+    //   }
+    //   return this.loadByForeign(model)
+    // }
     buildData() {
         return undefined;
     }
     async lazyLoad() { }
     async eagerLoad() { }
-    loadByLocal(localModel) {
-        const foreignModel = {};
-        const query = foreignModel.newQuery().where(this.foreign.key, localModel.getAttribute(this.local.key));
-        if (this.is1v1) {
-            return query.first();
-        }
-        return query.get();
-    }
-    loadByForeign(foreignModel) {
-        const localModel = {};
-        const query = localModel.newQuery().where(this.local.key, foreignModel.getAttribute(this.foreign.key));
-        return query.first();
-    }
 }
+HasOneOrMany.className = constants_1.NajsEloquent.Relation.HasOneOrMany;
 exports.HasOneOrMany = HasOneOrMany;
+najs_binding_1.register(HasOneOrMany, constants_1.NajsEloquent.Relation.HasOneOrMany);

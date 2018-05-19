@@ -1,4 +1,6 @@
+import { register } from 'najs-binding'
 import { Relation } from './Relation'
+import { NajsEloquent } from '../constants'
 
 export type RelationInfo = {
   model: string
@@ -7,6 +9,8 @@ export type RelationInfo = {
 }
 
 export class HasOneOrMany extends Relation {
+  static className: string = NajsEloquent.Relation.HasOneOrMany
+
   /**
    * Store local RelationInfo, it always has 1 record
    */
@@ -21,7 +25,7 @@ export class HasOneOrMany extends Relation {
   protected is1v1: boolean
 
   getClassName(): string {
-    return 'HasOneOrMany'
+    return NajsEloquent.Relation.HasOneOrMany
   }
 
   setup(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo) {
@@ -30,14 +34,14 @@ export class HasOneOrMany extends Relation {
     this.foreign = foreign
   }
 
-  load(model: any): any {
-    if (model.getModelName() === this.local.model) {
-      return this.loadByLocal(model)
-    }
-    return this.loadByForeign(model)
-  }
+  // load(model: any): any {
+  //   if (model.getModelName() === this.local.model) {
+  //     return this.loadByLocal(model)
+  //   }
+  //   return this.loadByForeign(model)
+  // }
 
-  protected buildData() {
+  buildData() {
     return undefined
   }
 
@@ -45,18 +49,19 @@ export class HasOneOrMany extends Relation {
 
   async eagerLoad() {}
 
-  loadByLocal(localModel: any) {
-    const foreignModel = <any>{}
-    const query = foreignModel.newQuery().where(this.foreign.key, localModel.getAttribute(this.local.key))
-    if (this.is1v1) {
-      return query.first()
-    }
-    return query.get()
-  }
+  // loadByLocal(localModel: any) {
+  //   const foreignModel = <any>{}
+  //   const query = foreignModel.newQuery().where(this.foreign.key, localModel.getAttribute(this.local.key))
+  //   if (this.is1v1) {
+  //     return query.first()
+  //   }
+  //   return query.get()
+  // }
 
-  loadByForeign(foreignModel: any) {
-    const localModel = <any>{}
-    const query = localModel.newQuery().where(this.local.key, foreignModel.getAttribute(this.foreign.key))
-    return query.first()
-  }
+  // loadByForeign(foreignModel: any) {
+  //   const localModel = <any>{}
+  //   const query = localModel.newQuery().where(this.local.key, foreignModel.getAttribute(this.foreign.key))
+  //   return query.first()
+  // }
 }
+register(HasOneOrMany, NajsEloquent.Relation.HasOneOrMany)
