@@ -20,11 +20,7 @@ export class RelationFactory implements NajsEloquent.Relation.IRelationFactory {
   }
 
   hasOne(model: string | NajsEloquent.Model.ModelDefinition<any>, foreignKey?: string, localKey?: string): any {
-    if (this.isSample) {
-      return make(NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name])
-    }
-
-    if (!this.relation) {
+    return this.setupRelation(NajsEloquent.Relation.HasOneOrMany, () => {
       const relation: HasOneOrMany = make(NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name])
       const foreign: NajsEloquent.Model.IModel<any> = this.getModelByNameOrDefinition(model)
       relation.setup(
@@ -40,7 +36,18 @@ export class RelationFactory implements NajsEloquent.Relation.IRelationFactory {
           key: foreignKey || foreign.getDriver().formatAttributeName(`${this.rootModel.getModelName()}Id`)
         }
       )
-      this.relation = relation
+
+      return relation
+    })
+  }
+
+  protected setupRelation(className: string, setup: () => NajsEloquent.Relation.IRelation) {
+    if (this.isSample) {
+      return make(className, [this.rootModel, this.name])
+    }
+
+    if (!this.relation) {
+      this.relation = setup()
     }
     return this.relation
   }

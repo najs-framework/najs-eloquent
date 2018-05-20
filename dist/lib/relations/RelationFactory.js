@@ -13,10 +13,7 @@ class RelationFactory {
         this.isSample = isSample;
     }
     hasOne(model, foreignKey, localKey) {
-        if (this.isSample) {
-            return najs_binding_1.make(constants_1.NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name]);
-        }
-        if (!this.relation) {
+        return this.setupRelation(constants_1.NajsEloquent.Relation.HasOneOrMany, () => {
             const relation = najs_binding_1.make(constants_1.NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name]);
             const foreign = this.getModelByNameOrDefinition(model);
             relation.setup(true, {
@@ -28,7 +25,15 @@ class RelationFactory {
                 table: foreign.getRecordName(),
                 key: foreignKey || foreign.getDriver().formatAttributeName(`${this.rootModel.getModelName()}Id`)
             });
-            this.relation = relation;
+            return relation;
+        });
+    }
+    setupRelation(className, setup) {
+        if (this.isSample) {
+            return najs_binding_1.make(className, [this.rootModel, this.name]);
+        }
+        if (!this.relation) {
+            this.relation = setup();
         }
         return this.relation;
     }

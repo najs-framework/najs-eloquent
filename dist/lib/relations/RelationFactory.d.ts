@@ -9,5 +9,6 @@ export declare class RelationFactory implements NajsEloquent.Relation.IRelationF
     protected isSample: boolean;
     constructor(rootModel: NajsEloquent.Model.IModel<any>, name: string, isSample: boolean);
     hasOne(model: string | NajsEloquent.Model.ModelDefinition<any>, foreignKey?: string, localKey?: string): any;
+    protected setupRelation(className: string, setup: () => NajsEloquent.Relation.IRelation): {};
     protected getModelByNameOrDefinition(model: string | Function): NajsEloquent.Model.IModel<any>;
 }
