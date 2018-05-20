@@ -75,6 +75,23 @@ export function findRelationsMapForModel(model: NajsEloquent.Model.IModel<any>) 
   })
 }
 
+function define_relation_property_if_needed(model: NajsEloquent.Model.IModel<any>, name: string) {
+  const prototype = Object.getPrototypeOf(model)
+  const propertyDescriptor = Object.getOwnPropertyDescriptor(prototype, name)
+  if (propertyDescriptor) {
+    return
+  }
+
+  Object.defineProperty(prototype, name, {
+    get: function(this: NajsEloquent.Model.IModel<any>) {
+      if (typeof this['relationsMap'][name] === 'undefined') {
+        throw new Error(`Relation "${name}" is not defined in model "${this.getModelName()}".`)
+      }
+      return this.getRelationByName(name).getData()
+    }
+  })
+}
+
 export class ModelRelation implements Najs.Contracts.Eloquent.Component {
   static className = NajsEloquent.Model.Component.ModelRelation
   getClassName(): string {
@@ -124,6 +141,7 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
     }
 
     if (typeof this['relations'][name] === 'undefined') {
+      define_relation_property_if_needed(this, name)
       this['relations'][name] = {
         factory: new RelationFactory(this, name, false)
       }

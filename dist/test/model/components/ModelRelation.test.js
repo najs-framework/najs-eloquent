@@ -98,6 +98,34 @@ describe('ModelRelation', function () {
                 expect(user.defineRelationProperty('test') === relationFactory).toBe(true);
                 expect(user.defineRelationProperty('other') === relationFactory).toBe(false);
             });
+            it('calls define_relation_property_if_needed() and define the give property in model', function () {
+                class HasOneUser extends Eloquent_1.Eloquent {
+                    getUserRelation() {
+                        return this.defineRelationProperty('user').hasOne('User');
+                    }
+                }
+                HasOneUser.className = 'HasOneUser';
+                const model = new HasOneUser();
+                expect(Object.getOwnPropertyDescriptor(HasOneUser.prototype, 'user')).not.toBeUndefined();
+                expect(model['user']).toBeUndefined();
+            });
+            it('define_relation_property_if_needed() throws error if it is not define in right way', function () {
+                class HasOneUserError extends Eloquent_1.Eloquent {
+                    getUserRelation() {
+                        return this.defineRelationProperty('user');
+                    }
+                }
+                HasOneUserError.className = 'HasOneUserError';
+                const model = new HasOneUserError();
+                try {
+                    expect(model['user']).toBeUndefined();
+                }
+                catch (error) {
+                    expect(error.message).toEqual('Relation "user" is not defined in model "HasOneUserError".');
+                    return;
+                }
+                expect('should not reach this line').toEqual('hm');
+            });
         });
         describe('findRelationsForModel()', function () {
             it('looks all relationsMap definition in Model and create an "relationsMap" object in prototype', function () {

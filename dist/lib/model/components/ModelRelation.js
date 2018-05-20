@@ -68,6 +68,21 @@ function findRelationsMapForModel(model) {
     });
 }
 exports.findRelationsMapForModel = findRelationsMapForModel;
+function define_relation_property_if_needed(model, name) {
+    const prototype = Object.getPrototypeOf(model);
+    const propertyDescriptor = Object.getOwnPropertyDescriptor(prototype, name);
+    if (propertyDescriptor) {
+        return;
+    }
+    Object.defineProperty(prototype, name, {
+        get: function () {
+            if (typeof this['relationsMap'][name] === 'undefined') {
+                throw new Error(`Relation "${name}" is not defined in model "${this.getModelName()}".`);
+            }
+            return this.getRelationByName(name).getData();
+        }
+    });
+}
 class ModelRelation {
     getClassName() {
         return constants_1.NajsEloquent.Model.Component.ModelRelation;
@@ -115,6 +130,7 @@ ModelRelation.defineRelationProperty = function (name) {
         return new RelationFactory_1.RelationFactory(this, name, true);
     }
     if (typeof this['relations'][name] === 'undefined') {
+        define_relation_property_if_needed(this, name);
         this['relations'][name] = {
             factory: new RelationFactory_1.RelationFactory(this, name, false)
         };
