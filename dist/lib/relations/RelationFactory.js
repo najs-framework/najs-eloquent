@@ -28,6 +28,22 @@ class RelationFactory {
             return this.setupHasOneOrMany(true, localInfo, foreignInfo);
         });
     }
+    belongsTo(model, foreignKey, localKey) {
+        return this.setupRelation(constants_1.NajsEloquent.Relation.HasOneOrMany, () => {
+            const local = this.getModelByNameOrDefinition(model);
+            const localInfo = {
+                model: local.getModelName(),
+                table: local.getRecordName(),
+                key: localKey || local.getPrimaryKeyName()
+            };
+            const foreignInfo = {
+                model: this.rootModel.getModelName(),
+                table: this.rootModel.getRecordName(),
+                key: foreignKey || this.rootModel.getDriver().formatAttributeName(`${local.getModelName()}Id`)
+            };
+            return this.setupHasOneOrMany(true, localInfo, foreignInfo);
+        });
+    }
     setupHasOneOrMany(oneToOne, local, foreign) {
         const relation = najs_binding_1.make(constants_1.NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name]);
         relation.setup(true, local, foreign);

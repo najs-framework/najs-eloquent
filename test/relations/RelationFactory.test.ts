@@ -90,10 +90,10 @@ describe('RelationFactory', function() {
   })
 
   describe('.hasOne()', function() {
-    class User extends Eloquent {
-      static className = 'User'
+    class ModelA extends Eloquent {
+      static className = 'ModelA'
     }
-    register(User)
+    register(ModelA)
 
     it('calls .setupRelation() with class "NajsEloquent.Relation.HasOneOrMany" by default', function() {
       const factory = new RelationFactory(<any>{}, 'test', true)
@@ -103,7 +103,7 @@ describe('RelationFactory', function() {
     })
 
     it('creates an localInfo from rootModel, foreignInfo from model in the first param', function() {
-      const factory = new RelationFactory(new User(), 'test', false)
+      const factory = new RelationFactory(new ModelA(), 'test', false)
       const setupHasOneOrManyStub = Sinon.stub(factory, 'setupHasOneOrMany')
 
       factory.hasOne('Test')
@@ -111,14 +111,130 @@ describe('RelationFactory', function() {
         setupHasOneOrManyStub.calledWith(
           true,
           {
-            model: 'User',
-            table: 'users',
+            model: 'ModelA',
+            table: 'model_as',
             key: 'id'
           },
           {
             model: 'Test',
             table: 'tests',
-            key: 'user_id'
+            key: 'model_a_id'
+          }
+        )
+      ).toBe(true)
+    })
+
+    it('can created with custom foreign key in the second param and local key in third param', function() {
+      const factory = new RelationFactory(new ModelA(), 'test', false)
+      const setupHasOneOrManyStub = Sinon.stub(factory, 'setupHasOneOrMany')
+
+      factory.hasOne('Test', 'test_foreign_id')
+      expect(
+        setupHasOneOrManyStub.calledWith(
+          true,
+          {
+            model: 'ModelA',
+            table: 'model_as',
+            key: 'id'
+          },
+          {
+            model: 'Test',
+            table: 'tests',
+            key: 'test_foreign_id'
+          }
+        )
+      ).toBe(true)
+
+      delete factory['relation']
+      factory.hasOne('Test', 'test_foreign_id', 'anything')
+      expect(
+        setupHasOneOrManyStub.calledWith(
+          true,
+          {
+            model: 'ModelA',
+            table: 'model_as',
+            key: 'anything'
+          },
+          {
+            model: 'Test',
+            table: 'tests',
+            key: 'test_foreign_id'
+          }
+        )
+      ).toBe(true)
+    })
+  })
+
+  describe('.belongsTo()', function() {
+    class ModelB extends Eloquent {
+      static className = 'ModelB'
+    }
+    register(ModelB)
+
+    it('calls .setupRelation() with class "NajsEloquent.Relation.HasOneOrMany" by default', function() {
+      const factory = new RelationFactory(<any>{}, 'test', true)
+      const setupRelationStub = Sinon.stub(factory, 'setupRelation')
+      factory.belongsTo('Test')
+      expect(setupRelationStub.calledWith('NajsEloquent.Relation.HasOneOrMany')).toBe(true)
+    })
+
+    it('creates an local from model in the first param, foreignInfo from rootModel', function() {
+      const factory = new RelationFactory(new ModelB(), 'test', false)
+      const setupHasOneOrManyStub = Sinon.stub(factory, 'setupHasOneOrMany')
+
+      factory.belongsTo('Test')
+      expect(
+        setupHasOneOrManyStub.calledWith(
+          true,
+          {
+            model: 'Test',
+            table: 'tests',
+            key: 'id'
+          },
+          {
+            model: 'ModelB',
+            table: 'model_bs',
+            key: 'test_id'
+          }
+        )
+      ).toBe(true)
+    })
+
+    it('can created with custom foreign key in the second param and local key in third param', function() {
+      const factory = new RelationFactory(new ModelB(), 'test', false)
+      const setupHasOneOrManyStub = Sinon.stub(factory, 'setupHasOneOrMany')
+
+      factory.belongsTo('Test', 'test_foreign_id')
+      expect(
+        setupHasOneOrManyStub.calledWith(
+          true,
+          {
+            model: 'Test',
+            table: 'tests',
+            key: 'id'
+          },
+          {
+            model: 'ModelB',
+            table: 'model_bs',
+            key: 'test_foreign_id'
+          }
+        )
+      ).toBe(true)
+
+      delete factory['relation']
+      factory.belongsTo('Test', 'test_foreign_id', 'anything')
+      expect(
+        setupHasOneOrManyStub.calledWith(
+          true,
+          {
+            model: 'Test',
+            table: 'tests',
+            key: 'anything'
+          },
+          {
+            model: 'ModelB',
+            table: 'model_bs',
+            key: 'test_foreign_id'
           }
         )
       ).toBe(true)
