@@ -4,7 +4,7 @@
 
 import './HasOneOrMany'
 import { NajsEloquent } from '../constants'
-import { HasOneOrMany } from './HasOneOrMany'
+import { RelationInfo, HasOneOrMany } from './HasOneOrMany'
 import { make } from 'najs-binding'
 
 export class RelationFactory implements NajsEloquent.Relation.IRelationFactory {
@@ -21,27 +21,28 @@ export class RelationFactory implements NajsEloquent.Relation.IRelationFactory {
 
   hasOne(model: string | NajsEloquent.Model.ModelDefinition<any>, foreignKey?: string, localKey?: string): any {
     return this.setupRelation(NajsEloquent.Relation.HasOneOrMany, () => {
-      const relation: HasOneOrMany = make(NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name])
       const foreign: NajsEloquent.Model.IModel<any> = this.getModelByNameOrDefinition(model)
-      relation.setup(
-        true,
-        {
-          model: this.rootModel.getModelName(),
-          table: this.rootModel.getRecordName(),
-          key: localKey || this.rootModel.getPrimaryKey()
-        },
-        {
-          model: foreign.getModelName(),
-          table: foreign.getRecordName(),
-          key: foreignKey || foreign.getDriver().formatAttributeName(`${this.rootModel.getModelName()}Id`)
-        }
-      )
-
-      return relation
+      const localInfo = {
+        model: this.rootModel.getModelName(),
+        table: this.rootModel.getRecordName(),
+        key: localKey || this.rootModel.getPrimaryKeyName()
+      }
+      const foreignInfo = {
+        model: foreign.getModelName(),
+        table: foreign.getRecordName(),
+        key: foreignKey || foreign.getDriver().formatAttributeName(`${this.rootModel.getModelName()}Id`)
+      }
+      return this.setupHasOneOrMany(true, localInfo, foreignInfo)
     })
   }
 
-  protected setupRelation(className: string, setup: () => NajsEloquent.Relation.IRelation) {
+  setupHasOneOrMany(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo) {
+    const relation: HasOneOrMany = make(NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name])
+    relation.setup(true, local, foreign)
+    return relation
+  }
+
+  setupRelation(className: string, setup: () => NajsEloquent.Relation.IRelation) {
     if (this.isSample) {
       return make(className, [this.rootModel, this.name])
     }
@@ -52,7 +53,7 @@ export class RelationFactory implements NajsEloquent.Relation.IRelationFactory {
     return this.relation
   }
 
-  protected getModelByNameOrDefinition(model: string | Function): NajsEloquent.Model.IModel<any> {
+  getModelByNameOrDefinition(model: string | Function): NajsEloquent.Model.IModel<any> {
     if (typeof model === 'function') {
       return Reflect.construct(model as Function, [])
     }

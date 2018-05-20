@@ -3,21 +3,24 @@
 import { register } from 'najs-binding'
 import { NajsEloquent } from '../constants'
 import { snakeCase } from 'lodash'
+import { plural } from 'pluralize'
 
 export class DummyDriver implements Najs.Contracts.Eloquent.Driver<Object> {
   static className: string = NajsEloquent.Driver.DummyDriver
   attributes: Object = {}
+  modelName: string
 
   getClassName(): string {
     return NajsEloquent.Driver.DummyDriver
   }
 
   initialize(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: Object): void {
+    this.modelName = model.getModelName()
     this.attributes = data || {}
   }
 
   getRecordName(): string {
-    return ''
+    return snakeCase(plural(this.modelName))
   }
 
   getRecord(): Object {

@@ -14,19 +14,24 @@ class RelationFactory {
     }
     hasOne(model, foreignKey, localKey) {
         return this.setupRelation(constants_1.NajsEloquent.Relation.HasOneOrMany, () => {
-            const relation = najs_binding_1.make(constants_1.NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name]);
             const foreign = this.getModelByNameOrDefinition(model);
-            relation.setup(true, {
+            const localInfo = {
                 model: this.rootModel.getModelName(),
                 table: this.rootModel.getRecordName(),
-                key: localKey || this.rootModel.getPrimaryKey()
-            }, {
+                key: localKey || this.rootModel.getPrimaryKeyName()
+            };
+            const foreignInfo = {
                 model: foreign.getModelName(),
                 table: foreign.getRecordName(),
                 key: foreignKey || foreign.getDriver().formatAttributeName(`${this.rootModel.getModelName()}Id`)
-            });
-            return relation;
+            };
+            return this.setupHasOneOrMany(true, localInfo, foreignInfo);
         });
+    }
+    setupHasOneOrMany(oneToOne, local, foreign) {
+        const relation = najs_binding_1.make(constants_1.NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name]);
+        relation.setup(true, local, foreign);
+        return relation;
     }
     setupRelation(className, setup) {
         if (this.isSample) {

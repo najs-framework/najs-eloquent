@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
 const constants_1 = require("../constants");
 const lodash_1 = require("lodash");
+const pluralize_1 = require("pluralize");
 class DummyDriver {
     constructor() {
         this.attributes = {};
@@ -12,10 +13,11 @@ class DummyDriver {
         return constants_1.NajsEloquent.Driver.DummyDriver;
     }
     initialize(model, isGuarded, data) {
+        this.modelName = model.getModelName();
         this.attributes = data || {};
     }
     getRecordName() {
-        return '';
+        return lodash_1.snakeCase(pluralize_1.plural(this.modelName));
     }
     getRecord() {
         return this.attributes;

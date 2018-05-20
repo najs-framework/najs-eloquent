@@ -12,13 +12,28 @@ describe('DummyDriver', function() {
   describe('.initialize()', function() {
     it('should work', function() {
       const driver = new DummyDriver()
-      driver.initialize(<any>{}, false)
+      driver.initialize(
+        <any>{
+          getModelName() {
+            return 'Test'
+          }
+        },
+        false
+      )
     })
   })
 
   describe('.getRecordName()', function() {
     it('should work', function() {
       const driver = new DummyDriver()
+      driver.initialize(
+        <any>{
+          getModelName() {
+            return 'Test'
+          }
+        },
+        false
+      )
       driver.getRecordName()
     })
   })

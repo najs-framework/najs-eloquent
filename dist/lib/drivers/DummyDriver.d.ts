@@ -2,6 +2,7 @@
 export declare class DummyDriver implements Najs.Contracts.Eloquent.Driver<Object> {
     static className: string;
     attributes: Object;
+    modelName: string;
     getClassName(): string;
     initialize(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: Object): void;
     getRecordName(): string;
