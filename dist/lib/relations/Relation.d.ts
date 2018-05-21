@@ -1,6 +1,5 @@
 /// <reference path="interfaces/IRelation.d.ts" />
-/// <reference path="../model/interfaces/IModel.d.ts" />
-/// <reference path="../model/interfaces/IModelQuery.d.ts" />
+/// <reference path="../model/interfaces/IEloquent.d.ts" />
 export declare abstract class Relation {
     protected rootModel: NajsEloquent.Model.IModel<any>;
     protected name: string;
@@ -14,5 +13,5 @@ export declare abstract class Relation {
     isLoaded(): boolean;
     getData<T>(): T | undefined;
     getDataBucket(): NajsEloquent.Relation.IRelationDataBucket | undefined;
-    getModelByName(model: string): NajsEloquent.Model.IModel<any> & NajsEloquent.Model.IModelQuery<any, NajsEloquent.Wrapper.IQueryBuilderWrapper<any>>;
+    getModelByName(model: string): NajsEloquent.Model.IEloquent<any>;
 }

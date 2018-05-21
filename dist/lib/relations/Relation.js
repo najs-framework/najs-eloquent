@@ -1,7 +1,6 @@
 "use strict";
 /// <reference path="interfaces/IRelation.ts" />
-/// <reference path="../model/interfaces/IModel.ts" />
-/// <reference path="../model/interfaces/IModelQuery.ts" />
+/// <reference path="../model/interfaces/IEloquent.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
 class Relation {

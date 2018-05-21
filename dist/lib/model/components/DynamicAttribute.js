@@ -114,7 +114,7 @@ class DynamicAttribute {
         }
     }
     static buildKnownAttributes(prototype, bases) {
-        return functions_1.array_unique(['knownAttributes', 'dynamicAttributes', 'attributes', 'settings', 'driver'], ['relationDataBucket'], ['fillable', 'guarded'], ['visible', 'hidden'], ['timestamps'], ['softDeletes'], Object.getOwnPropertyNames(prototype), ...bases.map(base => Object.getOwnPropertyNames(base)));
+        return functions_1.array_unique(['knownAttributes', 'dynamicAttributes', 'attributes', 'settings', 'driver'], ['relationDataBucket', 'relationsMap', 'relations'], ['fillable', 'guarded'], ['visible', 'hidden'], ['timestamps'], ['softDeletes'], Object.getOwnPropertyNames(prototype), ...bases.map(base => Object.getOwnPropertyNames(base)));
     }
 }
 exports.DynamicAttribute = DynamicAttribute;

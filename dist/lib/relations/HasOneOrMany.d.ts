@@ -1,4 +1,5 @@
 /// <reference path="../model/interfaces/IModel.d.ts" />
+/// <reference path="../wrappers/interfaces/IQueryBuilderWrapper.d.ts" />
 import { Relation } from './Relation';
 export declare type RelationInfo = {
     model: string;
@@ -22,6 +23,7 @@ export declare class HasOneOrMany extends Relation {
     getClassName(): string;
     setup(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo): void;
     buildData(): undefined;
-    lazyLoad(): Promise<void>;
     eagerLoad(): Promise<void>;
+    lazyLoad(): Promise<any>;
+    executeQuery(query: NajsEloquent.Wrapper.IQueryBuilderWrapper<any>): Promise<any>;
 }
