@@ -8,11 +8,12 @@ export declare class QueryBuilderWrapper<T> {
     static className: string;
     protected modelName: string;
     protected recordName: string;
-    constructor(model: string, recordName: string, queryBuilder: NajsEloquent.QueryBuilder.IQueryBuilder & NajsEloquent.QueryBuilder.IFetchResultQuery<T>);
+    protected relationDataBucket?: NajsEloquent.Relation.IRelationDataBucket;
+    constructor(model: string, recordName: string, queryBuilder: NajsEloquent.QueryBuilder.IQueryBuilder & NajsEloquent.QueryBuilder.IFetchResultQuery<T>, relationDataBucket?: NajsEloquent.Relation.IRelationDataBucket);
     getClassName(): string;
-    protected createCollection(result: Object[]): CollectJs.Collection<NajsEloquent.Model.IModel<T> & T>;
-    protected createInstance(result: Object): NajsEloquent.Model.IModel<T> & T;
-    protected createEagerBucket(): NajsEloquent.Relation.IRelationDataBucket;
+    createCollection(result: Object[]): CollectJs.Collection<NajsEloquent.Model.IModel<T> & T>;
+    createInstance(result: Object): NajsEloquent.Model.IModel<T> & T;
+    createRelationDataBucketIfNeeded(): NajsEloquent.Relation.IRelationDataBucket;
     first(id?: any): Promise<(NajsEloquent.Model.IModel<T> & T) | null>;
     find(id?: any): Promise<(NajsEloquent.Model.IModel<T> & T) | null>;
     get(...fields: Array<string | string[]>): Promise<CollectJs.Collection<NajsEloquent.Model.IModel<T> & T>>;

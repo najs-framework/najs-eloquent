@@ -421,6 +421,12 @@ describe('MongooseDriver', function() {
       expect(queryBuilderWrapper['modelName']).toEqual(driver['modelName'])
       expect(queryBuilderWrapper['queryBuilder']).toBeInstanceOf(MongooseQueryBuilder)
     })
+
+    it('transfers RelationDataBucket to new query', function() {
+      const driver = new MongooseDriver(modelInstance)
+      const queryBuilderWrapper = driver.newQuery(<any>'any')
+      expect(queryBuilderWrapper['relationDataBucket']).toEqual('any')
+    })
   })
 
   describe('.delete()', function() {

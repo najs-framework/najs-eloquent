@@ -1,5 +1,6 @@
 /// <reference types="najs-binding" />
 /// <reference path="../model/interfaces/IModel.ts" />
+/// <reference path="../relations/interfaces/IRelationDataBucket.ts" />
 /// <reference path="../wrappers/interfaces/IQueryBuilderWrapper.ts" />
 
 namespace Najs.Contracts.Eloquent {
@@ -85,7 +86,7 @@ namespace Najs.Contracts.Eloquent {
     /**
      * Create and return new query builder.
      */
-    newQuery<T>(): NajsEloquent.Wrapper.IQueryBuilderWrapper<T>
+    newQuery<T>(dataBucket?: NajsEloquent.Relation.IRelationDataBucket): NajsEloquent.Wrapper.IQueryBuilderWrapper<T>
 
     /**
      * Delete the attached model.

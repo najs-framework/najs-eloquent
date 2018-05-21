@@ -6,7 +6,7 @@ namespace NajsEloquent.Model {
     /**
      * Relation data bucket which is used for eager load.
      */
-    protected relationDataBucket: Relation.IRelationDataBucket
+    protected relationDataBucket?: Relation.IRelationDataBucket
 
     /**
      * Relations mapping information, this is shared for all instances.

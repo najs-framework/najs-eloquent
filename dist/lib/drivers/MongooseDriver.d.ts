@@ -31,7 +31,7 @@ export declare class MongooseDriver<Record extends Object> implements Najs.Contr
     setAttribute<T>(name: string, value: T): boolean;
     getPrimaryKeyName(): string;
     toObject(): Object;
-    newQuery<T>(): NajsEloquent.Wrapper.IQueryBuilderWrapper<T>;
+    newQuery<T>(dataBucket?: NajsEloquent.Relation.IRelationDataBucket): NajsEloquent.Wrapper.IQueryBuilderWrapper<T>;
     delete(softDeletes: boolean): Promise<any>;
     restore(): Promise<any>;
     save(): Promise<any>;

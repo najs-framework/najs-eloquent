@@ -150,11 +150,12 @@ export class MongooseDriver<Record extends Object> implements Najs.Contracts.Elo
     return this.attributes.toObject({ virtuals: true })
   }
 
-  newQuery<T>(): NajsEloquent.Wrapper.IQueryBuilderWrapper<T> {
-    return make(NajsEloquent.Wrapper.MongooseQueryBuilderWrapper, [
+  newQuery<T>(dataBucket?: NajsEloquent.Relation.IRelationDataBucket): NajsEloquent.Wrapper.IQueryBuilderWrapper<T> {
+    return make<NajsEloquent.Wrapper.IQueryBuilderWrapper<T>>(NajsEloquent.Wrapper.MongooseQueryBuilderWrapper, [
       this.modelName,
       this.getRecordName(),
-      make(NajsEloquent.QueryBuilder.MongooseQueryBuilder, [this.modelName, this.softDeletesSetting])
+      make(NajsEloquent.QueryBuilder.MongooseQueryBuilder, [this.modelName, this.softDeletesSetting]),
+      dataBucket
     ])
   }
 

@@ -20,32 +20,43 @@ export class QueryBuilderWrapper<T> {
   static className: string = NajsEloquent.Wrapper.QueryBuilderWrapper
   protected modelName: string
   protected recordName: string
+  protected relationDataBucket?: NajsEloquent.Relation.IRelationDataBucket
 
   constructor(
     model: string,
     recordName: string,
-    queryBuilder: NajsEloquent.QueryBuilder.IQueryBuilder & NajsEloquent.QueryBuilder.IFetchResultQuery<T>
+    queryBuilder: NajsEloquent.QueryBuilder.IQueryBuilder & NajsEloquent.QueryBuilder.IFetchResultQuery<T>,
+    relationDataBucket?: NajsEloquent.Relation.IRelationDataBucket
   ) {
     this.modelName = model
     this.recordName = recordName
     this.queryBuilder = queryBuilder
+    this.relationDataBucket = relationDataBucket
   }
 
   getClassName() {
     return NajsEloquent.Wrapper.QueryBuilderWrapper
   }
 
-  protected createCollection(result: Object[]): CollectJs.Collection<NajsEloquent.Model.IModel<T> & T> {
-    return this.createEagerBucket().newCollection<NajsEloquent.Model.IModel<T> & T>(this.recordName, result)
+  createCollection(result: Object[]): CollectJs.Collection<NajsEloquent.Model.IModel<T> & T> {
+    return this.createRelationDataBucketIfNeeded().newCollection<NajsEloquent.Model.IModel<T> & T>(
+      this.recordName,
+      result
+    )
   }
 
-  protected createInstance(result: Object): NajsEloquent.Model.IModel<T> & T {
-    return this.createEagerBucket().newInstance<NajsEloquent.Model.IModel<T> & T>(this.recordName, result)
+  createInstance(result: Object): NajsEloquent.Model.IModel<T> & T {
+    return this.createRelationDataBucketIfNeeded().newInstance<NajsEloquent.Model.IModel<T> & T>(
+      this.recordName,
+      result
+    )
   }
 
-  protected createEagerBucket(): NajsEloquent.Relation.IRelationDataBucket {
-    const eager: NajsEloquent.Relation.IRelationDataBucket = make(NajsEloquent.Relation.RelationDataBucket, [])
-    return eager.register(this.recordName, this.modelName)
+  createRelationDataBucketIfNeeded(): NajsEloquent.Relation.IRelationDataBucket {
+    if (!this.relationDataBucket) {
+      this.relationDataBucket = make(NajsEloquent.Relation.RelationDataBucket, [])
+    }
+    return this.relationDataBucket!.register(this.recordName, this.modelName)
   }
 
   async first(id?: any): Promise<(NajsEloquent.Model.IModel<T> & T) | null> {

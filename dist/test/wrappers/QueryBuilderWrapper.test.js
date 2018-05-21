@@ -7,6 +7,7 @@ const DummyDriver_1 = require("../../lib/drivers/DummyDriver");
 const Eloquent_1 = require("../../lib/model/Eloquent");
 const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
 const NotFoundError_1 = require("../../lib/errors/NotFoundError");
+const RelationDataBucket_1 = require("../../lib/relations/RelationDataBucket");
 EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy', true);
 class Test extends Eloquent_1.Eloquent {
 }
@@ -16,6 +17,20 @@ describe('QueryBuilderWrapper', function () {
     it('implements IAutoload and returns class name as "NajsEloquent.Wrapper.QueryBuilderWrapper"', function () {
         const queryBuilderWrapper = new QueryBuilderWrapper_1.QueryBuilderWrapper('Test', 'test', {});
         expect(queryBuilderWrapper.getClassName()).toEqual('NajsEloquent.Wrapper.QueryBuilderWrapper');
+    });
+    describe('protected createRelationDataBucketIfNeeded()', function () {
+        it('use make() and create new RelationDataBucket if there is no bucket yet', function () {
+            const queryBuilderWrapper = new QueryBuilderWrapper_1.QueryBuilderWrapper('Test', 'test', {});
+            const relationDataBucket = queryBuilderWrapper.createRelationDataBucketIfNeeded();
+            expect(relationDataBucket['modelMap']).toEqual({ test: 'Test' });
+        });
+        it('re-uses relationDataBucket and always call RelationDataBucket.register() before returning', function () {
+            const relationDataBucket = new RelationDataBucket_1.RelationDataBucket();
+            relationDataBucket.register('anything', 'Anything');
+            const queryBuilderWrapper = new QueryBuilderWrapper_1.QueryBuilderWrapper('Test', 'test', {}, relationDataBucket);
+            queryBuilderWrapper.createRelationDataBucketIfNeeded();
+            expect(relationDataBucket['modelMap']).toEqual({ anything: 'Anything', test: 'Test' });
+        });
     });
     describe('FORWARD_FUNCTIONS', function () {
         it('contains not overridden functions except AdvancedQuery function', function () {

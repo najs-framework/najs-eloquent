@@ -10,23 +10,26 @@ const NotFoundError_1 = require("../errors/NotFoundError");
 const functions_1 = require("../util/functions");
 const FORWARD_FUNCTIONS = functions_1.array_unique(constants_1.QueryFunctions.BasicQuery, constants_1.QueryFunctions.ConditionQuery, constants_1.QueryFunctions.SoftDeleteQuery, constants_1.QueryFunctions.FetchResultQuery.filter(item => item !== 'first' && item !== 'get'));
 class QueryBuilderWrapper {
-    constructor(model, recordName, queryBuilder) {
+    constructor(model, recordName, queryBuilder, relationDataBucket) {
         this.modelName = model;
         this.recordName = recordName;
         this.queryBuilder = queryBuilder;
+        this.relationDataBucket = relationDataBucket;
     }
     getClassName() {
         return constants_1.NajsEloquent.Wrapper.QueryBuilderWrapper;
     }
     createCollection(result) {
-        return this.createEagerBucket().newCollection(this.recordName, result);
+        return this.createRelationDataBucketIfNeeded().newCollection(this.recordName, result);
     }
     createInstance(result) {
-        return this.createEagerBucket().newInstance(this.recordName, result);
+        return this.createRelationDataBucketIfNeeded().newInstance(this.recordName, result);
     }
-    createEagerBucket() {
-        const eager = najs_binding_1.make(constants_1.NajsEloquent.Relation.RelationDataBucket, []);
-        return eager.register(this.recordName, this.modelName);
+    createRelationDataBucketIfNeeded() {
+        if (!this.relationDataBucket) {
+            this.relationDataBucket = najs_binding_1.make(constants_1.NajsEloquent.Relation.RelationDataBucket, []);
+        }
+        return this.relationDataBucket.register(this.recordName, this.modelName);
     }
     async first(id) {
         if (typeof id !== 'undefined') {

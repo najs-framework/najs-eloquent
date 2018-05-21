@@ -42,6 +42,6 @@ namespace NajsEloquent.Relation {
     /**
      * Get RelationDataBucket which contains eager data.
      */
-    getDataBucket(): IRelationDataBucket
+    getDataBucket(): IRelationDataBucket | undefined
   }
 }

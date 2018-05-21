@@ -18,11 +18,11 @@ class ModelQuery {
         return constants_1.StartQueryFunctions;
     }
     static newQuery() {
-        return this['driver'].newQuery();
+        return this['driver'].newQuery(this['relationDataBucket']);
     }
     static forwardToQueryBuilder(name) {
         return function () {
-            return this['driver'].newQuery()[name](...arguments);
+            return this['driver'].newQuery(this['relationDataBucket'])[name](...arguments);
         };
     }
 }

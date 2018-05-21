@@ -1,4 +1,5 @@
 /// <reference path="../model/interfaces/IModel.d.ts" />
+/// <reference path="../relations/interfaces/IRelationDataBucket.d.ts" />
 /// <reference path="../wrappers/interfaces/IQueryBuilderWrapper.d.ts" />
 declare namespace Najs.Contracts.Eloquent {
     interface Driver<NativeRecord> extends Najs.Contracts.Autoload {
@@ -71,7 +72,7 @@ declare namespace Najs.Contracts.Eloquent {
         /**
          * Create and return new query builder.
          */
-        newQuery<T>(): NajsEloquent.Wrapper.IQueryBuilderWrapper<T>;
+        newQuery<T>(dataBucket?: NajsEloquent.Relation.IRelationDataBucket): NajsEloquent.Wrapper.IQueryBuilderWrapper<T>;
         /**
          * Delete the attached model.
          *

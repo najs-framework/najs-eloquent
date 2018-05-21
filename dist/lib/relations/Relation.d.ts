@@ -12,5 +12,5 @@ export declare abstract class Relation {
     getAttachedPropertyName(): string;
     isLoaded(): boolean;
     getData<T>(): T | undefined;
-    getDataBucket(): NajsEloquent.Relation.IRelationDataBucket;
+    getDataBucket(): NajsEloquent.Relation.IRelationDataBucket | undefined;
 }

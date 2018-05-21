@@ -34,7 +34,7 @@ export abstract class Relation {
     return this.buildData()
   }
 
-  getDataBucket(): NajsEloquent.Relation.IRelationDataBucket {
+  getDataBucket(): NajsEloquent.Relation.IRelationDataBucket | undefined {
     return this.rootModel['relationDataBucket']
   }
 }

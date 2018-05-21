@@ -34,18 +34,16 @@ export class HasOneOrMany extends Relation {
     this.foreign = foreign
   }
 
-  // load(model: any): any {
-  //   if (model.getModelName() === this.local.model) {
-  //     return this.loadByLocal(model)
-  //   }
-  //   return this.loadByForeign(model)
-  // }
-
   buildData() {
     return undefined
   }
 
-  async lazyLoad() {}
+  async lazyLoad() {
+    // if (this.rootModel.getModelName() === this.local.model) {
+    //   return this.loadByLocal(this.rootModel)
+    // }
+    // return this.loadByForeign(this.rootModel)
+  }
 
   async eagerLoad() {}
 

@@ -117,11 +117,12 @@ class MongooseDriver {
     toObject() {
         return this.attributes.toObject({ virtuals: true });
     }
-    newQuery() {
+    newQuery(dataBucket) {
         return najs_binding_1.make(constants_1.NajsEloquent.Wrapper.MongooseQueryBuilderWrapper, [
             this.modelName,
             this.getRecordName(),
-            najs_binding_1.make(constants_1.NajsEloquent.QueryBuilder.MongooseQueryBuilder, [this.modelName, this.softDeletesSetting])
+            najs_binding_1.make(constants_1.NajsEloquent.QueryBuilder.MongooseQueryBuilder, [this.modelName, this.softDeletesSetting]),
+            dataBucket
         ]);
     }
     async delete(softDeletes) {

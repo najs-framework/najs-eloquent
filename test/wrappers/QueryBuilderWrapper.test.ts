@@ -5,6 +5,7 @@ import { DummyDriver } from '../../lib/drivers/DummyDriver'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverProviderFacade'
 import { NotFoundError } from '../../lib/errors/NotFoundError'
+import { RelationDataBucket } from '../../lib/relations/RelationDataBucket'
 
 EloquentDriverProvider.register(DummyDriver, 'dummy', true)
 
@@ -17,6 +18,22 @@ describe('QueryBuilderWrapper', function() {
   it('implements IAutoload and returns class name as "NajsEloquent.Wrapper.QueryBuilderWrapper"', function() {
     const queryBuilderWrapper = new QueryBuilderWrapper('Test', 'test', <any>{})
     expect(queryBuilderWrapper.getClassName()).toEqual('NajsEloquent.Wrapper.QueryBuilderWrapper')
+  })
+
+  describe('protected createRelationDataBucketIfNeeded()', function() {
+    it('use make() and create new RelationDataBucket if there is no bucket yet', function() {
+      const queryBuilderWrapper = new QueryBuilderWrapper('Test', 'test', <any>{})
+      const relationDataBucket = queryBuilderWrapper.createRelationDataBucketIfNeeded()
+      expect(relationDataBucket['modelMap']).toEqual({ test: 'Test' })
+    })
+
+    it('re-uses relationDataBucket and always call RelationDataBucket.register() before returning', function() {
+      const relationDataBucket = new RelationDataBucket()
+      relationDataBucket.register('anything', 'Anything')
+      const queryBuilderWrapper = new QueryBuilderWrapper('Test', 'test', <any>{}, relationDataBucket)
+      queryBuilderWrapper.createRelationDataBucketIfNeeded()
+      expect(relationDataBucket['modelMap']).toEqual({ anything: 'Anything', test: 'Test' })
+    })
   })
 
   describe('FORWARD_FUNCTIONS', function() {

@@ -22,12 +22,12 @@ export class ModelQuery implements Najs.Contracts.Eloquent.Component {
   }
 
   static newQuery(this: NajsEloquent.Model.IModel<any>): any {
-    return this['driver'].newQuery()
+    return this['driver'].newQuery(this['relationDataBucket'])
   }
 
   static forwardToQueryBuilder(name: string): any {
     return function(this: NajsEloquent.Model.IModel<any>): any {
-      return this['driver'].newQuery()[name](...arguments)
+      return this['driver'].newQuery(this['relationDataBucket'])[name](...arguments)
     }
   }
 }

@@ -351,6 +351,11 @@ describe('MongooseDriver', function () {
             expect(queryBuilderWrapper['modelName']).toEqual(driver['modelName']);
             expect(queryBuilderWrapper['queryBuilder']).toBeInstanceOf(MongooseQueryBuilder_1.MongooseQueryBuilder);
         });
+        it('transfers RelationDataBucket to new query', function () {
+            const driver = new MongooseDriver_1.MongooseDriver(modelInstance);
+            const queryBuilderWrapper = driver.newQuery('any');
+            expect(queryBuilderWrapper['relationDataBucket']).toEqual('any');
+        });
     });
     describe('.delete()', function () {
         it('calls and returns attributes.delete() if softDeletes param = true', async function () {
