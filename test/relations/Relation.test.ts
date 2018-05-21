@@ -1,4 +1,6 @@
 import 'jest'
+import * as Sinon from 'sinon'
+import * as NajsBinding from 'najs-binding'
 import { Relation } from '../../lib/relations/Relation'
 
 describe('Relation', function() {
@@ -117,6 +119,18 @@ describe('Relation', function() {
       }
       const relation: Relation = Reflect.construct(Relation, [rootModel, 'test'])
       expect(relation.getDataBucket() === relationDataBucket).toBe(true)
+    })
+  })
+
+  describe('.getModelByName()', function() {
+    it('simply uses make() to create new model by model name', function() {
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      const makeStub = Sinon.stub(NajsBinding, 'make')
+      makeStub.returns('anything')
+
+      expect(relation.getModelByName('Test')).toEqual('anything')
+      expect(makeStub.calledWith('Test')).toBe(true)
+      makeStub.restore()
     })
   })
 })

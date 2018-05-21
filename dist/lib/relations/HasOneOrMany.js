@@ -1,4 +1,5 @@
 "use strict";
+/// <reference path="../model/interfaces/IModel.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
 const Relation_1 = require("./Relation");
@@ -17,9 +18,10 @@ class HasOneOrMany extends Relation_1.Relation {
     }
     async lazyLoad() {
         // if (this.rootModel.getModelName() === this.local.model) {
-        //   return this.loadByLocal(this.rootModel)
+        //   this.loadByLocal(this.rootModel)
+        // } else {
+        //   this.loadByForeign(this.rootModel)
         // }
-        // return this.loadByForeign(this.rootModel)
     }
     async eagerLoad() { }
 }

@@ -1,6 +1,7 @@
 /// <reference path="IModel.d.ts" />
 /// <reference path="IModelQueryAdvanced.d.ts" />
 /// <reference path="../../wrappers/interfaces/IQueryBuilderWrapper.d.ts" />
+/// <reference path="../../relations/interfaces/IRelationDataBucket.d.ts" />
 declare namespace NajsEloquent.Model {
     /**
      * Interface contains query functions which attached to the model.
@@ -9,9 +10,11 @@ declare namespace NajsEloquent.Model {
      */
     interface IModelQuery<T, QueryBuilderWrapper extends NajsEloquent.Wrapper.IQueryBuilderWrapper<any>> extends IModelQueryAdvanced<T> {
         /**
-         * Create new query builder for model
+         * Create new query builder for the model, attached to given relation data bucket.
+         *
+         * @param {Object} relationDataBucket
          */
-        newQuery(): QueryBuilderWrapper;
+        newQuery(relationDataBucket?: Relation.IRelationDataBucket): QueryBuilderWrapper;
         /**
          * Set the query with given name
          *

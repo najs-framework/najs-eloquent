@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
+const Sinon = require("sinon");
+const NajsBinding = require("najs-binding");
 const Relation_1 = require("../../lib/relations/Relation");
 describe('Relation', function () {
     describe('constructor()', function () {
@@ -108,6 +110,16 @@ describe('Relation', function () {
             };
             const relation = Reflect.construct(Relation_1.Relation, [rootModel, 'test']);
             expect(relation.getDataBucket() === relationDataBucket).toBe(true);
+        });
+    });
+    describe('.getModelByName()', function () {
+        it('simply uses make() to create new model by model name', function () {
+            const relation = Reflect.construct(Relation_1.Relation, [{}, 'test']);
+            const makeStub = Sinon.stub(NajsBinding, 'make');
+            makeStub.returns('anything');
+            expect(relation.getModelByName('Test')).toEqual('anything');
+            expect(makeStub.calledWith('Test')).toBe(true);
+            makeStub.restore();
         });
     });
 });

@@ -1,5 +1,8 @@
 /// <reference path="interfaces/IRelation.ts" />
 /// <reference path="../model/interfaces/IModel.ts" />
+/// <reference path="../model/interfaces/IModelQuery.ts" />
+
+import { make } from 'najs-binding'
 
 export abstract class Relation {
   protected rootModel: NajsEloquent.Model.IModel<any>
@@ -36,5 +39,12 @@ export abstract class Relation {
 
   getDataBucket(): NajsEloquent.Relation.IRelationDataBucket | undefined {
     return this.rootModel['relationDataBucket']
+  }
+
+  getModelByName(
+    model: string
+  ): NajsEloquent.Model.IModel<any> &
+    NajsEloquent.Model.IModelQuery<any, NajsEloquent.Wrapper.IQueryBuilderWrapper<any>> {
+    return make(model)
   }
 }

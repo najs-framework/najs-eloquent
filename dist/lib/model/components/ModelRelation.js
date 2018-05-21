@@ -91,6 +91,7 @@ class ModelRelation {
         prototype['load'] = ModelRelation.load;
         prototype['getRelationByName'] = ModelRelation.getRelationByName;
         prototype['defineRelationProperty'] = ModelRelation.defineRelationProperty;
+        prototype['getRelationDataBucket'] = ModelRelation.getRelationDataBucket;
     }
     static callMappedRelationByName(model, name) {
         if (typeof model['relationsMap'] === 'undefined' || typeof model['relationsMap'][name] === 'undefined') {
@@ -107,6 +108,9 @@ class ModelRelation {
     }
 }
 ModelRelation.className = constants_1.NajsEloquent.Model.Component.ModelRelation;
+ModelRelation.getRelationDataBucket = function () {
+    return this['relationDataBucket'];
+};
 ModelRelation.load = async function () {
     ModelRelation.warningNotAvailableUntilVersion4();
     // const relations: string[] = flatten(arguments)

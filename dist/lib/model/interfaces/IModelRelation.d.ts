@@ -37,6 +37,10 @@ declare namespace NajsEloquent.Model {
          * @param {string} name
          */
         defineRelationProperty(name: string): Relation.IRelationFactory;
+        /**
+         *
+         */
+        getRelationDataBucket(): Relation.IRelationDataBucket | undefined;
     }
     interface IModelRelationQuery {
         /**

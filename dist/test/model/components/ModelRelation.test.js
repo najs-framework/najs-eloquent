@@ -48,6 +48,13 @@ describe('ModelRelation', function () {
                 user.load();
             });
         });
+        describe('.getRelationDataBucket()', function () {
+            it('returns relationDataBucket property', function () {
+                const user = new User();
+                user['relationDataBucket'] = 'anything';
+                expect(user.getRelationDataBucket()).toEqual('anything');
+            });
+        });
         describe('.getRelationByName()', function () {
             it('throws an Error if there is no "relationsMap" variable', function () {
                 try {

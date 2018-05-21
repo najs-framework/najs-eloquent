@@ -84,37 +84,67 @@ describe('Eloquent/ModelQuery', function () {
                 expect(typeof User.prototype[name] === 'function').toBe(true);
             }
         });
-        it('forwards .newQuery() to driver.newQuery()', function () {
-            const driver = {
-                newQuery() {
-                    return 'anything';
-                }
-            };
-            const user = new User();
-            user['driver'] = driver;
-            expect(user.newQuery()).toEqual('anything');
-        });
-        for (const name of ModelQuery_1.ModelQuery.ForwardToQueryBuilderMethods) {
-            it('forwards all params to driver.newQuery().' + name + '()', function () {
-                const target = function () {
-                    return 'anything-' + Array.from(arguments).join('-');
-                };
-                const targetSpy = Sinon.spy(target);
+        describe('.newQuery()', function () {
+            it('forwards to driver.newQuery()', function () {
                 const driver = {
                     newQuery() {
-                        return {
-                            [name]: targetSpy
-                        };
+                        return 'anything';
                     }
                 };
                 const user = new User();
                 user['driver'] = driver;
-                expect(user[name]('a')).toEqual('anything-a');
-                expect(targetSpy.calledWith('a')).toBe(true);
-                expect(user[name]('a', 'b')).toEqual('anything-a-b');
-                expect(targetSpy.calledWith('a', 'b')).toBe(true);
-                expect(user[name](['a', 'b', 'c'])).toEqual('anything-a,b,c');
-                expect(targetSpy.calledWith(['a', 'b', 'c'])).toBe(true);
+                expect(user.newQuery()).toEqual('anything');
+            });
+            it('calls .getRelationDataBucket() and forwards to driver.newQuery() if there is no parameter', function () {
+                const driver = {
+                    newQuery(param) {
+                        return param;
+                    }
+                };
+                const user = new User();
+                user['driver'] = driver;
+                const getRelationDataBucketStub = Sinon.stub(user, 'getRelationDataBucket');
+                getRelationDataBucketStub.returns('anything');
+                expect(user.newQuery()).toEqual('anything');
+                expect(getRelationDataBucketStub.called).toBe(true);
+            });
+            it('does not call .getRelationDataBucket() and forwards the first param to driver.newQuery()', function () {
+                const driver = {
+                    newQuery(param) {
+                        return param;
+                    }
+                };
+                const user = new User();
+                user['driver'] = driver;
+                const getRelationDataBucketStub = Sinon.stub(user, 'getRelationDataBucket');
+                getRelationDataBucketStub.returns('something else');
+                expect(user.newQuery('anything')).toEqual('anything');
+                expect(getRelationDataBucketStub.called).toBe(false);
+            });
+        });
+        for (const name of ModelQuery_1.ModelQuery.ForwardToQueryBuilderMethods) {
+            describe(`.${name}()`, function () {
+                it('forwards all params to driver.newQuery().' + name + '()', function () {
+                    const target = function () {
+                        return 'anything-' + Array.from(arguments).join('-');
+                    };
+                    const targetSpy = Sinon.spy(target);
+                    const driver = {
+                        newQuery() {
+                            return {
+                                [name]: targetSpy
+                            };
+                        }
+                    };
+                    const user = new User();
+                    user['driver'] = driver;
+                    expect(user[name]('a')).toEqual('anything-a');
+                    expect(targetSpy.calledWith('a')).toBe(true);
+                    expect(user[name]('a', 'b')).toEqual('anything-a-b');
+                    expect(targetSpy.calledWith('a', 'b')).toBe(true);
+                    expect(user[name](['a', 'b', 'c'])).toEqual('anything-a,b,c');
+                    expect(targetSpy.calledWith(['a', 'b', 'c'])).toBe(true);
+                });
             });
         }
     });

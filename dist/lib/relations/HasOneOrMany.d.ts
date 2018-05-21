@@ -1,3 +1,4 @@
+/// <reference path="../model/interfaces/IModel.d.ts" />
 import { Relation } from './Relation';
 export declare type RelationInfo = {
     model: string;

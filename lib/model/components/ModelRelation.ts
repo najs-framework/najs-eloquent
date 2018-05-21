@@ -102,6 +102,11 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
     prototype['load'] = ModelRelation.load
     prototype['getRelationByName'] = ModelRelation.getRelationByName
     prototype['defineRelationProperty'] = ModelRelation.defineRelationProperty
+    prototype['getRelationDataBucket'] = ModelRelation.getRelationDataBucket
+  }
+
+  static getRelationDataBucket: NajsEloquent.Model.ModelMethod<any> = function() {
+    return this['relationDataBucket']
   }
 
   static load: NajsEloquent.Model.ModelMethod<any> = async function() {

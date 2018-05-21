@@ -1,5 +1,6 @@
 /// <reference path="../../contracts/Component.ts" />
 /// <reference path="../interfaces/IModel.ts" />
+/// <reference path="../../relations/interfaces/IRelationDataBucket.ts" />
 
 import { register } from 'najs-binding'
 import { NajsEloquent, StartQueryFunctions } from '../../constants'
@@ -21,13 +22,13 @@ export class ModelQuery implements Najs.Contracts.Eloquent.Component {
     return StartQueryFunctions
   }
 
-  static newQuery(this: NajsEloquent.Model.IModel<any>): any {
-    return this['driver'].newQuery(this['relationDataBucket'])
+  static newQuery(this: NajsEloquent.Model.IModel<any>, dataBucket?: NajsEloquent.Relation.IRelationDataBucket): any {
+    return this['driver'].newQuery(dataBucket || this.getRelationDataBucket())
   }
 
   static forwardToQueryBuilder(name: string): any {
     return function(this: NajsEloquent.Model.IModel<any>): any {
-      return this['driver'].newQuery(this['relationDataBucket'])[name](...arguments)
+      return this['driver'].newQuery(this.getRelationDataBucket())[name](...arguments)
     }
   }
 }
