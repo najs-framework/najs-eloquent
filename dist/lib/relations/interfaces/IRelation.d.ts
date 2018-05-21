@@ -6,6 +6,7 @@ declare namespace NajsEloquent.Relation {
     };
     type RelationData = {
         factory: IRelationFactory;
+        isBuilt?: boolean;
         isLoaded?: boolean;
         loadType?: 'lazy' | 'eager';
         data?: any;
@@ -18,19 +19,23 @@ declare namespace NajsEloquent.Relation {
         /**
          * Get new query based on the relation.
          */
-        getData<T>(): T | undefined;
+        getData<T>(): T | undefined | null;
         /**
          * Determine the relationship is loaded or not.
          */
         isLoaded(): boolean;
         /**
-         * Lazy load relation data.
+         * load relation data, use eagerLoad() if it's possible otherwise will use lazyLoad().
          */
-        lazyLoad(): Promise<void>;
+        load<T>(): Promise<T | undefined | null>;
         /**
          * Lazy load relation data.
          */
-        eagerLoad(): Promise<void>;
+        lazyLoad<T>(): Promise<T | undefined | null>;
+        /**
+         * Eager load relation data.
+         */
+        eagerLoad<T>(): Promise<T | undefined | null>;
         /**
          * Get RelationDataBucket which contains eager data.
          */

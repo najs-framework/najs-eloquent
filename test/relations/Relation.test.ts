@@ -14,7 +14,7 @@ describe('Relation', function() {
     })
   })
 
-  describe('protected getRelationInfo()', function() {
+  describe('.relationData', function() {
     it('returns rootModel["relations"][this.name]', function() {
       const info = {}
       const rootModel = {
@@ -23,7 +23,7 @@ describe('Relation', function() {
         }
       }
       const relation: Relation = Reflect.construct(Relation, [rootModel, 'test'])
-      expect(relation['getRelationInfo']() === info).toBe(true)
+      expect(relation.relationData === info).toBe(true)
     })
   })
 
@@ -73,8 +73,34 @@ describe('Relation', function() {
     })
   })
 
-  describe('.getData()', function() {
-    it('returns undefined if .isLoaded() returns false', function() {
+  describe('.isBuilt()', function() {
+    it('returns true if the info data contains property "isBuilt" with value === true', function() {
+      const info = {
+        isBuilt: true
+      }
+      const rootModel = {
+        relations: {
+          test: info
+        }
+      }
+      const relation: Relation = Reflect.construct(Relation, [rootModel, 'test'])
+      expect(relation.isBuilt()).toBe(true)
+    })
+
+    it('returns true if the info data contains property "isBuilt" with value === false', function() {
+      const info = {
+        isBuilt: false
+      }
+      const rootModel = {
+        relations: {
+          test: info
+        }
+      }
+      const relation: Relation = Reflect.construct(Relation, [rootModel, 'test'])
+      expect(relation.isBuilt()).toBe(false)
+    })
+
+    it('returns false if the info data does not contain property "isBuilt"', function() {
       const info = {}
       const rootModel = {
         relations: {
@@ -82,32 +108,7 @@ describe('Relation', function() {
         }
       }
       const relation: Relation = Reflect.construct(Relation, [rootModel, 'test'])
-      expect(relation.getData()).toBeUndefined()
-    })
-
-    it('returns .buildData() if .isLoaded() returns true', function() {
-      const info = {
-        isLoaded: true
-      }
-      const rootModel = {
-        relations: {
-          test: info
-        }
-      }
-      class ChildRelation extends Relation {
-        getClassName() {
-          return 'ChildRelation'
-        }
-
-        async lazyLoad() {}
-        async eagerLoad() {}
-
-        buildData<T>(): T | undefined {
-          return <any>'build-data'
-        }
-      }
-      const relation: Relation = new ChildRelation(<any>rootModel, 'test')
-      expect(relation.getData()).toEqual('build-data')
+      expect(relation.isBuilt()).toBe(false)
     })
   })
 
@@ -131,6 +132,231 @@ describe('Relation', function() {
       expect(relation.getModelByName('Test')).toEqual('anything')
       expect(makeStub.calledWith('Test')).toBe(true)
       makeStub.restore()
+    })
+  })
+
+  describe('.getData()', function() {
+    it('returns undefined if .isLoaded() returns false', function() {
+      const info = {}
+      const rootModel = {
+        relations: {
+          test: info
+        }
+      }
+      const relation: Relation = Reflect.construct(Relation, [rootModel, 'test'])
+      expect(relation.getData()).toBeUndefined()
+    })
+
+    it('returns .relationData.data if .isLoaded() returns true and .isBuilt() return true', function() {
+      const info = {
+        isLoaded: true,
+        isBuilt: true,
+        data: 'anything'
+      }
+      const rootModel = {
+        relations: {
+          test: info
+        }
+      }
+      class ChildRelation extends Relation {
+        getClassName() {
+          return 'ChildRelation'
+        }
+
+        async lazyLoad<T>(): Promise<T> {
+          return <any>{}
+        }
+
+        async eagerLoad<T>(): Promise<T> {
+          return <any>{}
+        }
+
+        buildData<T>(): T | undefined {
+          return <any>'build-data'
+        }
+      }
+      const relation: Relation = new ChildRelation(<any>rootModel, 'test')
+      expect(relation.getData()).toEqual('anything')
+    })
+
+    it('returns .buildData() if .isLoaded() returns true and .isBuilt() return false', function() {
+      const info = {
+        isLoaded: true,
+        isBuilt: false
+      }
+      const rootModel = {
+        relations: {
+          test: info
+        }
+      }
+      class ChildRelation extends Relation {
+        getClassName() {
+          return 'ChildRelation'
+        }
+
+        async lazyLoad<T>(): Promise<T> {
+          return <any>{}
+        }
+
+        async eagerLoad<T>(): Promise<T> {
+          return <any>{}
+        }
+
+        buildData<T>(): T | undefined {
+          return <any>'build-data'
+        }
+      }
+      const relation: Relation = new ChildRelation(<any>rootModel, 'test')
+      expect(relation.getData()).toEqual('build-data')
+    })
+  })
+
+  describe('.load()', function() {
+    it('returns this.relationData.data if .isLoaded() and .isBuilt() returns true', async function() {
+      const info = {
+        isLoaded: true,
+        isBuilt: true,
+        data: 'anything'
+      }
+      const rootModel = {
+        relations: {
+          test: info
+        }
+      }
+      class ChildRelation extends Relation {
+        getClassName() {
+          return 'ChildRelation'
+        }
+
+        async lazyLoad<T>(): Promise<T> {
+          return <any>{}
+        }
+
+        async eagerLoad<T>(): Promise<T> {
+          return <any>{}
+        }
+
+        buildData<T>(): T | undefined {
+          return <any>'build-data'
+        }
+      }
+      const relation: Relation = new ChildRelation(<any>rootModel, 'test')
+      expect(await relation.load()).toEqual('anything')
+    })
+
+    it('calls .lazyLoad() if there is no relationDataBucket in rootModel', async function() {
+      const rootModel = {
+        relations: {
+          test: {}
+        },
+
+        getRelationDataBucket() {
+          return undefined
+        },
+
+        isNew() {
+          return false
+        }
+      }
+      class ChildRelation extends Relation {
+        getClassName() {
+          return 'ChildRelation'
+        }
+
+        async lazyLoad<T>(): Promise<T> {
+          return <any>'lazyLoad'
+        }
+
+        async eagerLoad<T>(): Promise<T> {
+          return <any>'eagerLoad'
+        }
+
+        buildData<T>(): T | undefined {
+          return <any>'build-data'
+        }
+      }
+      const relation: Relation = new ChildRelation(<any>rootModel, 'test')
+      expect(await relation.load()).toEqual('lazyLoad')
+    })
+
+    it('throws an Error if there is no relationDataBucket and the rootModel.isNew() returns true', async function() {
+      const rootModel = {
+        relations: {
+          test: {}
+        },
+
+        getModelName() {
+          return 'Test'
+        },
+
+        getRelationDataBucket() {
+          return undefined
+        },
+
+        isNew() {
+          return true
+        }
+      }
+      class ChildRelation extends Relation {
+        getClassName() {
+          return 'ChildRelation'
+        }
+
+        async lazyLoad<T>(): Promise<T> {
+          return <any>'lazyLoad'
+        }
+
+        async eagerLoad<T>(): Promise<T> {
+          return <any>'eagerLoad'
+        }
+
+        buildData<T>(): T | undefined {
+          return <any>'build-data'
+        }
+      }
+      const relation: Relation = new ChildRelation(<any>rootModel, 'test')
+      try {
+        await relation.load()
+      } catch (error) {
+        expect(error.message).toEqual('Can not load relation "test" in a new instance of "Test".')
+        return
+      }
+      expect('should not reach this line').toEqual('Hm')
+    })
+
+    it('calls .eagerLoad() if there is a relationDataBucket in rootModel', async function() {
+      const rootModel = {
+        relations: {
+          test: {}
+        },
+
+        getRelationDataBucket() {
+          return {}
+        },
+
+        isNew() {
+          return false
+        }
+      }
+      class ChildRelation extends Relation {
+        getClassName() {
+          return 'ChildRelation'
+        }
+
+        async lazyLoad<T>(): Promise<T> {
+          return <any>'lazyLoad'
+        }
+
+        async eagerLoad<T>(): Promise<T> {
+          return <any>'eagerLoad'
+        }
+
+        buildData<T>(): T | undefined {
+          return <any>'build-data'
+        }
+      }
+      const relation: Relation = new ChildRelation(<any>rootModel, 'test')
+      expect(await relation.load()).toEqual('eagerLoad')
     })
   })
 })

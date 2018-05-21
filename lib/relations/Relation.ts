@@ -3,7 +3,7 @@
 
 import { make } from 'najs-binding'
 
-export abstract class Relation {
+export abstract class Relation implements NajsEloquent.Relation.IRelation {
   protected rootModel: NajsEloquent.Model.IModel<any>
   protected name: string
 
@@ -12,12 +12,12 @@ export abstract class Relation {
     this.name = name
   }
 
-  abstract buildData<T>(): T | undefined
   abstract getClassName(): string
-  abstract lazyLoad(): Promise<void>
-  abstract eagerLoad(): Promise<void>
+  abstract buildData<T>(): T | undefined | null
+  abstract lazyLoad<T>(): Promise<T | undefined | null>
+  abstract eagerLoad<T>(): Promise<T | undefined | null>
 
-  protected getRelationInfo(): NajsEloquent.Relation.RelationData {
+  get relationData(): NajsEloquent.Relation.RelationData {
     return this.rootModel['relations'][this.name]
   }
 
@@ -26,14 +26,11 @@ export abstract class Relation {
   }
 
   isLoaded(): boolean {
-    return !!this.getRelationInfo().isLoaded
+    return !!this.relationData.isLoaded
   }
 
-  getData<T>(): T | undefined {
-    if (!this.isLoaded()) {
-      return undefined
-    }
-    return this.buildData()
+  isBuilt(): boolean {
+    return !!this.relationData.isBuilt
   }
 
   getDataBucket(): NajsEloquent.Relation.IRelationDataBucket | undefined {
@@ -42,5 +39,33 @@ export abstract class Relation {
 
   getModelByName(model: string): NajsEloquent.Model.IEloquent<any> {
     return make(model)
+  }
+
+  getData<T>(): T | undefined | null {
+    if (!this.isLoaded()) {
+      return undefined
+    }
+
+    if (this.isBuilt()) {
+      return this.relationData.data
+    }
+
+    return this.buildData()
+  }
+
+  async load<T>(): Promise<T | undefined | null> {
+    if (this.isLoaded() && this.isBuilt()) {
+      return this.relationData.data
+    }
+
+    if (!this.rootModel.getRelationDataBucket()) {
+      if (this.rootModel.isNew()) {
+        throw new Error(`Can not load relation "${this.name}" in a new instance of "${this.rootModel.getModelName()}".`)
+      }
+
+      return this.lazyLoad<T>()
+    }
+
+    return this.eagerLoad<T>()
   }
 }

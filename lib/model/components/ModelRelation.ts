@@ -155,7 +155,7 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
   }
 
   static warningNotAvailableUntilVersion4() {
-    console.warn('Relation feature is not available until v0.4.0')
+    // console.warn('Relation feature is not available until v0.4.0')
   }
 }
 register(ModelRelation)

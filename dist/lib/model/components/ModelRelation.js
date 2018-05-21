@@ -104,7 +104,7 @@ class ModelRelation {
         return model[mapping.mapTo].call(model);
     }
     static warningNotAvailableUntilVersion4() {
-        console.warn('Relation feature is not available until v0.4.0');
+        // console.warn('Relation feature is not available until v0.4.0')
     }
 }
 ModelRelation.className = constants_1.NajsEloquent.Model.Component.ModelRelation;

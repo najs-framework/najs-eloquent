@@ -139,10 +139,10 @@ describe('HasOneOrMany - Integration - MongooseDriver', function() {
       await phone.save()
 
       const phoneData = await user.getPhoneRelation().lazyLoad()
-      console.log(phoneData['toJson']())
+      console.log(phoneData!['toJson']())
 
       const userData = await phone.getUserRelation().lazyLoad()
-      console.log(userData['toJson']())
+      console.log(userData!['toJson']())
     })
   })
 })

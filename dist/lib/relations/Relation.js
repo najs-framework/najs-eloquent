@@ -8,26 +8,44 @@ class Relation {
         this.rootModel = rootModel;
         this.name = name;
     }
-    getRelationInfo() {
+    get relationData() {
         return this.rootModel['relations'][this.name];
     }
     getAttachedPropertyName() {
         return this.name;
     }
     isLoaded() {
-        return !!this.getRelationInfo().isLoaded;
+        return !!this.relationData.isLoaded;
     }
-    getData() {
-        if (!this.isLoaded()) {
-            return undefined;
-        }
-        return this.buildData();
+    isBuilt() {
+        return !!this.relationData.isBuilt;
     }
     getDataBucket() {
         return this.rootModel['relationDataBucket'];
     }
     getModelByName(model) {
         return najs_binding_1.make(model);
+    }
+    getData() {
+        if (!this.isLoaded()) {
+            return undefined;
+        }
+        if (this.isBuilt()) {
+            return this.relationData.data;
+        }
+        return this.buildData();
+    }
+    async load() {
+        if (this.isLoaded() && this.isBuilt()) {
+            return this.relationData.data;
+        }
+        if (!this.rootModel.getRelationDataBucket()) {
+            if (this.rootModel.isNew()) {
+                throw new Error(`Can not load relation "${this.name}" in a new instance of "${this.rootModel.getModelName()}".`);
+            }
+            return this.lazyLoad();
+        }
+        return this.eagerLoad();
     }
 }
 exports.Relation = Relation;
