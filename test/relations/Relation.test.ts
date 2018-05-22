@@ -1,6 +1,7 @@
 import 'jest'
 import * as Sinon from 'sinon'
 import * as NajsBinding from 'najs-binding'
+import * as Helper from '../../lib/util/helpers'
 import { Relation } from '../../lib/relations/Relation'
 
 describe('Relation', function() {
@@ -24,6 +25,19 @@ describe('Relation', function() {
       }
       const relation: Relation = Reflect.construct(Relation, [rootModel, 'test'])
       expect(relation.relationData === info).toBe(true)
+    })
+  })
+
+  describe('.with()', function() {
+    it('simply flattens and assigns value to "loadChain"', function() {
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      expect(relation['loadChain']).toBeUndefined()
+      relation.with('test')
+      expect(relation['loadChain']).toEqual(['test'])
+      relation.with('a', 'b')
+      expect(relation['loadChain']).toEqual(['a', 'b'])
+      relation.with('a', ['b', 'c'])
+      expect(relation['loadChain']).toEqual(['a', 'b', 'c'])
     })
   })
 
@@ -444,6 +458,108 @@ describe('Relation', function() {
       }
       const relation: Relation = new ChildRelation(<any>rootModel, 'test')
       expect(await relation.load()).toEqual('eagerLoad')
+    })
+  })
+
+  describe('.loadChainRelations()', function() {
+    it('does nothing and return result (the first param) if loadChain is not found', async function() {
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      expect(await relation.loadChainRelations('test')).toEqual('test')
+    })
+
+    it('does nothing and return result (the first param) if loadChain is empty', async function() {
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      relation['loadChain'] = []
+      expect(await relation.loadChainRelations('test')).toEqual('test')
+    })
+
+    it('does nothing and return result (the first param) if it is null or undefined', async function() {
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      // tslint:disable-next-line
+      expect(await relation.loadChainRelations(null)).toBeNull()
+      expect(await relation.loadChainRelations(undefined)).toBeUndefined()
+    })
+
+    it('does nothing and return result (the first param) if it is not Model or Collection', async function() {
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      expect(await relation.loadChainRelations(123)).toEqual(123)
+      expect(await relation.loadChainRelations('string')).toEqual('string')
+
+      const array: any = []
+      expect((await relation.loadChainRelations(array)) === array).toBe(true)
+
+      const object: any = {}
+      expect((await relation.loadChainRelations(object)) === object).toBe(true)
+    })
+
+    it('calls result.load() and pass loadChain if it is a Model', async function() {
+      const isModelStub = Sinon.stub(Helper, 'isModel')
+      isModelStub.returns(true)
+      const model = {
+        load(arg: any) {
+          return arg
+        }
+      }
+      const loadSpy = Sinon.spy(model, 'load')
+
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      relation['loadChain'] = ['a', 'b']
+      expect((await relation.loadChainRelations(model)) === model).toBe(true)
+      expect(loadSpy.calledWith(['a', 'b'])).toBe(true)
+
+      isModelStub.restore()
+    })
+
+    it('does nothing and return result (the first param) if it is Collection but empty', async function() {
+      const isCollectionStub = Sinon.stub(Helper, 'isCollection')
+      isCollectionStub.returns(true)
+      const model = {
+        load(arg: any) {
+          return arg
+        }
+      }
+      const collection = {
+        isNotEmpty() {
+          return false
+        },
+        first() {
+          return model
+        }
+      }
+      const loadSpy = Sinon.spy(model, 'load')
+
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      relation['loadChain'] = ['a', 'b']
+      expect((await relation.loadChainRelations(collection)) === collection).toBe(true)
+      expect(loadSpy.calledWith(['a', 'b'])).toBe(false)
+
+      isCollectionStub.restore()
+    })
+
+    it('calls result.first().load() and pass loadChain if result is a Collection and not empty', async function() {
+      const isCollectionStub = Sinon.stub(Helper, 'isCollection')
+      isCollectionStub.returns(true)
+      const model = {
+        load(arg: any) {
+          return arg
+        }
+      }
+      const collection = {
+        isNotEmpty() {
+          return true
+        },
+        first() {
+          return model
+        }
+      }
+      const loadSpy = Sinon.spy(model, 'load')
+
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      relation['loadChain'] = ['a', 'b']
+      expect((await relation.loadChainRelations(collection)) === collection).toBe(true)
+      expect(loadSpy.calledWith(['a', 'b'])).toBe(true)
+
+      isCollectionStub.restore()
     })
   })
 })

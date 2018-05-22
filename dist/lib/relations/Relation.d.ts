@@ -1,14 +1,17 @@
 /// <reference path="interfaces/IRelation.d.ts" />
+/// <reference path="../../../lib/collect.js/index.d.ts" />
 /// <reference path="../model/interfaces/IEloquent.d.ts" />
 export declare abstract class Relation implements NajsEloquent.Relation.IRelation {
     protected rootModel: NajsEloquent.Model.IModel<any>;
     protected name: string;
+    protected loadChain: string[];
     constructor(rootModel: NajsEloquent.Model.IModel<any>, name: string);
     abstract getClassName(): string;
     abstract buildData<T>(): T | undefined | null;
     abstract lazyLoad<T>(): Promise<T | undefined | null>;
     abstract eagerLoad<T>(): Promise<T | undefined | null>;
     readonly relationData: NajsEloquent.Relation.RelationData;
+    with(...names: Array<string | string[]>): this;
     getAttachedPropertyName(): string;
     isLoaded(): boolean;
     isBuilt(): boolean;
@@ -20,4 +23,5 @@ export declare abstract class Relation implements NajsEloquent.Relation.IRelatio
     makeModelOrCollectionFromRecords(relationDataBucket: NajsEloquent.Relation.IRelationDataBucket, table: string, makeCollection: boolean, records: Object[]): any;
     getData<T>(): T | undefined | null;
     load<T>(): Promise<T | undefined | null>;
+    loadChainRelations(result: any): Promise<any>;
 }

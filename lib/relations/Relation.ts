@@ -1,11 +1,16 @@
 /// <reference path="interfaces/IRelation.ts" />
+/// <reference path="../collect.js/index.d.ts" />
 /// <reference path="../model/interfaces/IEloquent.ts" />
 
 import { make } from 'najs-binding'
+import { flatten } from 'lodash'
+import { Model } from '../model/Model'
+import { isModel, isCollection } from '../util/helpers'
 
 export abstract class Relation implements NajsEloquent.Relation.IRelation {
   protected rootModel: NajsEloquent.Model.IModel<any>
   protected name: string
+  protected loadChain: string[]
 
   constructor(rootModel: NajsEloquent.Model.IModel<any>, name: string) {
     this.rootModel = rootModel
@@ -19,6 +24,12 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
 
   get relationData(): NajsEloquent.Relation.RelationData {
     return this.rootModel['relations'][this.name]
+  }
+
+  with(...names: Array<string | string[]>) {
+    this.loadChain = flatten(arguments).filter(item => item !== '')
+
+    return this
   }
 
   getAttachedPropertyName(): string {
@@ -99,9 +110,26 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
         throw new Error(`Can not load relation "${this.name}" in a new instance of "${this.rootModel.getModelName()}".`)
       }
 
-      return this.lazyLoad<T>()
+      return this.loadChainRelations(await this.lazyLoad<T>())
     }
 
-    return this.eagerLoad<T>()
+    return this.loadChainRelations(await this.eagerLoad<T>())
+  }
+
+  async loadChainRelations(result: any): Promise<any> {
+    if (!result || !this.loadChain || this.loadChain.length === 0) {
+      return result
+    }
+
+    if (isModel(result)) {
+      await (result as Model).load(this.loadChain)
+      return result
+    }
+
+    if (isCollection(result) && (result as CollectJs.Collection<any>).isNotEmpty()) {
+      await (result as CollectJs.Collection<NajsEloquent.Model.IModel<any>>).first().load(this.loadChain)
+    }
+
+    return result
   }
 }

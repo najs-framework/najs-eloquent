@@ -17,6 +17,12 @@ declare namespace NajsEloquent.Relation {
          */
         getAttachedPropertyName(): string;
         /**
+         * Set sub-relation with will be loaded when current relation load.
+         *
+         * @param relations
+         */
+        with(...relations: Array<string | string[]>): this;
+        /**
          * Get new query based on the relation.
          */
         getData<T>(): T | undefined | null;

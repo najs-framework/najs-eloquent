@@ -110,6 +110,17 @@ describe('ModelRelation', function () {
                 const model = new ModelA();
                 expect(model.getRelationByName('post').getAttachedPropertyName()).toEqual('post');
             });
+            it('calls relation.with() and pass the rest of string if there is a dot in model string', function () {
+                class ModelA extends Eloquent_1.Eloquent {
+                    getUserRelation() {
+                        return this.defineRelationProperty('post').hasOne('Test');
+                    }
+                }
+                ModelA.className = 'ModelA';
+                const model = new ModelA();
+                const relation = model.getRelationByName('post.test');
+                expect(relation['loadChain']).toEqual(['test']);
+            });
         });
         describe('.defineRelationProperty()', function () {
             it('set name to this.relationName if the instance is sample instance', function () {

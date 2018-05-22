@@ -34,3 +34,32 @@ export function find_base_prototypes(prototype: Object, root: Object): Object[] 
   } while (count < 100 && (typeof prototype === 'undefined' || prototype !== root))
   return bases
 }
+
+export type DotNotationInfo = {
+  first: string
+  last: string
+  afterFirst: string
+  beforeLast: string
+  parts: string[]
+}
+
+export function parse_string_with_dot_notation(input: string): DotNotationInfo {
+  const parts = input.split('.').filter(item => item !== '')
+  const result = { first: '', last: '', afterFirst: '', beforeLast: '', parts: parts }
+  if (parts.length === 0) {
+    return result
+  }
+
+  if (parts.length === 1) {
+    result.first = parts[0]
+    result.last = parts[0]
+    result.afterFirst = ''
+    result.beforeLast = ''
+  } else {
+    result.first = parts[0]
+    result.last = parts[parts.length - 1]
+    result.afterFirst = parts.slice(1).join('.')
+    result.beforeLast = parts.slice(0, parts.length - 1).join('.')
+  }
+  return result
+}

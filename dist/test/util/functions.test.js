@@ -16,3 +16,27 @@ describe('in_array()', function () {
         expect(functions_1.in_array('a', ['c', 'd'], ['a', 'b'])).toBe(true);
     });
 });
+describe('parse_string_with_dot_notation()', function () {
+    it('works with empty string', function () {
+        const result = functions_1.parse_string_with_dot_notation('');
+        expect(result).toEqual({ first: '', last: '', afterFirst: '', beforeLast: '', parts: [] });
+    });
+    it('works with string has no dot notation', function () {
+        const result = functions_1.parse_string_with_dot_notation('name');
+        expect(result).toEqual({ first: 'name', last: 'name', afterFirst: '', beforeLast: '', parts: ['name'] });
+    });
+    it('works with string has dot notation', function () {
+        const dataset = {
+            'a.b': { first: 'a', last: 'b', afterFirst: 'b', beforeLast: 'a', parts: ['a', 'b'] },
+            'a.b.c': { first: 'a', last: 'c', afterFirst: 'b.c', beforeLast: 'a.b', parts: ['a', 'b', 'c'] },
+            'a.b.c.d': { first: 'a', last: 'd', afterFirst: 'b.c.d', beforeLast: 'a.b.c', parts: ['a', 'b', 'c', 'd'] },
+            'a..b.c': { first: 'a', last: 'c', afterFirst: 'b.c', beforeLast: 'a.b', parts: ['a', 'b', 'c'] },
+            'a..b..c..d': { first: 'a', last: 'd', afterFirst: 'b.c.d', beforeLast: 'a.b.c', parts: ['a', 'b', 'c', 'd'] },
+            '...': { first: '', last: '', afterFirst: '', beforeLast: '', parts: [] }
+        };
+        for (const string in dataset) {
+            const result = functions_1.parse_string_with_dot_notation(string);
+            expect(result).toEqual(dataset[string]);
+        }
+    });
+});

@@ -1,8 +1,11 @@
 "use strict";
 /// <reference path="interfaces/IRelation.ts" />
+/// <reference path="../collect.js/index.d.ts" />
 /// <reference path="../model/interfaces/IEloquent.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
+const lodash_1 = require("lodash");
+const helpers_1 = require("../util/helpers");
 class Relation {
     constructor(rootModel, name) {
         this.rootModel = rootModel;
@@ -10,6 +13,10 @@ class Relation {
     }
     get relationData() {
         return this.rootModel['relations'][this.name];
+    }
+    with(...names) {
+        this.loadChain = lodash_1.flatten(arguments).filter(item => item !== '');
+        return this;
     }
     getAttachedPropertyName() {
         return this.name;
@@ -67,9 +74,22 @@ class Relation {
             if (this.rootModel.isNew()) {
                 throw new Error(`Can not load relation "${this.name}" in a new instance of "${this.rootModel.getModelName()}".`);
             }
-            return this.lazyLoad();
+            return this.loadChainRelations(await this.lazyLoad());
         }
-        return this.eagerLoad();
+        return this.loadChainRelations(await this.eagerLoad());
+    }
+    async loadChainRelations(result) {
+        if (!result || !this.loadChain || this.loadChain.length === 0) {
+            return result;
+        }
+        if (helpers_1.isModel(result)) {
+            await result.load(this.loadChain);
+            return result;
+        }
+        if (helpers_1.isCollection(result) && result.isNotEmpty()) {
+            await result.first().load(this.loadChain);
+        }
+        return result;
     }
 }
 exports.Relation = Relation;

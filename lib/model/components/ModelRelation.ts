@@ -6,7 +6,7 @@ import { NajsEloquent } from '../../constants'
 import { Relation } from './../../relations/Relation'
 import { RelationFactory } from '../../relations/RelationFactory'
 import { Eloquent } from '../Eloquent'
-import { find_base_prototypes } from '../../util/functions'
+import { find_base_prototypes, parse_string_with_dot_notation } from '../../util/functions'
 import { flatten } from 'lodash'
 
 function get_value_and_type_of_property(descriptor: PropertyDescriptor, instance: Object) {
@@ -117,22 +117,16 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
   }
 
   static getRelationByName: NajsEloquent.Model.ModelMethod<any> = function(name: string) {
-    // const relationNames = name.split('.')
-    // for (const relationName of relationNames) {
-    //   return this[relationName]
-    // }
-    return ModelRelation.callMappedRelationByName(this, name)
-  }
-
-  static callMappedRelationByName(model: NajsEloquent.Model.IModel<any>, name: string) {
-    if (typeof model['relationsMap'] === 'undefined' || typeof model['relationsMap'][name] === 'undefined') {
-      throw new Error(`Relation "${name}" is not found in model "${model.getModelName()}".`)
+    const info = parse_string_with_dot_notation(name)
+    if (typeof this['relationsMap'] === 'undefined' || typeof this['relationsMap'][info.first] === 'undefined') {
+      throw new Error(`Relation "${info.first}" is not found in model "${this.getModelName()}".`)
     }
-    const mapping = model['relationsMap'][name]
-    if (mapping.type === 'getter') {
-      return model[mapping.mapTo]
+    const mapping = this['relationsMap'][info.first]
+    const relation = mapping.type === 'getter' ? this[mapping.mapTo] : this[mapping.mapTo].call(this)
+    if (info.afterFirst) {
+      relation.with(info.afterFirst)
     }
-    return model[mapping.mapTo].call(model)
+    return relation
   }
 
   static defineRelationProperty: NajsEloquent.Model.ModelMethod<any> = function(name: string) {

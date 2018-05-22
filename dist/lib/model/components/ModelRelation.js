@@ -93,16 +93,6 @@ class ModelRelation {
         prototype['defineRelationProperty'] = ModelRelation.defineRelationProperty;
         prototype['getRelationDataBucket'] = ModelRelation.getRelationDataBucket;
     }
-    static callMappedRelationByName(model, name) {
-        if (typeof model['relationsMap'] === 'undefined' || typeof model['relationsMap'][name] === 'undefined') {
-            throw new Error(`Relation "${name}" is not found in model "${model.getModelName()}".`);
-        }
-        const mapping = model['relationsMap'][name];
-        if (mapping.type === 'getter') {
-            return model[mapping.mapTo];
-        }
-        return model[mapping.mapTo].call(model);
-    }
 }
 ModelRelation.className = constants_1.NajsEloquent.Model.Component.ModelRelation;
 ModelRelation.getRelationDataBucket = function () {
@@ -115,11 +105,16 @@ ModelRelation.load = async function () {
     }
 };
 ModelRelation.getRelationByName = function (name) {
-    // const relationNames = name.split('.')
-    // for (const relationName of relationNames) {
-    //   return this[relationName]
-    // }
-    return ModelRelation.callMappedRelationByName(this, name);
+    const info = functions_1.parse_string_with_dot_notation(name);
+    if (typeof this['relationsMap'] === 'undefined' || typeof this['relationsMap'][info.first] === 'undefined') {
+        throw new Error(`Relation "${info.first}" is not found in model "${this.getModelName()}".`);
+    }
+    const mapping = this['relationsMap'][info.first];
+    const relation = mapping.type === 'getter' ? this[mapping.mapTo] : this[mapping.mapTo].call(this);
+    if (info.afterFirst) {
+        relation.with(info.afterFirst);
+    }
+    return relation;
 };
 ModelRelation.defineRelationProperty = function (name) {
     if (this['__sample']) {

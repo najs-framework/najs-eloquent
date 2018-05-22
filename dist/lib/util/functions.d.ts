@@ -12,3 +12,11 @@ export declare function in_array<T>(key: T, ...args: T[][]): boolean;
  */
 export declare function array_unique<T>(...array: Array<T[] | ArrayLike<any>>): T[];
 export declare function find_base_prototypes(prototype: Object, root: Object): Object[];
+export declare type DotNotationInfo = {
+    first: string;
+    last: string;
+    afterFirst: string;
+    beforeLast: string;
+    parts: string[];
+};
+export declare function parse_string_with_dot_notation(input: string): DotNotationInfo;
