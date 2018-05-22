@@ -41,19 +41,42 @@ export class HasOneOrMany extends Relation {
     return undefined
   }
 
-  async eagerLoad<T>(): Promise<T> {
-    return <any>undefined
+  getQueryInfo() {
+    if (this.rootModel.getModelName() === this.local.model) {
+      return {
+        model: this.foreign.model,
+        filterKey: this.foreign.key,
+        valuesKey: this.local.key
+      }
+    }
+    return {
+      model: this.local.model,
+      filterKey: this.local.key,
+      valuesKey: this.foreign.key
+    }
   }
 
-  async lazyLoad<T>(): Promise<T> {
-    const rootIsLocal = this.rootModel.getModelName() === this.local.model
-    const queryModelName: string = rootIsLocal ? this.foreign.model : this.local.model
-    const leftHandKey: string = rootIsLocal ? this.foreign.key : this.local.key
-    const rightHandKey: string = rootIsLocal ? this.local.key : this.foreign.key
+  async eagerLoad<T>(): Promise<T | undefined | null> {
+    const info = this.getQueryInfo()
 
-    const query = this.getModelByName(queryModelName)
+    const query = this.getModelByName(info.model)
       .newQuery(this.rootModel.getRelationDataBucket())
-      .where(leftHandKey, this.rootModel.getAttribute(rightHandKey))
+      .whereIn(info.filterKey, this.getKeysInDataBucket(this.rootModel.getRecordName(), info.valuesKey))
+
+    const result = await query.get()
+    this.relationData.isLoaded = true
+    this.relationData.loadType = 'eager'
+    this.relationData.isBuilt = false
+    // console.log('b', this.rootModel['relations'][this.name])
+    return <any>result
+  }
+
+  async lazyLoad<T>(): Promise<T | undefined | null> {
+    const info = this.getQueryInfo()
+
+    const query = this.getModelByName(info.model)
+      .newQuery(this.rootModel.getRelationDataBucket())
+      .where(info.filterKey, this.rootModel.getAttribute(info.valuesKey))
 
     const result = this.executeQuery(query)
     this.relationData.isLoaded = true

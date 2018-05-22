@@ -9,6 +9,7 @@ import { EloquentDriverProviderFacade } from '../../lib/facades/global/EloquentD
 import { init_mongoose, delete_collection } from '../util'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { HasOne } from '../../lib/relations/types/HasOne'
+import { Factory, factory } from './../../lib/facades/global/FactoryFacade'
 
 EloquentDriverProviderFacade.register(MongooseDriver, 'mongoose', true)
 
@@ -34,10 +35,10 @@ describe('HasOneOrMany', function() {
   //   relation.lazyLoad()
   // })
 
-  describe('.eagerLoad()', function() {
-    const relation = new HasOneOrMany(<any>{}, 'test')
-    relation.eagerLoad()
-  })
+  // describe('.eagerLoad()', function() {
+  //   const relation = new HasOneOrMany(<any>{}, 'test')
+  //   relation.eagerLoad()
+  // })
 
   describe('.executeQuery', function() {
     it('calls query.first() if "is1v1" is true', function() {
@@ -100,6 +101,7 @@ describe('HasOneOrMany - Integration - MongooseDriver', function() {
       user_id: { type: String, required: true },
       number: { type: String, required: true }
     }
+    static fillable = ['number']
 
     user?: HasOne<Phone>
     user_id: string
@@ -116,6 +118,8 @@ describe('HasOneOrMany - Integration - MongooseDriver', function() {
     static schema = {
       name: { type: String, required: true }
     }
+    static fillable = ['name']
+
     phone?: HasOne<Phone>
     name: string
 
@@ -124,6 +128,23 @@ describe('HasOneOrMany - Integration - MongooseDriver', function() {
     }
   }
   register(User)
+
+  Factory.define(User, function(faker, attributes) {
+    return Object.assign(
+      {
+        name: faker.name()
+      },
+      attributes
+    )
+  })
+  Factory.define(Phone, function(faker, attributes) {
+    return Object.assign(
+      {
+        number: faker.phone()
+      },
+      attributes
+    )
+  })
 
   describe('.lazyLoad()', function() {
     it('should work', async function() {
@@ -143,6 +164,40 @@ describe('HasOneOrMany - Integration - MongooseDriver', function() {
 
       const userData = await phone.getUserRelation().lazyLoad()
       console.log(userData!['toJson']())
+    })
+  })
+
+  describe('.eagerLoad()', function() {
+    it('should work', async function() {
+      const users = await factory(User)
+        .times(3)
+        .create()
+      const phones = await factory(Phone)
+        .times(5)
+        .make()
+
+      phones.items[0]['user_id'] = users.items[0]['id']
+      await phones.items[0].save()
+      phones.items[1]['user_id'] = users.items[0]['id']
+      await phones.items[1].save()
+      phones.items[2]['user_id'] = users.items[0]['id']
+      await phones.items[2].save()
+      phones.items[3]['user_id'] = users.items[1]['id']
+      await phones.items[3].save()
+      phones.items[4]['user_id'] = users.items[1]['id']
+      await phones.items[3].save()
+
+      const userModel = new User()
+      const result = await userModel.get()
+      // const first = result.first()
+      // const last = result.last()
+      // console.log(first.getRelationDataBucket() === last.getRelationDataBucket())
+      // console.log('result', result)
+      // console.log('data bucket', userModel.getRelationDataBucket())
+
+      const first: User = <any>result.first()
+      await first.getPhoneRelation().eagerLoad()
+      console.log(first.getRelationDataBucket())
     })
   })
 })

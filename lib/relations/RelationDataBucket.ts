@@ -42,5 +42,20 @@ export class RelationDataBucket implements NajsEloquent.Relation.IRelationDataBu
   newCollection<T>(name: string, records: Object[]): CollectJs.Collection<T> {
     return collect(records.map(item => this.newInstance(name, item)))
   }
+
+  getAttributes(name: string, attribute: string, allowDuplicated: boolean = false): any[] {
+    if (typeof this.bucket[name] === 'undefined') {
+      return []
+    }
+    const result: any[] = []
+    for (const key in this.bucket[name]) {
+      const value = this.bucket[name][key][attribute]
+      if (typeof value === 'undefined' || value === null) {
+        continue
+      }
+      result.push(value)
+    }
+    return allowDuplicated ? result : Array.from(new Set(result))
+  }
 }
 register(RelationDataBucket)

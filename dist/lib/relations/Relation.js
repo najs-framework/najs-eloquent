@@ -26,6 +26,13 @@ class Relation {
     getModelByName(model) {
         return najs_binding_1.make(model);
     }
+    getKeysInDataBucket(table, key) {
+        const relationDataBucket = this.rootModel.getRelationDataBucket();
+        if (!relationDataBucket) {
+            return [];
+        }
+        return relationDataBucket.getAttributes(table, key);
+    }
     getData() {
         if (!this.isLoaded()) {
             return undefined;

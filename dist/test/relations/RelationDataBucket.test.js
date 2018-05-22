@@ -21,4 +21,46 @@ describe('RelationDataBucket', function () {
             expect('should not reach this line').toEqual('hm');
         });
     });
+    describe('.getAttributes()', function () {
+        it('returns an empty array if there is no name in bucket', function () {
+            const relationDataBucket = new RelationDataBucket_1.RelationDataBucket();
+            expect(relationDataBucket.getAttributes('test', 'attribute')).toEqual([]);
+        });
+        it('loops all this.bucket[name] and get the attribute then push them to the list', function () {
+            const relationDataBucket = new RelationDataBucket_1.RelationDataBucket();
+            relationDataBucket['bucket'] = {
+                test: {
+                    1: { a: 'a1', b: 'b1' },
+                    2: { a: 'a2', b: 'b2' },
+                    3: { a: 'a3', b: 'b2' }
+                }
+            };
+            expect(relationDataBucket.getAttributes('test', 'a')).toEqual(['a1', 'a2', 'a3']);
+        });
+        it('loops all this.bucket[name] and skip if the value is undefined or null', function () {
+            const relationDataBucket = new RelationDataBucket_1.RelationDataBucket();
+            relationDataBucket['bucket'] = {
+                test: {
+                    1: { a: 'a1', b: 'b1' },
+                    2: { a: undefined, b: 'b2' },
+                    // tslint:disable-next-line
+                    3: { a: null, b: 'b2' },
+                    4: { a: 'a4', b: 'b2' }
+                }
+            };
+            expect(relationDataBucket.getAttributes('test', 'a')).toEqual(['a1', 'a4']);
+        });
+        it('remove repetition if the third param is false, otherwise it does not', function () {
+            const relationDataBucket = new RelationDataBucket_1.RelationDataBucket();
+            relationDataBucket['bucket'] = {
+                test: {
+                    1: { a: 'a1', b: 'b1' },
+                    2: { a: 'a2', b: 'b2' },
+                    3: { a: 'a3', b: 'b2' }
+                }
+            };
+            expect(relationDataBucket.getAttributes('test', 'b')).toEqual(['b1', 'b2']);
+            expect(relationDataBucket.getAttributes('test', 'b', true)).toEqual(['b1', 'b2', 'b2']);
+        });
+    });
 });

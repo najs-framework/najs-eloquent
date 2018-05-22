@@ -17,17 +17,37 @@ class HasOneOrMany extends Relation_1.Relation {
     buildData() {
         return undefined;
     }
+    getQueryInfo() {
+        if (this.rootModel.getModelName() === this.local.model) {
+            return {
+                model: this.foreign.model,
+                filterKey: this.foreign.key,
+                valuesKey: this.local.key
+            };
+        }
+        return {
+            model: this.local.model,
+            filterKey: this.local.key,
+            valuesKey: this.foreign.key
+        };
+    }
     async eagerLoad() {
-        return undefined;
+        const info = this.getQueryInfo();
+        const query = this.getModelByName(info.model)
+            .newQuery(this.rootModel.getRelationDataBucket())
+            .whereIn(info.filterKey, this.getKeysInDataBucket(this.rootModel.getRecordName(), info.valuesKey));
+        const result = await query.get();
+        this.relationData.isLoaded = true;
+        this.relationData.loadType = 'eager';
+        this.relationData.isBuilt = false;
+        // console.log('b', this.rootModel['relations'][this.name])
+        return result;
     }
     async lazyLoad() {
-        const rootIsLocal = this.rootModel.getModelName() === this.local.model;
-        const queryModelName = rootIsLocal ? this.foreign.model : this.local.model;
-        const leftHandKey = rootIsLocal ? this.foreign.key : this.local.key;
-        const rightHandKey = rootIsLocal ? this.local.key : this.foreign.key;
-        const query = this.getModelByName(queryModelName)
+        const info = this.getQueryInfo();
+        const query = this.getModelByName(info.model)
             .newQuery(this.rootModel.getRelationDataBucket())
-            .where(leftHandKey, this.rootModel.getAttribute(rightHandKey));
+            .where(info.filterKey, this.rootModel.getAttribute(info.valuesKey));
         const result = this.executeQuery(query);
         this.relationData.isLoaded = true;
         this.relationData.loadType = 'lazy';

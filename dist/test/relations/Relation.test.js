@@ -124,6 +124,37 @@ describe('Relation', function () {
             makeStub.restore();
         });
     });
+    describe('.getKeysInDataBucket()', function () {
+        it('returns an empty array if there is no relationDataBucket in rootModel', function () {
+            const rootModel = {
+                relations: {
+                    test: {}
+                },
+                getRelationDataBucket() {
+                    return undefined;
+                }
+            };
+            const relation = Reflect.construct(Relation_1.Relation, [rootModel, 'test']);
+            expect(relation.getKeysInDataBucket('test', 'attribute')).toEqual([]);
+        });
+        it('calls and returns relationDataBucket.getAttributes() if it is attached to rootModel', function () {
+            const relationDataBucket = {
+                getAttributes(name, attribute) {
+                    return `anything-${name}-${attribute}`;
+                }
+            };
+            const rootModel = {
+                relations: {
+                    test: {}
+                },
+                getRelationDataBucket() {
+                    return relationDataBucket;
+                }
+            };
+            const relation = Reflect.construct(Relation_1.Relation, [rootModel, 'test']);
+            expect(relation.getKeysInDataBucket('test', 'attribute')).toEqual('anything-test-attribute');
+        });
+    });
     describe('.getData()', function () {
         it('returns undefined if .isLoaded() returns false', function () {
             const info = {};

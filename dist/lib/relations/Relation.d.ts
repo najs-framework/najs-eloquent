@@ -14,6 +14,7 @@ export declare abstract class Relation implements NajsEloquent.Relation.IRelatio
     isBuilt(): boolean;
     getDataBucket(): NajsEloquent.Relation.IRelationDataBucket | undefined;
     getModelByName(model: string): NajsEloquent.Model.IEloquent<any>;
+    getKeysInDataBucket(table: string, key: string): string[];
     getData<T>(): T | undefined | null;
     load<T>(): Promise<T | undefined | null>;
 }

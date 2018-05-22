@@ -23,5 +23,12 @@ declare namespace NajsEloquent.Relation {
          * @param records
          */
         newCollection<T>(name: string, records: Object[]): CollectJs.Collection<T>;
+        /**
+         * Get list of given attribute in bucket by name
+         * @param {string} name
+         * @param {string} attribute
+         * @param {boolean} allowDuplicated if true will remove duplicated values. Default is false
+         */
+        getAttributes(name: string, attribute: string, allowDuplicated?: boolean): any[];
     }
 }

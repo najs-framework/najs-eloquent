@@ -32,6 +32,20 @@ class RelationDataBucket {
     newCollection(name, records) {
         return collect(records.map(item => this.newInstance(name, item)));
     }
+    getAttributes(name, attribute, allowDuplicated = false) {
+        if (typeof this.bucket[name] === 'undefined') {
+            return [];
+        }
+        const result = [];
+        for (const key in this.bucket[name]) {
+            const value = this.bucket[name][key][attribute];
+            if (typeof value === 'undefined' || value === null) {
+                continue;
+            }
+            result.push(value);
+        }
+        return allowDuplicated ? result : Array.from(new Set(result));
+    }
 }
 RelationDataBucket.className = constants_1.NajsEloquent.Relation.RelationDataBucket;
 exports.RelationDataBucket = RelationDataBucket;

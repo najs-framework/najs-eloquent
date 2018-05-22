@@ -41,6 +41,14 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
     return make(model)
   }
 
+  getKeysInDataBucket(table: string, key: string): string[] {
+    const relationDataBucket = this.rootModel.getRelationDataBucket()
+    if (!relationDataBucket) {
+      return []
+    }
+    return relationDataBucket.getAttributes(table, key)
+  }
+
   getData<T>(): T | undefined | null {
     if (!this.isLoaded()) {
       return undefined

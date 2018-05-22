@@ -135,6 +135,41 @@ describe('Relation', function() {
     })
   })
 
+  describe('.getKeysInDataBucket()', function() {
+    it('returns an empty array if there is no relationDataBucket in rootModel', function() {
+      const rootModel = {
+        relations: {
+          test: {}
+        },
+
+        getRelationDataBucket() {
+          return undefined
+        }
+      }
+      const relation: Relation = Reflect.construct(Relation, [rootModel, 'test'])
+      expect(relation.getKeysInDataBucket('test', 'attribute')).toEqual([])
+    })
+
+    it('calls and returns relationDataBucket.getAttributes() if it is attached to rootModel', function() {
+      const relationDataBucket = {
+        getAttributes(name: string, attribute: string) {
+          return `anything-${name}-${attribute}`
+        }
+      }
+      const rootModel = {
+        relations: {
+          test: {}
+        },
+
+        getRelationDataBucket() {
+          return relationDataBucket
+        }
+      }
+      const relation: Relation = Reflect.construct(Relation, [rootModel, 'test'])
+      expect(relation.getKeysInDataBucket('test', 'attribute')).toEqual('anything-test-attribute')
+    })
+  })
+
   describe('.getData()', function() {
     it('returns undefined if .isLoaded() returns false', function() {
       const info = {}

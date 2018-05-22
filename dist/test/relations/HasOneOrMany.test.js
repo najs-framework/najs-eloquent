@@ -10,6 +10,7 @@ const MongooseProviderFacade_1 = require("../../lib/facades/global/MongooseProvi
 const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
 const util_1 = require("../util");
 const Eloquent_1 = require("../../lib/model/Eloquent");
+const FactoryFacade_1 = require("./../../lib/facades/global/FactoryFacade");
 EloquentDriverProviderFacade_1.EloquentDriverProviderFacade.register(MongooseDriver_1.MongooseDriver, 'mongoose', true);
 describe('HasOneOrMany', function () {
     it('extends Relation, implements IAutoload with class name NajsEloquent.Relation.HasOneOrMany', function () {
@@ -29,10 +30,10 @@ describe('HasOneOrMany', function () {
     //   const relation = new HasOneOrMany(<any>{}, 'test')
     //   relation.lazyLoad()
     // })
-    describe('.eagerLoad()', function () {
-        const relation = new HasOneOrMany_1.HasOneOrMany({}, 'test');
-        relation.eagerLoad();
-    });
+    // describe('.eagerLoad()', function() {
+    //   const relation = new HasOneOrMany(<any>{}, 'test')
+    //   relation.eagerLoad()
+    // })
     describe('.executeQuery', function () {
         it('calls query.first() if "is1v1" is true', function () {
             const query = {
@@ -88,6 +89,7 @@ describe('HasOneOrMany - Integration - MongooseDriver', function () {
         user_id: { type: String, required: true },
         number: { type: String, required: true }
     };
+    Phone.fillable = ['number'];
     Eloquent_1.Eloquent.register(Phone);
     class User extends Eloquent_1.Eloquent {
         getPhoneRelation() {
@@ -98,7 +100,18 @@ describe('HasOneOrMany - Integration - MongooseDriver', function () {
     User.schema = {
         name: { type: String, required: true }
     };
+    User.fillable = ['name'];
     najs_binding_1.register(User);
+    FactoryFacade_1.Factory.define(User, function (faker, attributes) {
+        return Object.assign({
+            name: faker.name()
+        }, attributes);
+    });
+    FactoryFacade_1.Factory.define(Phone, function (faker, attributes) {
+        return Object.assign({
+            number: faker.phone()
+        }, attributes);
+    });
     describe('.lazyLoad()', function () {
         it('should work', async function () {
             const user = new User();
@@ -113,6 +126,36 @@ describe('HasOneOrMany - Integration - MongooseDriver', function () {
             console.log(phoneData['toJson']());
             const userData = await phone.getUserRelation().lazyLoad();
             console.log(userData['toJson']());
+        });
+    });
+    describe('.eagerLoad()', function () {
+        it('should work', async function () {
+            const users = await FactoryFacade_1.factory(User)
+                .times(3)
+                .create();
+            const phones = await FactoryFacade_1.factory(Phone)
+                .times(5)
+                .make();
+            phones.items[0]['user_id'] = users.items[0]['id'];
+            await phones.items[0].save();
+            phones.items[1]['user_id'] = users.items[0]['id'];
+            await phones.items[1].save();
+            phones.items[2]['user_id'] = users.items[0]['id'];
+            await phones.items[2].save();
+            phones.items[3]['user_id'] = users.items[1]['id'];
+            await phones.items[3].save();
+            phones.items[4]['user_id'] = users.items[1]['id'];
+            await phones.items[3].save();
+            const userModel = new User();
+            const result = await userModel.get();
+            // const first = result.first()
+            // const last = result.last()
+            // console.log(first.getRelationDataBucket() === last.getRelationDataBucket())
+            // console.log('result', result)
+            // console.log('data bucket', userModel.getRelationDataBucket())
+            const first = result.first();
+            await first.getPhoneRelation().eagerLoad();
+            console.log(first.getRelationDataBucket());
         });
     });
 });

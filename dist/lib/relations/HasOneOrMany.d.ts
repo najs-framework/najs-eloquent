@@ -23,7 +23,12 @@ export declare class HasOneOrMany extends Relation {
     getClassName(): string;
     setup(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo): void;
     buildData(): undefined;
-    eagerLoad<T>(): Promise<T>;
-    lazyLoad<T>(): Promise<T>;
+    getQueryInfo(): {
+        model: string;
+        filterKey: string;
+        valuesKey: string;
+    };
+    eagerLoad<T>(): Promise<T | undefined | null>;
+    lazyLoad<T>(): Promise<T | undefined | null>;
     executeQuery(query: NajsEloquent.Wrapper.IQueryBuilderWrapper<any>): Promise<any>;
 }
