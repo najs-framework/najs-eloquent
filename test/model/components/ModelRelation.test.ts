@@ -1,4 +1,5 @@
 import 'jest'
+import * as Sinon from 'sinon'
 import { ClassSetting } from '../../../lib/util/ClassSetting'
 import { Eloquent } from '../../../lib/model/Eloquent'
 import { ModelRelation } from '../../../lib/model/components/ModelRelation'
@@ -47,9 +48,36 @@ describe('ModelRelation', function() {
     register(Test)
 
     describe('.load()', function() {
-      it('does nothing for now', function() {
+      it('flattens arguments, then loops all relations and calls .getRelationByName().load()', async function() {
         const user = new User()
-        user.load()
+        const relation = {
+          load() {}
+        }
+        const loadSpy = Sinon.spy(relation, 'load')
+        const getRelationByNameStub = Sinon.stub(user, 'getRelationByName')
+        getRelationByNameStub.returns(relation)
+
+        await user.load('test')
+        expect(getRelationByNameStub.calledWith('test')).toBe(true)
+        expect(loadSpy.called).toBe(true)
+
+        getRelationByNameStub.resetHistory()
+        loadSpy.resetHistory()
+
+        await user.load('a', 'b', 'c')
+        expect(getRelationByNameStub.firstCall.calledWith('a')).toBe(true)
+        expect(getRelationByNameStub.secondCall.calledWith('b')).toBe(true)
+        expect(getRelationByNameStub.thirdCall.calledWith('c')).toBe(true)
+        expect(loadSpy.callCount).toBe(3)
+
+        getRelationByNameStub.resetHistory()
+        loadSpy.resetHistory()
+
+        await user.load('a', ['b', 'c'])
+        expect(getRelationByNameStub.firstCall.calledWith('a')).toBe(true)
+        expect(getRelationByNameStub.secondCall.calledWith('b')).toBe(true)
+        expect(getRelationByNameStub.thirdCall.calledWith('c')).toBe(true)
+        expect(loadSpy.callCount).toBe(3)
       })
     })
 

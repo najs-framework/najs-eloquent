@@ -8,7 +8,7 @@ const Relation_1 = require("./../../relations/Relation");
 const RelationFactory_1 = require("../../relations/RelationFactory");
 const Eloquent_1 = require("../Eloquent");
 const functions_1 = require("../../util/functions");
-// // import { flatten } from 'lodash'
+const lodash_1 = require("lodash");
 function get_value_and_type_of_property(descriptor, instance) {
     // perform getter or function for sample, the sample will contains "relationName"
     const sample = instance['getClassSetting']().getSample();
@@ -103,24 +103,18 @@ class ModelRelation {
         }
         return model[mapping.mapTo].call(model);
     }
-    static warningNotAvailableUntilVersion4() {
-        // console.warn('Relation feature is not available until v0.4.0')
-    }
 }
 ModelRelation.className = constants_1.NajsEloquent.Model.Component.ModelRelation;
 ModelRelation.getRelationDataBucket = function () {
     return this['relationDataBucket'];
 };
 ModelRelation.load = async function () {
-    ModelRelation.warningNotAvailableUntilVersion4();
-    // const relations: string[] = flatten(arguments)
-    // for (const relationName of relations) {
-    //   this.getRelationByName(relationName).lazyLoad(this)
-    // }
-    // return this
+    const relations = lodash_1.flatten(arguments);
+    for (const relationName of relations) {
+        await this.getRelationByName(relationName).load();
+    }
 };
 ModelRelation.getRelationByName = function (name) {
-    ModelRelation.warningNotAvailableUntilVersion4();
     // const relationNames = name.split('.')
     // for (const relationName of relationNames) {
     //   return this[relationName]
@@ -128,7 +122,6 @@ ModelRelation.getRelationByName = function (name) {
     return ModelRelation.callMappedRelationByName(this, name);
 };
 ModelRelation.defineRelationProperty = function (name) {
-    ModelRelation.warningNotAvailableUntilVersion4();
     if (this['__sample']) {
         this['relationName'] = name;
         return new RelationFactory_1.RelationFactory(this, name, true);

@@ -153,9 +153,8 @@ describe('HasOneOrMany - Integration - MongooseDriver', function () {
             // console.log(first.getRelationDataBucket() === last.getRelationDataBucket())
             // console.log('result', result)
             // console.log('data bucket', userModel.getRelationDataBucket())
-            const first = result.first();
-            await first.getPhoneRelation().eagerLoad();
-            console.log(first.phone['toJson']());
+            await result.first().load('phone');
+            console.log(result.first().phone.toJson());
             const last = result.last();
             console.log(last.phone);
             const newUser = await FactoryFacade_1.Factory.create(User);

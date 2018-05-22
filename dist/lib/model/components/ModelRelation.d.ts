@@ -10,5 +10,4 @@ export declare class ModelRelation implements Najs.Contracts.Eloquent.Component 
     static getRelationByName: NajsEloquent.Model.ModelMethod<any>;
     static callMappedRelationByName(model: NajsEloquent.Model.IModel<any>, name: string): any;
     static defineRelationProperty: NajsEloquent.Model.ModelMethod<any>;
-    static warningNotAvailableUntilVersion4(): void;
 }

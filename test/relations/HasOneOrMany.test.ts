@@ -8,7 +8,7 @@ import { MongooseProvider } from '../../lib/facades/global/MongooseProviderFacad
 import { EloquentDriverProviderFacade } from '../../lib/facades/global/EloquentDriverProviderFacade'
 import { init_mongoose, delete_collection } from '../util'
 import { Eloquent } from '../../lib/model/Eloquent'
-import { HasOne } from '../../lib/relations/types/HasOne'
+import { HasOne, BelongsTo, HasOneRelation, BelongsToRelation } from '../../lib/relations/types'
 import { Factory, factory } from './../../lib/facades/global/FactoryFacade'
 
 EloquentDriverProviderFacade.register(MongooseDriver, 'mongoose', true)
@@ -95,7 +95,19 @@ describe('HasOneOrMany - Integration - MongooseDriver', function() {
     await delete_collection(MongooseProvider.getMongooseInstance(), 'posts')
   })
 
-  class Phone extends Eloquent {
+  interface IPhone {
+    number: string
+    user_id: string
+  }
+
+  interface IPhoneRelations {
+    user: BelongsTo<IUser>
+
+    getUserRelation(): BelongsToRelation<IUser>
+  }
+
+  interface Phone extends IPhone, IPhoneRelations {}
+  class Phone extends Eloquent<IPhone & IPhoneRelations> {
     static className: string = 'Phone'
     static schema = {
       user_id: { type: String, required: true },
@@ -103,25 +115,29 @@ describe('HasOneOrMany - Integration - MongooseDriver', function() {
     }
     static fillable = ['number']
 
-    user?: HasOne<Phone>
-    user_id: string
-    number: string
-
     getUserRelation() {
       return this.defineRelationProperty('user').belongsTo('User')
     }
   }
   Eloquent.register(Phone)
 
-  class User extends Eloquent {
+  interface IUser {
+    name: string
+  }
+
+  interface IUserRelations {
+    phone: HasOne<IPhone>
+
+    getPhoneRelation(): HasOneRelation<IPhone>
+  }
+
+  interface User extends IUser, IUserRelations {}
+  class User extends Eloquent<IUser & IUserRelations> {
     static className: string = 'User'
     static schema = {
       name: { type: String, required: true }
     }
     static fillable = ['name']
-
-    phone?: HasOne<Phone>
-    name: string
 
     getPhoneRelation() {
       return this.defineRelationProperty('phone').hasOne('Phone')
@@ -195,9 +211,8 @@ describe('HasOneOrMany - Integration - MongooseDriver', function() {
       // console.log('result', result)
       // console.log('data bucket', userModel.getRelationDataBucket())
 
-      const first: User = <any>result.first()
-      await first.getPhoneRelation().eagerLoad()
-      console.log(first.phone!['toJson']())
+      await result.first().load('phone')
+      console.log(result.first().phone!.toJson())
 
       const last: User = <any>result.last()
       console.log(last.phone)

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
+const Sinon = require("sinon");
 const ClassSetting_1 = require("../../../lib/util/ClassSetting");
 const Eloquent_1 = require("../../../lib/model/Eloquent");
 const ModelRelation_1 = require("../../../lib/model/components/ModelRelation");
@@ -43,9 +44,31 @@ describe('ModelRelation', function () {
         Test.className = 'Test';
         najs_binding_1.register(Test);
         describe('.load()', function () {
-            it('does nothing for now', function () {
+            it('flattens arguments, then loops all relations and calls .getRelationByName().load()', async function () {
                 const user = new User();
-                user.load();
+                const relation = {
+                    load() { }
+                };
+                const loadSpy = Sinon.spy(relation, 'load');
+                const getRelationByNameStub = Sinon.stub(user, 'getRelationByName');
+                getRelationByNameStub.returns(relation);
+                await user.load('test');
+                expect(getRelationByNameStub.calledWith('test')).toBe(true);
+                expect(loadSpy.called).toBe(true);
+                getRelationByNameStub.resetHistory();
+                loadSpy.resetHistory();
+                await user.load('a', 'b', 'c');
+                expect(getRelationByNameStub.firstCall.calledWith('a')).toBe(true);
+                expect(getRelationByNameStub.secondCall.calledWith('b')).toBe(true);
+                expect(getRelationByNameStub.thirdCall.calledWith('c')).toBe(true);
+                expect(loadSpy.callCount).toBe(3);
+                getRelationByNameStub.resetHistory();
+                loadSpy.resetHistory();
+                await user.load('a', ['b', 'c']);
+                expect(getRelationByNameStub.firstCall.calledWith('a')).toBe(true);
+                expect(getRelationByNameStub.secondCall.calledWith('b')).toBe(true);
+                expect(getRelationByNameStub.thirdCall.calledWith('c')).toBe(true);
+                expect(loadSpy.callCount).toBe(3);
             });
         });
         describe('.getRelationDataBucket()', function () {

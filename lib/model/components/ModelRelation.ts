@@ -7,7 +7,7 @@ import { Relation } from './../../relations/Relation'
 import { RelationFactory } from '../../relations/RelationFactory'
 import { Eloquent } from '../Eloquent'
 import { find_base_prototypes } from '../../util/functions'
-// // import { flatten } from 'lodash'
+import { flatten } from 'lodash'
 
 function get_value_and_type_of_property(descriptor: PropertyDescriptor, instance: Object) {
   // perform getter or function for sample, the sample will contains "relationName"
@@ -110,16 +110,13 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
   }
 
   static load: NajsEloquent.Model.ModelMethod<any> = async function() {
-    ModelRelation.warningNotAvailableUntilVersion4()
-    // const relations: string[] = flatten(arguments)
-    // for (const relationName of relations) {
-    //   this.getRelationByName(relationName).lazyLoad(this)
-    // }
-    // return this
+    const relations: string[] = flatten(arguments)
+    for (const relationName of relations) {
+      await this.getRelationByName(relationName).load()
+    }
   }
 
   static getRelationByName: NajsEloquent.Model.ModelMethod<any> = function(name: string) {
-    ModelRelation.warningNotAvailableUntilVersion4()
     // const relationNames = name.split('.')
     // for (const relationName of relationNames) {
     //   return this[relationName]
@@ -139,7 +136,6 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
   }
 
   static defineRelationProperty: NajsEloquent.Model.ModelMethod<any> = function(name: string) {
-    ModelRelation.warningNotAvailableUntilVersion4()
     if (this['__sample']) {
       this['relationName'] = name
       return new RelationFactory(this, name, true)
@@ -152,10 +148,6 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
       }
     }
     return this['relations'][name].factory
-  }
-
-  static warningNotAvailableUntilVersion4() {
-    // console.warn('Relation feature is not available until v0.4.0')
   }
 }
 register(ModelRelation)
