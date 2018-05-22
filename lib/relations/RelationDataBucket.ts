@@ -3,6 +3,8 @@
 
 import { make, register } from 'najs-binding'
 import { NajsEloquent } from '../constants'
+import { eq } from 'lodash'
+import { ObjectID } from 'bson'
 const collect = require('collect.js')
 
 export class RelationDataBucket implements NajsEloquent.Relation.IRelationDataBucket {
@@ -29,7 +31,7 @@ export class RelationDataBucket implements NajsEloquent.Relation.IRelationDataBu
     if (!this.modelMap[name]) {
       throw new ReferenceError(`"${name}" is not found or not registered yet.`)
     }
-    const model: NajsEloquent.Model.IModel<any> = make(this.modelMap[name], [record])
+    const model: NajsEloquent.Model.IModel<any> = this.makeModelFromRecord(name, record)
     if (typeof this.bucket[name] === 'undefined') {
       this.bucket[name] = {}
     }
@@ -41,6 +43,14 @@ export class RelationDataBucket implements NajsEloquent.Relation.IRelationDataBu
 
   newCollection<T>(name: string, records: Object[]): CollectJs.Collection<T> {
     return collect(records.map(item => this.newInstance(name, item)))
+  }
+
+  makeModelFromRecord(name: string, record: Object): NajsEloquent.Model.IModel<any> {
+    return make(this.modelMap[name], [record])
+  }
+
+  makeCollectionFromRecords(name: string, records: Object[]): CollectJs.Collection<NajsEloquent.Model.IModel<any>> {
+    return collect(records.map(item => this.makeModelFromRecord(name, item)))
   }
 
   getAttributes(name: string, attribute: string, allowDuplicated: boolean = false): any[] {
@@ -56,6 +66,33 @@ export class RelationDataBucket implements NajsEloquent.Relation.IRelationDataBu
       result.push(value)
     }
     return allowDuplicated ? result : Array.from(new Set(result))
+  }
+
+  filter(name: string, key: string, value: any, getFirstOnly: boolean = false): Object[] {
+    if (typeof this.bucket[name] === 'undefined') {
+      return []
+    }
+    const result: any[] = []
+
+    const convertedValue = this.convertToStringIfValueIsObjectID(value)
+    for (const id in this.bucket[name]) {
+      const compareValue = this.convertToStringIfValueIsObjectID(this.bucket[name][id][key])
+      if (eq(compareValue, convertedValue)) {
+        result.push(this.bucket[name][id])
+
+        if (getFirstOnly) {
+          break
+        }
+      }
+    }
+    return result
+  }
+
+  convertToStringIfValueIsObjectID(value: any) {
+    if (value instanceof ObjectID) {
+      return value.toHexString()
+    }
+    return value
   }
 }
 register(RelationDataBucket)

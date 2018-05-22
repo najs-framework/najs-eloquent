@@ -24,11 +24,33 @@ declare namespace NajsEloquent.Relation {
          */
         newCollection<T>(name: string, records: Object[]): CollectJs.Collection<T>;
         /**
-         * Get list of given attribute in bucket by name
+         * Make model from name and record.
+         *
+         * @param {string} name
+         * @param {Object} record
+         */
+        makeModelFromRecord(name: string, record: Object): NajsEloquent.Model.IModel<any>;
+        /**
+         * Make collection of model from name and records.
+         *
+         * @param {string} name
+         * @param {Object} record
+         */
+        makeCollectionFromRecords(name: string, records: Object[]): CollectJs.Collection<NajsEloquent.Model.IModel<any>>;
+        /**
+         * Get list of given attribute in bucket by name.
          * @param {string} name
          * @param {string} attribute
          * @param {boolean} allowDuplicated if true will remove duplicated values. Default is false
          */
         getAttributes(name: string, attribute: string, allowDuplicated?: boolean): any[];
+        /**
+         * Filter table in bucket by given key and value.
+         *
+         * @param {string} name
+         * @param {string} key
+         * @param {mixed} value
+         */
+        filter(name: string, key: string, value: string, getFirstOnly?: boolean): Object[];
     }
 }

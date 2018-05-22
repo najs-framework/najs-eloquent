@@ -1,5 +1,8 @@
 import 'jest'
+import * as Sinon from 'sinon'
+import * as NajsBinding from 'najs-binding'
 import { RelationDataBucket } from '../../lib/relations/RelationDataBucket'
+import { ObjectID } from 'bson'
 
 describe('RelationDataBucket', function() {
   it('implements IAutoload and returns class name "NajsEloquent.Relation.RelationDataBucket"', function() {
@@ -64,6 +67,87 @@ describe('RelationDataBucket', function() {
       }
       expect(relationDataBucket.getAttributes('test', 'b')).toEqual(['b1', 'b2'])
       expect(relationDataBucket.getAttributes('test', 'b', true)).toEqual(['b1', 'b2', 'b2'])
+    })
+  })
+
+  describe('.makeModelFromRecord()', function() {
+    it('calls make() with model name from modelMap', function() {
+      const makeStub = Sinon.stub(NajsBinding, 'make')
+      makeStub.returns('anything')
+
+      const relationDataBucket = new RelationDataBucket()
+      relationDataBucket['modelMap'] = {
+        test: 'Model'
+      }
+      const param = {}
+      expect(relationDataBucket.makeModelFromRecord('test', param)).toEqual('anything')
+      expect(makeStub.calledWith('Model', [param])).toBe(true)
+      makeStub.restore()
+    })
+  })
+
+  describe('.makeCollectionFromRecords()', function() {
+    it('creates new Collection by mapping records with .makeModelFromRecord()', function() {
+      const makeStub = Sinon.stub(NajsBinding, 'make')
+      makeStub.returns('anything')
+
+      const relationDataBucket = new RelationDataBucket()
+      relationDataBucket['modelMap'] = {
+        test: 'Model'
+      }
+      const result = relationDataBucket.makeCollectionFromRecords('test', [{}, {}])
+      expect(result.count()).toBe(2)
+      expect(result.items).toEqual(['anything', 'anything'])
+      makeStub.restore()
+    })
+  })
+
+  describe('.filter()', function() {
+    it('returns an empty array if there is no name in bucket', function() {
+      const relationDataBucket = new RelationDataBucket()
+      relationDataBucket['bucket'] = {}
+      expect(relationDataBucket.filter('test', 'id', 'any')).toEqual([])
+    })
+
+    it('loops for all value in the bucket and use Lodash.eq() to compare data', function() {
+      const relationDataBucket = new RelationDataBucket()
+      relationDataBucket['bucket'] = {
+        test: {
+          1: { a: 'a1', b: 'b1' },
+          2: { a: 'a2', b: 'b2' },
+          3: { a: 'a3', b: 'b2' }
+        }
+      }
+      expect(relationDataBucket.filter('test', 'a', 'a1')).toEqual([{ a: 'a1', b: 'b1' }])
+      expect(relationDataBucket.filter('test', 'b', 'b2')).toEqual([{ a: 'a2', b: 'b2' }, { a: 'a3', b: 'b2' }])
+    })
+
+    it('returns the first record if 4th params is true', function() {
+      const relationDataBucket = new RelationDataBucket()
+      relationDataBucket['bucket'] = {
+        test: {
+          1: { a: 'a1', b: 'b1' },
+          2: { a: 'a2', b: 'b2' },
+          3: { a: 'a3', b: 'b2' }
+        }
+      }
+      expect(relationDataBucket.filter('test', 'b', 'b2', true)).toEqual([{ a: 'a2', b: 'b2' }])
+    })
+  })
+
+  describe('.convertToStringIfValueIsObjectID()', function() {
+    it('converts ObjectID to hex string', function() {
+      const objectId = ObjectID.createFromTime(new Date().getTime())
+      const relationDataBucket = new RelationDataBucket()
+      expect(typeof relationDataBucket.convertToStringIfValueIsObjectID(objectId)).toEqual('string')
+      expect(relationDataBucket.convertToStringIfValueIsObjectID(objectId) === objectId.toHexString()).toBe(true)
+    })
+
+    it('returns original value if it is not ObjectId', function() {
+      const value = {}
+      const relationDataBucket = new RelationDataBucket()
+      expect(relationDataBucket.convertToStringIfValueIsObjectID('test')).toEqual('test')
+      expect(relationDataBucket.convertToStringIfValueIsObjectID(value) === value).toBe(true)
     })
   })
 })

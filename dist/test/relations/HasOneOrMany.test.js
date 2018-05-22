@@ -22,10 +22,10 @@ describe('HasOneOrMany', function () {
         const relation = new HasOneOrMany_1.HasOneOrMany({}, 'test');
         relation.setup(true, {}, {});
     });
-    describe('.buildData()', function () {
-        const relation = new HasOneOrMany_1.HasOneOrMany({}, 'test');
-        relation.buildData();
-    });
+    // describe('.buildData()', function() {
+    //   const relation = new HasOneOrMany(<any>{}, 'test')
+    //   relation.buildData()
+    // })
     // describe('.lazyLoad()', function() {
     //   const relation = new HasOneOrMany(<any>{}, 'test')
     //   relation.lazyLoad()
@@ -155,7 +155,13 @@ describe('HasOneOrMany - Integration - MongooseDriver', function () {
             // console.log('data bucket', userModel.getRelationDataBucket())
             const first = result.first();
             await first.getPhoneRelation().eagerLoad();
-            console.log(first.getRelationDataBucket());
+            console.log(first.phone['toJson']());
+            const last = result.last();
+            console.log(last.phone);
+            const newUser = await FactoryFacade_1.Factory.create(User);
+            await newUser.getPhoneRelation().load();
+            newUser.getPhoneRelation().markBuild(false);
+            console.log(newUser.phone);
         });
     });
 });

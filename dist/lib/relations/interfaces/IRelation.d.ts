@@ -21,9 +21,25 @@ declare namespace NajsEloquent.Relation {
          */
         getData<T>(): T | undefined | null;
         /**
-         * Determine the relationship is loaded or not.
+         * Determine the relation is loaded or not.
          */
         isLoaded(): boolean;
+        /**
+         * Determine the relation data is built or not.
+         */
+        isBuilt(): boolean;
+        /**
+         * Mark load status of the relation.
+         *
+         * @param {boolean} loaded
+         */
+        markLoad(loaded: boolean): this;
+        /**
+         * Mark build status of the relation.
+         *
+         * @param {boolean} loaded
+         */
+        markBuild(built: boolean): this;
         /**
          * load relation data, use eagerLoad() if it's possible otherwise will use lazyLoad().
          */

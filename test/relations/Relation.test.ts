@@ -112,6 +112,58 @@ describe('Relation', function() {
     })
   })
 
+  describe('.markLoad()', function() {
+    it('set loaded status of the relation, and it is chainable', function() {
+      const relation: Relation = Reflect.construct(Relation, [{ relations: { test: {} } }, 'test'])
+      expect(relation.markLoad(true) === relation).toBe(true)
+      expect(relation.isLoaded()).toBe(true)
+      expect(relation.markLoad(false) === relation).toBe(true)
+      expect(relation.isLoaded()).toBe(false)
+    })
+  })
+
+  describe('.markBuild()', function() {
+    it('set built status of the relation, and it is chainable', function() {
+      const relation: Relation = Reflect.construct(Relation, [{ relations: { test: {} } }, 'test'])
+      expect(relation.markBuild(true) === relation).toBe(true)
+      expect(relation.isBuilt()).toBe(true)
+      expect(relation.markBuild(false) === relation).toBe(true)
+      expect(relation.isBuilt()).toBe(false)
+    })
+  })
+
+  describe('.makeModelOrCollectionFromRecords()', function() {
+    it('calls and returns relationDataBucket.makeCollectionFromRecords() if makeCollection is true', function() {
+      const relationDataBucket = {
+        makeCollectionFromRecords(name: string, records: any[]) {
+          return 'anything-' + name + '-' + records.join('-')
+        }
+      }
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      expect(relation.makeModelOrCollectionFromRecords(<any>relationDataBucket, 'test', true, ['a', 'b'])).toEqual(
+        'anything-test-a-b'
+      )
+    })
+
+    it('returns undefined if makeCollection is false and records is empty', function() {
+      const relationDataBucket = {}
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      expect(relation.makeModelOrCollectionFromRecords(<any>relationDataBucket, 'test', false, [])).toBeUndefined()
+    })
+
+    it('calls and returns relationDataBucket.makeModelFromRecord() with records[0] if makeCollection is false and records not empty', function() {
+      const relationDataBucket = {
+        makeModelFromRecord(name: string, record: any) {
+          return 'anything-' + name + '-' + record
+        }
+      }
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      expect(relation.makeModelOrCollectionFromRecords(<any>relationDataBucket, 'test', false, ['a', 'b'])).toEqual(
+        'anything-test-a'
+      )
+    })
+  })
+
   describe('.getDataBucket()', function() {
     it('returns property "relationDataBucket" in this.rootModel', function() {
       const relationDataBucket = {}

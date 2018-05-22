@@ -22,9 +22,10 @@ export declare class HasOneOrMany extends Relation {
     protected is1v1: boolean;
     getClassName(): string;
     setup(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo): void;
-    buildData(): undefined;
+    buildData<T>(): T | undefined | null;
     getQueryInfo(): {
         model: string;
+        table: string;
         filterKey: string;
         valuesKey: string;
     };

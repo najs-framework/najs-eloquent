@@ -33,6 +33,18 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
     return !!this.relationData.isBuilt
   }
 
+  markLoad(loaded: boolean) {
+    this.relationData.isLoaded = loaded
+
+    return this
+  }
+
+  markBuild(built: boolean) {
+    this.relationData.isBuilt = built
+
+    return this
+  }
+
   getDataBucket(): NajsEloquent.Relation.IRelationDataBucket | undefined {
     return this.rootModel['relationDataBucket']
   }
@@ -47,6 +59,22 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
       return []
     }
     return relationDataBucket.getAttributes(table, key)
+  }
+
+  makeModelOrCollectionFromRecords(
+    relationDataBucket: NajsEloquent.Relation.IRelationDataBucket,
+    table: string,
+    makeCollection: boolean,
+    records: Object[]
+  ): any {
+    if (makeCollection) {
+      return relationDataBucket.makeCollectionFromRecords(table, records)
+    }
+
+    if (records.length === 0) {
+      return undefined
+    }
+    return relationDataBucket.makeModelFromRecord(table, records[0])
   }
 
   getData<T>(): T | undefined | null {

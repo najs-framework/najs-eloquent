@@ -37,20 +37,36 @@ export class HasOneOrMany extends Relation {
     this.foreign = foreign
   }
 
-  buildData() {
-    return undefined
+  buildData<T>(): T | undefined | null {
+    this.relationData.isBuilt = true
+    const relationDataBucket = this.rootModel.getRelationDataBucket()
+    if (!relationDataBucket) {
+      return undefined
+    }
+
+    const info = this.getQueryInfo()
+    const data = this.makeModelOrCollectionFromRecords(
+      relationDataBucket,
+      info.table,
+      !this.is1v1,
+      relationDataBucket.filter(info.table, info.filterKey, this.rootModel.getAttribute(info.valuesKey), this.is1v1)
+    )
+    this.relationData.data = data
+    return data
   }
 
   getQueryInfo() {
     if (this.rootModel.getModelName() === this.local.model) {
       return {
         model: this.foreign.model,
+        table: this.foreign.table,
         filterKey: this.foreign.key,
         valuesKey: this.local.key
       }
     }
     return {
       model: this.local.model,
+      table: this.local.table,
       filterKey: this.local.key,
       valuesKey: this.foreign.key
     }
@@ -67,7 +83,6 @@ export class HasOneOrMany extends Relation {
     this.relationData.isLoaded = true
     this.relationData.loadType = 'eager'
     this.relationData.isBuilt = false
-    // console.log('b', this.rootModel['relations'][this.name])
     return <any>result
   }
 
@@ -78,7 +93,7 @@ export class HasOneOrMany extends Relation {
       .newQuery(this.rootModel.getRelationDataBucket())
       .where(info.filterKey, this.rootModel.getAttribute(info.valuesKey))
 
-    const result = this.executeQuery(query)
+    const result = await this.executeQuery(query)
     this.relationData.isLoaded = true
     this.relationData.loadType = 'lazy'
     this.relationData.isBuilt = true

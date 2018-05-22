@@ -9,5 +9,9 @@ export declare class RelationDataBucket implements NajsEloquent.Relation.IRelati
     register(name: string, modelName: string): this;
     newInstance<T>(name: string, record: Object): T;
     newCollection<T>(name: string, records: Object[]): CollectJs.Collection<T>;
+    makeModelFromRecord(name: string, record: Object): NajsEloquent.Model.IModel<any>;
+    makeCollectionFromRecords(name: string, records: Object[]): CollectJs.Collection<NajsEloquent.Model.IModel<any>>;
     getAttributes(name: string, attribute: string, allowDuplicated?: boolean): any[];
+    filter(name: string, key: string, value: any, getFirstOnly?: boolean): Object[];
+    convertToStringIfValueIsObjectID(value: any): any;
 }

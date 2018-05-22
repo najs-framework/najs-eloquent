@@ -20,6 +20,14 @@ class Relation {
     isBuilt() {
         return !!this.relationData.isBuilt;
     }
+    markLoad(loaded) {
+        this.relationData.isLoaded = loaded;
+        return this;
+    }
+    markBuild(built) {
+        this.relationData.isBuilt = built;
+        return this;
+    }
     getDataBucket() {
         return this.rootModel['relationDataBucket'];
     }
@@ -32,6 +40,15 @@ class Relation {
             return [];
         }
         return relationDataBucket.getAttributes(table, key);
+    }
+    makeModelOrCollectionFromRecords(relationDataBucket, table, makeCollection, records) {
+        if (makeCollection) {
+            return relationDataBucket.makeCollectionFromRecords(table, records);
+        }
+        if (records.length === 0) {
+            return undefined;
+        }
+        return relationDataBucket.makeModelFromRecord(table, records[0]);
     }
     getData() {
         if (!this.isLoaded()) {

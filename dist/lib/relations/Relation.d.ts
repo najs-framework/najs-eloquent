@@ -12,9 +12,12 @@ export declare abstract class Relation implements NajsEloquent.Relation.IRelatio
     getAttachedPropertyName(): string;
     isLoaded(): boolean;
     isBuilt(): boolean;
+    markLoad(loaded: boolean): this;
+    markBuild(built: boolean): this;
     getDataBucket(): NajsEloquent.Relation.IRelationDataBucket | undefined;
     getModelByName(model: string): NajsEloquent.Model.IEloquent<any>;
     getKeysInDataBucket(table: string, key: string): string[];
+    makeModelOrCollectionFromRecords(relationDataBucket: NajsEloquent.Relation.IRelationDataBucket, table: string, makeCollection: boolean, records: Object[]): any;
     getData<T>(): T | undefined | null;
     load<T>(): Promise<T | undefined | null>;
 }

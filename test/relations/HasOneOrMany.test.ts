@@ -25,10 +25,10 @@ describe('HasOneOrMany', function() {
     relation.setup(true, <any>{}, <any>{})
   })
 
-  describe('.buildData()', function() {
-    const relation = new HasOneOrMany(<any>{}, 'test')
-    relation.buildData()
-  })
+  // describe('.buildData()', function() {
+  //   const relation = new HasOneOrMany(<any>{}, 'test')
+  //   relation.buildData()
+  // })
 
   // describe('.lazyLoad()', function() {
   //   const relation = new HasOneOrMany(<any>{}, 'test')
@@ -197,7 +197,15 @@ describe('HasOneOrMany - Integration - MongooseDriver', function() {
 
       const first: User = <any>result.first()
       await first.getPhoneRelation().eagerLoad()
-      console.log(first.getRelationDataBucket())
+      console.log(first.phone!['toJson']())
+
+      const last: User = <any>result.last()
+      console.log(last.phone)
+
+      const newUser = await Factory.create(User)
+      await newUser.getPhoneRelation().load()
+      newUser.getPhoneRelation().markBuild(false)
+      console.log(newUser.phone)
     })
   })
 })
