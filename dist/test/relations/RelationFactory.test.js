@@ -129,6 +129,57 @@ describe('RelationFactory', function () {
             })).toBe(true);
         });
     });
+    describe('.hasMany()', function () {
+        class ModelA extends Eloquent_1.Eloquent {
+        }
+        ModelA.className = 'ModelA';
+        najs_binding_1.register(ModelA);
+        it('calls .setupRelation() with class "NajsEloquent.Relation.HasOneOrMany" by default', function () {
+            const factory = new RelationFactory_1.RelationFactory({}, 'test', true);
+            const setupRelationStub = Sinon.stub(factory, 'setupRelation');
+            factory.hasMany('Test');
+            expect(setupRelationStub.calledWith('NajsEloquent.Relation.HasOneOrMany')).toBe(true);
+        });
+        it('creates an localInfo from rootModel, foreignInfo from model in the first param', function () {
+            const factory = new RelationFactory_1.RelationFactory(new ModelA(), 'test', false);
+            const setupHasOneOrManyStub = Sinon.stub(factory, 'setupHasOneOrMany');
+            factory.hasMany('Test');
+            expect(setupHasOneOrManyStub.calledWith(false, {
+                model: 'ModelA',
+                table: 'model_as',
+                key: 'id'
+            }, {
+                model: 'Test',
+                table: 'tests',
+                key: 'model_a_id'
+            })).toBe(true);
+        });
+        it('can created with custom foreign key in the second param and local key in third param', function () {
+            const factory = new RelationFactory_1.RelationFactory(new ModelA(), 'test', false);
+            const setupHasOneOrManyStub = Sinon.stub(factory, 'setupHasOneOrMany');
+            factory.hasMany('Test', 'test_foreign_id');
+            expect(setupHasOneOrManyStub.calledWith(false, {
+                model: 'ModelA',
+                table: 'model_as',
+                key: 'id'
+            }, {
+                model: 'Test',
+                table: 'tests',
+                key: 'test_foreign_id'
+            })).toBe(true);
+            delete factory['relation'];
+            factory.hasMany('Test', 'test_foreign_id', 'anything');
+            expect(setupHasOneOrManyStub.calledWith(false, {
+                model: 'ModelA',
+                table: 'model_as',
+                key: 'anything'
+            }, {
+                model: 'Test',
+                table: 'tests',
+                key: 'test_foreign_id'
+            })).toBe(true);
+        });
+    });
     describe('.belongsTo()', function () {
         class ModelB extends Eloquent_1.Eloquent {
         }

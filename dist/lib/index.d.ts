@@ -14,6 +14,7 @@ export declare type Model<T> = NajsEloquent.Model.IModel<T> & T;
 export declare type ModelAsync<T> = Promise<NajsEloquent.Model.IModel<T> & T>;
 export declare type Collection<T> = CollectJs.Collection<NajsEloquent.Model.IModel<T> & T>;
 export declare type CollectionAsync<T> = Promise<CollectJs.Collection<NajsEloquent.Model.IModel<T> & T>>;
+export { HasOne, HasOneRelation, HasMany, HasManyRelation, BelongsTo, BelongsToRelation } from './relations/types';
 export { QueryLogFacade, QueryLog } from './facades/global/QueryLogFacade';
 export { EloquentDriverProviderFacade, EloquentDriverProvider } from './facades/global/EloquentDriverProviderFacade';
 export { EloquentComponentProviderFacade, EloquentComponentProvider } from './facades/global/EloquentComponentProviderFacade';

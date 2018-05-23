@@ -23,6 +23,27 @@ declare namespace NajsEloquent.Relation {
          */
         hasOne<T>(model: Model.ModelDefinition<T> | string, foreignKey: string, localKey: string): IHasOne<T>;
         /**
+         * Has one relationship
+         *
+         * @param {string|ModelDefinition} model
+         */
+        hasMany<T>(model: Model.ModelDefinition<T> | string): IHasMany<T>;
+        /**
+         * Has one relationship
+         *
+         * @param {string|ModelDefinition} model
+         * @param {string} foreignKey
+         */
+        hasMany<T>(model: Model.ModelDefinition<T> | string, foreignKey: string): IHasMany<T>;
+        /**
+         * Has one relationship
+         *
+         * @param {string|ModelDefinition} model
+         * @param {string} foreignKey
+         * @param {string} localKey
+         */
+        hasMany<T>(model: Model.ModelDefinition<T> | string, foreignKey: string, localKey: string): IHasMany<T>;
+        /**
          * Has one inverse relationship
          *
          * @param {string|ModelDefinition} model

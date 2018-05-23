@@ -39,6 +39,8 @@ export type ModelAsync<T> = Promise<NajsEloquent.Model.IModel<T> & T>
 export type Collection<T> = CollectJs.Collection<NajsEloquent.Model.IModel<T> & T>
 export type CollectionAsync<T> = Promise<CollectJs.Collection<NajsEloquent.Model.IModel<T> & T>>
 
+export { HasOne, HasOneRelation, HasMany, HasManyRelation, BelongsTo, BelongsToRelation } from './relations/types'
+
 // package facades
 export { QueryLogFacade, QueryLog } from './facades/global/QueryLogFacade'
 export { EloquentDriverProviderFacade, EloquentDriverProvider } from './facades/global/EloquentDriverProviderFacade'

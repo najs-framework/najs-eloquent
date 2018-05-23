@@ -36,6 +36,23 @@ export class RelationFactory implements NajsEloquent.Relation.IRelationFactory {
     })
   }
 
+  hasMany(model: string | NajsEloquent.Model.ModelDefinition<any>, foreignKey?: string, localKey?: string): any {
+    return this.setupRelation(NajsEloquent.Relation.HasOneOrMany, () => {
+      const foreign: NajsEloquent.Model.IModel<any> = this.getModelByNameOrDefinition(model)
+      const localInfo = {
+        model: this.rootModel.getModelName(),
+        table: this.rootModel.getRecordName(),
+        key: localKey || this.rootModel.getPrimaryKeyName()
+      }
+      const foreignInfo = {
+        model: foreign.getModelName(),
+        table: foreign.getRecordName(),
+        key: foreignKey || foreign.getDriver().formatAttributeName(`${this.rootModel.getModelName()}Id`)
+      }
+      return this.setupHasOneOrMany(false, localInfo, foreignInfo)
+    })
+  }
+
   belongsTo(model: string | NajsEloquent.Model.ModelDefinition<any>, foreignKey?: string, localKey?: string): any {
     return this.setupRelation(NajsEloquent.Relation.HasOneOrMany, () => {
       const local: NajsEloquent.Model.IModel<any> = this.getModelByNameOrDefinition(model)
