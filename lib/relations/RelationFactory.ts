@@ -72,7 +72,7 @@ export class RelationFactory implements NajsEloquent.Relation.IRelationFactory {
 
   setupHasOneOrMany(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo) {
     const relation: HasOneOrMany = make(NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name])
-    relation.setup(true, local, foreign)
+    relation.setup(oneToOne, local, foreign)
     return relation
   }
 

@@ -1,4 +1,13 @@
-import { Eloquent, EloquentStaticMongoose } from '../../dist/lib'
+import {
+  Eloquent,
+  EloquentStaticMongoose,
+  HasMany,
+  HasManyRelation,
+  BelongsTo,
+  BelongsToRelation
+} from '../../dist/lib'
+import { User } from './User'
+import { Comment } from './Comment'
 
 export interface IPost {
   user_id: string
@@ -7,14 +16,22 @@ export interface IPost {
   view: number
 }
 
-export const PostBase: EloquentStaticMongoose<IPost> = Eloquent.Mongoose<IPost>()
+export interface IPostRelations {
+  user: BelongsTo<User>
+  comments: HasMany<Comment>
+
+  getUserRelation(): BelongsToRelation<User>
+  getCommentsRelation(): HasManyRelation<Comment>
+}
+
+export const PostBase: EloquentStaticMongoose<IPost & IPostRelations> = Eloquent.Mongoose<IPost & IPostRelations>()
 
 /**
  * Post model, extends from Eloquent.Mongoose<IPost>(), supports
  *   - full definitions of Eloquent<IPost>
  *   - full definitions of static API
  */
-export interface Post extends IPost {}
+export interface Post extends IPost, IPostRelations {}
 export class Post extends PostBase {
   static className: string = 'Post'
   protected static timestamps = true
@@ -29,4 +46,13 @@ export class Post extends PostBase {
   getClassName() {
     return Post.className
   }
+
+  getUserRelation(): BelongsToRelation<User> {
+    return this.defineRelationProperty('user').belongsTo(User)
+  }
+
+  getCommentsRelation(): HasManyRelation<Comment> {
+    return this.defineRelationProperty('comments').hasMany(Comment)
+  }
 }
+Eloquent.register(Post)

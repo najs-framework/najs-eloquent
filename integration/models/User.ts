@@ -1,4 +1,5 @@
-import { Eloquent } from '../../dist/lib'
+import { Eloquent, HasMany, HasManyRelation } from '../../dist/lib'
+import { Post } from './Post'
 
 export interface IUser {
   email: string
@@ -11,13 +12,19 @@ export interface IUser {
   deleted_at: Date | null
 }
 
+export interface IUserRelations {
+  posts: HasMany<Post>
+
+  getPostsRelation(): HasManyRelation<Post>
+}
+
 /**
  * User model, extends from Eloquent<IPost>
  *   - supports full definitions of Eloquent<IPost>
  *   - DO NOT SUPPORT definitions of static API
  */
-export interface User extends IUser {}
-export class User extends Eloquent<IUser> {
+export interface User extends IUser, IUserRelations {}
+export class User extends Eloquent<IUser & IUserRelations> {
   static className: string = 'User'
   static timestamps = true
   static softDeletes = true
@@ -40,4 +47,9 @@ export class User extends Eloquent<IUser> {
   }
 
   setRawPassword(password: string) {}
+
+  getPostsRelation(): HasManyRelation<Post> {
+    return this.defineRelationProperty('posts').hasMany(Post)
+  }
 }
+Eloquent.register(User)

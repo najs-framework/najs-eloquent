@@ -62,7 +62,7 @@ class RelationFactory {
     }
     setupHasOneOrMany(oneToOne, local, foreign) {
         const relation = najs_binding_1.make(constants_1.NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name]);
-        relation.setup(true, local, foreign);
+        relation.setup(oneToOne, local, foreign);
         return relation;
     }
     setupRelation(className, setup) {
