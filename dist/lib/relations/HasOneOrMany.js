@@ -26,19 +26,14 @@ class HasOneOrMany extends Relation_1.Relation {
         return data;
     }
     getQueryInfo() {
-        if (this.rootModel.getModelName() === this.local.model) {
-            return {
-                model: this.foreign.model,
-                table: this.foreign.table,
-                filterKey: this.foreign.key,
-                valuesKey: this.local.key
-            };
-        }
+        const isUsingLocal = this.rootModel.getModelName() === this.local.model;
+        const local = isUsingLocal ? this.local : this.foreign;
+        const foreign = isUsingLocal ? this.foreign : this.local;
         return {
-            model: this.local.model,
-            table: this.local.table,
-            filterKey: this.local.key,
-            valuesKey: this.foreign.key
+            model: foreign.model,
+            table: foreign.table,
+            filterKey: foreign.key,
+            valuesKey: local.key
         };
     }
     async eagerLoad() {
