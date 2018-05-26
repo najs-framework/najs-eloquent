@@ -20,23 +20,19 @@ export class RelationFactory implements NajsEloquent.Relation.IRelationFactory {
   }
 
   hasOne(model: string | NajsEloquent.Model.ModelDefinition<any>, foreignKey?: string, localKey?: string): any {
-    return this.setupRelation(NajsEloquent.Relation.HasOneOrMany, () => {
-      const foreign: NajsEloquent.Model.IModel<any> = this.getModelByNameOrDefinition(model)
-      const localInfo = {
-        model: this.rootModel.getModelName(),
-        table: this.rootModel.getRecordName(),
-        key: localKey || this.rootModel.getPrimaryKeyName()
-      }
-      const foreignInfo = {
-        model: foreign.getModelName(),
-        table: foreign.getRecordName(),
-        key: foreignKey || foreign.getDriver().formatAttributeName(`${this.rootModel.getModelName()}Id`)
-      }
-      return this.setupHasOneOrMany(true, localInfo, foreignInfo)
-    })
+    return this.hasOneOrMany(true, model, foreignKey, localKey)
   }
 
   hasMany(model: string | NajsEloquent.Model.ModelDefinition<any>, foreignKey?: string, localKey?: string): any {
+    return this.hasOneOrMany(false, model, foreignKey, localKey)
+  }
+
+  protected hasOneOrMany(
+    is1v1: boolean,
+    model: string | NajsEloquent.Model.ModelDefinition<any>,
+    foreignKey?: string,
+    localKey?: string
+  ) {
     return this.setupRelation(NajsEloquent.Relation.HasOneOrMany, () => {
       const foreign: NajsEloquent.Model.IModel<any> = this.getModelByNameOrDefinition(model)
       const localInfo = {
@@ -49,7 +45,7 @@ export class RelationFactory implements NajsEloquent.Relation.IRelationFactory {
         table: foreign.getRecordName(),
         key: foreignKey || foreign.getDriver().formatAttributeName(`${this.rootModel.getModelName()}Id`)
       }
-      return this.setupHasOneOrMany(false, localInfo, foreignInfo)
+      return this.setupHasOneOrMany(is1v1, localInfo, foreignInfo)
     })
   }
 

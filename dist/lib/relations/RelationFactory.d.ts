@@ -11,6 +11,7 @@ export declare class RelationFactory implements NajsEloquent.Relation.IRelationF
     constructor(rootModel: NajsEloquent.Model.IModel<any>, name: string, isSample: boolean);
     hasOne(model: string | NajsEloquent.Model.ModelDefinition<any>, foreignKey?: string, localKey?: string): any;
     hasMany(model: string | NajsEloquent.Model.ModelDefinition<any>, foreignKey?: string, localKey?: string): any;
+    protected hasOneOrMany(is1v1: boolean, model: string | NajsEloquent.Model.ModelDefinition<any>, foreignKey?: string, localKey?: string): {};
     belongsTo(model: string | NajsEloquent.Model.ModelDefinition<any>, foreignKey?: string, localKey?: string): any;
     setupHasOneOrMany(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo): HasOneOrMany;
     setupRelation(className: string, setup: () => NajsEloquent.Relation.IRelation): {};

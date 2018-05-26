@@ -13,22 +13,12 @@ class RelationFactory {
         this.isSample = isSample;
     }
     hasOne(model, foreignKey, localKey) {
-        return this.setupRelation(constants_1.NajsEloquent.Relation.HasOneOrMany, () => {
-            const foreign = this.getModelByNameOrDefinition(model);
-            const localInfo = {
-                model: this.rootModel.getModelName(),
-                table: this.rootModel.getRecordName(),
-                key: localKey || this.rootModel.getPrimaryKeyName()
-            };
-            const foreignInfo = {
-                model: foreign.getModelName(),
-                table: foreign.getRecordName(),
-                key: foreignKey || foreign.getDriver().formatAttributeName(`${this.rootModel.getModelName()}Id`)
-            };
-            return this.setupHasOneOrMany(true, localInfo, foreignInfo);
-        });
+        return this.hasOneOrMany(true, model, foreignKey, localKey);
     }
     hasMany(model, foreignKey, localKey) {
+        return this.hasOneOrMany(false, model, foreignKey, localKey);
+    }
+    hasOneOrMany(is1v1, model, foreignKey, localKey) {
         return this.setupRelation(constants_1.NajsEloquent.Relation.HasOneOrMany, () => {
             const foreign = this.getModelByNameOrDefinition(model);
             const localInfo = {
@@ -41,7 +31,7 @@ class RelationFactory {
                 table: foreign.getRecordName(),
                 key: foreignKey || foreign.getDriver().formatAttributeName(`${this.rootModel.getModelName()}Id`)
             };
-            return this.setupHasOneOrMany(false, localInfo, foreignInfo);
+            return this.setupHasOneOrMany(is1v1, localInfo, foreignInfo);
         });
     }
     belongsTo(model, foreignKey, localKey) {
