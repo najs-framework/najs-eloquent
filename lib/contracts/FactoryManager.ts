@@ -3,43 +3,102 @@
 
 namespace Najs.Contracts.Eloquent {
   export interface FactoryManager {
+    /**
+     * Define a class with a given set of attributes.
+     *
+     * @param {string|Function} className
+     * @param {Function} definition
+     * @param {string} name
+     */
     define(
       className: string | NajsEloquent.Model.ModelDefinition<any>,
       definition: NajsEloquent.Factory.FactoryDefinition,
-      name: string
+      name?: string
     ): this
 
+    /**
+     * Define a class with a given short-name.
+     *
+     * @param {string|Function} className
+     * @param {string} name
+     * @param {Function} definition
+     */
     defineAs(
       className: string | NajsEloquent.Model.ModelDefinition<any>,
       name: string,
       definition: NajsEloquent.Factory.FactoryDefinition
     ): this
 
+    /**
+     * Define a state with a given set of attributes.
+     *
+     * @param {string|Function} className
+     * @param {string} state
+     * @param {Function} definition
+     */
     state(
       className: string | NajsEloquent.Model.ModelDefinition<any>,
       state: string,
       definition: NajsEloquent.Factory.FactoryDefinition
     ): this
 
-    of<T>(className: string | NajsEloquent.Model.ModelDefinition<T>): FactoryBuilder<T>
-    of<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name: string): FactoryBuilder<T>
+    /**
+     * Create a builder for the given model.
+     *
+     * @param {string|Function} className
+     * @param {string} name
+     */
+    of<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name?: string): FactoryBuilder<T>
 
-    create<T>(className: string | NajsEloquent.Model.ModelDefinition<T>): T
-    create<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, attributes: Object): T
+    /**
+     * Create an instance of the given model and persist it to the database.
+     *
+     * @param {string|Function} className
+     * @param {Object} attributes
+     */
+    create<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, attributes?: Object): T
 
-    createAs<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name: string): T
-    createAs<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name: string, attributes: Object): T
+    /**
+     * Create an instance of the given model and type and persist it to the database.
+     *
+     * @param {string|Function} className
+     * @param {string} name
+     * @param {Object} attributes
+     */
+    createAs<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name: string, attributes?: Object): T
 
-    make<T>(className: string | NajsEloquent.Model.ModelDefinition<T>): T
-    make<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, attributes: Object): T
+    /**
+     * Create an instance of the given model.
+     *
+     * @param {string|Function} className
+     * @param {Object} attributes
+     */
+    make<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, attributes?: Object): T
 
-    makeAs<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name: string): T
-    makeAs<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name: string, attributes: Object): T
+    /**
+     * Create an instance of the given model and type.
+     *
+     * @param {string|Function} className
+     * @param {string} name
+     * @param {Object} attributes
+     */
+    makeAs<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name: string, attributes?: Object): T
 
-    raw<T>(className: string | NajsEloquent.Model.ModelDefinition<T>): T
-    raw<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, attributes: Object): T
+    /**
+     * Get the raw attribute array for a given model.
+     *
+     * @param {string|Function} className
+     * @param {Object} attributes
+     */
+    raw<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, attributes?: Object): T
 
-    rawOf<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name: string): T
-    rawOf<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name: string, attributes: Object): T
+    /**
+     * Get the raw attribute array for a given named model.
+     *
+     * @param {string|Function} className
+     * @param {string} name
+     * @param {Object} attributes
+     */
+    rawOf<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name: string, attributes?: Object): T
   }
 }

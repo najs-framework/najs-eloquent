@@ -1,4 +1,5 @@
 "use strict";
+/// <reference path="../contracts/FactoryBuilder.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
 const lodash_1 = require("lodash");

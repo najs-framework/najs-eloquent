@@ -1,12 +1,16 @@
+/// <reference path="../contracts/FactoryBuilder.ts" />
+
 import { make } from 'najs-binding'
 import { range, flatten, isFunction, isPlainObject } from 'lodash'
 import collect from 'collect.js'
 import { ChanceFaker } from './FactoryManager'
 import { Eloquent } from '../model/Eloquent'
-import { IFactoryBuilder, IFactoryBuilderCollection } from './interfaces/IFactoryBuilder'
 import { Collection } from 'collect.js'
 
-export class FactoryBuilder<T extends Eloquent> implements IFactoryBuilder<T> {
+export interface FactoryBuilder<T extends Eloquent>
+  extends Najs.Contracts.Eloquent.FactoryBuilder<T>,
+    Najs.Contracts.Eloquent.FactoryBuilderCollection<T> {}
+export class FactoryBuilder<T extends Eloquent> {
   protected className: string
   protected name: string
   protected definitions: Object
@@ -23,26 +27,20 @@ export class FactoryBuilder<T extends Eloquent> implements IFactoryBuilder<T> {
     this.faker = faker
   }
 
-  times(amount: number): IFactoryBuilderCollection<T> {
+  times(amount: number): any {
     this.amount = amount
 
     return this
   }
 
-  states(state: string): this
-  states(states: string[]): this
-  states(...state: string[]): this
-  states(...states: Array<string[]>): this
   states(...states: any[]): this {
     this.activeStates = !this.activeStates ? flatten(states) : this.activeStates.concat(flatten(states))
 
     return this
   }
 
-  async create<T>(): Promise<T>
-  async create<T>(attributes: Object): Promise<T>
   async create(attributes?: Object): Promise<any> {
-    const result = this.make<T>(<any>attributes)
+    const result = this.make(<any>attributes)
 
     if (result instanceof Eloquent) {
       await result['save']()
@@ -54,8 +52,6 @@ export class FactoryBuilder<T extends Eloquent> implements IFactoryBuilder<T> {
     })
   }
 
-  make<T>(): T
-  make<T>(attributes: Object): T
   make(attributes?: Object): any {
     if (typeof this.amount === 'undefined') {
       return this.makeInstance(attributes)
@@ -70,8 +66,6 @@ export class FactoryBuilder<T extends Eloquent> implements IFactoryBuilder<T> {
     )
   }
 
-  raw<T>(): T
-  raw<T>(attributes: Object): T
   raw(attributes?: Object): any {
     if (typeof this.amount === 'undefined') {
       return this.getRawAttributes(attributes)

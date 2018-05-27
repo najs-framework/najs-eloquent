@@ -1,7 +1,5 @@
 /// <reference path="../../model/interfaces/IModel.ts" />
 
-import { IFactoryBuilder } from './IFactoryBuilder'
-
 export interface ModelClass<T> {
   new (): T
 }
@@ -25,8 +23,8 @@ export interface IFactoryManager<Faker> {
     definition: IFactoryDefinition<Faker>
   ): this
 
-  of<T>(className: string | ModelClass<T>): IFactoryBuilder<T>
-  of<T>(className: string | ModelClass<T>, name: string): IFactoryBuilder<T>
+  of<T>(className: string | ModelClass<T>): any
+  of<T>(className: string | ModelClass<T>, name: string): any
 
   create<T = any>(className: string | ModelClass<T>): Promise<T>
   create<T = any>(className: string | ModelClass<T>, attributes: Object): Promise<T>

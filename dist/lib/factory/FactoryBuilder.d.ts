@@ -1,7 +1,9 @@
+/// <reference path="../contracts/FactoryBuilder.d.ts" />
 import { ChanceFaker } from './FactoryManager';
 import { Eloquent } from '../model/Eloquent';
-import { IFactoryBuilder, IFactoryBuilderCollection } from './interfaces/IFactoryBuilder';
-export declare class FactoryBuilder<T extends Eloquent> implements IFactoryBuilder<T> {
+export interface FactoryBuilder<T extends Eloquent> extends Najs.Contracts.Eloquent.FactoryBuilder<T>, Najs.Contracts.Eloquent.FactoryBuilderCollection<T> {
+}
+export declare class FactoryBuilder<T extends Eloquent> {
     protected className: string;
     protected name: string;
     protected definitions: Object;
@@ -10,17 +12,11 @@ export declare class FactoryBuilder<T extends Eloquent> implements IFactoryBuild
     protected amount?: number;
     protected activeStates?: string[];
     constructor(className: string, name: string, definitions: Object, states: Object, faker: ChanceFaker);
-    times(amount: number): IFactoryBuilderCollection<T>;
-    states(state: string): this;
-    states(states: string[]): this;
-    states(...state: string[]): this;
-    states(...states: Array<string[]>): this;
-    create<T>(): Promise<T>;
-    create<T>(attributes: Object): Promise<T>;
-    make<T>(): T;
-    make<T>(attributes: Object): T;
-    raw<T>(): T;
-    raw<T>(attributes: Object): T;
+    times(amount: number): any;
+    states(...states: any[]): this;
+    create(attributes?: Object): Promise<any>;
+    make(attributes?: Object): any;
+    raw(attributes?: Object): any;
     protected makeInstance(attributes?: Object): any;
     protected getRawAttributes(attributes?: Object): any;
     protected applyStates(definition: Object, attributes?: Object): Object;

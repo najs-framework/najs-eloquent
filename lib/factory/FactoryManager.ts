@@ -1,3 +1,4 @@
+/// <reference path="../contracts/FactoryBuilder.ts" />
 /// <reference types="chance" />
 
 import { Facade } from 'najs-facade'
@@ -6,7 +7,6 @@ import { Eloquent } from '../model/Eloquent'
 import { FactoryBuilder } from './FactoryBuilder'
 import { Chance } from 'chance'
 import { NajsEloquent } from '../constants'
-import { IFactoryBuilder } from './interfaces/IFactoryBuilder'
 import { IFactoryManager, IFactoryDefinition, ModelClass } from './interfaces/IFactoryManager'
 
 export type ChanceFaker = Chance.Chance
@@ -62,9 +62,9 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
     return this.addDefinition('states', className, state, definition)
   }
 
-  of<T>(className: string | ModelClass<T>): IFactoryBuilder<T>
-  of<T>(className: string | ModelClass<T>, name: string): IFactoryBuilder<T>
-  of(className: string | ModelClass<any>, name: string = 'default'): IFactoryBuilder<any> {
+  of<T>(className: string | ModelClass<T>): Najs.Contracts.Eloquent.FactoryBuilder<T>
+  of<T>(className: string | ModelClass<T>, name: string): Najs.Contracts.Eloquent.FactoryBuilder<T>
+  of(className: string | ModelClass<any>, name: string = 'default'): Najs.Contracts.Eloquent.FactoryBuilder<any> {
     return new FactoryBuilder(this.parseModelName(className), name, this.definitions, this.states, this.faker)
   }
 

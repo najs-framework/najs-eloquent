@@ -1,4 +1,5 @@
 "use strict";
+/// <reference path="../contracts/FactoryBuilder.ts" />
 /// <reference types="chance" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_facade_1 = require("najs-facade");
