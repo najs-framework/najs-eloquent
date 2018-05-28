@@ -1,4 +1,5 @@
 "use strict";
+/// <reference path="../../contracts/FactoryManager.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 require("../../factory/FactoryManager");
 const najs_binding_1 = require("najs-binding");

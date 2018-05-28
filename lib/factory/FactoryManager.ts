@@ -1,17 +1,18 @@
+/// <reference path="../contracts/FactoryManager.ts" />
 /// <reference path="../contracts/FactoryBuilder.ts" />
+/// <reference path="../model/interfaces/IModel.ts" />
 /// <reference types="chance" />
 
+import './FactoryBuilder'
 import { Facade } from 'najs-facade'
-import { register, IAutoload, getClassName } from 'najs-binding'
+import { register, make, getClassName } from 'najs-binding'
 import { Eloquent } from '../model/Eloquent'
-import { FactoryBuilder } from './FactoryBuilder'
 import { Chance } from 'chance'
 import { NajsEloquent } from '../constants'
-import { IFactoryManager, IFactoryDefinition, ModelClass } from './interfaces/IFactoryManager'
 
 export type ChanceFaker = Chance.Chance
 
-export class FactoryManager extends Facade implements IAutoload, IFactoryManager<ChanceFaker> {
+export class FactoryManager extends Facade implements Najs.Contracts.Eloquent.FactoryManager {
   static className: string = NajsEloquent.Factory.FactoryManager
 
   protected faker: ChanceFaker
@@ -38,7 +39,7 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
     return this
   }
 
-  private parseModelName(className: string | ModelClass<Eloquent>): string {
+  private parseModelName(className: string | { new (): any }): string {
     if (typeof className === 'function') {
       Eloquent.register(<any>className)
       return getClassName(className)
@@ -47,61 +48,71 @@ export class FactoryManager extends Facade implements IAutoload, IFactoryManager
   }
 
   define(
-    className: string | ModelClass<Eloquent>,
-    definition: IFactoryDefinition<ChanceFaker>,
+    className: string | { new (): any },
+    definition: NajsEloquent.Factory.FactoryDefinition,
     name: string = 'default'
   ): this {
     return this.addDefinition('definitions', className, name, definition)
   }
 
-  defineAs(className: string | ModelClass<Eloquent>, name: string, definition: IFactoryDefinition<ChanceFaker>): this {
+  defineAs(
+    className: string | { new (): any },
+    name: string,
+    definition: NajsEloquent.Factory.FactoryDefinition
+  ): this {
     return this.define(className, definition, name)
   }
 
-  state(className: string | ModelClass<Eloquent>, state: string, definition: IFactoryDefinition<ChanceFaker>): this {
+  state(className: string | { new (): any }, state: string, definition: NajsEloquent.Factory.FactoryDefinition): this {
     return this.addDefinition('states', className, state, definition)
   }
 
-  of<T>(className: string | ModelClass<T>): Najs.Contracts.Eloquent.FactoryBuilder<T>
-  of<T>(className: string | ModelClass<T>, name: string): Najs.Contracts.Eloquent.FactoryBuilder<T>
-  of(className: string | ModelClass<any>, name: string = 'default'): Najs.Contracts.Eloquent.FactoryBuilder<any> {
-    return new FactoryBuilder(this.parseModelName(className), name, this.definitions, this.states, this.faker)
+  of<T>(className: string | { new (): T }): Najs.Contracts.Eloquent.FactoryBuilder<T>
+  of<T>(className: string | { new (): T }, name: string): Najs.Contracts.Eloquent.FactoryBuilder<T>
+  of(className: string | { new (): any }, name: string = 'default'): Najs.Contracts.Eloquent.FactoryBuilder<any> {
+    return make<Najs.Contracts.Eloquent.FactoryBuilder<any>>(NajsEloquent.Factory.FactoryBuilder, [
+      this.parseModelName(className),
+      name,
+      this.definitions,
+      this.states,
+      this.faker
+    ])
   }
 
-  create<T>(className: string | ModelClass<T>): T
-  create<T>(className: string | ModelClass<T>, attributes: Object): T
+  create<T>(className: string | { new (): T }): T
+  create<T>(className: string | { new (): T }, attributes: Object): T
   create(className: any): any {
     return this.of(className).create(arguments[1])
   }
 
-  createAs<T>(className: string | ModelClass<T>, name: string): T
-  createAs<T>(className: string | ModelClass<T>, name: string, attributes: Object): T
+  createAs<T>(className: string | { new (): T }, name: string): T
+  createAs<T>(className: string | { new (): T }, name: string, attributes: Object): T
   createAs(className: any, name: any): any {
     return this.of(className, name).create(arguments[2])
   }
 
-  make<T>(className: string | ModelClass<T>): T
-  make<T>(className: string | ModelClass<T>, attributes: Object): T
+  make<T>(className: string | { new (): T }): T
+  make<T>(className: string | { new (): T }, attributes: Object): T
   make(className: any): any {
     return this.of(className).make(arguments[1])
   }
 
-  makeAs<T>(className: string | ModelClass<T>, name: string): T
-  makeAs<T>(className: string | ModelClass<T>, name: string, attributes: Object): T
+  makeAs<T>(className: string | { new (): T }, name: string): T
+  makeAs<T>(className: string | { new (): T }, name: string, attributes: Object): T
   makeAs(className: any, name: string): any {
     return this.of(className, name).make(arguments[2])
   }
 
-  raw<T>(className: string | ModelClass<T>): T
-  raw<T>(className: string | ModelClass<T>, attributes: Object): T
+  raw<T>(className: string | { new (): T }): T
+  raw<T>(className: string | { new (): T }, attributes: Object): T
   raw(className: any): any {
     return this.of(className).raw(arguments[1])
   }
 
-  rawOf<T>(className: string | ModelClass<T>, name: string): T
-  rawOf<T>(className: string | ModelClass<T>, name: string, attributes: Object): T
+  rawOf<T>(className: string | { new (): T }, name: string): T
+  rawOf<T>(className: string | { new (): T }, name: string, attributes: Object): T
   rawOf(className: any, name: string): any {
     return this.of(className, name).raw(arguments[2])
   }
 }
-register(FactoryManager)
+register(FactoryManager, NajsEloquent.Factory.FactoryManager)

@@ -5,6 +5,7 @@ const najs_binding_1 = require("najs-binding");
 const lodash_1 = require("lodash");
 const collect_js_1 = require("collect.js");
 const Eloquent_1 = require("../model/Eloquent");
+const constants_1 = require("../constants");
 class FactoryBuilder {
     constructor(className, name, definitions, states, faker) {
         this.className = className;
@@ -12,6 +13,9 @@ class FactoryBuilder {
         this.definitions = definitions;
         this.definedStates = states;
         this.faker = faker;
+    }
+    getClassName() {
+        return constants_1.NajsEloquent.Factory.FactoryBuilder;
     }
     times(amount) {
         this.amount = amount;
@@ -91,3 +95,4 @@ class FactoryBuilder {
     }
 }
 exports.FactoryBuilder = FactoryBuilder;
+najs_binding_1.register(FactoryBuilder, constants_1.NajsEloquent.Factory.FactoryBuilder);

@@ -31,6 +31,7 @@ export declare const NajsEloquent: {
     };
     Factory: {
         FactoryManager: string;
+        FactoryBuilder: string;
     };
     QueryLog: {
         FlipFlopQueryLog: string;

@@ -33,6 +33,16 @@ describe('FactoryBuilder', function() {
     })
   })
 
+  describe('.getClassName()', function() {
+    it('implements Autoload and returns class name NajsEloquent.Factory.FactoryBuilder', function() {
+      const faker = {}
+      const definitions = {}
+      const states = {}
+      const builder = new FactoryBuilder('Class', 'name', definitions, states, <any>faker)
+      expect(builder.getClassName()).toEqual('NajsEloquent.Factory.FactoryBuilder')
+    })
+  })
+
   describe('.times()', function() {
     it('assigns param to "amount"', function() {
       const builder = new FactoryBuilder('Class', 'name', {}, {}, <any>{})

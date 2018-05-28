@@ -1,10 +1,11 @@
 /// <reference path="../contracts/FactoryBuilder.ts" />
 
-import { make } from 'najs-binding'
+import { register, make } from 'najs-binding'
 import { range, flatten, isFunction, isPlainObject } from 'lodash'
 import collect from 'collect.js'
 import { ChanceFaker } from './FactoryManager'
 import { Eloquent } from '../model/Eloquent'
+import { NajsEloquent } from '../constants'
 import { Collection } from 'collect.js'
 
 export interface FactoryBuilder<T extends Eloquent>
@@ -25,6 +26,10 @@ export class FactoryBuilder<T extends Eloquent> {
     this.definitions = definitions
     this.definedStates = states
     this.faker = faker
+  }
+
+  getClassName() {
+    return NajsEloquent.Factory.FactoryBuilder
   }
 
   times(amount: number): any {
@@ -130,3 +135,4 @@ export class FactoryBuilder<T extends Eloquent> {
     return attributes
   }
 }
+register(FactoryBuilder, NajsEloquent.Factory.FactoryBuilder)

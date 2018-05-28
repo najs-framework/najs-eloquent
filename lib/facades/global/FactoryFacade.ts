@@ -1,19 +1,22 @@
+/// <reference path="../../contracts/FactoryManager.ts" />
+
 import '../../factory/FactoryManager'
 import { make } from 'najs-binding'
 import { Facade, IFacade, IFacadeBase } from 'najs-facade'
 import { container } from '../container'
 import { NajsEloquent } from '../../constants'
-import { IFactory } from '../../factory/interfaces/IFactory'
-import { IFactoryManager, ModelClass } from '../../factory/interfaces/IFactoryManager'
-import { ChanceFaker } from '../../factory/FactoryManager'
 
-const facade = Facade.create<IFactoryManager<ChanceFaker>>(container, 'FactoryManager', function() {
-  return make<IFactoryManager<ChanceFaker>>(NajsEloquent.Factory.FactoryManager)
+const facade = Facade.create<Najs.Contracts.Eloquent.FactoryManager>(container, 'FactoryManager', function() {
+  return make<Najs.Contracts.Eloquent.FactoryManager>(NajsEloquent.Factory.FactoryManager)
 })
 
-export const FactoryFacade: IFactoryManager<ChanceFaker> & IFacade = facade
-export const Factory: IFactoryManager<ChanceFaker> & IFacadeBase = facade
-export const factory: IFactory = <any>function(className: string | ModelClass<any>, arg1: any, arg2: any): any {
+export const FactoryFacade: Najs.Contracts.Eloquent.FactoryManager & IFacade = facade
+export const Factory: Najs.Contracts.Eloquent.FactoryManager & IFacadeBase = facade
+export const factory: Najs.Contracts.Eloquent.FactoryFunction = <any>function(
+  className: string | any,
+  arg1: any,
+  arg2: any
+): any {
   let name: string = 'default'
   if (typeof arg1 === 'string') {
     name = arg1

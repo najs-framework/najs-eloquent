@@ -12,6 +12,7 @@ export declare class FactoryBuilder<T extends Eloquent> {
     protected amount?: number;
     protected activeStates?: string[];
     constructor(className: string, name: string, definitions: Object, states: Object, faker: ChanceFaker);
+    getClassName(): string;
     times(amount: number): any;
     states(...states: any[]): this;
     create(attributes?: Object): Promise<any>;

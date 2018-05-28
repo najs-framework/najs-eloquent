@@ -2,6 +2,13 @@
 /// <reference path="../factory/interfaces/FactoryDefinition.ts" />
 
 namespace Najs.Contracts.Eloquent {
+  export interface FactoryFunction {
+    <T>(className: string | { new (): T }): Najs.Contracts.Eloquent.FactoryBuilder<T>
+    <T>(className: string | { new (): T }, name: string): Najs.Contracts.Eloquent.FactoryBuilder<T>
+    <T>(className: string | { new (): T }, amount: number): Najs.Contracts.Eloquent.FactoryBuilder<T>
+    <T>(className: string | { new (): T }, name: string, amount: number): Najs.Contracts.Eloquent.FactoryBuilder<T>
+  }
+
   export interface FactoryManager {
     /**
      * Define a class with a given set of attributes.
@@ -10,11 +17,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {Function} definition
      * @param {string} name
      */
-    define(
-      className: string | NajsEloquent.Model.ModelDefinition<any>,
-      definition: NajsEloquent.Factory.FactoryDefinition,
-      name?: string
-    ): this
+    define(className: string | { new (): any }, definition: NajsEloquent.Factory.FactoryDefinition, name?: string): this
 
     /**
      * Define a class with a given short-name.
@@ -24,7 +27,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {Function} definition
      */
     defineAs(
-      className: string | NajsEloquent.Model.ModelDefinition<any>,
+      className: string | { new (): any },
       name: string,
       definition: NajsEloquent.Factory.FactoryDefinition
     ): this
@@ -36,11 +39,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string} state
      * @param {Function} definition
      */
-    state(
-      className: string | NajsEloquent.Model.ModelDefinition<any>,
-      state: string,
-      definition: NajsEloquent.Factory.FactoryDefinition
-    ): this
+    state(className: string | { new (): any }, state: string, definition: NajsEloquent.Factory.FactoryDefinition): this
 
     /**
      * Create a builder for the given model.
@@ -48,7 +47,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string|Function} className
      * @param {string} name
      */
-    of<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name?: string): FactoryBuilder<T>
+    of<T>(className: string | { new (): T }, name?: string): FactoryBuilder<T>
 
     /**
      * Create an instance of the given model and persist it to the database.
@@ -56,7 +55,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string|Function} className
      * @param {Object} attributes
      */
-    create<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, attributes?: Object): T
+    create<T>(className: string | { new (): T }, attributes?: Object): T
 
     /**
      * Create an instance of the given model and type and persist it to the database.
@@ -65,7 +64,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string} name
      * @param {Object} attributes
      */
-    createAs<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name: string, attributes?: Object): T
+    createAs<T>(className: string | { new (): T }, name: string, attributes?: Object): T
 
     /**
      * Create an instance of the given model.
@@ -73,7 +72,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string|Function} className
      * @param {Object} attributes
      */
-    make<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, attributes?: Object): T
+    make<T>(className: string | { new (): T }, attributes?: Object): T
 
     /**
      * Create an instance of the given model and type.
@@ -82,7 +81,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string} name
      * @param {Object} attributes
      */
-    makeAs<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name: string, attributes?: Object): T
+    makeAs<T>(className: string | { new (): T }, name: string, attributes?: Object): T
 
     /**
      * Get the raw attribute array for a given model.
@@ -90,7 +89,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string|Function} className
      * @param {Object} attributes
      */
-    raw<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, attributes?: Object): T
+    raw<T>(className: string | { new (): T }, attributes?: Object): T
 
     /**
      * Get the raw attribute array for a given named model.
@@ -99,6 +98,6 @@ namespace Najs.Contracts.Eloquent {
      * @param {string} name
      * @param {Object} attributes
      */
-    rawOf<T>(className: string | NajsEloquent.Model.ModelDefinition<T>, name: string, attributes?: Object): T
+    rawOf<T>(className: string | { new (): T }, name: string, attributes?: Object): T
   }
 }

@@ -1,11 +1,11 @@
+/// <reference path="../contracts/FactoryManager.d.ts" />
 /// <reference path="../contracts/FactoryBuilder.d.ts" />
+/// <reference path="../model/interfaces/IModel.d.ts" />
 /// <reference types="chance" />
+import './FactoryBuilder';
 import { Facade } from 'najs-facade';
-import { IAutoload } from 'najs-binding';
-import { Eloquent } from '../model/Eloquent';
-import { IFactoryManager, IFactoryDefinition, ModelClass } from './interfaces/IFactoryManager';
 export declare type ChanceFaker = Chance.Chance;
-export declare class FactoryManager extends Facade implements IAutoload, IFactoryManager<ChanceFaker> {
+export declare class FactoryManager extends Facade implements Najs.Contracts.Eloquent.FactoryManager {
     static className: string;
     protected faker: ChanceFaker;
     protected definitions: Object;
@@ -14,21 +14,55 @@ export declare class FactoryManager extends Facade implements IAutoload, IFactor
     getClassName(): string;
     protected addDefinition(bag: string, className: any, name: string, definition: any): this;
     private parseModelName(className);
-    define(className: string | ModelClass<Eloquent>, definition: IFactoryDefinition<ChanceFaker>, name?: string): this;
-    defineAs(className: string | ModelClass<Eloquent>, name: string, definition: IFactoryDefinition<ChanceFaker>): this;
-    state(className: string | ModelClass<Eloquent>, state: string, definition: IFactoryDefinition<ChanceFaker>): this;
-    of<T>(className: string | ModelClass<T>): Najs.Contracts.Eloquent.FactoryBuilder<T>;
-    of<T>(className: string | ModelClass<T>, name: string): Najs.Contracts.Eloquent.FactoryBuilder<T>;
-    create<T>(className: string | ModelClass<T>): T;
-    create<T>(className: string | ModelClass<T>, attributes: Object): T;
-    createAs<T>(className: string | ModelClass<T>, name: string): T;
-    createAs<T>(className: string | ModelClass<T>, name: string, attributes: Object): T;
-    make<T>(className: string | ModelClass<T>): T;
-    make<T>(className: string | ModelClass<T>, attributes: Object): T;
-    makeAs<T>(className: string | ModelClass<T>, name: string): T;
-    makeAs<T>(className: string | ModelClass<T>, name: string, attributes: Object): T;
-    raw<T>(className: string | ModelClass<T>): T;
-    raw<T>(className: string | ModelClass<T>, attributes: Object): T;
-    rawOf<T>(className: string | ModelClass<T>, name: string): T;
-    rawOf<T>(className: string | ModelClass<T>, name: string, attributes: Object): T;
+    define(className: string | {
+        new (): any;
+    }, definition: NajsEloquent.Factory.FactoryDefinition, name?: string): this;
+    defineAs(className: string | {
+        new (): any;
+    }, name: string, definition: NajsEloquent.Factory.FactoryDefinition): this;
+    state(className: string | {
+        new (): any;
+    }, state: string, definition: NajsEloquent.Factory.FactoryDefinition): this;
+    of<T>(className: string | {
+        new (): T;
+    }): Najs.Contracts.Eloquent.FactoryBuilder<T>;
+    of<T>(className: string | {
+        new (): T;
+    }, name: string): Najs.Contracts.Eloquent.FactoryBuilder<T>;
+    create<T>(className: string | {
+        new (): T;
+    }): T;
+    create<T>(className: string | {
+        new (): T;
+    }, attributes: Object): T;
+    createAs<T>(className: string | {
+        new (): T;
+    }, name: string): T;
+    createAs<T>(className: string | {
+        new (): T;
+    }, name: string, attributes: Object): T;
+    make<T>(className: string | {
+        new (): T;
+    }): T;
+    make<T>(className: string | {
+        new (): T;
+    }, attributes: Object): T;
+    makeAs<T>(className: string | {
+        new (): T;
+    }, name: string): T;
+    makeAs<T>(className: string | {
+        new (): T;
+    }, name: string, attributes: Object): T;
+    raw<T>(className: string | {
+        new (): T;
+    }): T;
+    raw<T>(className: string | {
+        new (): T;
+    }, attributes: Object): T;
+    rawOf<T>(className: string | {
+        new (): T;
+    }, name: string): T;
+    rawOf<T>(className: string | {
+        new (): T;
+    }, name: string, attributes: Object): T;
 }
