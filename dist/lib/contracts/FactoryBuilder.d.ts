@@ -24,7 +24,7 @@ declare namespace Najs.Contracts.Eloquent {
          *
          * @param {Object} attributes
          */
-        raw<T = Model>(attributes?: Object): CollectJs.Collection<T>;
+        raw<T = Model>(attributes?: Object): T[];
     }
     interface FactoryBuilder<Model> {
         /**

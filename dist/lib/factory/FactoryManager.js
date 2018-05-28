@@ -53,25 +53,28 @@ class FactoryManager extends najs_facade_1.Facade {
             this.faker
         ]);
     }
-    create(className) {
-        return this.of(className).create(arguments[1]);
-    }
-    createAs(className, name) {
-        return this.of(className, name).create(arguments[2]);
-    }
-    make(className) {
-        return this.of(className).make(arguments[1]);
-    }
-    makeAs(className, name) {
-        return this.of(className, name).make(arguments[2]);
-    }
-    raw(className) {
-        return this.of(className).raw(arguments[1]);
-    }
-    rawOf(className, name) {
-        return this.of(className, name).raw(arguments[2]);
-    }
 }
 FactoryManager.className = constants_1.NajsEloquent.Factory.FactoryManager;
 exports.FactoryManager = FactoryManager;
+// implicit implements partial of FactoryManager
+const funcs = {
+    create: 'create',
+    createAs: 'create',
+    make: 'make',
+    makeAs: 'make',
+    raw: 'raw',
+    rawOf: 'raw'
+};
+for (const name in funcs) {
+    const hasName = name !== funcs[name];
+    FactoryManager.prototype[name] = function () {
+        const builder = this.of(arguments[0], hasName ? arguments[1] : 'default');
+        const second = arguments[hasName ? 2 : 1];
+        const third = arguments[hasName ? 3 : 2];
+        if (typeof second === 'number') {
+            return builder.times(second)[funcs[name]](third);
+        }
+        return builder[funcs[name]](second);
+    };
+}
 najs_binding_1.register(FactoryManager, constants_1.NajsEloquent.Factory.FactoryManager);

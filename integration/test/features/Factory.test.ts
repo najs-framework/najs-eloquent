@@ -12,7 +12,7 @@ interface ITest {
   deleted_at: Date | null
 }
 
-interface Test extends ITest { }
+interface Test extends ITest {}
 class Test extends Eloquent<ITest> {
   static className: string = 'Test'
   static timestamps = true
@@ -59,21 +59,21 @@ Factory.state(Test, 'testing', () => {
 
 function expectUser(user: User) {
   expect(Validator.isMongoId(user.id)).toBe(true)
-  expect(typeof (user.first_name)).toEqual('string')
-  expect(typeof (user.last_name)).toEqual('string')
+  expect(typeof user.first_name).toEqual('string')
+  expect(typeof user.last_name).toEqual('string')
   expect(Validator.isEmail(user.email)).toBe(true)
   expect(user.deleted_at).toBeNull()
-  expect(typeof (user.age)).toEqual('number')
+  expect(typeof user.age).toEqual('number')
 }
 
 function expectTest(test: Test) {
   expect(Validator.isMongoId(test.id)).toBe(true)
-  expect(typeof (test.name)).toEqual('string')
+  expect(typeof test.name).toEqual('string')
   expect(test.deleted_at).toBeNull()
 }
 
-describe('Factory', function () {
-  beforeAll(async function () {
+describe('Factory', function() {
+  beforeAll(async function() {
     await init_mongoose('integration_factory')
   })
 
@@ -81,65 +81,75 @@ describe('Factory', function () {
   //   await delete_collection(['users'])
   // })
 
-  describe('.make()', function () {
-    it('can make an instance of User', function () {
+  describe('.make()', function() {
+    it('can make an instance of User', function() {
       const testUser = Factory.make(User)
       expectUser(testUser)
     })
 
-    it('can make an instance of Test with status is tested', function () {
-      const test = factory(Test).states(['tested']).make()
+    it('can make an instance of Test with status is tested', function() {
+      const test = factory(Test)
+        .states(['tested'])
+        .make()
       expectTest(test)
       expect(test.status).toEqual('tested')
     })
 
-    it('can make an instance of Test with status is testing', function () {
-      const test = factory(Test).states(['testing']).make()
+    it('can make an instance of Test with status is testing', function() {
+      const test = factory(Test)
+        .states(['testing'])
+        .make()
       expectTest(test)
       expect(test.status).toEqual('testing')
     })
   })
 
-  describe('.makeAs()', function () {
-    it('can make as an instance of Test', function () {
+  describe('.makeAs()', function() {
+    it('can make as an instance of Test', function() {
       const test = Factory.makeAs(Test, 'test')
       expectTest(test)
       expect(test.is_test).toBe(true)
     })
   })
 
-  describe('.create()', function () {
-    it('can create an instance of User', async function () {
+  describe('.create()', function() {
+    it('can create an instance of User', async function() {
       const testUser = await Factory.create(User)
       expectUser(testUser)
       expect(testUser.created_at instanceof Date).toBe(true)
       expect(testUser.updated_at instanceof Date).toBe(true)
     })
 
-    it('can create an instance of Test with status is tested', async function () {
-      const test = await factory(Test).states(['tested']).create()
+    it('can create an instance of Test with status is tested', async function() {
+      const test = await factory(Test)
+        .states(['tested'])
+        .create()
       expectTest(test)
       expect(test.status).toEqual('tested')
       expect(test.created_at instanceof Date).toBe(true)
       expect(test.updated_at instanceof Date).toBe(true)
     })
 
-    it('can create an instance of Test with status is testing', async function () {
-      const test = await factory(Test).states(['testing']).create()
+    it('can create an instance of Test with status is testing', async function() {
+      const test = await factory(Test)
+        .states(['testing'])
+        .create()
       expectTest(test)
       expect(test.status).toEqual('testing')
       expect(test.created_at instanceof Date).toBe(true)
       expect(test.updated_at instanceof Date).toBe(true)
     })
 
-    it('can create 5 instance of User', async function () {
-      const users = await factory(User).times(5).create()
+    it('can create 5 instance of User', async function() {
+      const users = await factory(User)
+        .times(5)
+        .create()
       expect(users.count()).toEqual(5)
     })
   })
 
-  describe('.createAs()', function () {
-    it('can create as an instance of Test', async function () {
+  describe('.createAs()', function() {
+    it('can create as an instance of Test', async function() {
       const test = await Factory.createAs(Test, 'test')
       expectTest(test)
       expect(test.created_at instanceof Date).toBe(true)
@@ -148,24 +158,21 @@ describe('Factory', function () {
     })
   })
 
-  describe('.rawOf()', function () {
-    it('can raw of an instance of Test', function () {
+  describe('.rawOf()', function() {
+    it('can raw of an instance of Test', function() {
       const test = Factory.rawOf(Test, 'test')
       expect(test).toMatchObject({ is_test: true })
     })
   })
 
-  describe('.raw()', function () {
-    it('can raw an instance of Test', function () {
+  describe('.raw()', function() {
+    it('can raw an instance of Test', function() {
       const test = Factory.raw(Test, { name: 'test' })
       expect(test).toMatchObject({ name: 'test' })
-    })
-  })
-
-  describe('.getFacade()', function () {
-    it('can raw an instance of Test', function () {
-      const test = Factory.getFacade().createMock()
-      console.log(test)
+      const array = Factory.raw(Test, 10, { name: 'test' })
+      for (const item of array) {
+        expect(item).toMatchObject({ name: 'test' })
+      }
     })
   })
 })

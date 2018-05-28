@@ -203,5 +203,32 @@ describe('FactoryManager', function() {
         }
       })
     })
+
+    it('calls .of().times() then .' + CreateByOfForwardToBuilder[name] + '() and returns a result', function() {
+      const factoryManager = new FactoryManager()
+
+      const ofStub = Sinon.stub(factoryManager, 'of')
+      ofStub.returns({
+        times: function(amount: any) {
+          this.amount = amount
+          return this
+        },
+        [CreateByOfForwardToBuilder[name]]: function(val: any) {
+          return 'anything-' + this.amount + '-' + val
+        }
+      })
+
+      if (hasNameParam) {
+        expect(factoryManager[name]('Class', 'name', 10)).toEqual('anything-10-undefined')
+        expect(ofStub.calledWith('Class', 'name')).toBe(true)
+        expect(factoryManager[name]('Class', 'name', 10, 'test')).toEqual('anything-10-test')
+        expect(ofStub.calledWith('Class', 'name')).toBe(true)
+      } else {
+        expect(factoryManager[name]('Class', 10)).toEqual('anything-10-undefined')
+        expect(ofStub.calledWith('Class')).toBe(true)
+        expect(factoryManager[name]('Class', 'test')).toEqual('anything-10-test')
+        expect(ofStub.calledWith('Class')).toBe(true)
+      }
+    })
   }
 })
