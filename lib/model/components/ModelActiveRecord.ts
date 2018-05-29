@@ -2,6 +2,7 @@
 /// <reference path="../interfaces/IModel.ts" />
 
 import { register } from 'najs-binding'
+import { flatten } from 'lodash'
 import { NajsEloquent } from '../../constants'
 
 export class ModelActiveRecord implements Najs.Contracts.Eloquent.Component {
@@ -12,6 +13,7 @@ export class ModelActiveRecord implements Najs.Contracts.Eloquent.Component {
 
   extend(prototype: Object, bases: Object[], driver: Najs.Contracts.Eloquent.Driver<any>): void {
     prototype['isNew'] = ModelActiveRecord.isNew
+    prototype['isDirty'] = ModelActiveRecord.isDirty
     prototype['delete'] = ModelActiveRecord.delete
     prototype['save'] = ModelActiveRecord.save
     prototype['fresh'] = ModelActiveRecord.fresh
@@ -19,6 +21,16 @@ export class ModelActiveRecord implements Najs.Contracts.Eloquent.Component {
 
   static isNew: NajsEloquent.Model.ModelMethod<boolean> = function() {
     return this['driver'].isNew()
+  }
+
+  static isDirty: NajsEloquent.Model.ModelMethod<boolean> = function() {
+    const fields = flatten(arguments)
+    for (const field of fields) {
+      if (!this['driver'].isModified(field)) {
+        return false
+      }
+    }
+    return true
   }
 
   static delete: NajsEloquent.Model.ModelMethod<Promise<boolean>> = function() {

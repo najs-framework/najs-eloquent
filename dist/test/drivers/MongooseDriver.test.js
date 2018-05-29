@@ -418,6 +418,19 @@ describe('MongooseDriver', function () {
             expect(markModifiedSpy.calledWith('test')).toBe(true);
         });
     });
+    describe('.isModified()', function () {
+        it('calls and returns attributes.isModified()', function () {
+            const driver = new MongooseDriver_1.MongooseDriver(modelInstance);
+            driver['attributes'] = {
+                isModified(name) {
+                    return 'is-' + name;
+                }
+            };
+            const isModifiedSpy = Sinon.spy(driver['attributes'], 'isModified');
+            expect(driver.isModified('test')).toEqual('is-test');
+            expect(isModifiedSpy.calledWith('test')).toBe(true);
+        });
+    });
     describe('.isNew()', function () {
         it('returns attributes.isNew', function () {
             const driver = new MongooseDriver_1.MongooseDriver(modelInstance);

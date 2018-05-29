@@ -140,6 +140,9 @@ class MongooseDriver {
     markModified(name) {
         this.attributes.markModified(name);
     }
+    isModified(name) {
+        return this.attributes.isModified(name);
+    }
     isNew() {
         return this.attributes.isNew;
     }

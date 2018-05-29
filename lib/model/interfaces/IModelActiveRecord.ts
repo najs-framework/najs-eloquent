@@ -8,6 +8,13 @@ namespace NajsEloquent.Model {
     isNew(): boolean
 
     /**
+     * Determine the path is modified or not.
+     *
+     * @param {string|string[]} paths
+     */
+    isDirty(...paths: Array<string | string[]>): boolean
+
+    /**
      * Delete the model, use soft-delete if it is enabled.
      */
     delete(): Promise<boolean>

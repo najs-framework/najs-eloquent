@@ -94,6 +94,10 @@ declare namespace Najs.Contracts.Eloquent {
          */
         markModified(name: string): void;
         /**
+         * Determine the field is modified or not.
+         */
+        isModified(field: string): boolean;
+        /**
          * Determine the model is new or not.
          */
         isNew(): boolean;

@@ -158,6 +158,13 @@ describe('DummyDriver', function() {
     })
   })
 
+  describe('.isModified()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.isModified('test')
+    })
+  })
+
   describe('.getModelComponentName()', function() {
     it('should work', function() {
       const driver = new DummyDriver()

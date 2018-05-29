@@ -18,7 +18,7 @@ describe('Model/Fillable', function() {
 
     describe('.extend()', function() {
       it('extends the given prototype with 8 functions', function() {
-        const functions = ['isNew', 'delete', 'save', 'fresh']
+        const functions = ['isNew', 'isDirty', 'delete', 'save', 'fresh']
         const prototype = {}
         const activeRecord = new ModelActiveRecord()
         activeRecord.extend(prototype, [], <any>{})
@@ -45,6 +45,25 @@ describe('Model/Fillable', function() {
         const model = new Model()
         model['driver'] = <any>driver
         expect(model.isNew()).toEqual('anything')
+      })
+    })
+
+    describe('.isDirty()', function() {
+      it('flattens arguments, loops and calls driver.isModified() with AND operator', function() {
+        const driver = {
+          isModified(name: string) {
+            if (name === 'false') {
+              return false
+            }
+            return true
+          }
+        }
+        const model = new Model()
+        model['driver'] = <any>driver
+        expect(model.isDirty('a', 'b', 'c')).toBe(true)
+        expect(model.isDirty(['a', 'b'], 'c')).toBe(true)
+        expect(model.isDirty(['a', 'b'], 'false')).toBe(false)
+        expect(model.isDirty('false', 'a', 'b')).toBe(false)
       })
     })
 

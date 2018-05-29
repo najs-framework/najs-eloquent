@@ -178,6 +178,10 @@ export class MongooseDriver<Record extends Object> implements Najs.Contracts.Elo
     this.attributes.markModified(name)
   }
 
+  isModified(name: string): boolean {
+    return this.attributes.isModified(name)
+  }
+
   isNew(): boolean {
     return this.attributes.isNew
   }

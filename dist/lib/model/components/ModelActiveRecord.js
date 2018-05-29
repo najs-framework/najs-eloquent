@@ -3,6 +3,7 @@
 /// <reference path="../interfaces/IModel.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
+const lodash_1 = require("lodash");
 const constants_1 = require("../../constants");
 class ModelActiveRecord {
     getClassName() {
@@ -10,6 +11,7 @@ class ModelActiveRecord {
     }
     extend(prototype, bases, driver) {
         prototype['isNew'] = ModelActiveRecord.isNew;
+        prototype['isDirty'] = ModelActiveRecord.isDirty;
         prototype['delete'] = ModelActiveRecord.delete;
         prototype['save'] = ModelActiveRecord.save;
         prototype['fresh'] = ModelActiveRecord.fresh;
@@ -18,6 +20,15 @@ class ModelActiveRecord {
 ModelActiveRecord.className = constants_1.NajsEloquent.Model.Component.ModelActiveRecord;
 ModelActiveRecord.isNew = function () {
     return this['driver'].isNew();
+};
+ModelActiveRecord.isDirty = function () {
+    const fields = lodash_1.flatten(arguments);
+    for (const field of fields) {
+        if (!this['driver'].isModified(field)) {
+            return false;
+        }
+    }
+    return true;
 };
 ModelActiveRecord.delete = function () {
     return this['driver'].delete(this.hasSoftDeletes());

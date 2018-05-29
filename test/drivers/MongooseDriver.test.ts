@@ -495,6 +495,20 @@ describe('MongooseDriver', function() {
     })
   })
 
+  describe('.isModified()', function() {
+    it('calls and returns attributes.isModified()', function() {
+      const driver = new MongooseDriver(modelInstance)
+      driver['attributes'] = <any>{
+        isModified(name: string) {
+          return 'is-' + name
+        }
+      }
+      const isModifiedSpy = Sinon.spy(driver['attributes'], 'isModified')
+      expect(driver.isModified('test')).toEqual('is-test')
+      expect(isModifiedSpy.calledWith('test')).toBe(true)
+    })
+  })
+
   describe('.isNew()', function() {
     it('returns attributes.isNew', function() {
       const driver = new MongooseDriver(modelInstance)

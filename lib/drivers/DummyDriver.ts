@@ -94,6 +94,10 @@ export class DummyDriver implements Najs.Contracts.Eloquent.Driver<Object> {
 
   markModified(name: string): void {}
 
+  isModified(name: string): boolean {
+    return false
+  }
+
   getModelComponentName(): string | undefined {
     return undefined
   }

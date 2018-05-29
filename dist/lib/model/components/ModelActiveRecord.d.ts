@@ -5,6 +5,7 @@ export declare class ModelActiveRecord implements Najs.Contracts.Eloquent.Compon
     getClassName(): string;
     extend(prototype: Object, bases: Object[], driver: Najs.Contracts.Eloquent.Driver<any>): void;
     static isNew: NajsEloquent.Model.ModelMethod<boolean>;
+    static isDirty: NajsEloquent.Model.ModelMethod<boolean>;
     static delete: NajsEloquent.Model.ModelMethod<Promise<boolean>>;
     static save: NajsEloquent.Model.ModelMethod<any>;
     static fresh: NajsEloquent.Model.ModelMethod<any>;
