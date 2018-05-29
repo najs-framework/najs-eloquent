@@ -37,7 +37,6 @@ export class RelationDataBucket implements NajsEloquent.Relation.IRelationDataBu
     }
 
     this.bucket[name][model.getPrimaryKey()] = record
-    model['relationDataBucket'] = this
     return <any>model
   }
 
@@ -46,7 +45,9 @@ export class RelationDataBucket implements NajsEloquent.Relation.IRelationDataBu
   }
 
   makeModelFromRecord(name: string, record: Object): NajsEloquent.Model.IModel<any> {
-    return make(this.modelMap[name], [record])
+    const model: any = make(this.modelMap[name], [record])
+    model['relationDataBucket'] = this
+    return model
   }
 
   makeCollectionFromRecords(name: string, records: Object[]): CollectJs.Collection<NajsEloquent.Model.IModel<any>> {

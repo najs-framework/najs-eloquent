@@ -28,14 +28,15 @@ class RelationDataBucket {
             this.bucket[name] = {};
         }
         this.bucket[name][model.getPrimaryKey()] = record;
-        model['relationDataBucket'] = this;
         return model;
     }
     newCollection(name, records) {
         return collect(records.map(item => this.newInstance(name, item)));
     }
     makeModelFromRecord(name, record) {
-        return najs_binding_1.make(this.modelMap[name], [record]);
+        const model = najs_binding_1.make(this.modelMap[name], [record]);
+        model['relationDataBucket'] = this;
+        return model;
     }
     makeCollectionFromRecords(name, records) {
         return collect(records.map(item => this.makeModelFromRecord(name, item)));

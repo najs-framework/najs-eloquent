@@ -72,15 +72,17 @@ describe('RelationDataBucket', function() {
 
   describe('.makeModelFromRecord()', function() {
     it('calls make() with model name from modelMap', function() {
+      const instance = {}
       const makeStub = Sinon.stub(NajsBinding, 'make')
-      makeStub.returns('anything')
+      makeStub.returns(instance)
 
       const relationDataBucket = new RelationDataBucket()
       relationDataBucket['modelMap'] = {
         test: 'Model'
       }
       const param = {}
-      expect(relationDataBucket.makeModelFromRecord('test', param)).toEqual('anything')
+      expect(relationDataBucket.makeModelFromRecord('test', param) === instance).toBe(true)
+      expect(instance['relationDataBucket'] === relationDataBucket).toBe(true)
       expect(makeStub.calledWith('Model', [param])).toBe(true)
       makeStub.restore()
     })
@@ -88,8 +90,9 @@ describe('RelationDataBucket', function() {
 
   describe('.makeCollectionFromRecords()', function() {
     it('creates new Collection by mapping records with .makeModelFromRecord()', function() {
+      const instance = {}
       const makeStub = Sinon.stub(NajsBinding, 'make')
-      makeStub.returns('anything')
+      makeStub.returns(instance)
 
       const relationDataBucket = new RelationDataBucket()
       relationDataBucket['modelMap'] = {
@@ -97,7 +100,8 @@ describe('RelationDataBucket', function() {
       }
       const result = relationDataBucket.makeCollectionFromRecords('test', [{}, {}])
       expect(result.count()).toBe(2)
-      expect(result.items).toEqual(['anything', 'anything'])
+      expect(result.items[0] === instance).toBe(true)
+      expect(result.items[1] === instance).toBe(true)
       makeStub.restore()
     })
   })
