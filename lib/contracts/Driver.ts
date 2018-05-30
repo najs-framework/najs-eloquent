@@ -115,7 +115,12 @@ namespace Najs.Contracts.Eloquent {
     /**
      * Determine the field is modified or not.
      */
-    isModified(field: string): boolean
+    isModified(name: string): boolean
+
+    /**
+     * Get modified fields name.
+     */
+    getModified(): string[]
 
     /**
      * Determine the model is new or not.

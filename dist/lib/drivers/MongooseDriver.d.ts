@@ -37,6 +37,7 @@ export declare class MongooseDriver<Record extends Object> implements Najs.Contr
     save(): Promise<any>;
     markModified(name: string): void;
     isModified(name: string): boolean;
+    getModified(): string[];
     isNew(): boolean;
     isSoftDeleted(): boolean;
     formatAttributeName(name: string): string;

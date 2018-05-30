@@ -12,6 +12,7 @@ class ModelActiveRecord {
     extend(prototype, bases, driver) {
         prototype['isNew'] = ModelActiveRecord.isNew;
         prototype['isDirty'] = ModelActiveRecord.isDirty;
+        prototype['getDirty'] = ModelActiveRecord.getDirty;
         prototype['delete'] = ModelActiveRecord.delete;
         prototype['save'] = ModelActiveRecord.save;
         prototype['fresh'] = ModelActiveRecord.fresh;
@@ -29,6 +30,9 @@ ModelActiveRecord.isDirty = function () {
         }
     }
     return true;
+};
+ModelActiveRecord.getDirty = function () {
+    return this['driver'].getModified();
 };
 ModelActiveRecord.delete = function () {
     return this['driver'].delete(this.hasSoftDeletes());

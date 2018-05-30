@@ -76,6 +76,9 @@ class DummyDriver {
     isModified(name) {
         return false;
     }
+    getModified() {
+        return [];
+    }
     getModelComponentName() {
         return undefined;
     }

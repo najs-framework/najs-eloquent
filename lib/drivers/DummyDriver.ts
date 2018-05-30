@@ -98,6 +98,10 @@ export class DummyDriver implements Najs.Contracts.Eloquent.Driver<Object> {
     return false
   }
 
+  getModified(): string[] {
+    return []
+  }
+
   getModelComponentName(): string | undefined {
     return undefined
   }

@@ -14,6 +14,7 @@ export class ModelActiveRecord implements Najs.Contracts.Eloquent.Component {
   extend(prototype: Object, bases: Object[], driver: Najs.Contracts.Eloquent.Driver<any>): void {
     prototype['isNew'] = ModelActiveRecord.isNew
     prototype['isDirty'] = ModelActiveRecord.isDirty
+    prototype['getDirty'] = ModelActiveRecord.getDirty
     prototype['delete'] = ModelActiveRecord.delete
     prototype['save'] = ModelActiveRecord.save
     prototype['fresh'] = ModelActiveRecord.fresh
@@ -31,6 +32,10 @@ export class ModelActiveRecord implements Najs.Contracts.Eloquent.Component {
       }
     }
     return true
+  }
+
+  static getDirty: NajsEloquent.Model.ModelMethod<string[]> = function() {
+    return this['driver'].getModified()
   }
 
   static delete: NajsEloquent.Model.ModelMethod<Promise<boolean>> = function() {

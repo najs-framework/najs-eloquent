@@ -24,6 +24,7 @@ export declare class DummyDriver implements Najs.Contracts.Eloquent.Driver<Objec
     isSoftDeleted(): boolean;
     markModified(name: string): void;
     isModified(name: string): boolean;
+    getModified(): string[];
     getModelComponentName(): string | undefined;
     getModelComponentOrder(components: string[]): string[];
     formatAttributeName(name: string): string;

@@ -18,7 +18,7 @@ describe('Model/Fillable', function() {
 
     describe('.extend()', function() {
       it('extends the given prototype with 8 functions', function() {
-        const functions = ['isNew', 'isDirty', 'delete', 'save', 'fresh']
+        const functions = ['isNew', 'isDirty', 'getDirty', 'delete', 'save', 'fresh']
         const prototype = {}
         const activeRecord = new ModelActiveRecord()
         activeRecord.extend(prototype, [], <any>{})
@@ -60,10 +60,25 @@ describe('Model/Fillable', function() {
         }
         const model = new Model()
         model['driver'] = <any>driver
+        expect(model.isDirty('a')).toBe(true)
+        expect(model.isDirty('false')).toBe(false)
         expect(model.isDirty('a', 'b', 'c')).toBe(true)
         expect(model.isDirty(['a', 'b'], 'c')).toBe(true)
         expect(model.isDirty(['a', 'b'], 'false')).toBe(false)
         expect(model.isDirty('false', 'a', 'b')).toBe(false)
+      })
+    })
+
+    describe('.getDirty()', function() {
+      it('calls and returns driver.getModified()', function() {
+        const driver = {
+          getModified(name: string) {
+            return 'getModified'
+          }
+        }
+        const model = new Model()
+        model['driver'] = <any>driver
+        expect(model.getDirty()).toEqual('getModified')
       })
     })
 

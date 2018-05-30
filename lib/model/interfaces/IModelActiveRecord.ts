@@ -15,6 +15,11 @@ namespace NajsEloquent.Model {
     isDirty(...paths: Array<string | string[]>): boolean
 
     /**
+     * Get modified paths.
+     */
+    getDirty(): string[]
+
+    /**
      * Delete the model, use soft-delete if it is enabled.
      */
     delete(): Promise<boolean>

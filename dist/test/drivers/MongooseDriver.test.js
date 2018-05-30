@@ -431,6 +431,19 @@ describe('MongooseDriver', function () {
             expect(isModifiedSpy.calledWith('test')).toBe(true);
         });
     });
+    describe('.getModified()', function () {
+        it('calls and returns attributes.modifiedPaths()', function () {
+            const driver = new MongooseDriver_1.MongooseDriver(modelInstance);
+            driver['attributes'] = {
+                modifiedPaths() {
+                    return 'modifiedPaths';
+                }
+            };
+            const modifiedPathsSpy = Sinon.spy(driver['attributes'], 'modifiedPaths');
+            expect(driver.getModified()).toEqual('modifiedPaths');
+            expect(modifiedPathsSpy.calledWith()).toBe(true);
+        });
+    });
     describe('.isNew()', function () {
         it('returns attributes.isNew', function () {
             const driver = new MongooseDriver_1.MongooseDriver(modelInstance);

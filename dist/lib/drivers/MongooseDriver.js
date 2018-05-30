@@ -143,6 +143,9 @@ class MongooseDriver {
     isModified(name) {
         return this.attributes.isModified(name);
     }
+    getModified() {
+        return this.attributes.modifiedPaths();
+    }
     isNew() {
         return this.attributes.isNew;
     }

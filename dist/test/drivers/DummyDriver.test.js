@@ -139,6 +139,12 @@ describe('DummyDriver', function () {
             driver.isModified('test');
         });
     });
+    describe('.getModified()', function () {
+        it('should work', function () {
+            const driver = new DummyDriver_1.DummyDriver();
+            driver.getModified();
+        });
+    });
     describe('.getModelComponentName()', function () {
         it('should work', function () {
             const driver = new DummyDriver_1.DummyDriver();

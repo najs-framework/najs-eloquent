@@ -182,6 +182,10 @@ export class MongooseDriver<Record extends Object> implements Najs.Contracts.Elo
     return this.attributes.isModified(name)
   }
 
+  getModified(): string[] {
+    return this.attributes.modifiedPaths()
+  }
+
   isNew(): boolean {
     return this.attributes.isNew
   }

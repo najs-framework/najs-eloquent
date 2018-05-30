@@ -509,6 +509,20 @@ describe('MongooseDriver', function() {
     })
   })
 
+  describe('.getModified()', function() {
+    it('calls and returns attributes.modifiedPaths()', function() {
+      const driver = new MongooseDriver(modelInstance)
+      driver['attributes'] = <any>{
+        modifiedPaths() {
+          return 'modifiedPaths'
+        }
+      }
+      const modifiedPathsSpy = Sinon.spy(driver['attributes'], 'modifiedPaths')
+      expect(driver.getModified()).toEqual('modifiedPaths')
+      expect(modifiedPathsSpy.calledWith()).toBe(true)
+    })
+  })
+
   describe('.isNew()', function() {
     it('returns attributes.isNew', function() {
       const driver = new MongooseDriver(modelInstance)
