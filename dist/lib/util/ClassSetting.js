@@ -40,12 +40,14 @@ class ClassSetting {
     }
     static get(instance, cache = true) {
         const className = najs_binding_1.getClassName(instance);
+        // console.log('get', className)
         if (!this.samples[className] || !cache) {
             const sample = najs_binding_1.make(className, [exports.CREATE_SAMPLE]);
             sample['__sample'] = true;
             this.samples[className] = new ClassSetting(sample);
             this.samples[className];
         }
+        // console.log('sample', this.samples[className])
         return this.samples[className];
     }
     static of(instance, cache = true) {

@@ -168,6 +168,8 @@ describe('ModelRelation', function() {
           }
         }
         const model = new HasOneUser()
+        model['bindRelationMapIfNeeded']()
+
         expect(Object.getOwnPropertyDescriptor(HasOneUser.prototype, 'user')).not.toBeUndefined()
         expect(model['user']).toBeUndefined()
       })
@@ -180,6 +182,8 @@ describe('ModelRelation', function() {
           }
         }
         const model = new HasOneUserError()
+        model['bindRelationMapIfNeeded']()
+
         try {
           expect(model['user']).toBeUndefined()
         } catch (error) {
@@ -190,7 +194,7 @@ describe('ModelRelation', function() {
       })
     })
 
-    describe('findRelationsForModel()', function() {
+    describe('.findRelationsForModel()', function() {
       it('looks all relationsMap definition in Model and create an "relationsMap" object in prototype', function() {
         class A extends Eloquent {
           static className: string = 'A'
@@ -201,6 +205,8 @@ describe('ModelRelation', function() {
         }
 
         const instance = new A()
+        instance['bindRelationMapIfNeeded']()
+
         expect(instance['relationsMap']).toEqual({
           baby: { mapTo: 'getBabyRelation', type: 'function' }
         })
@@ -217,6 +223,7 @@ describe('ModelRelation', function() {
         }
 
         const instance = new B()
+        instance['bindRelationMapIfNeeded']()
 
         expect(instance['relationsMap']).toEqual({
           baby: { mapTo: 'babyRelation', type: 'getter' }
@@ -234,6 +241,7 @@ describe('ModelRelation', function() {
         }
 
         const instance = new C()
+        instance['bindRelationMapIfNeeded']()
 
         expect(instance['relationsMap']).toEqual({})
         expect(C.prototype['relationsMap'] === instance['relationsMap']).toBe(true)
@@ -249,6 +257,7 @@ describe('ModelRelation', function() {
         }
 
         const instance = new D()
+        instance['bindRelationMapIfNeeded']()
 
         expect(instance['relationsMap']).toEqual({})
         expect(D.prototype['relationsMap'] === instance['relationsMap']).toBe(true)
@@ -271,6 +280,7 @@ describe('ModelRelation', function() {
         }
 
         const instance = new F()
+        instance['bindRelationMapIfNeeded']()
 
         expect(instance['relationsMap']).toEqual({
           baby: { mapTo: 'babyRelation', type: 'getter' },

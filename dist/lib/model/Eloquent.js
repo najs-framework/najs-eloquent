@@ -22,9 +22,6 @@ class Eloquent extends Model_1.Model {
         super(data, isGuarded);
         this.relations = {};
         if (data !== ClassSetting_1.CREATE_SAMPLE) {
-            if (typeof this.relationsMap === 'undefined') {
-                ModelRelation_1.findRelationsMapForModel(this);
-            }
             EloquentComponentProviderFacade_1.EloquentComponentProvider.extend(this, this.driver);
             if (this.driver.useEloquentProxy()) {
                 return new Proxy(this, EloquentProxy_1.EloquentProxy);

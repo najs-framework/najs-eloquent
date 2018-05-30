@@ -8,7 +8,7 @@ import { CREATE_SAMPLE } from '../util/ClassSetting'
 import { DynamicAttribute } from './components/DynamicAttribute'
 import { ModelQuery } from './components/ModelQuery'
 import { StaticQuery } from './components/StaticQuery'
-import { ModelRelation, findRelationsMapForModel } from './components/ModelRelation'
+import { ModelRelation } from './components/ModelRelation'
 import { EloquentProxy } from './EloquentProxy'
 import { EloquentComponentProvider } from '../facades/global/EloquentComponentProviderFacade'
 import { MongooseQueryBuilderWrapper } from '../wrappers/MongooseQueryBuilderWrapper'
@@ -30,10 +30,6 @@ export class Eloquent<T extends Object = {}> extends Model<T> {
     this.relations = {}
 
     if (data !== CREATE_SAMPLE) {
-      if (typeof this.relationsMap === 'undefined') {
-        findRelationsMapForModel(this)
-      }
-
       EloquentComponentProvider.extend(this, this.driver)
       if (this.driver.useEloquentProxy()) {
         return new Proxy(this, EloquentProxy)

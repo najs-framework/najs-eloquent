@@ -147,6 +147,7 @@ describe('ModelRelation', function () {
                 }
                 HasOneUser.className = 'HasOneUser';
                 const model = new HasOneUser();
+                model['bindRelationMapIfNeeded']();
                 expect(Object.getOwnPropertyDescriptor(HasOneUser.prototype, 'user')).not.toBeUndefined();
                 expect(model['user']).toBeUndefined();
             });
@@ -158,6 +159,7 @@ describe('ModelRelation', function () {
                 }
                 HasOneUserError.className = 'HasOneUserError';
                 const model = new HasOneUserError();
+                model['bindRelationMapIfNeeded']();
                 try {
                     expect(model['user']).toBeUndefined();
                 }
@@ -168,7 +170,7 @@ describe('ModelRelation', function () {
                 expect('should not reach this line').toEqual('hm');
             });
         });
-        describe('findRelationsForModel()', function () {
+        describe('.findRelationsForModel()', function () {
             it('looks all relationsMap definition in Model and create an "relationsMap" object in prototype', function () {
                 class A extends Eloquent_1.Eloquent {
                     getBabyRelation() {
@@ -177,6 +179,7 @@ describe('ModelRelation', function () {
                 }
                 A.className = 'A';
                 const instance = new A();
+                instance['bindRelationMapIfNeeded']();
                 expect(instance['relationsMap']).toEqual({
                     baby: { mapTo: 'getBabyRelation', type: 'function' }
                 });
@@ -190,6 +193,7 @@ describe('ModelRelation', function () {
                 }
                 B.className = 'B';
                 const instance = new B();
+                instance['bindRelationMapIfNeeded']();
                 expect(instance['relationsMap']).toEqual({
                     baby: { mapTo: 'babyRelation', type: 'getter' }
                 });
@@ -203,6 +207,7 @@ describe('ModelRelation', function () {
                 }
                 C.className = 'C';
                 const instance = new C();
+                instance['bindRelationMapIfNeeded']();
                 expect(instance['relationsMap']).toEqual({});
                 expect(C.prototype['relationsMap'] === instance['relationsMap']).toBe(true);
             });
@@ -214,6 +219,7 @@ describe('ModelRelation', function () {
                 }
                 D.className = 'D';
                 const instance = new D();
+                instance['bindRelationMapIfNeeded']();
                 expect(instance['relationsMap']).toEqual({});
                 expect(D.prototype['relationsMap'] === instance['relationsMap']).toBe(true);
             });
@@ -231,6 +237,7 @@ describe('ModelRelation', function () {
                 }
                 F.className = 'F';
                 const instance = new F();
+                instance['bindRelationMapIfNeeded']();
                 expect(instance['relationsMap']).toEqual({
                     baby: { mapTo: 'babyRelation', type: 'getter' },
                     cindy: { mapTo: 'getCindyRelation', type: 'function' }

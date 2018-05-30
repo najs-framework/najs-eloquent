@@ -53,7 +53,7 @@ function find_relations_in_prototype(instance, prototype, relationsMap) {
         find_relation(name, descriptors[name], instance, relationsMap);
     }
 }
-function findRelationsMapForModel(model) {
+function bind_relations_map_to_model(model) {
     const relationsMap = {};
     const modelPrototype = Object.getPrototypeOf(model);
     find_relations_in_prototype(model, modelPrototype, relationsMap);
@@ -67,7 +67,6 @@ function findRelationsMapForModel(model) {
         value: relationsMap
     });
 }
-exports.findRelationsMapForModel = findRelationsMapForModel;
 function define_relation_property_if_needed(model, name) {
     const prototype = Object.getPrototypeOf(model);
     const propertyDescriptor = Object.getOwnPropertyDescriptor(prototype, name);
@@ -76,7 +75,7 @@ function define_relation_property_if_needed(model, name) {
     }
     Object.defineProperty(prototype, name, {
         get: function () {
-            if (typeof this['relationsMap'][name] === 'undefined') {
+            if (typeof this['relationsMap'] === 'undefined' || typeof this['relationsMap'][name] === 'undefined') {
                 throw new Error(`Relation "${name}" is not defined in model "${this.getModelName()}".`);
             }
             return this.getRelationByName(name).getData();
@@ -89,6 +88,7 @@ class ModelRelation {
     }
     extend(prototype, bases, driver) {
         prototype['load'] = ModelRelation.load;
+        prototype['bindRelationMapIfNeeded'] = ModelRelation.bindRelationMapIfNeeded;
         prototype['getRelationByName'] = ModelRelation.getRelationByName;
         prototype['defineRelationProperty'] = ModelRelation.defineRelationProperty;
         prototype['getRelationDataBucket'] = ModelRelation.getRelationDataBucket;
@@ -104,7 +104,13 @@ ModelRelation.load = async function () {
         await this.getRelationByName(relationName).load();
     }
 };
+ModelRelation.bindRelationMapIfNeeded = function (name) {
+    if (typeof this['relationsMap'] === 'undefined') {
+        bind_relations_map_to_model(this);
+    }
+};
 ModelRelation.getRelationByName = function (name) {
+    this['bindRelationMapIfNeeded']();
     const info = functions_1.parse_string_with_dot_notation(name);
     if (typeof this['relationsMap'] === 'undefined' || typeof this['relationsMap'][info.first] === 'undefined') {
         throw new Error(`Relation "${info.first}" is not found in model "${this.getModelName()}".`);

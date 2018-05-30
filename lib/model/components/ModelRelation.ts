@@ -58,7 +58,7 @@ function find_relations_in_prototype(instance: Object, prototype: Object, relati
   }
 }
 
-export function findRelationsMapForModel(model: NajsEloquent.Model.IModel<any>) {
+function bind_relations_map_to_model(model: NajsEloquent.Model.IModel<any>) {
   const relationsMap = {}
   const modelPrototype = Object.getPrototypeOf(model)
   find_relations_in_prototype(model, modelPrototype, relationsMap)
@@ -84,7 +84,7 @@ function define_relation_property_if_needed(model: NajsEloquent.Model.IModel<any
 
   Object.defineProperty(prototype, name, {
     get: function(this: NajsEloquent.Model.IModel<any>) {
-      if (typeof this['relationsMap'][name] === 'undefined') {
+      if (typeof this['relationsMap'] === 'undefined' || typeof this['relationsMap'][name] === 'undefined') {
         throw new Error(`Relation "${name}" is not defined in model "${this.getModelName()}".`)
       }
       return this.getRelationByName(name).getData()
@@ -100,6 +100,7 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
 
   extend(prototype: Object, bases: Object[], driver: Najs.Contracts.Eloquent.Driver<any>): void {
     prototype['load'] = ModelRelation.load
+    prototype['bindRelationMapIfNeeded'] = ModelRelation.bindRelationMapIfNeeded
     prototype['getRelationByName'] = ModelRelation.getRelationByName
     prototype['defineRelationProperty'] = ModelRelation.defineRelationProperty
     prototype['getRelationDataBucket'] = ModelRelation.getRelationDataBucket
@@ -116,7 +117,15 @@ export class ModelRelation implements Najs.Contracts.Eloquent.Component {
     }
   }
 
+  static bindRelationMapIfNeeded: NajsEloquent.Model.ModelMethod<any> = function(name: string) {
+    if (typeof this['relationsMap'] === 'undefined') {
+      bind_relations_map_to_model(this)
+    }
+  }
+
   static getRelationByName: NajsEloquent.Model.ModelMethod<any> = function(name: string) {
+    this['bindRelationMapIfNeeded']()
+
     const info = parse_string_with_dot_notation(name)
     if (typeof this['relationsMap'] === 'undefined' || typeof this['relationsMap'][info.first] === 'undefined') {
       throw new Error(`Relation "${info.first}" is not found in model "${this.getModelName()}".`)

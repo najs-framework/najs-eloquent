@@ -2,7 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EloquentProxy = {
     shouldProxy(target, key) {
-        return typeof key !== 'symbol' && target.knownAttributes.indexOf(key) === -1 && target.driver.shouldBeProxied(key);
+        return (typeof key !== 'symbol' &&
+            target.knownAttributes.indexOf(key) === -1 &&
+            (typeof target.relationsMap === 'undefined' || typeof target.relationsMap[key] === 'undefined') &&
+            target.driver.shouldBeProxied(key));
     },
     get(target, key) {
         if (this.shouldProxy(target, key)) {
