@@ -40,7 +40,7 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
     return (
       !!this.relationData.isLoaded ||
       (typeof this.rootModel['relationDataBucket'] !== 'undefined' &&
-        this.rootModel['relationDataBucket']!.isRelationLoaded(this.rootModel.getRecordName(), this.name))
+        this.rootModel['relationDataBucket']!.isRelationLoaded(this.rootModel.getModelName(), this.name))
     )
   }
 
@@ -109,7 +109,8 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
       return this.relationData.data
     }
 
-    if (!this.rootModel.getRelationDataBucket()) {
+    const dataBucket = this.rootModel.getRelationDataBucket()
+    if (!dataBucket) {
       if (this.rootModel.isNew()) {
         throw new Error(`Can not load relation "${this.name}" in a new instance of "${this.rootModel.getModelName()}".`)
       }
@@ -117,6 +118,7 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
       return this.loadChainRelations(await this.lazyLoad<T>())
     }
 
+    dataBucket.markRelationLoaded(this.rootModel.getModelName(), this.name)
     return this.loadChainRelations(await this.eagerLoad<T>())
   }
 

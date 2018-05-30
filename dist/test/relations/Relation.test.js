@@ -380,8 +380,11 @@ describe('Relation', function () {
                 relations: {
                     test: {}
                 },
+                getModelName() {
+                    return 'Test';
+                },
                 getRelationDataBucket() {
-                    return {};
+                    return { markRelationLoaded() { } };
                 },
                 isNew() {
                     return false;

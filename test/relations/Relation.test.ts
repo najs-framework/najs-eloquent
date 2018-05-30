@@ -431,8 +431,12 @@ describe('Relation', function() {
           test: {}
         },
 
+        getModelName() {
+          return 'Test'
+        },
+
         getRelationDataBucket() {
-          return {}
+          return { markRelationLoaded() {} }
         },
 
         isNew() {
