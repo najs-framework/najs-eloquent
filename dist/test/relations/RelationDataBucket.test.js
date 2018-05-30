@@ -98,6 +98,27 @@ describe('RelationDataBucket', function () {
             makeStub.restore();
         });
     });
+    describe('.markRelationLoaded()', function () {
+        it('simply creates an object for each modelName and assign the loaded variable based on relation name', function () {
+            const relationDataBucket = new RelationDataBucket_1.RelationDataBucket();
+            expect(relationDataBucket['loaded']).toEqual({});
+            relationDataBucket.markRelationLoaded('Test', 'any');
+            expect(relationDataBucket['loaded']).toEqual({ Test: { any: true } });
+            relationDataBucket.markRelationLoaded('Test', 'any', false);
+            expect(relationDataBucket['loaded']).toEqual({ Test: { any: false } });
+        });
+    });
+    describe('.isRelationLoaded()', function () {
+        it('returns true if the model name and relation name is marked by .markRelationLoaded()', function () {
+            const relationDataBucket = new RelationDataBucket_1.RelationDataBucket();
+            expect(relationDataBucket.isRelationLoaded('Test', 'any')).toBe(false);
+            relationDataBucket['loaded'] = { Test: {} };
+            expect(relationDataBucket.isRelationLoaded('Test', 'any')).toBe(false);
+            relationDataBucket['loaded'] = { Test: { any: false } };
+            relationDataBucket['loaded'] = { Test: { any: true } };
+            expect(relationDataBucket.isRelationLoaded('Test', 'any')).toBe(true);
+        });
+    });
     describe('.filter()', function () {
         it('returns an empty array if there is no name in bucket', function () {
             const relationDataBucket = new RelationDataBucket_1.RelationDataBucket();

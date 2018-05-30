@@ -37,7 +37,11 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
   }
 
   isLoaded(): boolean {
-    return !!this.relationData.isLoaded
+    return (
+      !!this.relationData.isLoaded ||
+      (typeof this.rootModel['relationDataBucket'] !== 'undefined' &&
+        this.rootModel['relationDataBucket']!.isRelationLoaded(this.rootModel.getRecordName(), this.name))
+    )
   }
 
   isBuilt(): boolean {

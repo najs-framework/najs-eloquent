@@ -11,6 +11,7 @@ class RelationDataBucket {
     constructor() {
         this.modelMap = {};
         this.bucket = {};
+        this.loaded = {};
     }
     getClassName() {
         return constants_1.NajsEloquent.Relation.RelationDataBucket;
@@ -40,6 +41,16 @@ class RelationDataBucket {
     }
     makeCollectionFromRecords(name, records) {
         return collect(records.map(item => this.makeModelFromRecord(name, item)));
+    }
+    markRelationLoaded(modelName, relationName, loaded = true) {
+        if (typeof this.loaded[modelName] === 'undefined') {
+            this.loaded[modelName] = {};
+        }
+        this.loaded[modelName][relationName] = loaded;
+        return this;
+    }
+    isRelationLoaded(modelName, relationName) {
+        return typeof this.loaded[modelName] !== 'undefined' && this.loaded[modelName][relationName] === true;
     }
     getAttributes(name, attribute, allowDuplicated = false) {
         if (typeof this.bucket[name] === 'undefined') {

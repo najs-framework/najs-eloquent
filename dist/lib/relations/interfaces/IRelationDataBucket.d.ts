@@ -38,6 +38,20 @@ declare namespace NajsEloquent.Relation {
          */
         makeCollectionFromRecords(name: string, records: Object[]): CollectJs.Collection<NajsEloquent.Model.IModel<any>>;
         /**
+         * Mark that the relation in model is loaded.
+         *
+         * @param {string} modelName
+         * @param {string} relationName
+         */
+        markRelationLoaded(modelName: string, relationName: string, loaded?: boolean): this;
+        /**
+         * Mark that the relation in model is loaded.
+         *
+         * @param {string} modelName
+         * @param {string} relationName
+         */
+        isRelationLoaded(modelName: string, relationName: string): boolean;
+        /**
          * Get list of given attribute in bucket by name.
          * @param {string} name
          * @param {string} attribute

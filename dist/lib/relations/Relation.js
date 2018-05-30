@@ -22,7 +22,9 @@ class Relation {
         return this.name;
     }
     isLoaded() {
-        return !!this.relationData.isLoaded;
+        return (!!this.relationData.isLoaded ||
+            (typeof this.rootModel['relationDataBucket'] !== 'undefined' &&
+                this.rootModel['relationDataBucket'].isRelationLoaded(this.rootModel.getRecordName(), this.name)));
     }
     isBuilt() {
         return !!this.relationData.isBuilt;

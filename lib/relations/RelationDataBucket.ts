@@ -12,10 +12,12 @@ export class RelationDataBucket implements NajsEloquent.Relation.IRelationDataBu
 
   protected modelMap: Object
   protected bucket: Object
+  protected loaded: Object
 
   constructor() {
     this.modelMap = {}
     this.bucket = {}
+    this.loaded = {}
   }
 
   getClassName(): string {
@@ -52,6 +54,19 @@ export class RelationDataBucket implements NajsEloquent.Relation.IRelationDataBu
 
   makeCollectionFromRecords(name: string, records: Object[]): CollectJs.Collection<NajsEloquent.Model.IModel<any>> {
     return collect(records.map(item => this.makeModelFromRecord(name, item)))
+  }
+
+  markRelationLoaded(modelName: string, relationName: string, loaded: boolean = true): this {
+    if (typeof this.loaded[modelName] === 'undefined') {
+      this.loaded[modelName] = {}
+    }
+    this.loaded[modelName][relationName] = loaded
+
+    return this
+  }
+
+  isRelationLoaded(modelName: string, relationName: string): boolean {
+    return typeof this.loaded[modelName] !== 'undefined' && this.loaded[modelName][relationName] === true
   }
 
   getAttributes(name: string, attribute: string, allowDuplicated: boolean = false): any[] {
