@@ -5,14 +5,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
 const lodash_1 = require("lodash");
+const RelationType_1 = require("./RelationType");
 const helpers_1 = require("../util/helpers");
 class Relation {
-    constructor(rootModel, name) {
+    constructor(rootModel, name, type) {
         this.rootModel = rootModel;
         this.name = name;
+        this.type = type || RelationType_1.RelationType.Unknown;
     }
     get relationData() {
         return this.rootModel['relations'][this.name];
+    }
+    getType() {
+        return this.type;
     }
     with(...names) {
         this.loadChain = lodash_1.flatten(arguments).filter(item => item !== '');

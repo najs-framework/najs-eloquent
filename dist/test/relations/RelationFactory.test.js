@@ -9,6 +9,7 @@ const DummyDriver_1 = require("../../lib/drivers/DummyDriver");
 const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
 const Eloquent_1 = require("../../lib/model/Eloquent");
 const najs_binding_1 = require("najs-binding");
+const RelationType_1 = require("../../lib/relations/RelationType");
 EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy', true);
 class Test extends Eloquent_1.Eloquent {
 }
@@ -71,7 +72,7 @@ describe('RelationFactory', function () {
             const factory = new RelationFactory_1.RelationFactory({}, 'test', true);
             const local = {};
             const foreign = {};
-            const instance = factory.setupHasOneOrMany(true, local, foreign);
+            const instance = factory.setupHasOneOrMany(true, local, foreign, RelationType_1.RelationType.BelongsTo);
             expect(instance).toBeInstanceOf(HasOneOrMany_1.HasOneOrMany);
             expect(instance['is1v1']).toBe(true);
             expect(instance['local'] === local).toBe(true);

@@ -5,6 +5,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require("./HasOneOrMany");
 const constants_1 = require("../constants");
+const RelationType_1 = require("./RelationType");
 const najs_binding_1 = require("najs-binding");
 class RelationFactory {
     constructor(rootModel, name, isSample) {
@@ -31,7 +32,7 @@ class RelationFactory {
                 table: foreign.getRecordName(),
                 key: foreignKey || foreign.getDriver().formatAttributeName(`${this.rootModel.getModelName()}Id`)
             };
-            return this.setupHasOneOrMany(is1v1, localInfo, foreignInfo);
+            return this.setupHasOneOrMany(is1v1, localInfo, foreignInfo, is1v1 ? RelationType_1.RelationType.HasOne : RelationType_1.RelationType.HasMany);
         });
     }
     belongsTo(model, foreignKey, localKey) {
@@ -47,11 +48,11 @@ class RelationFactory {
                 table: this.rootModel.getRecordName(),
                 key: foreignKey || this.rootModel.getDriver().formatAttributeName(`${local.getModelName()}Id`)
             };
-            return this.setupHasOneOrMany(true, localInfo, foreignInfo);
+            return this.setupHasOneOrMany(true, localInfo, foreignInfo, RelationType_1.RelationType.BelongsTo);
         });
     }
-    setupHasOneOrMany(oneToOne, local, foreign) {
-        const relation = najs_binding_1.make(constants_1.NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name]);
+    setupHasOneOrMany(oneToOne, local, foreign, type) {
+        const relation = najs_binding_1.make(constants_1.NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name, type]);
         relation.setup(oneToOne, local, foreign);
         return relation;
     }

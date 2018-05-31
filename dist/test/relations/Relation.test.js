@@ -7,12 +7,21 @@ const Helper = require("../../lib/util/helpers");
 const Relation_1 = require("../../lib/relations/Relation");
 describe('Relation', function () {
     describe('constructor()', function () {
-        it('needs rootModel and the name of relation', function () {
+        it('needs rootModel and the name of relation, initialized with type unknown if not passed', function () {
             const rootModel = {};
             const name = 'test';
             const relation = Reflect.construct(Relation_1.Relation, [rootModel, name]);
             expect(relation['rootModel'] === rootModel).toBe(true);
             expect(relation['name'] === 'test').toBe(true);
+            expect(relation['type'] === 'unknown').toBe(true);
+        });
+        it('initialized with type is a string in third param', function () {
+            const rootModel = {};
+            const name = 'test';
+            const relation = Reflect.construct(Relation_1.Relation, [rootModel, name, 'belongs-to']);
+            expect(relation['rootModel'] === rootModel).toBe(true);
+            expect(relation['name'] === 'test').toBe(true);
+            expect(relation['type'] === 'belongs-to').toBe(true);
         });
     });
     describe('.relationData', function () {
@@ -37,6 +46,14 @@ describe('Relation', function () {
             expect(relation['loadChain']).toEqual(['a', 'b']);
             relation.with('a', ['b', 'c']);
             expect(relation['loadChain']).toEqual(['a', 'b', 'c']);
+        });
+    });
+    describe('.getType()', function () {
+        it('simply returns type property', function () {
+            const relation = Reflect.construct(Relation_1.Relation, [{}, 'test']);
+            expect(relation.getType()).toEqual('unknown');
+            relation['type'] = 'has-many';
+            expect(relation.getType()).toEqual('has-many');
         });
     });
     describe('.getAttachedPropertyName()', function () {

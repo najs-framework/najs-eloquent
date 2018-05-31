@@ -5,16 +5,19 @@
 import { make } from 'najs-binding'
 import { flatten } from 'lodash'
 import { Model } from '../model/Model'
+import { RelationType } from './RelationType'
 import { isModel, isCollection } from '../util/helpers'
 
 export abstract class Relation implements NajsEloquent.Relation.IRelation {
   protected rootModel: NajsEloquent.Model.IModel<any>
   protected name: string
   protected loadChain: string[]
+  protected type: RelationType
 
-  constructor(rootModel: NajsEloquent.Model.IModel<any>, name: string) {
+  constructor(rootModel: NajsEloquent.Model.IModel<any>, name: string, type?: RelationType) {
     this.rootModel = rootModel
     this.name = name
+    this.type = type || RelationType.Unknown
   }
 
   abstract getClassName(): string
@@ -24,6 +27,10 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
 
   get relationData(): NajsEloquent.Relation.RelationData {
     return this.rootModel['relations'][this.name]
+  }
+
+  getType(): string {
+    return this.type
   }
 
   with(...names: Array<string | string[]>) {

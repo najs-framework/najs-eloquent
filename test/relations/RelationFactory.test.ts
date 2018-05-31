@@ -7,6 +7,7 @@ import { DummyDriver } from '../../lib/drivers/DummyDriver'
 import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverProviderFacade'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { register } from 'najs-binding'
+import { RelationType } from '../../lib/relations/RelationType'
 
 EloquentDriverProvider.register(DummyDriver, 'dummy', true)
 
@@ -81,7 +82,7 @@ describe('RelationFactory', function() {
       const factory = new RelationFactory(<any>{}, 'test', true)
       const local = {}
       const foreign = {}
-      const instance = factory.setupHasOneOrMany(true, <any>local, <any>foreign)
+      const instance = factory.setupHasOneOrMany(true, <any>local, <any>foreign, RelationType.BelongsTo)
       expect(instance).toBeInstanceOf(HasOneOrMany)
       expect(instance['is1v1']).toBe(true)
       expect(instance['local'] === local).toBe(true)

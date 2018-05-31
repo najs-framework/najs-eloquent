@@ -5,6 +5,7 @@
 import './HasOneOrMany'
 import { NajsEloquent } from '../constants'
 import { RelationInfo, HasOneOrMany } from './HasOneOrMany'
+import { RelationType } from './RelationType'
 import { make } from 'najs-binding'
 
 export class RelationFactory implements NajsEloquent.Relation.IRelationFactory {
@@ -45,7 +46,7 @@ export class RelationFactory implements NajsEloquent.Relation.IRelationFactory {
         table: foreign.getRecordName(),
         key: foreignKey || foreign.getDriver().formatAttributeName(`${this.rootModel.getModelName()}Id`)
       }
-      return this.setupHasOneOrMany(is1v1, localInfo, foreignInfo)
+      return this.setupHasOneOrMany(is1v1, localInfo, foreignInfo, is1v1 ? RelationType.HasOne : RelationType.HasMany)
     })
   }
 
@@ -62,12 +63,12 @@ export class RelationFactory implements NajsEloquent.Relation.IRelationFactory {
         table: this.rootModel.getRecordName(),
         key: foreignKey || this.rootModel.getDriver().formatAttributeName(`${local.getModelName()}Id`)
       }
-      return this.setupHasOneOrMany(true, localInfo, foreignInfo)
+      return this.setupHasOneOrMany(true, localInfo, foreignInfo, RelationType.BelongsTo)
     })
   }
 
-  setupHasOneOrMany(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo) {
-    const relation: HasOneOrMany = make(NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name])
+  setupHasOneOrMany(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo, type: RelationType) {
+    const relation: HasOneOrMany = make(NajsEloquent.Relation.HasOneOrMany, [this.rootModel, this.name, type])
     relation.setup(oneToOne, local, foreign)
     return relation
   }
