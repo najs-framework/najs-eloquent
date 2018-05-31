@@ -55,6 +55,9 @@ class Relation {
         }
         return relationDataBucket.getAttributes(table, key);
     }
+    compareRelationInfo(a, b) {
+        return a.model === b.model && a.table === b.table && a.key === b.key;
+    }
     makeModelOrCollectionFromRecords(relationDataBucket, table, makeCollection, records) {
         if (makeCollection) {
             return relationDataBucket.makeCollectionFromRecords(table, records);

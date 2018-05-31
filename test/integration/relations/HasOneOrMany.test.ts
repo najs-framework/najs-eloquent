@@ -39,6 +39,9 @@ describe('Integration Test - Relation', function() {
       console.log(post['relations'])
       console.log(post['relationsMap'])
 
+      console.log(post.getUserRelation())
+      console.log(data.getPostsRelation())
+
       post.comments!.first().getUserRelation()
       post.comments!.first().getPostRelation()
       // console.log(data.getRelationDataBucket())

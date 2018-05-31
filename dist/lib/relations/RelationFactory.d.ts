@@ -2,7 +2,8 @@
 /// <reference path="interfaces/IRelation.d.ts" />
 /// <reference path="interfaces/IRelationFactory.d.ts" />
 import './HasOneOrMany';
-import { RelationInfo, HasOneOrMany } from './HasOneOrMany';
+import { RelationInfo } from './Relation';
+import { HasOneOrMany } from './HasOneOrMany';
 import { RelationType } from './RelationType';
 export declare class RelationFactory implements NajsEloquent.Relation.IRelationFactory {
     protected rootModel: NajsEloquent.Model.IModel<any>;

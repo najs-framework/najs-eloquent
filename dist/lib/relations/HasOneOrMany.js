@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
 const Relation_1 = require("./Relation");
 const constants_1 = require("../constants");
+const RelationType_1 = require("./RelationType");
 class HasOneOrMany extends Relation_1.Relation {
     getClassName() {
         return constants_1.NajsEloquent.Relation.HasOneOrMany;
@@ -13,6 +14,24 @@ class HasOneOrMany extends Relation_1.Relation {
         this.is1v1 = oneToOne;
         this.local = local;
         this.foreign = foreign;
+    }
+    isInverseOf(relation) {
+        if (!(relation instanceof HasOneOrMany)) {
+            return false;
+        }
+        if (!this.isInverseOfTypeMatched(relation)) {
+            return false;
+        }
+        return (this.compareRelationInfo(this.local, relation.local) && this.compareRelationInfo(this.foreign, relation.foreign));
+    }
+    isInverseOfTypeMatched(relation) {
+        if (this.type !== RelationType_1.RelationType.BelongsTo && relation.type !== RelationType_1.RelationType.BelongsTo) {
+            return false;
+        }
+        if (this.type === RelationType_1.RelationType.BelongsTo) {
+            return relation.type === RelationType_1.RelationType.HasMany || relation.type === RelationType_1.RelationType.HasOne;
+        }
+        return this.type === RelationType_1.RelationType.HasMany || this.type === RelationType_1.RelationType.HasOne;
     }
     buildData() {
         this.relationData.isBuilt = true;

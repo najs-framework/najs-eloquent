@@ -10,6 +10,7 @@ import { init_mongoose, delete_collection } from '../util'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { HasOne, BelongsTo, HasOneRelation, BelongsToRelation } from '../../lib/relations/types'
 import { Factory, factory } from './../../lib/facades/global/FactoryFacade'
+import { RelationType } from '../../lib/relations/RelationType'
 
 EloquentDriverProviderFacade.register(MongooseDriver, 'mongoose', true)
 
@@ -39,6 +40,55 @@ describe('HasOneOrMany', function() {
   //   const relation = new HasOneOrMany(<any>{}, 'test')
   //   relation.eagerLoad()
   // })
+
+  describe('.isInverseOf', function() {
+    it('returns false if compared is not instance of HasOneOrMany', function() {
+      const current = new HasOneOrMany(<any>{}, 'test', RelationType.HasOne)
+      const compared = {}
+      expect(current.isInverseOf(<any>compared)).toBe(false)
+    })
+
+    it('returns false if .isInverseOfTypeMatched() returns false', function() {
+      const current = new HasOneOrMany(<any>{}, 'test', RelationType.HasOne)
+      const isInverseOfTypeMatchedStub = Sinon.stub(current, 'isInverseOfTypeMatched')
+      isInverseOfTypeMatchedStub.returns(false)
+      expect(current.isInverseOf(current)).toBe(false)
+    })
+
+    it('returns true if .compareRelationInfo() match for local/foreign', function() {
+      const current = new HasOneOrMany(<any>{}, 'test', RelationType.HasOne)
+      const compared = new HasOneOrMany(<any>{}, 'test', RelationType.BelongsTo)
+      current['local'] = { model: 'Test', table: 'test', key: 'test_id' }
+      current['foreign'] = { model: 'Test', table: 'test', key: 'test_id' }
+      compared['local'] = { model: 'Test', table: 'test', key: 'test_id' }
+      compared['foreign'] = { model: 'Test', table: 'test', key: 'test_id' }
+      expect(current.isInverseOf(compared)).toBe(true)
+      expect(compared.isInverseOf(current)).toBe(true)
+    })
+  })
+
+  describe('.isInverseOfTypeMatched', function() {
+    it('returns false if the current relation and compare relation have type not belongs-to', function() {
+      const current = new HasOneOrMany(<any>{}, 'test', RelationType.HasOne)
+      const compared = new HasOneOrMany(<any>{}, 'test', RelationType.HasOne)
+      expect(current.isInverseOfTypeMatched(compared)).toBe(false)
+      expect(compared.isInverseOfTypeMatched(current)).toBe(false)
+    })
+
+    it('returns true if the current relation is belongs-to but and compare relation is has many', function() {
+      const current = new HasOneOrMany(<any>{}, 'test', RelationType.BelongsTo)
+      const compared = new HasOneOrMany(<any>{}, 'test', RelationType.HasMany)
+      expect(current.isInverseOfTypeMatched(compared)).toBe(true)
+      expect(compared.isInverseOfTypeMatched(current)).toBe(true)
+    })
+
+    it('returns true if the current relation is belongs-to but and compare relation is has one', function() {
+      const current = new HasOneOrMany(<any>{}, 'test', RelationType.BelongsTo)
+      const compared = new HasOneOrMany(<any>{}, 'test', RelationType.HasOne)
+      expect(current.isInverseOfTypeMatched(compared)).toBe(true)
+      expect(compared.isInverseOfTypeMatched(current)).toBe(true)
+    })
+  })
 
   describe('.executeQuery', function() {
     it('calls query.first() if "is1v1" is true', function() {

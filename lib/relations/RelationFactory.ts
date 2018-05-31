@@ -4,7 +4,8 @@
 
 import './HasOneOrMany'
 import { NajsEloquent } from '../constants'
-import { RelationInfo, HasOneOrMany } from './HasOneOrMany'
+import { RelationInfo } from './Relation'
+import { HasOneOrMany } from './HasOneOrMany'
 import { RelationType } from './RelationType'
 import { make } from 'najs-binding'
 

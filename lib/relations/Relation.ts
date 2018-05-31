@@ -8,6 +8,12 @@ import { Model } from '../model/Model'
 import { RelationType } from './RelationType'
 import { isModel, isCollection } from '../util/helpers'
 
+export type RelationInfo = {
+  model: string
+  table: string
+  key: string
+}
+
 export abstract class Relation implements NajsEloquent.Relation.IRelation {
   protected rootModel: NajsEloquent.Model.IModel<any>
   protected name: string
@@ -24,6 +30,7 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
   abstract buildData<T>(): T | undefined | null
   abstract lazyLoad<T>(): Promise<T | undefined | null>
   abstract eagerLoad<T>(): Promise<T | undefined | null>
+  abstract isInverseOf<T extends Relation>(relation: T): boolean
 
   get relationData(): NajsEloquent.Relation.RelationData {
     return this.rootModel['relations'][this.name]
@@ -81,6 +88,10 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
       return []
     }
     return relationDataBucket.getAttributes(table, key)
+  }
+
+  compareRelationInfo(a: RelationInfo, b: RelationInfo) {
+    return a.model === b.model && a.table === b.table && a.key === b.key
   }
 
   makeModelOrCollectionFromRecords(

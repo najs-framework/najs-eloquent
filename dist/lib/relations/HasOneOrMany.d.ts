@@ -1,11 +1,6 @@
 /// <reference path="../model/interfaces/IModel.d.ts" />
 /// <reference path="../wrappers/interfaces/IQueryBuilderWrapper.d.ts" />
-import { Relation } from './Relation';
-export declare type RelationInfo = {
-    model: string;
-    table: string;
-    key: string;
-};
+import { Relation, RelationInfo } from './Relation';
 export declare class HasOneOrMany extends Relation {
     static className: string;
     /**
@@ -22,6 +17,8 @@ export declare class HasOneOrMany extends Relation {
     protected is1v1: boolean;
     getClassName(): string;
     setup(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo): void;
+    isInverseOf(relation: Relation): boolean;
+    isInverseOfTypeMatched(relation: HasOneOrMany): boolean;
     buildData<T>(): T | undefined | null;
     getQueryInfo(): {
         model: string;

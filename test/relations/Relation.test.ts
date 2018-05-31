@@ -165,6 +165,25 @@ describe('Relation', function() {
     })
   })
 
+  describe('.compareRelationInfo()', function() {
+    it('returns true if model, table and key are equals', function() {
+      const dataset = [
+        { a: { model: 'a', key: 'a', table: 'a' }, b: { model: 'b', key: 'b', table: 'b' }, result: false },
+        { a: { model: '', key: 'a', table: 'a' }, b: { model: 'a', key: 'a', table: 'a' }, result: false },
+        { a: { model: 'a', key: '', table: 'a' }, b: { model: 'a', key: 'a', table: 'a' }, result: false },
+        { a: { model: 'a', key: 'a', table: '' }, b: { model: 'a', key: 'a', table: 'a' }, result: false },
+        { a: { model: 'A', key: 'a', table: 'a' }, b: { model: 'a', key: 'a', table: 'a' }, result: false },
+        { a: { model: 'a', key: 'A', table: 'a' }, b: { model: 'a', key: 'a', table: 'a' }, result: false },
+        { a: { model: 'a', key: 'a', table: 'A' }, b: { model: 'a', key: 'a', table: 'a' }, result: false },
+        { a: { model: 'a', key: 'a', table: 'a' }, b: { model: 'a', key: 'a', table: 'a' }, result: true }
+      ]
+      const relation: Relation = Reflect.construct(Relation, [{ relations: { test: {} } }, 'test'])
+      for (const data of dataset) {
+        expect(relation.compareRelationInfo(data['a'], data['b'])).toBe(data['result'])
+      }
+    })
+  })
+
   describe('.makeModelOrCollectionFromRecords()', function() {
     it('calls and returns relationDataBucket.makeCollectionFromRecords() if makeCollection is true', function() {
       const relationDataBucket = {
@@ -294,6 +313,10 @@ describe('Relation', function() {
         buildData<T>(): T | undefined {
           return <any>'build-data'
         }
+
+        isInverseOf(relation: any): boolean {
+          return false
+        }
       }
       const relation: Relation = new ChildRelation(<any>rootModel, 'test')
       expect(relation.getData()).toEqual('anything')
@@ -324,6 +347,10 @@ describe('Relation', function() {
 
         buildData<T>(): T | undefined {
           return <any>'build-data'
+        }
+
+        isInverseOf(relation: any): boolean {
+          return false
         }
       }
       const relation: Relation = new ChildRelation(<any>rootModel, 'test')
@@ -359,6 +386,10 @@ describe('Relation', function() {
         buildData<T>(): T | undefined {
           return <any>'build-data'
         }
+
+        isInverseOf(relation: any): boolean {
+          return false
+        }
       }
       const relation: Relation = new ChildRelation(<any>rootModel, 'test')
       expect(await relation.load()).toEqual('anything')
@@ -393,6 +424,10 @@ describe('Relation', function() {
 
         buildData<T>(): T | undefined {
           return <any>'build-data'
+        }
+
+        isInverseOf(relation: any): boolean {
+          return false
         }
       }
       const relation: Relation = new ChildRelation(<any>rootModel, 'test')
@@ -432,6 +467,10 @@ describe('Relation', function() {
 
         buildData<T>(): T | undefined {
           return <any>'build-data'
+        }
+
+        isInverseOf(relation: any): boolean {
+          return false
         }
       }
       const relation: Relation = new ChildRelation(<any>rootModel, 'test')
@@ -477,6 +516,10 @@ describe('Relation', function() {
 
         buildData<T>(): T | undefined {
           return <any>'build-data'
+        }
+
+        isInverseOf(relation: any): boolean {
+          return false
         }
       }
       const relation: Relation = new ChildRelation(<any>rootModel, 'test')

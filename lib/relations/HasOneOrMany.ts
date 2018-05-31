@@ -2,14 +2,9 @@
 /// <reference path="../wrappers/interfaces/IQueryBuilderWrapper.ts" />
 
 import { register } from 'najs-binding'
-import { Relation } from './Relation'
+import { Relation, RelationInfo } from './Relation'
 import { NajsEloquent } from '../constants'
-
-export type RelationInfo = {
-  model: string
-  table: string
-  key: string
-}
+import { RelationType } from './RelationType'
 
 export class HasOneOrMany extends Relation {
   static className: string = NajsEloquent.Relation.HasOneOrMany
@@ -35,6 +30,32 @@ export class HasOneOrMany extends Relation {
     this.is1v1 = oneToOne
     this.local = local
     this.foreign = foreign
+  }
+
+  isInverseOf(relation: Relation): boolean {
+    if (!(relation instanceof HasOneOrMany)) {
+      return false
+    }
+
+    if (!this.isInverseOfTypeMatched(relation)) {
+      return false
+    }
+
+    return (
+      this.compareRelationInfo(this.local, relation.local) && this.compareRelationInfo(this.foreign, relation.foreign)
+    )
+  }
+
+  isInverseOfTypeMatched(relation: HasOneOrMany) {
+    if (this.type !== RelationType.BelongsTo && relation.type !== RelationType.BelongsTo) {
+      return false
+    }
+
+    if (this.type === RelationType.BelongsTo) {
+      return relation.type === RelationType.HasMany || relation.type === RelationType.HasOne
+    }
+
+    return this.type === RelationType.HasMany || this.type === RelationType.HasOne
   }
 
   buildData<T>(): T | undefined | null {

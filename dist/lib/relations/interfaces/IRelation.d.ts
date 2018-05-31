@@ -66,5 +66,11 @@ declare namespace NajsEloquent.Relation {
          * Get relation type
          */
         getType(): string;
+        /**
+         * Determine that current relation is an inverse of given relation or not.
+         *
+         * @param {Relation} relation
+         */
+        isInverseOf(relation: IRelation): boolean;
     }
 }
