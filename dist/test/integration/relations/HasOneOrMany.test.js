@@ -39,7 +39,8 @@ describe('Integration Test - Relation', function () {
             // console.log(data.getPostsRelation())
             post.comments.first().getUserRelation();
             post.comments.first().getPostRelation();
-            console.log(post.user);
+            // console.log(post.getRelationDataBucket())
+            // console.log(post.comments!.first().post)
             // console.log(data.getRelationDataBucket())
             // console.log(post.getRelationDataBucket())
             // console.log(await data.posts!.first().load('comments'))

@@ -74,20 +74,38 @@ class Relation {
         if (this.isBuilt()) {
             return this.relationData.data;
         }
-        // return this.setInverseRelationsLoadedStatus(this.buildData())
-        return this.buildData();
+        return this.setInverseRelationsLoadedStatus(this.buildData());
     }
-    // setInverseRelationsLoadedStatus(result: any): any {
-    //   // if (!result) {
-    //   //   return result
-    //   // }
-    //   // if (isModel(result)) {
-    //   // }
-    //   // if (isCollection(result)) {
-    //   // }
-    //   // console.log(result)
-    //   return result
-    // }
+    hasInverseData(relation) {
+        return this.isInverseOf(relation);
+    }
+    setInverseRelationsLoadedStatus(result) {
+        if (!result) {
+            return result;
+        }
+        if (helpers_1.isModel(result)) {
+            this.findAndMarkLoadedInverseRelations(result);
+            return result;
+        }
+        this.takeAndRunSampleModelInCollection(result, model => {
+            this.findAndMarkLoadedInverseRelations(model);
+        });
+        return result;
+    }
+    findAndMarkLoadedInverseRelations(model) {
+        const dataBucket = this.rootModel.getRelationDataBucket();
+        if (!dataBucket) {
+            return;
+        }
+        // hidden api, load relationsMap dynamically
+        model['bindRelationMapIfNeeded']();
+        for (const name in model['relationsMap']) {
+            const relation = model.getRelationByName(name);
+            if (this.hasInverseData(relation)) {
+                dataBucket.markRelationLoaded(model.getModelName(), name);
+            }
+        }
+    }
     async load() {
         if (this.isLoaded() && this.isBuilt()) {
             return this.relationData.data;

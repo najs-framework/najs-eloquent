@@ -32,7 +32,7 @@ export class HasOneOrMany extends Relation {
     this.foreign = foreign
   }
 
-  isInverseOf(relation: Relation): boolean {
+  isInverseOf(relation: NajsEloquent.Relation.IRelation): boolean {
     if (!(relation instanceof HasOneOrMany)) {
       return false
     }

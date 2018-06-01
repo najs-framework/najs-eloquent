@@ -320,6 +320,139 @@ describe('Relation', function () {
             expect(relation.getData()).toEqual('build-data');
         });
     });
+    describe('.hasInverseData()', function () {
+        it('calls and returns .isInverseOf()', function () {
+            class ChildRelation extends Relation_1.Relation {
+                getClassName() {
+                    return 'ChildRelation';
+                }
+                async lazyLoad() {
+                    return {};
+                }
+                async eagerLoad() {
+                    return {};
+                }
+                buildData() {
+                    return 'build-data';
+                }
+                isInverseOf(relation) {
+                    return 'anything';
+                }
+            }
+            const relation = new ChildRelation({}, 'test');
+            expect(relation.hasInverseData({})).toEqual('anything');
+        });
+    });
+    describe('.setInverseRelationsLoadedStatus()', function () {
+        it('always returns result even result is null or undefined', function () {
+            const relation = Reflect.construct(Relation_1.Relation, [{}, 'test']);
+            expect(relation.setInverseRelationsLoadedStatus(undefined)).toBeUndefined();
+        });
+        it('calls .findAndMarkLoadedInverseRelations() with result if the result is model', function () {
+            const isModelStub = Sinon.stub(Helper, 'isModel');
+            isModelStub.returns(true);
+            const relation = Reflect.construct(Relation_1.Relation, [{}, 'test']);
+            const findAndMarkLoadedInverseRelationsStub = Sinon.stub(relation, 'findAndMarkLoadedInverseRelations');
+            const model = {};
+            expect(relation.setInverseRelationsLoadedStatus(model) === model).toBe(true);
+            expect(findAndMarkLoadedInverseRelationsStub.calledWith(model));
+            isModelStub.restore();
+        });
+        it('calls .takeAndRunSampleModelInCollection() and map samples to .findAndMarkLoadedInverseRelations()', function () {
+            const isCollectionStub = Sinon.stub(Helper, 'isCollection');
+            isCollectionStub.returns(true);
+            const relation = Reflect.construct(Relation_1.Relation, [{}, 'test']);
+            const findAndMarkLoadedInverseRelationsStub = Sinon.stub(relation, 'findAndMarkLoadedInverseRelations');
+            const model = {
+                getModelName() {
+                    return 'test';
+                }
+            };
+            const collection = {
+                isEmpty() {
+                    return false;
+                },
+                count() {
+                    return 1;
+                },
+                get() {
+                    return model;
+                }
+            };
+            expect(relation.setInverseRelationsLoadedStatus(collection) === collection).toBe(true);
+            expect(findAndMarkLoadedInverseRelationsStub.calledWith(model));
+            isCollectionStub.restore();
+        });
+    });
+    describe('.findAndMarkLoadedInverseRelations()', function () {
+        it('does nothing if the rootModel has no relation data bucket', function () {
+            const relation = Reflect.construct(Relation_1.Relation, [
+                {
+                    getRelationDataBucket() {
+                        return undefined;
+                    }
+                },
+                'test'
+            ]);
+            const model = {
+                bindRelationMapIfNeeded() { }
+            };
+            const bindRelationMapIfNeededSpy = Sinon.spy(model, 'bindRelationMapIfNeeded');
+            relation.findAndMarkLoadedInverseRelations(model);
+            expect(bindRelationMapIfNeededSpy.called).toBe(false);
+        });
+        it('always calls model.bindRelationMapIfNeeded() before loops relationsMap of model', function () {
+            const relation = Reflect.construct(Relation_1.Relation, [
+                {
+                    getRelationDataBucket() {
+                        return {};
+                    }
+                },
+                'test'
+            ]);
+            const model = {
+                bindRelationMapIfNeeded() { }
+            };
+            const bindRelationMapIfNeededSpy = Sinon.spy(model, 'bindRelationMapIfNeeded');
+            const hasInverseDataStub = Sinon.stub(relation, 'hasInverseData');
+            hasInverseDataStub.returns(false);
+            relation.findAndMarkLoadedInverseRelations(model);
+            expect(bindRelationMapIfNeededSpy.called).toBe(true);
+        });
+        it('loops all relations in model.relationsMap and call dataBucket.markRelationLoaded() if .hasInverseData() returns true', function () {
+            const model = {
+                relationsMap: {
+                    a: 'test',
+                    b: 'test'
+                },
+                getModelName() {
+                    return 'test';
+                },
+                bindRelationMapIfNeeded() { },
+                getRelationByName(name) {
+                    return name;
+                }
+            };
+            const dataBucket = {
+                markRelationLoaded() { }
+            };
+            const relation = Reflect.construct(Relation_1.Relation, [
+                {
+                    getRelationDataBucket() {
+                        return dataBucket;
+                    }
+                },
+                'test'
+            ]);
+            const hasInverseDataStub = Sinon.stub(relation, 'hasInverseData');
+            hasInverseDataStub.callsFake(function () {
+                return arguments[0] === 'a';
+            });
+            const markRelationLoadedSpy = Sinon.spy(dataBucket, 'markRelationLoaded');
+            relation.findAndMarkLoadedInverseRelations(model);
+            expect(markRelationLoadedSpy.calledWith('test', 'a')).toBe(true);
+        });
+    });
     describe('.load()', function () {
         it('returns this.relationData.data if .isLoaded() and .isBuilt() returns true', async function () {
             const info = {

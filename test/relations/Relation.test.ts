@@ -359,6 +359,159 @@ describe('Relation', function() {
     })
   })
 
+  describe('.hasInverseData()', function() {
+    it('calls and returns .isInverseOf()', function() {
+      class ChildRelation extends Relation {
+        getClassName() {
+          return 'ChildRelation'
+        }
+
+        async lazyLoad<T>(): Promise<T> {
+          return <any>{}
+        }
+
+        async eagerLoad<T>(): Promise<T> {
+          return <any>{}
+        }
+
+        buildData<T>(): T | undefined {
+          return <any>'build-data'
+        }
+
+        isInverseOf(relation: any): boolean {
+          return <any>'anything'
+        }
+      }
+      const relation: Relation = new ChildRelation(<any>{}, 'test')
+      expect(relation.hasInverseData(<any>{})).toEqual('anything')
+    })
+  })
+
+  describe('.setInverseRelationsLoadedStatus()', function() {
+    it('always returns result even result is null or undefined', function() {
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      expect(relation.setInverseRelationsLoadedStatus(undefined)).toBeUndefined()
+    })
+
+    it('calls .findAndMarkLoadedInverseRelations() with result if the result is model', function() {
+      const isModelStub = Sinon.stub(Helper, 'isModel')
+      isModelStub.returns(true)
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      const findAndMarkLoadedInverseRelationsStub = Sinon.stub(relation, 'findAndMarkLoadedInverseRelations')
+
+      const model = {}
+
+      expect(relation.setInverseRelationsLoadedStatus(model) === model).toBe(true)
+      expect(findAndMarkLoadedInverseRelationsStub.calledWith(model))
+      isModelStub.restore()
+    })
+
+    it('calls .takeAndRunSampleModelInCollection() and map samples to .findAndMarkLoadedInverseRelations()', function() {
+      const isCollectionStub = Sinon.stub(Helper, 'isCollection')
+      isCollectionStub.returns(true)
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      const findAndMarkLoadedInverseRelationsStub = Sinon.stub(relation, 'findAndMarkLoadedInverseRelations')
+
+      const model = {
+        getModelName() {
+          return 'test'
+        }
+      }
+      const collection = {
+        isEmpty() {
+          return false
+        },
+        count() {
+          return 1
+        },
+        get() {
+          return model
+        }
+      }
+
+      expect(relation.setInverseRelationsLoadedStatus(collection) === collection).toBe(true)
+      expect(findAndMarkLoadedInverseRelationsStub.calledWith(model))
+      isCollectionStub.restore()
+    })
+  })
+
+  describe('.findAndMarkLoadedInverseRelations()', function() {
+    it('does nothing if the rootModel has no relation data bucket', function() {
+      const relation: Relation = Reflect.construct(Relation, [
+        {
+          getRelationDataBucket() {
+            return undefined
+          }
+        },
+        'test'
+      ])
+      const model = {
+        bindRelationMapIfNeeded() {}
+      }
+      const bindRelationMapIfNeededSpy = Sinon.spy(model, 'bindRelationMapIfNeeded')
+      relation.findAndMarkLoadedInverseRelations(<any>model)
+
+      expect(bindRelationMapIfNeededSpy.called).toBe(false)
+    })
+
+    it('always calls model.bindRelationMapIfNeeded() before loops relationsMap of model', function() {
+      const relation: Relation = Reflect.construct(Relation, [
+        {
+          getRelationDataBucket() {
+            return {}
+          }
+        },
+        'test'
+      ])
+      const model = {
+        bindRelationMapIfNeeded() {}
+      }
+      const bindRelationMapIfNeededSpy = Sinon.spy(model, 'bindRelationMapIfNeeded')
+      const hasInverseDataStub = Sinon.stub(relation, 'hasInverseData')
+      hasInverseDataStub.returns(false)
+
+      relation.findAndMarkLoadedInverseRelations(<any>model)
+
+      expect(bindRelationMapIfNeededSpy.called).toBe(true)
+    })
+
+    it('loops all relations in model.relationsMap and call dataBucket.markRelationLoaded() if .hasInverseData() returns true', function() {
+      const model = {
+        relationsMap: {
+          a: 'test',
+          b: 'test'
+        },
+        getModelName() {
+          return 'test'
+        },
+        bindRelationMapIfNeeded() {},
+        getRelationByName(name: any) {
+          return name
+        }
+      }
+      const dataBucket = {
+        markRelationLoaded() {}
+      }
+      const relation: Relation = Reflect.construct(Relation, [
+        {
+          getRelationDataBucket() {
+            return dataBucket
+          }
+        },
+        'test'
+      ])
+
+      const hasInverseDataStub = Sinon.stub(relation, 'hasInverseData')
+      hasInverseDataStub.callsFake(function() {
+        return arguments[0] === 'a'
+      })
+      const markRelationLoadedSpy = Sinon.spy(dataBucket, 'markRelationLoaded')
+
+      relation.findAndMarkLoadedInverseRelations(<any>model)
+      expect(markRelationLoadedSpy.calledWith('test', 'a')).toBe(true)
+    })
+  })
+
   describe('.load()', function() {
     it('returns this.relationData.data if .isLoaded() and .isBuilt() returns true', async function() {
       const info = {

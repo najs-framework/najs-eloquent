@@ -17,7 +17,7 @@ export declare class HasOneOrMany extends Relation {
     protected is1v1: boolean;
     getClassName(): string;
     setup(oneToOne: boolean, local: RelationInfo, foreign: RelationInfo): void;
-    isInverseOf(relation: Relation): boolean;
+    isInverseOf(relation: NajsEloquent.Relation.IRelation): boolean;
     isInverseOfTypeMatched(relation: HasOneOrMany): boolean;
     buildData<T>(): T | undefined | null;
     getQueryInfo(): {

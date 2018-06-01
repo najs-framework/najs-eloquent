@@ -30,7 +30,7 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
   abstract buildData<T>(): T | undefined | null
   abstract lazyLoad<T>(): Promise<T | undefined | null>
   abstract eagerLoad<T>(): Promise<T | undefined | null>
-  abstract isInverseOf<T extends Relation>(relation: T): boolean
+  abstract isInverseOf<T extends NajsEloquent.Relation.IRelation>(relation: T): boolean
 
   get relationData(): NajsEloquent.Relation.RelationData {
     return this.rootModel['relations'][this.name]
@@ -119,23 +119,45 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
       return this.relationData.data
     }
 
-    // return this.setInverseRelationsLoadedStatus(this.buildData())
-    return this.buildData()
+    return this.setInverseRelationsLoadedStatus(this.buildData())
   }
 
-  // setInverseRelationsLoadedStatus(result: any): any {
-  //   // if (!result) {
-  //   //   return result
-  //   // }
+  hasInverseData(relation: NajsEloquent.Relation.IRelation) {
+    return this.isInverseOf(relation)
+  }
 
-  //   // if (isModel(result)) {
-  //   // }
+  setInverseRelationsLoadedStatus(result: any): any {
+    if (!result) {
+      return result
+    }
 
-  //   // if (isCollection(result)) {
-  //   // }
-  //   // console.log(result)
-  //   return result
-  // }
+    if (isModel(result)) {
+      this.findAndMarkLoadedInverseRelations(result)
+      return result
+    }
+
+    this.takeAndRunSampleModelInCollection(result, model => {
+      this.findAndMarkLoadedInverseRelations(model)
+    })
+    return result
+  }
+
+  findAndMarkLoadedInverseRelations(model: NajsEloquent.Model.IModel<any>) {
+    const dataBucket = this.rootModel.getRelationDataBucket()
+    if (!dataBucket) {
+      return
+    }
+
+    // hidden api, load relationsMap dynamically
+    model['bindRelationMapIfNeeded']()
+
+    for (const name in model['relationsMap']) {
+      const relation = model.getRelationByName(name)
+      if (this.hasInverseData(relation)) {
+        dataBucket.markRelationLoaded(model.getModelName(), name)
+      }
+    }
+  }
 
   async load<T>(): Promise<T | undefined | null> {
     if (this.isLoaded() && this.isBuilt()) {

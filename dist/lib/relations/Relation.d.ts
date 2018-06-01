@@ -17,7 +17,7 @@ export declare abstract class Relation implements NajsEloquent.Relation.IRelatio
     abstract buildData<T>(): T | undefined | null;
     abstract lazyLoad<T>(): Promise<T | undefined | null>;
     abstract eagerLoad<T>(): Promise<T | undefined | null>;
-    abstract isInverseOf<T extends Relation>(relation: T): boolean;
+    abstract isInverseOf<T extends NajsEloquent.Relation.IRelation>(relation: T): boolean;
     readonly relationData: NajsEloquent.Relation.RelationData;
     getType(): string;
     with(...names: Array<string | string[]>): this;
@@ -32,6 +32,9 @@ export declare abstract class Relation implements NajsEloquent.Relation.IRelatio
     compareRelationInfo(a: RelationInfo, b: RelationInfo): boolean;
     makeModelOrCollectionFromRecords(relationDataBucket: NajsEloquent.Relation.IRelationDataBucket, table: string, makeCollection: boolean, records: Object[]): any;
     getData<T>(): T | undefined | null;
+    hasInverseData(relation: NajsEloquent.Relation.IRelation): boolean;
+    setInverseRelationsLoadedStatus(result: any): any;
+    findAndMarkLoadedInverseRelations(model: NajsEloquent.Model.IModel<any>): void;
     load<T>(): Promise<T | undefined | null>;
     loadChainRelations(result: any): Promise<any>;
     takeAndRunSampleModelInCollectionAsync(collection: CollectJs.Collection<NajsEloquent.Model.IModel<any>>, handle: ((model: NajsEloquent.Model.IModel<any>) => Promise<void>)): Promise<void>;
