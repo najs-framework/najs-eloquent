@@ -74,8 +74,20 @@ class Relation {
         if (this.isBuilt()) {
             return this.relationData.data;
         }
+        // return this.setInverseRelationsLoadedStatus(this.buildData())
         return this.buildData();
     }
+    // setInverseRelationsLoadedStatus(result: any): any {
+    //   // if (!result) {
+    //   //   return result
+    //   // }
+    //   // if (isModel(result)) {
+    //   // }
+    //   // if (isCollection(result)) {
+    //   // }
+    //   // console.log(result)
+    //   return result
+    // }
     async load() {
         if (this.isLoaded() && this.isBuilt()) {
             return this.relationData.data;
@@ -98,8 +110,33 @@ class Relation {
             await result.load(this.loadChain);
             return result;
         }
-        if (helpers_1.isCollection(result) && result.isNotEmpty()) {
-            await result.first().load(this.loadChain);
+        await this.takeAndRunSampleModelInCollectionAsync(result, async (model) => {
+            await model.load(this.loadChain);
+        });
+        return result;
+    }
+    async takeAndRunSampleModelInCollectionAsync(collection, handle) {
+        const samples = this.getSampleModelsInCollection(collection);
+        for (const sample of samples) {
+            await handle(sample);
+        }
+    }
+    takeAndRunSampleModelInCollection(collection, handle) {
+        this.getSampleModelsInCollection(collection).forEach(handle);
+    }
+    getSampleModelsInCollection(collection) {
+        const result = [];
+        if (!helpers_1.isCollection(collection) || collection.isEmpty()) {
+            return result;
+        }
+        const samples = {};
+        for (let i = 0, l = collection.count(); i < l; i++) {
+            const model = collection.get(i);
+            if (samples[model.getModelName()] === true) {
+                continue;
+            }
+            samples[model.getModelName()] = true;
+            result.push(model);
         }
         return result;
     }

@@ -119,8 +119,23 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
       return this.relationData.data
     }
 
+    // return this.setInverseRelationsLoadedStatus(this.buildData())
     return this.buildData()
   }
+
+  // setInverseRelationsLoadedStatus(result: any): any {
+  //   // if (!result) {
+  //   //   return result
+  //   // }
+
+  //   // if (isModel(result)) {
+  //   // }
+
+  //   // if (isCollection(result)) {
+  //   // }
+  //   // console.log(result)
+  //   return result
+  // }
 
   async load<T>(): Promise<T | undefined | null> {
     if (this.isLoaded() && this.isBuilt()) {
@@ -150,10 +165,45 @@ export abstract class Relation implements NajsEloquent.Relation.IRelation {
       return result
     }
 
-    if (isCollection(result) && (result as CollectJs.Collection<any>).isNotEmpty()) {
-      await (result as CollectJs.Collection<NajsEloquent.Model.IModel<any>>).first().load(this.loadChain)
+    await this.takeAndRunSampleModelInCollectionAsync(result, async model => {
+      await model.load(this.loadChain)
+    })
+
+    return result
+  }
+
+  async takeAndRunSampleModelInCollectionAsync(
+    collection: CollectJs.Collection<NajsEloquent.Model.IModel<any>>,
+    handle: ((model: NajsEloquent.Model.IModel<any>) => Promise<void>)
+  ) {
+    const samples = this.getSampleModelsInCollection(collection)
+    for (const sample of samples) {
+      await handle(sample)
+    }
+  }
+
+  takeAndRunSampleModelInCollection(
+    collection: CollectJs.Collection<NajsEloquent.Model.IModel<any>>,
+    handle: ((model: NajsEloquent.Model.IModel<any>) => void)
+  ) {
+    this.getSampleModelsInCollection(collection).forEach(handle)
+  }
+
+  getSampleModelsInCollection(collection: CollectJs.Collection<NajsEloquent.Model.IModel<any>>): any[] {
+    const result: NajsEloquent.Model.IModel<any>[] = []
+    if (!isCollection(collection) || collection.isEmpty()) {
+      return result
     }
 
+    const samples = {}
+    for (let i = 0, l = collection.count(); i < l; i++) {
+      const model = collection.get(i)!
+      if (samples[model.getModelName()] === true) {
+        continue
+      }
+      samples[model.getModelName()] = true
+      result.push(model)
+    }
     return result
   }
 }

@@ -3,6 +3,7 @@ import * as Sinon from 'sinon'
 import * as NajsBinding from 'najs-binding'
 import * as Helper from '../../lib/util/helpers'
 import { Relation } from '../../lib/relations/Relation'
+const collect = require('collect.js')
 
 describe('Relation', function() {
   describe('constructor()', function() {
@@ -585,8 +586,8 @@ describe('Relation', function() {
         }
       }
       const collection = {
-        isNotEmpty() {
-          return false
+        isEmpty() {
+          return true
         },
         first() {
           return model
@@ -606,15 +607,22 @@ describe('Relation', function() {
       const isCollectionStub = Sinon.stub(Helper, 'isCollection')
       isCollectionStub.returns(true)
       const model = {
+        getModelName() {
+          return 'Test'
+        },
+
         load(arg: any) {
           return arg
         }
       }
       const collection = {
-        isNotEmpty() {
-          return true
+        isEmpty() {
+          return false
         },
-        first() {
+        count() {
+          return 1
+        },
+        get() {
           return model
         }
       }
@@ -626,6 +634,79 @@ describe('Relation', function() {
       expect(loadSpy.calledWith(['a', 'b'])).toBe(true)
 
       isCollectionStub.restore()
+    })
+  })
+
+  describe('.takeAndRunSampleModelInCollectionAsync()', function() {
+    it('calls .getSampleModelsInCollection() to get samples and loops with handle', async function() {
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      const handle = async function(input: any) {
+        return input
+      }
+      const getSampleModelsInCollectionStub = Sinon.stub(relation, 'getSampleModelsInCollection')
+      getSampleModelsInCollectionStub.returns(['a', 'b'])
+      const handleSpy = Sinon.spy(handle)
+      await relation.takeAndRunSampleModelInCollectionAsync(<any>{}, handleSpy)
+      expect(handleSpy.callCount).toBe(2)
+      expect(handleSpy.firstCall.args[0]).toBe('a')
+      expect(handleSpy.secondCall.args[0]).toBe('b')
+    })
+  })
+
+  describe('.takeAndRunSampleModelInCollection()', function() {
+    it('calls .getSampleModelsInCollection() to get samples and loops with handle', async function() {
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      const handle = async function(input: any) {
+        return input
+      }
+      const getSampleModelsInCollectionStub = Sinon.stub(relation, 'getSampleModelsInCollection')
+      getSampleModelsInCollectionStub.returns(['a', 'b'])
+      const handleSpy = Sinon.spy(handle)
+      await relation.takeAndRunSampleModelInCollection(<any>{}, handleSpy)
+      expect(handleSpy.callCount).toBe(2)
+      expect(handleSpy.firstCall.args[0]).toBe('a')
+      expect(handleSpy.secondCall.args[0]).toBe('b')
+    })
+  })
+
+  describe('.getSampleModelsInCollection()', function() {
+    it('returns an empty array if param is not collection', function() {
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      expect(relation.getSampleModelsInCollection(<any>{})).toEqual([])
+    })
+
+    it('returns an empty array if collection is empty', function() {
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      expect(relation.getSampleModelsInCollection(<any>collect([]))).toEqual([])
+    })
+
+    it('groups returns an array by .getModelName()', function() {
+      const relation: Relation = Reflect.construct(Relation, [{}, 'test'])
+      const modelA1 = {
+        getModelName() {
+          return 'A'
+        }
+      }
+      const modelA2 = {
+        getModelName() {
+          return 'A'
+        }
+      }
+      const modelB1 = {
+        getModelName() {
+          return 'B'
+        }
+      }
+      const modelB2 = {
+        getModelName() {
+          return 'B'
+        }
+      }
+
+      const result = relation.getSampleModelsInCollection(<any>collect([modelA1, modelA2, modelB1, modelB2]))
+      expect(result).toHaveLength(2)
+      expect(result[0] === modelA1).toBe(true)
+      expect(result[1] === modelB1).toBe(true)
     })
   })
 })

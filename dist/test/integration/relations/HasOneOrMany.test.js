@@ -29,16 +29,17 @@ describe('Integration Test - Relation', function () {
             // console.log(data['relations'])
             await data.load('posts.comments');
             // console.log(data['relations'])
-            console.log(data.posts);
+            // console.log(data.posts)
             const post = data.posts.first();
-            console.log(post.comments);
-            console.log(post.user);
-            console.log(post['relations']);
-            console.log(post['relationsMap']);
-            console.log(post.getUserRelation());
-            console.log(data.getPostsRelation());
+            // console.log(post.comments)
+            // console.log(post.user)
+            // console.log(post['relations'])
+            // console.log(post['relationsMap'])
+            // console.log(post.getUserRelation())
+            // console.log(data.getPostsRelation())
             post.comments.first().getUserRelation();
             post.comments.first().getPostRelation();
+            console.log(post.user);
             // console.log(data.getRelationDataBucket())
             // console.log(post.getRelationDataBucket())
             // console.log(await data.posts!.first().load('comments'))

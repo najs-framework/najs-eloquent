@@ -34,4 +34,7 @@ export declare abstract class Relation implements NajsEloquent.Relation.IRelatio
     getData<T>(): T | undefined | null;
     load<T>(): Promise<T | undefined | null>;
     loadChainRelations(result: any): Promise<any>;
+    takeAndRunSampleModelInCollectionAsync(collection: CollectJs.Collection<NajsEloquent.Model.IModel<any>>, handle: ((model: NajsEloquent.Model.IModel<any>) => Promise<void>)): Promise<void>;
+    takeAndRunSampleModelInCollection(collection: CollectJs.Collection<NajsEloquent.Model.IModel<any>>, handle: ((model: NajsEloquent.Model.IModel<any>) => void)): void;
+    getSampleModelsInCollection(collection: CollectJs.Collection<NajsEloquent.Model.IModel<any>>): any[];
 }
