@@ -13,7 +13,6 @@ const ModelActiveRecord_1 = require("./components/ModelActiveRecord");
 const ModelTimestamps_1 = require("./components/ModelTimestamps");
 const ModelSoftDeletes_1 = require("./components/ModelSoftDeletes");
 const ModelEvent_1 = require("./components/ModelEvent");
-const events_1 = require("events");
 const collect = require('collect.js');
 class Model {
     /**
@@ -31,7 +30,7 @@ class Model {
             this.driver = EloquentDriverProviderFacade_1.EloquentDriverProvider.create(this);
             this.driver.initialize(this, isGuarded, data);
             this.attributes = this.driver.getRecord();
-            this.eventEmitter = new events_1.EventEmitter();
+            this.eventEmitter = this.driver.getEventEmitter(false);
         }
     }
     getDriver() {

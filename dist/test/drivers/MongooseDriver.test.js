@@ -501,4 +501,16 @@ describe('MongooseDriver', function () {
             expect(driver.getModelComponentOrder(components) === components).toBe(true);
         });
     });
+    describe('.getEventEmitter()', function () {
+        it('returns the global EventEmitter if the param is true', function () {
+            const driver = new MongooseDriver_1.MongooseDriver(modelInstance);
+            expect(driver.getEventEmitter(true) === MongooseDriver_1.MongooseDriver.GlobalEventEmitter).toBe(true);
+        });
+        it('creates and returns the EventEmitter if the param is false', function () {
+            const driver = new MongooseDriver_1.MongooseDriver(modelInstance);
+            expect(driver['eventEmitter']).toBeUndefined();
+            expect(driver.getEventEmitter(false) === driver['eventEmitter']).toBe(true);
+            expect(driver.getEventEmitter(false) === driver['eventEmitter']).toBe(true);
+        });
+    });
 });

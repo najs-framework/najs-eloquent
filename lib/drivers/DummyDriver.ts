@@ -4,6 +4,9 @@ import { register } from 'najs-binding'
 import { NajsEloquent } from '../constants'
 import { snakeCase } from 'lodash'
 import { plural } from 'pluralize'
+import { EventEmitter } from 'events'
+
+const globalEventEmitter: EventEmitter = new EventEmitter()
 
 export class DummyDriver implements Najs.Contracts.Eloquent.Driver<Object> {
   static className: string = NajsEloquent.Driver.DummyDriver
@@ -112,6 +115,10 @@ export class DummyDriver implements Najs.Contracts.Eloquent.Driver<Object> {
 
   formatAttributeName(name: string): string {
     return snakeCase(name)
+  }
+
+  getEventEmitter(global: boolean) {
+    return global ? globalEventEmitter : new EventEmitter()
   }
 }
 register(DummyDriver)

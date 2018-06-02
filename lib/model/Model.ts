@@ -12,7 +12,6 @@ import { ModelActiveRecord } from './components/ModelActiveRecord'
 import { ModelTimestamps } from './components/ModelTimestamps'
 import { ModelSoftDeletes } from './components/ModelSoftDeletes'
 import { ModelEvent } from './components/ModelEvent'
-import { EventEmitter } from 'events'
 const collect = require('collect.js')
 
 export interface Model<T = any> extends NajsEloquent.Model.IModel<T> {}
@@ -33,7 +32,7 @@ export class Model<T = any> {
       this.driver = EloquentDriverProvider.create(this)
       this.driver.initialize(this, isGuarded, data)
       this.attributes = this.driver.getRecord()
-      this.eventEmitter = new EventEmitter()
+      this.eventEmitter = this.driver.getEventEmitter(false)
     }
   }
 

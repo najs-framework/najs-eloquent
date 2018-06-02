@@ -12,6 +12,7 @@ const SoftDelete_1 = require("./mongoose/SoftDelete");
 const mongoose_1 = require("mongoose");
 const lodash_1 = require("lodash");
 const pluralize_1 = require("pluralize");
+const events_1 = require("events");
 const setupTimestampMoment = require('mongoose-timestamps-moment').setupTimestamp;
 class MongooseDriver {
     constructor(model) {
@@ -164,6 +165,16 @@ class MongooseDriver {
     getModelComponentOrder(components) {
         return components;
     }
+    getEventEmitter(global) {
+        if (global) {
+            return MongooseDriver.GlobalEventEmitter;
+        }
+        if (!this.eventEmitter) {
+            this.eventEmitter = new events_1.EventEmitter();
+        }
+        return this.eventEmitter;
+    }
 }
 MongooseDriver.className = constants_1.NajsEloquent.Driver.MongooseDriver;
+MongooseDriver.GlobalEventEmitter = new events_1.EventEmitter();
 exports.MongooseDriver = MongooseDriver;

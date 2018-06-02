@@ -192,4 +192,12 @@ describe('DummyDriver', function() {
       driver.formatAttributeName('test')
     })
   })
+
+  describe('.getEventEmitter()', function() {
+    it('should work', function() {
+      const driver = new DummyDriver()
+      driver.getEventEmitter(false)
+      driver.getEventEmitter(true)
+    })
+  })
 })

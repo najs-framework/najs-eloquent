@@ -1,6 +1,7 @@
 /// <reference path="../model/interfaces/IModel.d.ts" />
 /// <reference path="../relations/interfaces/IRelationDataBucket.d.ts" />
 /// <reference path="../wrappers/interfaces/IQueryBuilderWrapper.d.ts" />
+/// <reference types="node" />
 declare namespace Najs.Contracts.Eloquent {
     interface Driver<NativeRecord> extends Najs.Contracts.Autoload {
         /**
@@ -125,5 +126,12 @@ declare namespace Najs.Contracts.Eloquent {
          * @param {string[]} components
          */
         getModelComponentOrder(components: string[]): string[];
+        /**
+         * Get EventEmitter instance. If global is true return the global EventEmitter, otherwise returns an local which
+         * created and attached for a model only.
+         *
+         * @param {boolean} global
+         */
+        getEventEmitter(global: boolean): NodeJS.EventEmitter;
     }
 }

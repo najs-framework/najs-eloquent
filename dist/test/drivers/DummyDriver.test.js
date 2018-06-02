@@ -163,4 +163,11 @@ describe('DummyDriver', function () {
             driver.formatAttributeName('test');
         });
     });
+    describe('.getEventEmitter()', function () {
+        it('should work', function () {
+            const driver = new DummyDriver_1.DummyDriver();
+            driver.getEventEmitter(false);
+            driver.getEventEmitter(true);
+        });
+    });
 });

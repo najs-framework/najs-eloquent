@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /// <reference types="najs-binding" />
 /// <reference path="../model/interfaces/IModel.ts" />
 /// <reference path="../relations/interfaces/IRelationDataBucket.ts" />
@@ -150,5 +151,13 @@ namespace Najs.Contracts.Eloquent {
      * @param {string[]} components
      */
     getModelComponentOrder(components: string[]): string[]
+
+    /**
+     * Get EventEmitter instance. If global is true return the global EventEmitter, otherwise returns an local which
+     * created and attached for a model only.
+     *
+     * @param {boolean} global
+     */
+    getEventEmitter(global: boolean): NodeJS.EventEmitter
   }
 }

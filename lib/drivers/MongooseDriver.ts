@@ -11,10 +11,12 @@ import { SoftDelete } from './mongoose/SoftDelete'
 import { Document, Model, Schema, SchemaDefinition, SchemaOptions } from 'mongoose'
 import { isFunction, snakeCase } from 'lodash'
 import { plural } from 'pluralize'
+import { EventEmitter } from 'events'
 const setupTimestampMoment = require('mongoose-timestamps-moment').setupTimestamp
 
 export class MongooseDriver<Record extends Object> implements Najs.Contracts.Eloquent.Driver<Record> {
   static className: string = NajsEloquent.Driver.MongooseDriver
+  static GlobalEventEmitter: EventEmitter = new EventEmitter()
 
   protected attributes: Document & Record
   protected queryLogGroup: string
@@ -23,6 +25,7 @@ export class MongooseDriver<Record extends Object> implements Najs.Contracts.Elo
   protected schema: SchemaDefinition
   protected options: SchemaOptions
   protected softDeletesSetting?: NajsEloquent.Model.ISoftDeletesSetting
+  protected eventEmitter?: EventEmitter
 
   constructor(model: NajsEloquent.Model.IModel<any> & NajsEloquent.Model.IModelSetting) {
     this.modelName = model.getModelName()
@@ -207,5 +210,15 @@ export class MongooseDriver<Record extends Object> implements Najs.Contracts.Elo
 
   getModelComponentOrder(components: string[]): string[] {
     return components
+  }
+
+  getEventEmitter(global: boolean) {
+    if (global) {
+      return MongooseDriver.GlobalEventEmitter
+    }
+    if (!this.eventEmitter) {
+      this.eventEmitter = new EventEmitter()
+    }
+    return this.eventEmitter
   }
 }
