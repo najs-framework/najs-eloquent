@@ -20,6 +20,7 @@ export const NajsEloquent = {
       ModelSerialization: 'NajsEloquent.Model.Component.ModelSerialization',
       ModelSoftDeletes: 'NajsEloquent.Model.Component.ModelSoftDeletes',
       ModelActiveRecord: 'NajsEloquent.Model.Component.ModelActiveRecord',
+      ModelEvent: 'NajsEloquent.Model.Component.ModelEvent',
       ModelRelation: 'NajsEloquent.Model.Component.ModelRelation'
     }
   },

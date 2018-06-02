@@ -9,6 +9,7 @@
 /// <reference path="./IModelSoftDeletes.ts" />
 /// <reference path="./IModelRelation.ts" />
 /// <reference path="./IModelDynamicAttribute.ts" />
+/// <reference path="./IModelEvent.ts" />
 /// <reference path="./IModelRelation.ts" />
 
 namespace NajsEloquent.Model {
@@ -39,6 +40,7 @@ namespace NajsEloquent.Model {
       IModelActiveRecord,
       IModelTimestamps,
       IModelSoftDeletes,
+      IModelEvent,
       IModelRelation {
     /**
      * Get class name of the model.

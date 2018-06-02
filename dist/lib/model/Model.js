@@ -12,6 +12,8 @@ const ModelSerialization_1 = require("./components/ModelSerialization");
 const ModelActiveRecord_1 = require("./components/ModelActiveRecord");
 const ModelTimestamps_1 = require("./components/ModelTimestamps");
 const ModelSoftDeletes_1 = require("./components/ModelSoftDeletes");
+const ModelEvent_1 = require("./components/ModelEvent");
+const events_1 = require("events");
 const collect = require('collect.js');
 class Model {
     /**
@@ -29,6 +31,7 @@ class Model {
             this.driver = EloquentDriverProviderFacade_1.EloquentDriverProvider.create(this);
             this.driver.initialize(this, isGuarded, data);
             this.attributes = this.driver.getRecord();
+            this.eventEmitter = new events_1.EventEmitter();
         }
     }
     getDriver() {
@@ -58,7 +61,8 @@ const defaultComponents = [
     najs_binding_1.make(ModelSerialization_1.ModelSerialization.className),
     najs_binding_1.make(ModelActiveRecord_1.ModelActiveRecord.className),
     najs_binding_1.make(ModelTimestamps_1.ModelTimestamps.className),
-    najs_binding_1.make(ModelSoftDeletes_1.ModelSoftDeletes.className)
+    najs_binding_1.make(ModelSoftDeletes_1.ModelSoftDeletes.className),
+    najs_binding_1.make(ModelEvent_1.ModelEvent.className)
 ];
 for (const component of defaultComponents) {
     component.extend(Model.prototype, [], {});

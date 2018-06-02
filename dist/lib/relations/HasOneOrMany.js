@@ -84,6 +84,33 @@ class HasOneOrMany extends Relation_1.Relation {
         }
         return query.get();
     }
+    associate(model) {
+        const rootIsLocal = this.rootModel.getModelName() === this.local.model;
+        if (rootIsLocal) {
+            const localPrimaryKey = this.rootModel.getAttribute(this.local.key);
+            // if (!localPrimaryKey) {
+            //   console.log('please save root model first')
+            // }
+            // if (model.getModelName() !== this.foreign.model) {
+            //   console.log('can not associate the model')
+            // }
+            model.setAttribute(this.foreign.key, localPrimaryKey);
+            this.rootModel.on('saved', async function () {
+                await model.save();
+            });
+        }
+        else {
+            // if (model.getModelName() !== this.local.model) {
+            //   console.log('can not associate the model')
+            // }
+            const localPrimaryKey = model.getAttribute(this.local.key);
+            // if (!localPrimaryKey) {
+            //   console.log('please save root model first')
+            // }
+            this.rootModel.setAttribute(this.foreign.key, localPrimaryKey);
+        }
+        return this;
+    }
 }
 HasOneOrMany.className = constants_1.NajsEloquent.Relation.HasOneOrMany;
 exports.HasOneOrMany = HasOneOrMany;

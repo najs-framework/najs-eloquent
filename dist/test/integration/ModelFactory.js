@@ -4,10 +4,6 @@ const lib_1 = require("../../lib");
 const User_1 = require("./models/User");
 const Post_1 = require("./models/Post");
 const Comment_1 = require("./models/Comment");
-const bson_1 = require("bson");
-function createObjectId() {
-    return new bson_1.ObjectId().toHexString();
-}
 lib_1.Factory.define(User_1.User, (faker, attributes) => {
     return Object.assign({
         email: faker.email(),
@@ -18,7 +14,6 @@ lib_1.Factory.define(User_1.User, (faker, attributes) => {
 });
 lib_1.Factory.define(Post_1.Post, (faker, attributes) => {
     return Object.assign({
-        user_id: createObjectId(),
         title: faker.sentence(),
         content: faker.paragraph(),
         view: faker.natural()

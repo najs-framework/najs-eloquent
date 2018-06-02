@@ -29,4 +29,5 @@ export declare class HasOneOrMany extends Relation {
     eagerLoad<T>(): Promise<T | undefined | null>;
     lazyLoad<T>(): Promise<T | undefined | null>;
     executeQuery(query: NajsEloquent.Wrapper.IQueryBuilderWrapper<any>): Promise<any>;
+    associate<T>(model: NajsEloquent.Model.IModel<T>): this;
 }

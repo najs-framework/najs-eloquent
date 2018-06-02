@@ -39,6 +39,7 @@ ModelActiveRecord.delete = function () {
 };
 ModelActiveRecord.save = async function () {
     await this['driver'].save();
+    this.emit('saved');
     return this;
 };
 ModelActiveRecord.fresh = async function () {

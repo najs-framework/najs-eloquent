@@ -44,6 +44,7 @@ export class ModelActiveRecord implements Najs.Contracts.Eloquent.Component {
 
   static save: NajsEloquent.Model.ModelMethod<any> = async function() {
     await this['driver'].save()
+    this.emit('saved')
     return this
   }
 

@@ -9,6 +9,7 @@
 /// <reference path="IModelSoftDeletes.d.ts" />
 /// <reference path="IModelRelation.d.ts" />
 /// <reference path="IModelDynamicAttribute.d.ts" />
+/// <reference path="IModelEvent.d.ts" />
 declare namespace NajsEloquent.Model {
     type ModelDefinition<T> = string | {
         new (): IModel<T>;
@@ -27,7 +28,7 @@ declare namespace NajsEloquent.Model {
          */
         protected settings?: Object;
     }
-    interface IModel<T> extends IModelAttribute, IModelDynamicAttribute, IModelFillable, IModelSerialization, IModelActiveRecord, IModelTimestamps, IModelSoftDeletes, IModelRelation {
+    interface IModel<T> extends IModelAttribute, IModelDynamicAttribute, IModelFillable, IModelSerialization, IModelActiveRecord, IModelTimestamps, IModelSoftDeletes, IModelEvent, IModelRelation {
         /**
          * Get class name of the model.
          */
