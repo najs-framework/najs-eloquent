@@ -27,8 +27,12 @@ export class ModelEvent implements Najs.Contracts.Eloquent.Component {
   }
 
   extend(prototype: Object, bases: Object[], driver: Najs.Contracts.Eloquent.Driver<any>): void {
+    prototype['fire'] = ModelEvent.fire
     for (const functionName in EVENT_EMITTER_FUNCTIONS) {
       prototype[functionName] = function() {
+        if (typeof this['eventEmitter'] === 'undefined') {
+          this['eventEmitter'] = this['driver'].getEventEmitter(false)
+        }
         const result = this['eventEmitter'][functionName](...arguments)
         if (EVENT_EMITTER_FUNCTIONS[functionName]) {
           return this
@@ -36,6 +40,14 @@ export class ModelEvent implements Najs.Contracts.Eloquent.Component {
         return result
       }
     }
+  }
+
+  static fire: NajsEloquent.Model.ModelMethod<any> = function(eventName: string, args: any[]) {
+    this.emit(eventName, ...args)
+
+    // this['driver'].getEventEmitter(true).emit(eventName, this, ...args)
+
+    return this
   }
 }
 register(ModelEvent)

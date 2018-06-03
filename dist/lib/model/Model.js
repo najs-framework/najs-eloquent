@@ -13,6 +13,7 @@ const ModelActiveRecord_1 = require("./components/ModelActiveRecord");
 const ModelTimestamps_1 = require("./components/ModelTimestamps");
 const ModelSoftDeletes_1 = require("./components/ModelSoftDeletes");
 const ModelEvent_1 = require("./components/ModelEvent");
+const Event_1 = require("./Event");
 const collect = require('collect.js');
 class Model {
     /**
@@ -30,7 +31,6 @@ class Model {
             this.driver = EloquentDriverProviderFacade_1.EloquentDriverProvider.create(this);
             this.driver.initialize(this, isGuarded, data);
             this.attributes = this.driver.getRecord();
-            this.eventEmitter = this.driver.getEventEmitter(false);
         }
     }
     getDriver() {
@@ -52,6 +52,18 @@ class Model {
         return najs_binding_1.make(najs_binding_2.getClassName(this), [data]);
     }
 }
+Model.Events = {
+    Creating: Event_1.Event.Creating,
+    Created: Event_1.Event.Created,
+    Saving: Event_1.Event.Saving,
+    Saved: Event_1.Event.Saved,
+    Updating: Event_1.Event.Updating,
+    Updated: Event_1.Event.Updated,
+    Deleting: Event_1.Event.Deleting,
+    Deleted: Event_1.Event.Deleted,
+    Restoring: Event_1.Event.Restoring,
+    Restored: Event_1.Event.Restored
+};
 exports.Model = Model;
 const defaultComponents = [
     najs_binding_1.make(ModelSetting_1.ModelSetting.className),

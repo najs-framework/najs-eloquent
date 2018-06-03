@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
 const lodash_1 = require("lodash");
 const constants_1 = require("../../constants");
+const Event_1 = require("../Event");
 class ModelActiveRecord {
     getClassName() {
         return constants_1.NajsEloquent.Model.Component.ModelActiveRecord;
@@ -38,8 +39,9 @@ ModelActiveRecord.delete = function () {
     return this['driver'].delete(this.hasSoftDeletes());
 };
 ModelActiveRecord.save = async function () {
+    this.fire(Event_1.Event.Saving, []);
     await this['driver'].save();
-    this.emit('saved');
+    this.fire(Event_1.Event.Saved, []);
     return this;
 };
 ModelActiveRecord.fresh = async function () {

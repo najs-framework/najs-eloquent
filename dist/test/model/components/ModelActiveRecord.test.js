@@ -6,6 +6,7 @@ const Eloquent_1 = require("../../../lib/model/Eloquent");
 const ModelActiveRecord_1 = require("../../../lib/model/components/ModelActiveRecord");
 const DummyDriver_1 = require("../../../lib/drivers/DummyDriver");
 const EloquentDriverProviderFacade_1 = require("../../../lib/facades/global/EloquentDriverProviderFacade");
+const events_1 = require("events");
 EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy', true);
 describe('Model/Fillable', function () {
     describe('Unit', function () {
@@ -97,6 +98,9 @@ describe('Model/Fillable', function () {
                 const driver = {
                     async save() {
                         return 'anything';
+                    },
+                    getEventEmitter() {
+                        return new events_1.EventEmitter();
                     }
                 };
                 const saveSpy = Sinon.spy(driver, 'save');

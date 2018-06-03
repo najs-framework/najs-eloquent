@@ -4,6 +4,7 @@
 import { register } from 'najs-binding'
 import { flatten } from 'lodash'
 import { NajsEloquent } from '../../constants'
+import { Event } from '../Event'
 
 export class ModelActiveRecord implements Najs.Contracts.Eloquent.Component {
   static className = NajsEloquent.Model.Component.ModelActiveRecord
@@ -43,8 +44,9 @@ export class ModelActiveRecord implements Najs.Contracts.Eloquent.Component {
   }
 
   static save: NajsEloquent.Model.ModelMethod<any> = async function() {
+    this.fire(Event.Saving, [])
     await this['driver'].save()
-    this.emit('saved')
+    this.fire(Event.Saved, [])
     return this
   }
 

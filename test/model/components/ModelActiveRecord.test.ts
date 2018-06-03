@@ -4,6 +4,7 @@ import { Eloquent } from '../../../lib/model/Eloquent'
 import { ModelActiveRecord } from '../../../lib/model/components/ModelActiveRecord'
 import { DummyDriver } from '../../../lib/drivers/DummyDriver'
 import { EloquentDriverProvider } from '../../../lib/facades/global/EloquentDriverProviderFacade'
+import { EventEmitter } from 'events'
 
 EloquentDriverProvider.register(DummyDriver, 'dummy', true)
 
@@ -106,6 +107,9 @@ describe('Model/Fillable', function() {
         const driver = {
           async save() {
             return 'anything'
+          },
+          getEventEmitter() {
+            return new EventEmitter()
           }
         }
         const saveSpy = Sinon.spy(driver, 'save')

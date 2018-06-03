@@ -1,7 +1,20 @@
 /// <reference path="interfaces/IModel.d.ts" />
+import { Event } from './Event';
 export interface Model<T = any> extends NajsEloquent.Model.IModel<T> {
 }
 export declare class Model<T = any> {
+    static Events: {
+        Creating: Event;
+        Created: Event;
+        Saving: Event;
+        Saved: Event;
+        Updating: Event;
+        Updated: Event;
+        Deleting: Event;
+        Deleted: Event;
+        Restoring: Event;
+        Restored: Event;
+    };
     /**
      * Model constructor.
      *

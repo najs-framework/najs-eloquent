@@ -12,10 +12,24 @@ import { ModelActiveRecord } from './components/ModelActiveRecord'
 import { ModelTimestamps } from './components/ModelTimestamps'
 import { ModelSoftDeletes } from './components/ModelSoftDeletes'
 import { ModelEvent } from './components/ModelEvent'
+import { Event } from './Event'
 const collect = require('collect.js')
 
 export interface Model<T = any> extends NajsEloquent.Model.IModel<T> {}
 export class Model<T = any> {
+  static Events = {
+    Creating: Event.Creating,
+    Created: Event.Created,
+    Saving: Event.Saving,
+    Saved: Event.Saved,
+    Updating: Event.Updating,
+    Updated: Event.Updated,
+    Deleting: Event.Deleting,
+    Deleted: Event.Deleted,
+    Restoring: Event.Restoring,
+    Restored: Event.Restored
+  }
+
   /**
    * Model constructor.
    *
@@ -32,7 +46,6 @@ export class Model<T = any> {
       this.driver = EloquentDriverProvider.create(this)
       this.driver.initialize(this, isGuarded, data)
       this.attributes = this.driver.getRecord()
-      this.eventEmitter = this.driver.getEventEmitter(false)
     }
   }
 
