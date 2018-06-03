@@ -10,7 +10,10 @@ EloquentDriverProviderFacade_1.EloquentDriverProviderFacade.register(DummyDriver
 class User extends Model_1.Model {
 }
 User.className = 'User';
-describe('NajsEloquent', function () {
+describe('Model', function () {
+    describe('constructor()', function () {
+        it('creates property eventEmitter by calls this.driver.getEventEmitter()', function () { });
+    });
     describe('.getDriver()', function () {
         it('returns this.driver', function () {
             const model = new User();
