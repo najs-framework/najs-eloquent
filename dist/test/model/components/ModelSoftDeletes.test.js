@@ -6,6 +6,8 @@ const Eloquent_1 = require("../../../lib/model/Eloquent");
 const ModelSoftDeletes_1 = require("../../../lib/model/components/ModelSoftDeletes");
 const DummyDriver_1 = require("../../../lib/drivers/DummyDriver");
 const EloquentDriverProviderFacade_1 = require("../../../lib/facades/global/EloquentDriverProviderFacade");
+const Event_1 = require("../../../lib/model/Event");
+const events_1 = require("events");
 EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy', true);
 describe('Model/Fillable', function () {
     describe('Unit', function () {
@@ -116,6 +118,9 @@ describe('Model/Fillable', function () {
                 const driver = {
                     async delete() {
                         return false;
+                    },
+                    getEventEmitter() {
+                        return new events_1.EventEmitter();
                     }
                 };
                 const deleteSpy = Sinon.spy(driver, 'delete');
@@ -129,12 +134,32 @@ describe('Model/Fillable', function () {
                 expect(await staticTrue.forceDelete()).toEqual(false);
                 expect(deleteSpy.calledWith(false)).toBe(true);
             });
+            it('fires event Deleting before call delete() and Deleted afterward', async function () {
+                const driver = {
+                    async delete() {
+                        return false;
+                    },
+                    getEventEmitter() {
+                        return new events_1.EventEmitter();
+                    }
+                };
+                const staticFalse = new StaticTrue();
+                staticFalse['driver'] = driver;
+                const fireSpy = Sinon.spy(staticFalse, 'fire');
+                expect(await staticFalse.forceDelete()).toEqual(false);
+                expect(fireSpy.callCount).toEqual(2);
+                expect(fireSpy.firstCall.calledWith(Event_1.Event.Deleting)).toBe(true);
+                expect(fireSpy.secondCall.calledWith(Event_1.Event.Deleted)).toBe(true);
+            });
         });
         describe('.restore()', function () {
             it('simply calls driver.restore()', async function () {
                 const driver = {
                     async restore() {
                         return false;
+                    },
+                    getEventEmitter() {
+                        return new events_1.EventEmitter();
                     }
                 };
                 const restoreSpy = Sinon.spy(driver, 'restore');
@@ -147,6 +172,23 @@ describe('Model/Fillable', function () {
                 staticTrue['driver'] = driver;
                 expect(await staticTrue.restore()).toEqual(false);
                 expect(restoreSpy.calledWith()).toBe(true);
+            });
+            it('fires event Restoring before call restore() and Restored afterward', async function () {
+                const driver = {
+                    async restore() {
+                        return false;
+                    },
+                    getEventEmitter() {
+                        return new events_1.EventEmitter();
+                    }
+                };
+                const staticFalse = new StaticTrue();
+                staticFalse['driver'] = driver;
+                const fireSpy = Sinon.spy(staticFalse, 'fire');
+                expect(await staticFalse.restore()).toEqual(false);
+                expect(fireSpy.callCount).toEqual(2);
+                expect(fireSpy.firstCall.calledWith(Event_1.Event.Restoring)).toBe(true);
+                expect(fireSpy.secondCall.calledWith(Event_1.Event.Restored)).toBe(true);
             });
         });
     });

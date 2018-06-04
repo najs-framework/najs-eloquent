@@ -7,6 +7,7 @@ const ModelActiveRecord_1 = require("../../../lib/model/components/ModelActiveRe
 const DummyDriver_1 = require("../../../lib/drivers/DummyDriver");
 const EloquentDriverProviderFacade_1 = require("../../../lib/facades/global/EloquentDriverProviderFacade");
 const events_1 = require("events");
+const Event_1 = require("../../../lib/model/Event");
 EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy', true);
 describe('Model/Fillable', function () {
     describe('Unit', function () {
@@ -82,6 +83,9 @@ describe('Model/Fillable', function () {
                 const driver = {
                     async delete() {
                         return 'anything';
+                    },
+                    getEventEmitter() {
+                        return new events_1.EventEmitter();
                     }
                 };
                 const deleteSpy = Sinon.spy(driver, 'delete');
@@ -92,12 +96,32 @@ describe('Model/Fillable', function () {
                 expect(await model.delete()).toEqual('anything');
                 expect(deleteSpy.calledWith('value')).toBe(true);
             });
+            it('fires event Deleting before call delete() and Deleted afterward', async function () {
+                const driver = {
+                    async delete() {
+                        return 'anything';
+                    },
+                    getEventEmitter() {
+                        return new events_1.EventEmitter();
+                    }
+                };
+                const model = new Model();
+                const fireSpy = Sinon.spy(model, 'fire');
+                model['driver'] = driver;
+                expect(await model.delete()).toEqual('anything');
+                expect(fireSpy.callCount).toEqual(2);
+                expect(fireSpy.firstCall.calledWith(Event_1.Event.Deleting)).toBe(true);
+                expect(fireSpy.secondCall.calledWith(Event_1.Event.Deleted)).toBe(true);
+            });
         });
         describe('.save()', function () {
             it('simply calls driver.save() and returns a Promise which contains this', async function () {
                 const driver = {
                     async save() {
                         return 'anything';
+                    },
+                    isNew() {
+                        return true;
                     },
                     getEventEmitter() {
                         return new events_1.EventEmitter();
@@ -108,6 +132,50 @@ describe('Model/Fillable', function () {
                 model['driver'] = driver;
                 expect((await model.save()) === model).toBe(true);
                 expect(saveSpy.called).toBe(true);
+            });
+            it('fires event Creating + Saving before call save() and Created + Saved if isNew() return true', async function () {
+                const driver = {
+                    async save() {
+                        return 'anything';
+                    },
+                    isNew() {
+                        return true;
+                    },
+                    getEventEmitter() {
+                        return new events_1.EventEmitter();
+                    }
+                };
+                const model = new Model();
+                const fireSpy = Sinon.spy(model, 'fire');
+                model['driver'] = driver;
+                expect((await model.save()) === model).toBe(true);
+                expect(fireSpy.callCount).toEqual(4);
+                expect(fireSpy.firstCall.calledWith(Event_1.Event.Creating)).toBe(true);
+                expect(fireSpy.secondCall.calledWith(Event_1.Event.Saving)).toBe(true);
+                expect(fireSpy.thirdCall.calledWith(Event_1.Event.Created)).toBe(true);
+                expect(fireSpy.getCall(3).calledWith(Event_1.Event.Saved)).toBe(true);
+            });
+            it('fires event Updating + Saving before call save() and Updated + Saved if isNew() return false', async function () {
+                const driver = {
+                    async save() {
+                        return 'anything';
+                    },
+                    isNew() {
+                        return false;
+                    },
+                    getEventEmitter() {
+                        return new events_1.EventEmitter();
+                    }
+                };
+                const model = new Model();
+                const fireSpy = Sinon.spy(model, 'fire');
+                model['driver'] = driver;
+                expect((await model.save()) === model).toBe(true);
+                expect(fireSpy.callCount).toEqual(4);
+                expect(fireSpy.firstCall.calledWith(Event_1.Event.Updating)).toBe(true);
+                expect(fireSpy.secondCall.calledWith(Event_1.Event.Saving)).toBe(true);
+                expect(fireSpy.thirdCall.calledWith(Event_1.Event.Updated)).toBe(true);
+                expect(fireSpy.getCall(3).calledWith(Event_1.Event.Saved)).toBe(true);
             });
         });
         describe('.fresh()', function () {

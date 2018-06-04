@@ -3,6 +3,7 @@
 
 import { register } from 'najs-binding'
 import { NajsEloquent } from '../../constants'
+import { Event } from './../Event'
 
 const DEFAULT_SOFT_DELETES: NajsEloquent.Model.ISoftDeletesSetting = {
   deletedAt: 'deleted_at',
@@ -39,11 +40,19 @@ export class ModelSoftDeletes implements Najs.Contracts.Eloquent.Component {
   }
 
   static forceDelete: NajsEloquent.Model.ModelMethod<Promise<boolean>> = function() {
-    return this['driver'].delete(false)
+    this.fire(Event.Deleting, [])
+    const result = this['driver'].delete(false)
+    this.fire(Event.Deleted, [])
+
+    return result
   }
 
   static restore: NajsEloquent.Model.ModelMethod<Promise<boolean>> = function() {
-    return this['driver'].restore()
+    this.fire(Event.Restoring, [])
+    const result = this['driver'].restore()
+    this.fire(Event.Restored, [])
+
+    return result
   }
 
   static get DefaultSetting() {

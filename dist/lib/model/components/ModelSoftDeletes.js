@@ -4,6 +4,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
 const constants_1 = require("../../constants");
+const Event_1 = require("./../Event");
 const DEFAULT_SOFT_DELETES = {
     deletedAt: 'deleted_at',
     overrideMethods: false
@@ -37,10 +38,16 @@ ModelSoftDeletes.trashed = function () {
     return this['driver'].isSoftDeleted();
 };
 ModelSoftDeletes.forceDelete = function () {
-    return this['driver'].delete(false);
+    this.fire(Event_1.Event.Deleting, []);
+    const result = this['driver'].delete(false);
+    this.fire(Event_1.Event.Deleted, []);
+    return result;
 };
 ModelSoftDeletes.restore = function () {
-    return this['driver'].restore();
+    this.fire(Event_1.Event.Restoring, []);
+    const result = this['driver'].restore();
+    this.fire(Event_1.Event.Restored, []);
+    return result;
 };
 exports.ModelSoftDeletes = ModelSoftDeletes;
 najs_binding_1.register(ModelSoftDeletes);
