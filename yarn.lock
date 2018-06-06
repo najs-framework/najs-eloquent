@@ -50,6 +50,14 @@
     "@types/events" "*"
     "@types/node" "*"
 
+"@types/mongodb@^3.0.19":
+  version "3.0.19"
+  resolved "https://registry.yarnpkg.com/@types/mongodb/-/mongodb-3.0.19.tgz#09b1f3f6abce5aea879dfc9832aad27cd6fa81c6"
+  dependencies:
+    "@types/bson" "*"
+    "@types/events" "*"
+    "@types/node" "*"
+
 "@types/mongoose@^4.7.31":
   version "4.7.34"
   resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-4.7.34.tgz#564a9e420f8ed82a9eee4e7a9dcf1c93979c88cf"
@@ -2328,11 +2336,24 @@ mongodb-core@3.0.4:
     bson "~1.0.4"
     require_optional "^1.0.1"
 
+mongodb-core@3.0.9:
+  version "3.0.9"
+  resolved "https://registry.yarnpkg.com/mongodb-core/-/mongodb-core-3.0.9.tgz#8327410c88811013fb3e4ac7c4c670f324349be1"
+  dependencies:
+    bson "~1.0.4"
+    require_optional "^1.0.1"
+
 mongodb@3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-3.0.4.tgz#ee0c0f7bc565edc5f40ee2d23170e522a8ad2286"
   dependencies:
     mongodb-core "3.0.4"
+
+mongodb@^3.0.10:
+  version "3.0.10"
+  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-3.0.10.tgz#f948cb9595adcbfcad7444f6b24a040b653b23e8"
+  dependencies:
+    mongodb-core "3.0.9"
 
 mongoose-legacy-pluralize@1.0.2:
   version "1.0.2"
@@ -3588,6 +3609,10 @@ validate-npm-package-license@^3.0.1:
   dependencies:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
+
+validator@^10.2.0:
+  version "10.3.0"
+  resolved "https://registry.yarnpkg.com/validator/-/validator-10.3.0.tgz#157a8c0981858cff381f59aabcdb8f83b57317cc"
 
 verror@1.10.0:
   version "1.10.0"
