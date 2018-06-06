@@ -81,7 +81,7 @@ namespace Najs.Contracts.Eloquent {
     /**
      * Get raw object data of the native record.
      */
-    toObject(): Object
+    toObject(): object
 
     /**
      * Create and return new query builder.
