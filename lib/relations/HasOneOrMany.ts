@@ -137,8 +137,8 @@ export class HasOneOrMany extends Relation {
       // }
 
       model.setAttribute(this.foreign.key, localPrimaryKey)
-      this.rootModel.on('saved', async function() {
-        await model.save()
+      this.rootModel.on('saved', function() {
+        return model.save()
       })
     } else {
       // if (model.getModelName() !== this.local.model) {

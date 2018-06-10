@@ -20,7 +20,7 @@ describe('Integration Test - Relation', function() {
     console.log(postOne.toObject())
     user.getPostsRelation().associate(postOne)
     console.log(postOne.toObject())
-    user.save()
+    await user.save()
 
     console.log(postTwo.toObject())
     postTwo.getUserRelation().associate(user)
