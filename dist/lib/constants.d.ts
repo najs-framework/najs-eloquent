@@ -5,6 +5,7 @@ export declare const NajsEloquent: {
         };
         DummyDriver: string;
         MongooseDriver: string;
+        MongodbDriver: string;
         KnexDriver: string;
     };
     Model: {

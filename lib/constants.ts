@@ -7,6 +7,7 @@ export const NajsEloquent = {
     },
     DummyDriver: 'NajsEloquent.Driver.DummyDriver',
     MongooseDriver: 'NajsEloquent.Driver.MongooseDriver',
+    MongodbDriver: 'NajsEloquent.Driver.MongodbDriver',
     KnexDriver: 'NajsEloquent.Driver.KnexDriver'
   },
   Model: {
