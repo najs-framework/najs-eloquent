@@ -1,4 +1,4 @@
-/// <reference types="node" />
+/// <reference types="najs-event" />
 var NajsEloquent;
 (function (NajsEloquent) {
     var Model;

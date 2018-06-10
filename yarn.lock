@@ -895,6 +895,10 @@ ecc-jsbn@~0.1.1:
   dependencies:
     jsbn "~0.1.0"
 
+emittery@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/emittery/-/emittery-0.4.0.tgz#b5d194e28f89f494aaad7b308d143e52ac9d0b43"
+
 errno@^0.1.4:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/errno/-/errno-0.1.7.tgz#4684d71779ad39af177e3f007996f7c67c852618"
@@ -2411,6 +2415,14 @@ najs-binding@^1.8.0:
   dependencies:
     lodash "^4.17.4"
 
+najs-event@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/najs-event/-/najs-event-0.1.0.tgz#a092ab1d167b83c8f8f5716a8fbc194a24594ec9"
+  dependencies:
+    emittery "^0.4.0"
+    najs-facade "^1.1.1"
+    wolfy87-eventemitter "^5.2.4"
+
 najs-facade@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/najs-facade/-/najs-facade-1.1.1.tgz#f651a7c8b3d27268c9c6f4dd1ed30f6095c0b124"
@@ -3675,6 +3687,10 @@ wide-align@^1.1.0:
 window-size@0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/window-size/-/window-size-0.1.0.tgz#5438cd2ea93b202efa3a19fe8887aee7c94f9c9d"
+
+wolfy87-eventemitter@^5.2.4:
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/wolfy87-eventemitter/-/wolfy87-eventemitter-5.2.4.tgz#5021d2952d3611cbcd195149711d9b595cd11d48"
 
 wordwrap@0.0.2:
   version "0.0.2"

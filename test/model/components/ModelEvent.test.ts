@@ -8,19 +8,10 @@ import { EloquentDriverProvider } from '../../../lib/facades/global/EloquentDriv
 EloquentDriverProvider.register(DummyDriver, 'dummy', true)
 
 const EVENT_EMITTER_FUNCTIONS = {
-  addListener: true,
   on: true,
+  off: true,
   once: true,
-  prependListener: true,
-  prependOnceListener: true,
-  removeListener: true,
-  removeAllListeners: true,
-  setMaxListeners: true,
-  getMaxListeners: false,
-  listeners: false,
-  emit: false,
-  eventNames: false,
-  listenerCount: false
+  emit: false
 }
 
 describe('ModelEvent', function() {
@@ -38,7 +29,7 @@ describe('ModelEvent', function() {
       it(`passes all argument to this.eventEmitter.${name}()`, function() {
         const instance = new Test()
         // eventEmitter is initialize dynamically
-        instance.getMaxListeners()
+        instance.on('something', function() {})
 
         const stub = Sinon.stub(instance['eventEmitter']!, <any>name)
         stub.returns('anything')

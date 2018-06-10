@@ -39,18 +39,18 @@ export class ModelSoftDeletes implements Najs.Contracts.Eloquent.Component {
     return this['driver'].isSoftDeleted()
   }
 
-  static forceDelete: NajsEloquent.Model.ModelMethod<Promise<boolean>> = function() {
-    this.fire(Event.Deleting, [])
+  static forceDelete: NajsEloquent.Model.ModelMethod<Promise<boolean>> = async function() {
+    await this.fire(Event.Deleting, [])
     const result = this['driver'].delete(false)
-    this.fire(Event.Deleted, [])
+    await this.fire(Event.Deleted, [])
 
     return result
   }
 
-  static restore: NajsEloquent.Model.ModelMethod<Promise<boolean>> = function() {
-    this.fire(Event.Restoring, [])
+  static restore: NajsEloquent.Model.ModelMethod<Promise<boolean>> = async function() {
+    await this.fire(Event.Restoring, [])
     const result = this['driver'].restore()
-    this.fire(Event.Restored, [])
+    await this.fire(Event.Restored, [])
 
     return result
   }

@@ -5,8 +5,8 @@ const najs_binding_1 = require("najs-binding");
 const constants_1 = require("../constants");
 const lodash_1 = require("lodash");
 const pluralize_1 = require("pluralize");
-const events_1 = require("events");
-const globalEventEmitter = new events_1.EventEmitter();
+const najs_event_1 = require("najs-event");
+const globalEventEmitter = najs_event_1.EventEmitterFactory.create(true);
 class DummyDriver {
     constructor() {
         this.attributes = {};
@@ -91,7 +91,7 @@ class DummyDriver {
         return lodash_1.snakeCase(name);
     }
     getEventEmitter(global) {
-        return global ? globalEventEmitter : new events_1.EventEmitter();
+        return global ? globalEventEmitter : najs_event_1.EventEmitterFactory.create(true);
     }
 }
 DummyDriver.className = constants_1.NajsEloquent.Driver.DummyDriver;

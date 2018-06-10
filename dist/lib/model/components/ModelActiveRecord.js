@@ -35,19 +35,19 @@ ModelActiveRecord.isDirty = function () {
 ModelActiveRecord.getDirty = function () {
     return this['driver'].getModified();
 };
-ModelActiveRecord.delete = function () {
-    this.fire(Event_1.Event.Deleting, []);
-    const result = this['driver'].delete(this.hasSoftDeletes());
-    this.fire(Event_1.Event.Deleted, []);
+ModelActiveRecord.delete = async function () {
+    await this.fire(Event_1.Event.Deleting, []);
+    const result = await this['driver'].delete(this.hasSoftDeletes());
+    await this.fire(Event_1.Event.Deleted, []);
     return result;
 };
 ModelActiveRecord.save = async function () {
     const isCreate = this['driver'].isNew();
-    this.fire(isCreate ? Event_1.Event.Creating : Event_1.Event.Updating, []);
-    this.fire(Event_1.Event.Saving, []);
+    await this.fire(isCreate ? Event_1.Event.Creating : Event_1.Event.Updating, []);
+    await this.fire(Event_1.Event.Saving, []);
     await this['driver'].save();
-    this.fire(isCreate ? Event_1.Event.Created : Event_1.Event.Updated, []);
-    this.fire(Event_1.Event.Saved, []);
+    await this.fire(isCreate ? Event_1.Event.Created : Event_1.Event.Updated, []);
+    await this.fire(Event_1.Event.Saved, []);
     return this;
 };
 ModelActiveRecord.fresh = async function () {

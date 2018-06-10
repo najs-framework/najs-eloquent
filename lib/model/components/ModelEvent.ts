@@ -3,22 +3,7 @@
 
 import { NajsEloquent } from '../../constants'
 import { register } from 'najs-binding'
-
-const EVENT_EMITTER_FUNCTIONS = {
-  addListener: true,
-  on: true,
-  once: true,
-  prependListener: true,
-  prependOnceListener: true,
-  removeListener: true,
-  removeAllListeners: true,
-  setMaxListeners: true,
-  getMaxListeners: false,
-  listeners: false,
-  emit: false,
-  eventNames: false,
-  listenerCount: false
-}
+import { EventEmitterFactory } from 'najs-event'
 
 export class ModelEvent implements Najs.Contracts.Eloquent.Component {
   static className = NajsEloquent.Model.Component.ModelEvent
@@ -28,26 +13,18 @@ export class ModelEvent implements Najs.Contracts.Eloquent.Component {
 
   extend(prototype: Object, bases: Object[], driver: Najs.Contracts.Eloquent.Driver<any>): void {
     prototype['fire'] = ModelEvent.fire
-    for (const functionName in EVENT_EMITTER_FUNCTIONS) {
-      prototype[functionName] = function() {
-        if (typeof this['eventEmitter'] === 'undefined') {
-          this['eventEmitter'] = this['driver'].getEventEmitter(false)
-        }
-        const result = this['eventEmitter'][functionName](...arguments)
-        if (EVENT_EMITTER_FUNCTIONS[functionName]) {
-          return this
-        }
-        return result
+    EventEmitterFactory.wrap(prototype, function(this: NajsEloquent.Model.IModel<any>) {
+      if (typeof this['eventEmitter'] === 'undefined') {
+        this['eventEmitter'] = this['driver'].getEventEmitter(false)
       }
-    }
+      return this['eventEmitter']
+    })
   }
 
-  static fire: NajsEloquent.Model.ModelMethod<any> = function(eventName: string, args: any[]) {
-    this.emit(eventName, ...args)
+  static fire: NajsEloquent.Model.ModelMethod<any> = async function(eventName: string, args: any) {
+    await this.emit(eventName, args)
 
     // this['driver'].getEventEmitter(true).emit(eventName, this, ...args)
-
-    return this
   }
 }
 register(ModelEvent)

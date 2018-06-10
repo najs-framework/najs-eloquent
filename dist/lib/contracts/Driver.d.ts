@@ -1,7 +1,6 @@
 /// <reference path="../model/interfaces/IModel.d.ts" />
 /// <reference path="../relations/interfaces/IRelationDataBucket.d.ts" />
 /// <reference path="../wrappers/interfaces/IQueryBuilderWrapper.d.ts" />
-/// <reference types="node" />
 declare namespace Najs.Contracts.Eloquent {
     interface Driver<NativeRecord> extends Najs.Contracts.Autoload {
         /**
@@ -132,6 +131,6 @@ declare namespace Najs.Contracts.Eloquent {
          *
          * @param {boolean} global
          */
-        getEventEmitter(global: boolean): NodeJS.EventEmitter;
+        getEventEmitter(global: boolean): Najs.Contracts.Event.AsyncEventEmitter;
     }
 }

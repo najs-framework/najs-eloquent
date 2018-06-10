@@ -1,11 +1,11 @@
-/// <reference types="node" />
+/// <reference types="najs-event" />
 
 namespace NajsEloquent.Model {
   export declare class IModelEvent {
-    protected eventEmitter?: NodeJS.EventEmitter
+    protected eventEmitter?: Najs.Contracts.Event.AsyncEventEmitter
   }
 
-  export interface IModelEvent extends NodeJS.EventEmitter {
+  export interface IModelEvent extends Najs.Contracts.Event.AsyncEventEmitter {
     /**
      * Trigger the event with both global and local EventEmitter.
      *
@@ -16,12 +16,12 @@ namespace NajsEloquent.Model {
      *
      * then:
      *
-     *    local_listener(a, b)         // a=1, b=2
-     *    global_listener(model, a, b) // model: model triggered, a=1, b=2
+     *    local_listener(data)         // data = [1, 2]
+     *    global_listener(model, data) // model triggered, data = [1, 2]
      *
      * @param {string} eventName event's name
-     * @param {array} args arguments
+     * @param {mixed} args arguments
      */
-    fire(eventName: string, args: any[]): this
+    fire(eventName: string, args: any): Promise<void>
   }
 }

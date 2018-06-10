@@ -39,10 +39,10 @@ export class ModelActiveRecord implements Najs.Contracts.Eloquent.Component {
     return this['driver'].getModified()
   }
 
-  static delete: NajsEloquent.Model.ModelMethod<Promise<boolean>> = function() {
-    this.fire(Event.Deleting, [])
-    const result = this['driver'].delete(this.hasSoftDeletes())
-    this.fire(Event.Deleted, [])
+  static delete: NajsEloquent.Model.ModelMethod<Promise<boolean>> = async function() {
+    await this.fire(Event.Deleting, [])
+    const result = await this['driver'].delete(this.hasSoftDeletes())
+    await this.fire(Event.Deleted, [])
 
     return result
   }
@@ -50,13 +50,13 @@ export class ModelActiveRecord implements Najs.Contracts.Eloquent.Component {
   static save: NajsEloquent.Model.ModelMethod<any> = async function() {
     const isCreate = this['driver'].isNew()
 
-    this.fire(isCreate ? Event.Creating : Event.Updating, [])
-    this.fire(Event.Saving, [])
+    await this.fire(isCreate ? Event.Creating : Event.Updating, [])
+    await this.fire(Event.Saving, [])
 
     await this['driver'].save()
 
-    this.fire(isCreate ? Event.Created : Event.Updated, [])
-    this.fire(Event.Saved, [])
+    await this.fire(isCreate ? Event.Created : Event.Updated, [])
+    await this.fire(Event.Saved, [])
 
     return this
   }

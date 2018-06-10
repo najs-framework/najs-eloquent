@@ -1,6 +1,4 @@
 /// <reference path="../contracts/Driver.d.ts" />
-/// <reference types="node" />
-import { EventEmitter } from 'events';
 export declare class DummyDriver implements Najs.Contracts.Eloquent.Driver<Object> {
     static className: string;
     attributes: Object;
@@ -30,5 +28,5 @@ export declare class DummyDriver implements Najs.Contracts.Eloquent.Driver<Objec
     getModelComponentName(): string | undefined;
     getModelComponentOrder(components: string[]): string[];
     formatAttributeName(name: string): string;
-    getEventEmitter(global: boolean): EventEmitter;
+    getEventEmitter(global: boolean): Najs.Contracts.Event.AsyncEventEmitter;
 }

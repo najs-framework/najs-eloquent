@@ -1,14 +1,12 @@
 /// <reference path="../contracts/Driver.d.ts" />
 /// <reference path="../model/interfaces/IModel.d.ts" />
 /// <reference path="../model/interfaces/IModelSetting.d.ts" />
-/// <reference types="node" />
 import '../wrappers/MongooseQueryBuilderWrapper';
 import '../query-builders/mongodb/MongooseQueryBuilder';
 import { Document, Model, Schema, SchemaDefinition, SchemaOptions } from 'mongoose';
-import { EventEmitter } from 'events';
 export declare class MongooseDriver<Record extends Object> implements Najs.Contracts.Eloquent.Driver<Record> {
     static className: string;
-    static GlobalEventEmitter: EventEmitter;
+    static GlobalEventEmitter: Najs.Contracts.Event.AsyncEventEmitter;
     protected attributes: Document & Record;
     protected queryLogGroup: string;
     protected modelName: string;
@@ -16,7 +14,7 @@ export declare class MongooseDriver<Record extends Object> implements Najs.Contr
     protected schema: SchemaDefinition;
     protected options: SchemaOptions;
     protected softDeletesSetting?: NajsEloquent.Model.ISoftDeletesSetting;
-    protected eventEmitter?: EventEmitter;
+    protected eventEmitter?: Najs.Contracts.Event.AsyncEventEmitter;
     constructor(model: NajsEloquent.Model.IModel<any> & NajsEloquent.Model.IModelSetting);
     getClassName(): string;
     initialize(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: any): void;
@@ -47,5 +45,5 @@ export declare class MongooseDriver<Record extends Object> implements Najs.Contr
     formatAttributeName(name: string): string;
     getModelComponentName(): string | undefined;
     getModelComponentOrder(components: string[]): string[];
-    getEventEmitter(global: boolean): EventEmitter;
+    getEventEmitter(global: boolean): Najs.Contracts.Event.AsyncEventEmitter;
 }

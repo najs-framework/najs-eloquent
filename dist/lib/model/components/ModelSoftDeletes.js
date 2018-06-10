@@ -37,16 +37,16 @@ ModelSoftDeletes.trashed = function () {
     }
     return this['driver'].isSoftDeleted();
 };
-ModelSoftDeletes.forceDelete = function () {
-    this.fire(Event_1.Event.Deleting, []);
+ModelSoftDeletes.forceDelete = async function () {
+    await this.fire(Event_1.Event.Deleting, []);
     const result = this['driver'].delete(false);
-    this.fire(Event_1.Event.Deleted, []);
+    await this.fire(Event_1.Event.Deleted, []);
     return result;
 };
-ModelSoftDeletes.restore = function () {
-    this.fire(Event_1.Event.Restoring, []);
+ModelSoftDeletes.restore = async function () {
+    await this.fire(Event_1.Event.Restoring, []);
     const result = this['driver'].restore();
-    this.fire(Event_1.Event.Restored, []);
+    await this.fire(Event_1.Event.Restored, []);
     return result;
 };
 exports.ModelSoftDeletes = ModelSoftDeletes;

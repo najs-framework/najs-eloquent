@@ -1,4 +1,4 @@
-/// <reference types="node" />
+/// <reference types="najs-event" />
 /// <reference types="najs-binding" />
 /// <reference path="../model/interfaces/IModel.ts" />
 /// <reference path="../relations/interfaces/IRelationDataBucket.ts" />
@@ -158,6 +158,6 @@ namespace Najs.Contracts.Eloquent {
      *
      * @param {boolean} global
      */
-    getEventEmitter(global: boolean): NodeJS.EventEmitter
+    getEventEmitter(global: boolean): Najs.Contracts.Event.AsyncEventEmitter
   }
 }

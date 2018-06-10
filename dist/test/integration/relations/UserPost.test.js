@@ -23,9 +23,8 @@ describe('Integration Test - Relation', function () {
         postTwo.getUserRelation().associate(user);
         console.log(postTwo.toObject());
         await postTwo.save();
-        // This is flaky test because the post saved async
-        // const fresh = await Post.findOrFail(postOne.getPrimaryKey())
-        // console.log(fresh)
+        const fresh = await index_1.Post.findOrFail(postOne.getPrimaryKey());
+        console.log(fresh);
         const freshUser = await user.fresh();
         await freshUser.load('posts');
         console.log(freshUser.posts);
