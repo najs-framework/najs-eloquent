@@ -1,4 +1,4 @@
-/// <reference path="../../contracts/DriverProvider.ts" />
+/// <reference path="../../contracts/MongooseProvider.ts" />
 
 import '../../providers/MongooseProvider'
 import { make } from 'najs-binding'

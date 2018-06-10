@@ -1,5 +1,5 @@
 "use strict";
-/// <reference path="../../contracts/DriverProvider.ts" />
+/// <reference path="../../contracts/MongooseProvider.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 require("../../providers/MongooseProvider");
 const najs_binding_1 = require("najs-binding");

@@ -1,4 +1,4 @@
-/// <reference path="../../contracts/DriverProvider.d.ts" />
+/// <reference path="../../contracts/MongooseProvider.d.ts" />
 import '../../providers/MongooseProvider';
 import { IFacade, IFacadeBase } from 'najs-facade';
 import { Mongoose, Model, Schema, Document } from 'mongoose';

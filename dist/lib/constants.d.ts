@@ -40,6 +40,7 @@ export declare const NajsEloquent: {
     Provider: {
         ComponentProvider: string;
         DriverProvider: string;
+        MongodbProvider: string;
         MongooseProvider: string;
     };
     Wrapper: {
