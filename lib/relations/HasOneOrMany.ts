@@ -124,34 +124,32 @@ export class HasOneOrMany extends Relation {
     return query.get()
   }
 
+  protected assertModelAssociable(model: NajsEloquent.Model.IModel<any>, expected: string) {
+    if (model.getModelName() !== expected) {
+      throw new TypeError(`Can not associate model ${model.getModelName()} to ${this.rootModel.getModelName()}.`)
+    }
+  }
+
   associate<T>(model: NajsEloquent.Model.IModel<T>): this {
     const rootIsLocal = this.rootModel.getModelName() === this.local.model
-    if (rootIsLocal) {
-      const localPrimaryKey = this.rootModel.getAttribute(this.local.key)
-      // if (!localPrimaryKey) {
-      //   console.log('please save root model first')
-      // }
 
-      // if (model.getModelName() !== this.foreign.model) {
-      //   console.log('can not associate the model')
-      // }
+    this.assertModelAssociable(model, rootIsLocal ? this.foreign.model : this.local.model)
 
-      model.setAttribute(this.foreign.key, localPrimaryKey)
-      this.rootModel.on('saved', function() {
-        return model.save()
-      })
-    } else {
-      // if (model.getModelName() !== this.local.model) {
-      //   console.log('can not associate the model')
-      // }
+    const providePrimaryKeyModel = rootIsLocal ? this.rootModel : model
+    const receivePrimaryKeyModel = rootIsLocal ? model : this.rootModel
 
-      const localPrimaryKey = model.getAttribute(this.local.key)
-      // if (!localPrimaryKey) {
-      //   console.log('please save root model first')
-      // }
+    const primaryKey = providePrimaryKeyModel.getAttribute(this.local.key)
+    // This condition just work for knex driver, I'll add it later
+    // if (!primaryKey) {
+    //   modelProvidePrimaryKey.on('saved', () => {
+    //     return modelReceivePrimaryKey.setAttribute(this.foreign.key, primaryKey).save()
+    //   })
+    // }
 
-      this.rootModel.setAttribute(this.foreign.key, localPrimaryKey)
-    }
+    receivePrimaryKeyModel.setAttribute(this.foreign.key, primaryKey)
+    this.rootModel.on('saved', function() {
+      return model.save()
+    })
 
     return this
   }

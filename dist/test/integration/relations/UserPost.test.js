@@ -11,22 +11,46 @@ describe('Integration Test - Relation', function () {
         await index_1.delete_collection(['users']);
         await index_1.delete_collection(['posts']);
     });
-    it('can use with .associate() to assign the model to relation', async function () {
-        const user = await lib_1.Factory.create(index_1.User);
-        const postOne = await lib_1.Factory.make(index_1.Post);
-        const postTwo = await lib_1.Factory.make(index_1.Post);
-        console.log(postOne.toObject());
-        user.getPostsRelation().associate(postOne);
-        console.log(postOne.toObject());
-        user.save();
-        console.log(postTwo.toObject());
-        postTwo.getUserRelation().associate(user);
-        console.log(postTwo.toObject());
-        await postTwo.save();
-        const fresh = await index_1.Post.findOrFail(postOne.getPrimaryKey());
-        console.log(fresh);
-        const freshUser = await user.fresh();
-        await freshUser.load('posts');
-        console.log(freshUser.posts);
+    describe('.associate()', function () {
+        it('works with .hasMany() from parent model. After saving user, post is also saved.', async function () {
+            const user = lib_1.Factory.make(index_1.User);
+            const post = lib_1.Factory.make(index_1.Post);
+            user.getPostsRelation().associate(post);
+            await user.save();
+            await user.load('posts');
+            expect(user.posts.first().toJSON()).toEqual(post.toJSON());
+        });
+        it('throws TypeError if associate invalid model with .hasMany()', function () {
+            const user = lib_1.Factory.make(index_1.User);
+            try {
+                user.getPostsRelation().associate(lib_1.Factory.make(index_1.Comment));
+            }
+            catch (error) {
+                expect(error).toBeInstanceOf(TypeError);
+                expect(error.message).toEqual('Can not associate model Comment to User.');
+                return;
+            }
+            expect('should not reach this line').toEqual('hm');
+        });
+        it('works with inverse relation .belongsTo(). After saving post, user is also saved.', async function () {
+            const user = lib_1.Factory.make(index_1.User);
+            const post = lib_1.Factory.make(index_1.Post);
+            post.getUserRelation().associate(user);
+            await post.save();
+            await post.load('user');
+            expect(post.user.toJSON()).toEqual(user.toJSON());
+        });
+        it('throws TypeError if associate invalid model with .belongsTo()', function () {
+            const post = lib_1.Factory.make(index_1.Post);
+            try {
+                post.getUserRelation().associate(lib_1.Factory.make(index_1.Comment));
+            }
+            catch (error) {
+                expect(error).toBeInstanceOf(TypeError);
+                expect(error.message).toEqual('Can not associate model Comment to Post.');
+                return;
+            }
+            expect('should not reach this line').toEqual('hm');
+        });
     });
 });

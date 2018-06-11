@@ -1,6 +1,6 @@
 import 'jest'
 import { Factory } from '../../../lib'
-import { User, Post, init_mongoose, delete_collection } from '../mongodb/index'
+import { User, Post, Comment, init_mongoose, delete_collection } from '../mongodb/index'
 
 describe('Integration Test - Relation', function() {
   beforeAll(async function() {
@@ -12,26 +12,51 @@ describe('Integration Test - Relation', function() {
     await delete_collection(['posts'])
   })
 
-  it('can use with .associate() to assign the model to relation', async function() {
-    const user = await Factory.create(User)
-    const postOne = await Factory.make(Post)
-    const postTwo = await Factory.make(Post)
+  describe('.associate()', function() {
+    it('works with .hasMany() from parent model. After saving user, post is also saved.', async function() {
+      const user = Factory.make(User)
+      const post = Factory.make(Post)
 
-    console.log(postOne.toObject())
-    user.getPostsRelation().associate(postOne)
-    console.log(postOne.toObject())
-    await user.save()
+      user.getPostsRelation().associate(post)
+      await user.save()
 
-    console.log(postTwo.toObject())
-    postTwo.getUserRelation().associate(user)
-    console.log(postTwo.toObject())
-    await postTwo.save()
+      await user.load('posts')
+      expect(user.posts!.first().toJSON()).toEqual(post.toJSON())
+    })
 
-    const fresh = await Post.findOrFail(postOne.getPrimaryKey())
-    console.log(fresh)
+    it('throws TypeError if associate invalid model with .hasMany()', function() {
+      const user = Factory.make(User)
+      try {
+        user.getPostsRelation().associate(Factory.make(Comment))
+      } catch (error) {
+        expect(error).toBeInstanceOf(TypeError)
+        expect(error.message).toEqual('Can not associate model Comment to User.')
+        return
+      }
+      expect('should not reach this line').toEqual('hm')
+    })
 
-    const freshUser = await user.fresh()
-    await freshUser!.load('posts')
-    console.log(freshUser!.posts)
+    it('works with inverse relation .belongsTo(). After saving post, user is also saved.', async function() {
+      const user = Factory.make(User)
+      const post = Factory.make(Post)
+
+      post.getUserRelation().associate(user)
+      await post.save()
+
+      await post.load('user')
+      expect(post.user!.toJSON()).toEqual(user.toJSON())
+    })
+
+    it('throws TypeError if associate invalid model with .belongsTo()', function() {
+      const post = Factory.make(Post)
+      try {
+        post.getUserRelation().associate(Factory.make(Comment))
+      } catch (error) {
+        expect(error).toBeInstanceOf(TypeError)
+        expect(error.message).toEqual('Can not associate model Comment to Post.')
+        return
+      }
+      expect('should not reach this line').toEqual('hm')
+    })
   })
 })
