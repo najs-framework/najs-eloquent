@@ -31,4 +31,5 @@ export declare class HasOneOrMany extends Relation {
     executeQuery(query: NajsEloquent.Wrapper.IQueryBuilderWrapper<any>): Promise<any>;
     protected assertModelAssociable(model: NajsEloquent.Model.IModel<any>, expected: string): void;
     associate<T>(model: NajsEloquent.Model.IModel<T>): this;
+    dissociate<T>(model?: NajsEloquent.Model.IModel<T>): this;
 }

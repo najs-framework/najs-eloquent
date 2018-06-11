@@ -154,8 +154,24 @@ export class HasOneOrMany extends Relation {
     return this
   }
 
-  // disassociate<T>(model: NajsEloquent.Model.IModel<T>): this {
-  //   return this
-  // }
+  dissociate<T>(model?: NajsEloquent.Model.IModel<T>): this {
+    const rootIsLocal = this.rootModel.getModelName() === this.local.model
+    if (rootIsLocal) {
+      this.assertModelAssociable(model!, this.foreign.model)
+    }
+
+    const receivePrimaryKeyModel = rootIsLocal ? model! : this.rootModel
+
+    // tslint:disable-next-line
+    receivePrimaryKeyModel.setAttribute(this.foreign.key, null)
+
+    if (model) {
+      this.rootModel.on('saved', function() {
+        return model.save()
+      })
+    }
+
+    return this
+  }
 }
 register(HasOneOrMany, NajsEloquent.Relation.HasOneOrMany)

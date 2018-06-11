@@ -53,4 +53,47 @@ describe('Integration Test - Relation', function () {
             expect('should not reach this line').toEqual('hm');
         });
     });
+    describe('.dissociate()', function () {
+        it('works with .hasMany() from parent model. After saving user, post is also saved.', async function () {
+            const userOne = lib_1.Factory.make(index_1.User);
+            const userTwo = lib_1.Factory.make(index_1.User);
+            const post = lib_1.Factory.make(index_1.Post);
+            userOne.getPostsRelation().associate(post);
+            await userOne.save();
+            userOne.getPostsRelation().dissociate(post);
+            expect(post.user_id).toBeNull();
+            userTwo.getPostsRelation().associate(post);
+            await userOne.save();
+            await userTwo.save();
+            await userOne.load('posts');
+            expect(userOne.posts.isEmpty()).toBe(true);
+            await userTwo.load('posts');
+            expect(userTwo.posts.first().toJSON()).toEqual(post.toJSON());
+        });
+        it('throws TypeError if associate invalid model with .hasMany()', function () {
+            const user = lib_1.Factory.make(index_1.User);
+            try {
+                user.getPostsRelation().dissociate(lib_1.Factory.make(index_1.Comment));
+            }
+            catch (error) {
+                expect(error).toBeInstanceOf(TypeError);
+                expect(error.message).toEqual('Can not associate model Comment to User.');
+                return;
+            }
+            expect('should not reach this line').toEqual('hm');
+        });
+        it('works with inverse relation .belongsTo(). After saving post, user is also saved.', async function () {
+            const userOne = lib_1.Factory.make(index_1.User);
+            const userTwo = lib_1.Factory.make(index_1.User);
+            const post = lib_1.Factory.make(index_1.Post);
+            post.getUserRelation().associate(userOne);
+            await post.save();
+            post.getUserRelation().dissociate();
+            expect(post.user_id).toBeNull();
+            post.getUserRelation().associate(userTwo);
+            await post.save();
+            await post.load('user');
+            expect(post.user.toJSON()).toEqual(userTwo.toJSON());
+        });
+    });
 });

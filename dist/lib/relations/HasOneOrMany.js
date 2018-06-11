@@ -107,6 +107,21 @@ class HasOneOrMany extends Relation_1.Relation {
         });
         return this;
     }
+    dissociate(model) {
+        const rootIsLocal = this.rootModel.getModelName() === this.local.model;
+        if (rootIsLocal) {
+            this.assertModelAssociable(model, this.foreign.model);
+        }
+        const receivePrimaryKeyModel = rootIsLocal ? model : this.rootModel;
+        // tslint:disable-next-line
+        receivePrimaryKeyModel.setAttribute(this.foreign.key, null);
+        if (model) {
+            this.rootModel.on('saved', function () {
+                return model.save();
+            });
+        }
+        return this;
+    }
 }
 HasOneOrMany.className = constants_1.NajsEloquent.Relation.HasOneOrMany;
 exports.HasOneOrMany = HasOneOrMany;
