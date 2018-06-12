@@ -29,7 +29,7 @@ import { MongooseDriver } from './drivers/MongooseDriver'
 import { GenericQueryBuilder } from './query-builders/GenericQueryBuilder'
 import { MongodbConditionConverter } from './query-builders/mongodb/MongodbConditionConverter'
 import { MongooseQueryBuilder } from './query-builders/mongodb/MongooseQueryBuilder'
-import { MongooseQueryLog } from './query-builders/mongodb/MongooseQueryLog'
+import { MongodbQueryLog } from './query-builders/mongodb/MongodbQueryLog'
 import { QueryBuilderWrapper } from './wrappers/QueryBuilderWrapper'
 import { MongooseQueryBuilderWrapper } from './wrappers/MongooseQueryBuilderWrapper'
 
@@ -89,7 +89,7 @@ export const NajsEloquent: BuiltinClasses = {
     Mongodb: {
       MongodbConditionConverter: MongodbConditionConverter,
       MongooseQueryBuilder: MongooseQueryBuilder,
-      MongooseQueryLog: MongooseQueryLog
+      MongodbQueryLog: MongodbQueryLog
     }
   },
   Wrapper: {

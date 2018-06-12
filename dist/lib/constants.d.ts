@@ -25,8 +25,9 @@ export declare const NajsEloquent: {
     };
     QueryBuilder: {
         MongooseQueryBuilder: string;
+        MongodbQueryBuilder: string;
         MongodbConditionConverter: string;
-        MongooseQueryLog: string;
+        MongodbQueryLog: string;
     };
     Database: {
         Seeder: string;

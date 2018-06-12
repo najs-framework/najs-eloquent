@@ -15,7 +15,7 @@ import { MongooseProvider } from './providers/MongooseProvider';
 import { GenericQueryBuilder } from './query-builders/GenericQueryBuilder';
 import { MongodbConditionConverter } from './query-builders/mongodb/MongodbConditionConverter';
 import { MongooseQueryBuilder } from './query-builders/mongodb/MongooseQueryBuilder';
-import { MongooseQueryLog } from './query-builders/mongodb/MongooseQueryLog';
+import { MongodbQueryLog } from './query-builders/mongodb/MongodbQueryLog';
 import { QueryBuilderWrapper } from './wrappers/QueryBuilderWrapper';
 import { MongooseQueryBuilderWrapper } from './wrappers/MongooseQueryBuilderWrapper';
 export declare type BuiltinClasses = {
@@ -44,7 +44,7 @@ export declare type BuiltinClasses = {
         Mongodb: {
             MongodbConditionConverter: typeof MongodbConditionConverter;
             MongooseQueryBuilder: typeof MongooseQueryBuilder;
-            MongooseQueryLog: typeof MongooseQueryLog;
+            MongodbQueryLog: typeof MongodbQueryLog;
         };
     };
     Wrapper: {

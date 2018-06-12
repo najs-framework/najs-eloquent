@@ -28,7 +28,7 @@ const MongooseDriver_1 = require("./drivers/MongooseDriver");
 const GenericQueryBuilder_1 = require("./query-builders/GenericQueryBuilder");
 const MongodbConditionConverter_1 = require("./query-builders/mongodb/MongodbConditionConverter");
 const MongooseQueryBuilder_1 = require("./query-builders/mongodb/MongooseQueryBuilder");
-const MongooseQueryLog_1 = require("./query-builders/mongodb/MongooseQueryLog");
+const MongodbQueryLog_1 = require("./query-builders/mongodb/MongodbQueryLog");
 const QueryBuilderWrapper_1 = require("./wrappers/QueryBuilderWrapper");
 const MongooseQueryBuilderWrapper_1 = require("./wrappers/MongooseQueryBuilderWrapper");
 // package facades
@@ -88,7 +88,7 @@ exports.NajsEloquent = {
         Mongodb: {
             MongodbConditionConverter: MongodbConditionConverter_1.MongodbConditionConverter,
             MongooseQueryBuilder: MongooseQueryBuilder_1.MongooseQueryBuilder,
-            MongooseQueryLog: MongooseQueryLog_1.MongooseQueryLog
+            MongodbQueryLog: MongodbQueryLog_1.MongodbQueryLog
         }
     },
     Wrapper: {

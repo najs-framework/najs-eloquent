@@ -3,8 +3,8 @@ import { NajsEloquent } from '../../constants'
 import { IAutoload, register } from 'najs-binding'
 import { flatten } from 'lodash'
 
-export class MongooseQueryLog implements IAutoload {
-  static className: string = NajsEloquent.QueryBuilder.MongooseQueryLog
+export class MongodbQueryLog implements IAutoload {
+  static className: string = NajsEloquent.QueryBuilder.MongodbQueryLog
   protected data: Object
 
   constructor(data: Object) {
@@ -13,7 +13,7 @@ export class MongooseQueryLog implements IAutoload {
   }
 
   getClassName() {
-    return NajsEloquent.QueryBuilder.MongooseQueryLog
+    return NajsEloquent.QueryBuilder.MongodbQueryLog
   }
 
   action(action: string): this {
@@ -39,4 +39,4 @@ export class MongooseQueryLog implements IAutoload {
     QueryLog.push(this.data)
   }
 }
-register(MongooseQueryLog)
+register(MongodbQueryLog)

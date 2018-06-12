@@ -4,19 +4,18 @@
 /// <reference path="../../model/interfaces/IModel.ts" />
 
 import { MongooseProvider } from '../../facades/global/MongooseProviderFacade'
-import { GenericQueryBuilder } from '../GenericQueryBuilder'
+import { MongodbQueryBuilderBase } from './MongodbQueryBuilderBase'
 import { Model, Document, DocumentQuery, Mongoose } from 'mongoose'
-import { MongooseQueryLog } from './MongooseQueryLog'
-import { MongodbConditionConverter } from './MongodbConditionConverter'
+import { MongodbQueryLog } from './MongodbQueryLog'
 import { NajsEloquent as NajsEloquentClasses } from '../../constants'
-import { register, make } from 'najs-binding'
+import { register } from 'najs-binding'
 import { isEmpty } from 'lodash'
 
 export type MongooseQuery<T> =
   | DocumentQuery<Document & T | null, Document & T>
   | DocumentQuery<(Document & T)[] | null, Document & T>
 
-export class MongooseQueryBuilder<T> extends GenericQueryBuilder
+export class MongooseQueryBuilder<T> extends MongodbQueryBuilderBase
   implements NajsEloquent.QueryBuilder.IFetchResultQuery<T> {
   static className: string = NajsEloquentClasses.QueryBuilder.MongooseQueryBuilder
 
@@ -43,101 +42,6 @@ export class MongooseQueryBuilder<T> extends GenericQueryBuilder
     return NajsEloquentClasses.QueryBuilder.MongooseQueryBuilder
   }
 
-  protected getQuery(isFindOne: boolean = false, logger?: MongooseQueryLog): MongooseQuery<T> {
-    if (!this.hasMongooseQuery) {
-      const conditions = this.resolveMongodbConditionConverter().convert()
-      this.mongooseQuery = isFindOne
-        ? this.mongooseModel.findOne(conditions)
-        : (this.mongooseQuery = this.mongooseModel.find(conditions))
-
-      if (logger) {
-        logger.raw(this.mongooseModel.modelName).raw(isFindOne ? '.findOne(' : '.find(', conditions, ')')
-      }
-      this.hasMongooseQuery = true
-    }
-    return this.mongooseQuery
-  }
-
-  protected passFieldsToQuery(query: MongooseQuery<T>, logger?: MongooseQueryLog) {
-    for (const name in this.fields) {
-      if (!isEmpty(this.fields[name])) {
-        const fields = this.fields[name].join(' ')
-        query[name](fields)
-        if (logger) {
-          logger.raw(`.${name}("${fields}")`)
-        }
-      }
-    }
-  }
-
-  protected passLimitToQuery(query: MongooseQuery<T>, logger?: MongooseQueryLog) {
-    if (this.limitNumber) {
-      query.limit(this.limitNumber)
-      if (logger) {
-        logger.raw(`.limit(${this.limitNumber})`)
-      }
-    }
-  }
-
-  protected passOrderingToQuery(query: MongooseQuery<T>, logger?: MongooseQueryLog) {
-    if (this.ordering && !isEmpty(this.ordering)) {
-      const sort: Object = Object.keys(this.ordering).reduce((memo, key) => {
-        memo[key] = this.ordering[key] === 'asc' ? 1 : -1
-        return memo
-      }, {})
-      query.sort(sort)
-      if (logger) {
-        logger.raw('.sort(', sort, ')')
-      }
-    }
-  }
-
-  protected passDataToMongooseQuery(query: MongooseQuery<T>, logger?: MongooseQueryLog) {
-    this.passFieldsToQuery(query, logger)
-    this.passLimitToQuery(query, logger)
-    this.passOrderingToQuery(query, logger)
-    return query
-  }
-
-  protected createQuery(findOne: boolean, logger?: MongooseQueryLog) {
-    return this.passDataToMongooseQuery(this.getQuery(findOne, logger), logger) as DocumentQuery<
-      (Document & T)[] | null,
-      Document & T
-    >
-  }
-
-  protected getQueryConvention(): NajsEloquent.QueryBuilder.IQueryConvention {
-    return {
-      formatFieldName(name: any) {
-        if (name === 'id') {
-          return '_id'
-        }
-        return name
-      },
-      getNullValueFor(name: any) {
-        // tslint:disable-next-line
-        return null
-      }
-    }
-  }
-
-  getPrimaryKey(): string {
-    return this.primaryKey
-  }
-
-  toObject(): Object {
-    const conditions = this.resolveMongodbConditionConverter().convert()
-    return {
-      name: this.name ? this.name : undefined,
-      select: !isEmpty(this.fields.select) ? this.fields.select : undefined,
-      limit: this.limitNumber,
-      orderBy: !isEmpty(this.ordering) ? this.ordering : undefined,
-      conditions: !isEmpty(conditions) ? conditions : undefined
-    }
-  }
-
-  // -------------------------------------------------------------------------------------------------------------------
-
   native(
     handler: (native: Model<Document & T> | MongooseQuery<T>) => MongooseQuery<T>
   ): NajsEloquent.QueryBuilder.IFetchResultQuery<T> {
@@ -147,7 +51,7 @@ export class MongooseQueryBuilder<T> extends GenericQueryBuilder
   }
 
   async get(): Promise<Array<Document & T>> {
-    const logger = this.resolveMongooseQueryLog()
+    const logger = this.resolveMongodbQueryLog()
     const query = this.createQuery(false, logger)
     logger
       .raw('.exec()')
@@ -157,7 +61,7 @@ export class MongooseQueryBuilder<T> extends GenericQueryBuilder
   }
 
   async first(): Promise<T | null> {
-    const logger = this.resolveMongooseQueryLog()
+    const logger = this.resolveMongodbQueryLog()
     const query = this.passDataToMongooseQuery(this.getQuery(true, logger), logger)
     // change mongoose query operator from find to findOne if needed
     if (query['op'] === 'find') {
@@ -174,7 +78,7 @@ export class MongooseQueryBuilder<T> extends GenericQueryBuilder
   }
 
   async count(): Promise<number> {
-    const logger = this.resolveMongooseQueryLog().action('count')
+    const logger = this.resolveMongodbQueryLog().action('count')
     this.selectedFields = []
     this.select(this.primaryKey)
     const query = this.createQuery(false, logger)
@@ -189,7 +93,7 @@ export class MongooseQueryBuilder<T> extends GenericQueryBuilder
       multi: true
     })
 
-    this.resolveMongooseQueryLog()
+    this.resolveMongodbQueryLog()
       .action('update')
       .raw(this.mongooseModel.modelName)
       .raw(`.update(${JSON.stringify(conditions)}, ${JSON.stringify(data)}, {multi: true})`)
@@ -203,7 +107,7 @@ export class MongooseQueryBuilder<T> extends GenericQueryBuilder
     if (conditions === false) {
       return { n: 0, ok: 1 }
     }
-    this.resolveMongooseQueryLog()
+    this.resolveMongodbQueryLog()
       .raw(this.mongooseModel.modelName)
       .raw('.remove(', conditions, ')', '.exec()')
       .end()
@@ -225,7 +129,7 @@ export class MongooseQueryBuilder<T> extends GenericQueryBuilder
       $set: { [this.softDelete.deletedAt]: this.convention.getNullValueFor(this.softDelete.deletedAt) }
     }
     const query = this.mongooseModel.update(conditions, updateData, { multi: true })
-    this.resolveMongooseQueryLog()
+    this.resolveMongodbQueryLog()
       .action('restore')
       .raw(this.mongooseModel.modelName)
       .raw('.update(', conditions, ',', updateData, ', ', { multi: true }, ')')
@@ -235,7 +139,7 @@ export class MongooseQueryBuilder<T> extends GenericQueryBuilder
   }
 
   async execute(): Promise<any> {
-    const logger = this.resolveMongooseQueryLog()
+    const logger = this.resolveMongodbQueryLog()
     const query: any = this.getQuery(false, logger)
     logger
       .raw('.exec()')
@@ -244,25 +148,84 @@ export class MongooseQueryBuilder<T> extends GenericQueryBuilder
     return query.exec()
   }
 
-  private isNotUsedOrEmptyCondition(): false | Object {
-    if (!this.isUsed) {
-      return false
+  // -------------------------------------------------------------------------------------------------------------------
+
+  protected getQuery(isFindOne: boolean = false, logger?: MongodbQueryLog): MongooseQuery<T> {
+    if (!this.hasMongooseQuery) {
+      const conditions = this.resolveMongodbConditionConverter().convert()
+      this.mongooseQuery = isFindOne
+        ? this.mongooseModel.findOne(conditions)
+        : (this.mongooseQuery = this.mongooseModel.find(conditions))
+
+      if (logger) {
+        logger.raw(this.mongooseModel.modelName).raw(isFindOne ? '.findOne(' : '.find(', conditions, ')')
+      }
+      this.hasMongooseQuery = true
     }
-    const conditions = this.resolveMongodbConditionConverter().convert()
-    if (isEmpty(conditions)) {
-      return false
-    }
-    return conditions
+    return this.mongooseQuery
   }
 
-  private resolveMongodbConditionConverter(): MongodbConditionConverter {
-    return make<MongodbConditionConverter>(MongodbConditionConverter.className, [this.getConditions()])
+  protected passFieldsToQuery(query: MongooseQuery<T>, logger?: MongodbQueryLog) {
+    for (const name in this.fields) {
+      if (!isEmpty(this.fields[name])) {
+        const fields = this.fields[name].join(' ')
+        query[name](fields)
+        if (logger) {
+          logger.raw(`.${name}("${fields}")`)
+        }
+      }
+    }
   }
 
-  private resolveMongooseQueryLog(): MongooseQueryLog {
-    const data = this.toObject()
-    data['builder'] = this.getClassName()
-    return make<MongooseQueryLog>(MongooseQueryLog.className, [data])
+  protected passLimitToQuery(query: MongooseQuery<T>, logger?: MongodbQueryLog) {
+    if (this.limitNumber) {
+      query.limit(this.limitNumber)
+      if (logger) {
+        logger.raw(`.limit(${this.limitNumber})`)
+      }
+    }
+  }
+
+  protected passOrderingToQuery(query: MongooseQuery<T>, logger?: MongodbQueryLog) {
+    if (this.ordering && !isEmpty(this.ordering)) {
+      const sort: Object = Object.keys(this.ordering).reduce((memo, key) => {
+        memo[key] = this.ordering[key] === 'asc' ? 1 : -1
+        return memo
+      }, {})
+      query.sort(sort)
+      if (logger) {
+        logger.raw('.sort(', sort, ')')
+      }
+    }
+  }
+
+  protected passDataToMongooseQuery(query: MongooseQuery<T>, logger?: MongodbQueryLog) {
+    this.passFieldsToQuery(query, logger)
+    this.passLimitToQuery(query, logger)
+    this.passOrderingToQuery(query, logger)
+    return query
+  }
+
+  protected createQuery(findOne: boolean, logger?: MongodbQueryLog) {
+    return this.passDataToMongooseQuery(this.getQuery(findOne, logger), logger) as DocumentQuery<
+      (Document & T)[] | null,
+      Document & T
+    >
+  }
+
+  protected getQueryConvention(): NajsEloquent.QueryBuilder.IQueryConvention {
+    return {
+      formatFieldName(name: any) {
+        if (name === 'id') {
+          return '_id'
+        }
+        return name
+      },
+      getNullValueFor(name: any) {
+        // tslint:disable-next-line
+        return null
+      }
+    }
   }
 }
 register(MongooseQueryBuilder)

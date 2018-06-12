@@ -1,5 +1,5 @@
 import { IAutoload } from 'najs-binding';
-export declare class MongooseQueryLog implements IAutoload {
+export declare class MongodbQueryLog implements IAutoload {
     static className: string;
     protected data: Object;
     constructor(data: Object);

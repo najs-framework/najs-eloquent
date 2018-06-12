@@ -27,8 +27,9 @@ export const NajsEloquent = {
   },
   QueryBuilder: {
     MongooseQueryBuilder: 'NajsEloquent.QueryBuilder.Mongodb.MongooseQueryBuilder',
+    MongodbQueryBuilder: 'NajsEloquent.QueryBuilder.Mongodb.MongodbQueryBuilder',
     MongodbConditionConverter: 'NajsEloquent.QueryBuilder.Mongodb.MongodbConditionConverter',
-    MongooseQueryLog: 'NajsEloquent.QueryBuilder.Mongodb.MongooseQueryLog'
+    MongodbQueryLog: 'NajsEloquent.QueryBuilder.Mongodb.MongodbQueryLog'
   },
   Database: {
     Seeder: 'NajsEloquent.Database.Seeder'

@@ -17,7 +17,7 @@ const UserSchema: Schema = new Schema(
 )
 MongooseProvider.createModelFromSchema('User', UserSchema)
 
-describe('MongooseQueryLog', function() {
+describe('MongodbQueryLog', function() {
   // TODO: write test
 
   beforeEach(function() {
