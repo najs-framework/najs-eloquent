@@ -87,7 +87,7 @@ export class MongooseQueryBuilder<T> extends MongodbQueryBuilderBase
     return result
   }
 
-  async update(data: Object): Promise<Object> {
+  async update(data: Object): Promise<object> {
     const conditions = this.resolveMongodbConditionConverter().convert()
     const query = this.mongooseModel.update(conditions, data, {
       multi: true
@@ -102,7 +102,7 @@ export class MongooseQueryBuilder<T> extends MongodbQueryBuilderBase
     return <any>query.exec()
   }
 
-  async delete(): Promise<Object> {
+  async delete(): Promise<object> {
     const conditions = this.isNotUsedOrEmptyCondition()
     if (conditions === false) {
       return { n: 0, ok: 1 }
@@ -116,7 +116,7 @@ export class MongooseQueryBuilder<T> extends MongodbQueryBuilderBase
     return <any>query.exec()
   }
 
-  async restore(): Promise<Object> {
+  async restore(): Promise<object> {
     if (!this.softDelete) {
       return { n: 0, nModified: 0, ok: 1 }
     }

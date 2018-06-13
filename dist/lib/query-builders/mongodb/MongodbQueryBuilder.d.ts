@@ -12,9 +12,9 @@ export declare class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase impl
     get(): Promise<T[]>;
     first(): Promise<T | null>;
     count(): Promise<number>;
-    update(data: Object): Promise<Object>;
-    delete(): Promise<Object>;
-    restore(): Promise<Object>;
+    update(data: Object): Promise<object>;
+    delete(): Promise<object>;
+    restore(): Promise<object>;
     execute(): Promise<any>;
     protected logQueryAndOptions(logger: MongodbQueryLog, query: object, options: object | undefined, func: string): MongodbQueryLog;
     createQueryOptions(): object | undefined;

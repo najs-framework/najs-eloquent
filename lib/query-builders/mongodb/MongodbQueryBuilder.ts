@@ -62,16 +62,32 @@ export class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase
     return this.collection.count(query)
   }
 
-  update(data: Object): Promise<Object> {
+  update(data: Object): Promise<object> {
     throw new Error('Not implemented.')
   }
 
-  delete(): Promise<Object> {
+  delete(): Promise<object> {
     throw new Error('Not implemented.')
   }
 
-  restore(): Promise<Object> {
-    throw new Error('Not implemented.')
+  async restore(): Promise<object> {
+    if (!this.softDelete) {
+      return { n: 0, nModified: 0, ok: 1 }
+    }
+
+    const conditions = this.isNotUsedOrEmptyCondition()
+    if (conditions === false) {
+      return { n: 0, nModified: 0, ok: 1 }
+    }
+
+    const query = this.resolveMongodbConditionConverter().convert()
+    return this.collection
+      .updateMany(query, {
+        $set: { [this.softDelete.deletedAt]: this.convention.getNullValueFor(this.softDelete.deletedAt) }
+      })
+      .then(function(response) {
+        return response.result
+      })
   }
 
   execute(): Promise<any> {

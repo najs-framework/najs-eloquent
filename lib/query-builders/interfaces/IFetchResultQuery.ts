@@ -22,17 +22,17 @@ namespace NajsEloquent.QueryBuilder {
      *
      * @param {Object} data
      */
-    update(data: Object): Promise<Object>
+    update(data: Object): Promise<object>
 
     /**
      * Delete all records which match the query.
      */
-    delete(): Promise<Object>
+    delete(): Promise<object>
 
     /**
      * Restore all records which match the query.
      */
-    restore(): Promise<Object>
+    restore(): Promise<object>
 
     /**
      * Execute query and returns raw result.

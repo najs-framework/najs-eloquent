@@ -20,9 +20,9 @@ export declare class MongooseQueryBuilder<T> extends MongodbQueryBuilderBase imp
     get(): Promise<Array<Document & T>>;
     first(): Promise<T | null>;
     count(): Promise<number>;
-    update(data: Object): Promise<Object>;
-    delete(): Promise<Object>;
-    restore(): Promise<Object>;
+    update(data: Object): Promise<object>;
+    delete(): Promise<object>;
+    restore(): Promise<object>;
     execute(): Promise<any>;
     protected getQuery(isFindOne?: boolean, logger?: MongodbQueryLog): MongooseQuery<T>;
     protected passFieldsToQuery(query: MongooseQuery<T>, logger?: MongodbQueryLog): void;

@@ -661,42 +661,59 @@ describe('MongodbQueryBuilder', function() {
     //     })
     //   })
 
-    //   describe('.restore()', function() {
-    //     it('does nothing if Model do not support SoftDeletes', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query.where('first_name', 'peter').restore()
-    //       expect(result).toEqual({ n: 0, nModified: 0, ok: 1 })
-    //     })
+    describe('.restore()', function() {
+      it('does nothing if Model do not support SoftDeletes', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query.where('first_name', 'peter').restore()
+        expect(QueryLog.pull()).toHaveLength(0)
+        expect(result).toEqual({ n: 0, nModified: 0, ok: 1 })
+      })
 
-    //     it('can not call restore if query is empty', async function() {
-    //       const query = new MongooseQueryBuilder('Role', { deletedAt: 'deleted_at', overrideMethods: true })
-    //       const result = await query.withTrashed().restore()
-    //       expect(result).toEqual({ n: 0, nModified: 0, ok: 1 })
-    //     })
+      it('can not call restore if query is empty', async function() {
+        const query = new MongodbQueryBuilder('Role', collectionRoles, {
+          deletedAt: 'deleted_at',
+          overrideMethods: true
+        })
+        const result = await query.withTrashed().restore()
+        expect(QueryLog.pull()).toHaveLength(0)
+        expect(result).toEqual({ n: 0, nModified: 0, ok: 1 })
+      })
 
-    //     it('can restore data by query builder, case 1', async function() {
-    //       const query = new MongooseQueryBuilder('Role', { deletedAt: 'deleted_at', overrideMethods: true })
-    //       const result = await query
-    //         .onlyTrashed()
-    //         .where('name', 'role-0')
-    //         .restore()
-    //       expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
-    //       const count = await new MongooseQueryBuilder('Role').count()
-    //       expect(count).toEqual(1)
-    //     })
+      it('can restore data by query builder, case 1', async function() {
+        const query = new MongodbQueryBuilder('Role', collectionRoles, {
+          deletedAt: 'deleted_at',
+          overrideMethods: true
+        })
+        const result = await query
+          .onlyTrashed()
+          .where('name', 'role-0')
+          .restore()
+        expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
+        const count = await new MongodbQueryBuilder('Role', collectionRoles, {
+          deletedAt: 'deleted_at',
+          overrideMethods: true
+        }).count()
+        expect(count).toEqual(1)
+      })
 
-    //     it('can restore data by query builder, case 2: multiple documents', async function() {
-    //       const query = new MongooseQueryBuilder('Role', { deletedAt: 'deleted_at', overrideMethods: true })
-    //       const result = await query
-    //         .withTrashed()
-    //         .where('name', 'role-1')
-    //         .orWhere('name', 'role-2')
-    //         .orWhere('name', 'role-3')
-    //         .restore()
-    //       expect(result).toEqual({ n: 3, nModified: 3, ok: 1 })
-    //       const count = await new MongooseQueryBuilder('Role').count()
-    //       expect(count).toEqual(4)
-    //     })
-    //   })
+      it('can restore data by query builder, case 2: multiple documents', async function() {
+        const query = new MongodbQueryBuilder('Role', collectionRoles, {
+          deletedAt: 'deleted_at',
+          overrideMethods: true
+        })
+        const result = await query
+          .withTrashed()
+          .where('name', 'role-1')
+          .orWhere('name', 'role-2')
+          .orWhere('name', 'role-3')
+          .restore()
+        expect(result).toEqual({ n: 3, nModified: 3, ok: 1 })
+        const count = await new MongodbQueryBuilder('Role', collectionRoles, {
+          deletedAt: 'deleted_at',
+          overrideMethods: true
+        }).count()
+        expect(count).toEqual(4)
+      })
+    })
   })
 })

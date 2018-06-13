@@ -51,8 +51,22 @@ class MongodbQueryBuilder extends MongodbQueryBuilderBase_1.MongodbQueryBuilderB
     delete() {
         throw new Error('Not implemented.');
     }
-    restore() {
-        throw new Error('Not implemented.');
+    async restore() {
+        if (!this.softDelete) {
+            return { n: 0, nModified: 0, ok: 1 };
+        }
+        const conditions = this.isNotUsedOrEmptyCondition();
+        if (conditions === false) {
+            return { n: 0, nModified: 0, ok: 1 };
+        }
+        const query = this.resolveMongodbConditionConverter().convert();
+        return this.collection
+            .updateMany(query, {
+            $set: { [this.softDelete.deletedAt]: this.convention.getNullValueFor(this.softDelete.deletedAt) }
+        })
+            .then(function (response) {
+            return response.result;
+        });
     }
     execute() {
         throw new Error('Not implemented.');
