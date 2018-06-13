@@ -16,6 +16,6 @@ export declare class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase impl
     delete(): Promise<Object>;
     restore(): Promise<Object>;
     execute(): Promise<any>;
-    createQuery(isFindOne: boolean, logger: MongodbQueryLog): Promise<any>;
+    protected logQueryAndOptions(logger: MongodbQueryLog, query: object, options: object | undefined, func: string): MongodbQueryLog;
     createQueryOptions(): object | undefined;
 }

@@ -17,12 +17,6 @@ describe('Coverage fill', function() {
   it('implements IAutoload and returns "NajsEloquent.QueryBuilder.Mongodb.MongodbQueryBuilder" as className', function() {
     const query = new MongodbQueryBuilder('User', <any>{})
     try {
-      query.first()
-    } catch (error) {}
-    try {
-      query.count()
-    } catch (error) {}
-    try {
       query.update({})
     } catch (error) {}
     try {
@@ -411,121 +405,145 @@ describe('MongodbQueryBuilder', function() {
       })
     })
 
-    //   describe('.first()', function() {
-    //     it('finds first document of collection and return an instance of Eloquent<T>', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query.first()
-    //       expect_match_user(result, dataset[0])
-    //     })
+    describe('.first()', function() {
+      it('finds first document of collection and return an instance of Eloquent<T>', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query.first()
+        expect_query_log('raw', 'db.users.findOne({})')
+        expect_match_user(result, dataset[0])
+      })
 
-    //     it('returns null if no result', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query.where('first_name', 'no-one').first()
-    //       expect(result).toBeNull()
-    //     })
+      it('finds first document of collection and return an instance of Eloquent<T>', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query.orderBy('_id', 'desc').first()
+        expect_query_log('raw', 'db.users.findOne({}, {"sort":[["_id",-1]]})')
+        expect_match_user(result, dataset[6])
+      })
 
-    //     it('can find data by query builder, case 1', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query.where('age', 1000).first()
-    //       expect_match_user(result, dataset[3])
-    //     })
+      it('returns null if no result', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query.where('first_name', 'no-one').first()
+        expect_query_log('raw', 'db.users.findOne({"first_name":"no-one"})')
+        expect(result).toBeNull()
+      })
 
-    //     it('can find data by query builder, case 2', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query
-    //         .where('age', 40)
-    //         .orWhere('first_name', 'jane')
-    //         .first()
-    //       expect_match_user(result, dataset[1])
-    //     })
+      it('can find data by query builder, case 1', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query.where('age', 1000).first()
+        expect_query_log('raw', 'db.users.findOne({"age":1000})')
+        expect_match_user(result, dataset[3])
+      })
 
-    //     it('can find data by query builder, case 3', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query
-    //         .where('first_name', 'tony')
-    //         .where('last_name', 'stewart')
-    //         .first()
-    //       expect_match_user(result, dataset[5])
-    //     })
+      it('can find data by query builder, case 2', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query
+          .where('age', 40)
+          .orWhere('first_name', 'jane')
+          .first()
+        expect_query_log('raw', 'db.users.findOne({"$or":[{"age":40},{"first_name":"jane"}]})')
+        expect_match_user(result, dataset[1])
+      })
 
-    //     it('can find data by native() before using query functions of query builder', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query
-    //         .native(function(model: any) {
-    //           return model.findOne({
-    //             first_name: 'tony'
-    //           })
-    //         })
-    //         .first()
-    //       expect_match_user(result, dataset[2])
-    //     })
+      it('can find data by query builder, case 3', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query
+          .where('first_name', 'tony')
+          .where('last_name', 'stewart')
+          .first()
+        expect_query_log('raw', 'db.users.findOne({"first_name":"tony","last_name":"stewart"})')
+        expect_match_user(result, dataset[5])
+      })
 
-    //     it('can find data by native() after using query functions of query builder', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query
-    //         .where('age', 40)
-    //         .orWhere('age', 1000)
-    //         .native(function(nativeQuery: any) {
-    //           return nativeQuery.sort({ last_name: -1 })
-    //         })
-    //         .first()
-    //       expect_match_user(result, dataset[5])
-    //     })
+      // it('can find data by native() before using query functions of query builder', async function() {
+      //   const query = new MongodbQueryBuilder('User', collectionUsers)
+      //   const result = await query
+      //     .native(function(model: any) {
+      //       return model.findOne({
+      //         first_name: 'tony'
+      //       })
+      //     })
+      //     .first()
+      //   expect_match_user(result, dataset[2])
+      // })
 
-    //     it('can find data by native() and modified after using query functions of query builder', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query
-    //         .where('age', 40)
-    //         .orWhere('age', 1000)
-    //         .native(function(nativeQuery: any) {
-    //           return nativeQuery.findOne({
-    //             first_name: 'thor'
-    //           })
-    //         })
-    //         .first()
-    //       expect_match_user(result, dataset[3])
-    //     })
-    //   })
+      // it('can find data by native() after using query functions of query builder', async function() {
+      //   const query = new MongooseQueryBuilder('User')
+      //   const result = await query
+      //     .where('age', 40)
+      //     .orWhere('age', 1000)
+      //     .native(function(nativeQuery: any) {
+      //       return nativeQuery.sort({ last_name: -1 })
+      //     })
+      //     .first()
+      //   expect_match_user(result, dataset[5])
+      // })
 
-    //   describe('.count()', function() {
-    //     it('counts all data of collection and returns a Number', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query.count()
-    //       expect(result).toEqual(7)
-    //     })
+      // it('can find data by native() and modified after using query functions of query builder', async function() {
+      //   const query = new MongooseQueryBuilder('User')
+      //   const result = await query
+      //     .where('age', 40)
+      //     .orWhere('age', 1000)
+      //     .native(function(nativeQuery: any) {
+      //       return nativeQuery.findOne({
+      //         first_name: 'thor'
+      //       })
+      //     })
+      //     .first()
+      //   expect_match_user(result, dataset[3])
+      // })
+    })
 
-    //     it('returns 0 if no result', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query.where('first_name', 'no-one').count()
-    //       expect(result).toEqual(0)
-    //     })
+    describe('.count()', function() {
+      it('counts all data of collection and returns a Number', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query.count()
+        expect_query_log('raw', 'db.users.count({})')
+        expect(result).toEqual(7)
+      })
 
-    //     it('overrides select even .select was used', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query.select('abc', 'def').count()
-    //       expect(query['fields']['select']).toEqual(['_id'])
-    //       expect(result).toEqual(7)
-    //     })
+      it('returns 0 if no result', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query.where('first_name', 'no-one').count()
+        expect_query_log('raw', 'db.users.count({"first_name":"no-one"})')
+        expect(result).toEqual(0)
+      })
 
-    //     it('can count items by query builder, case 1', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query
-    //         .where('age', 18)
-    //         .orWhere('first_name', 'tony')
-    //         .count()
-    //       expect(result).toEqual(2)
-    //     })
+      it('overrides select even .select was used', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query.select('abc', 'def').count()
+        expect_query_log('raw', 'db.users.count({})')
+        expect(result).toEqual(7)
+      })
 
-    //     it('can count items by query builder, case 2', async function() {
-    //       const query = new MongooseQueryBuilder('User')
-    //       const result = await query
-    //         .where('age', 1000)
-    //         .orWhere('first_name', 'captain')
-    //         .orderBy('last_name')
-    //         .count()
-    //       expect(result).toEqual(2)
-    //     })
-    //   })
+      it('overrides ordering even .orderBy was used', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query.orderBy('abc').count()
+        expect_query_log('raw', 'db.users.count({})')
+        expect(result).toEqual(7)
+      })
+
+      it('can count items by query builder, case 1', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query
+          .where('age', 18)
+          .orWhere('first_name', 'tony')
+          .count()
+        expect_query_log('raw', 'db.users.count({"$or":[{"age":18},{"first_name":"tony"}]})')
+        expect(result).toEqual(2)
+      })
+
+      it('can count items by query builder, case 2', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query
+          .where('age', 1000)
+          .orWhere('first_name', 'captain')
+          .orderBy('last_name')
+          .limit(10)
+          .count()
+        expect_query_log('raw', 'db.users.count({"$or":[{"age":1000},{"first_name":"captain"}]}, {"limit":10})')
+        expect(result).toEqual(2)
+      })
+    })
 
     //   describe('.update()', function() {
     //     it('can update data of collection, returns update result of mongoose', async function() {

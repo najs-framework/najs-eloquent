@@ -30,19 +30,36 @@ export class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase
     return NajsEloquentClasses.QueryBuilder.MongodbQueryBuilder
   }
 
-  async get(): Promise<T[]> {
+  get(): Promise<T[]> {
+    const query = this.resolveMongodbConditionConverter().convert()
+    const options = this.createQueryOptions()
     const logger = this.resolveMongodbQueryLog()
-    const result = await this.createQuery(false, logger)
-    logger.end()
-    return result
+    this.logQueryAndOptions(logger, query, options, 'find')
+      .raw('.toArray()')
+      .end()
+    return this.collection.find(query, options).toArray()
   }
 
   first(): Promise<T | null> {
-    throw new Error('Not implemented.')
+    const query = this.resolveMongodbConditionConverter().convert()
+    const options = this.createQueryOptions()
+    const logger = this.resolveMongodbQueryLog()
+    this.logQueryAndOptions(logger, query, options, 'findOne').end()
+    return this.collection.findOne(query, options)
   }
 
   count(): Promise<number> {
-    throw new Error('Not implemented.')
+    if (this.fields.select) {
+      this.fields.select = []
+    }
+    if (!isEmpty(this.ordering)) {
+      this.ordering = {}
+    }
+    const query = this.resolveMongodbConditionConverter().convert()
+    const options = this.createQueryOptions()
+    const logger = this.resolveMongodbQueryLog()
+    this.logQueryAndOptions(logger, query, options, 'count').end()
+    return this.collection.count(query)
   }
 
   update(data: Object): Promise<Object> {
@@ -62,19 +79,13 @@ export class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase
   }
 
   // -------------------------------------------------------------------------------------------------------------------
-
-  createQuery(isFindOne: boolean, logger: MongodbQueryLog): Promise<any> {
-    const query = this.resolveMongodbConditionConverter().convert()
-    const options = this.createQueryOptions()
-    // if (isFindOne) {
-    //   logger.raw('db.', this.collection.collectionName, '.findOne(', query, options ? ', ' : '', options, ')')
-    //   return this.collection.findOne(query, options)
-    // } else {
-    logger
-      .raw('db.', this.collection.collectionName, '.find(', query, options ? ', ' : '', options, ')')
-      .raw('.toArray()')
-    return this.collection.find(query, options).toArray()
-    // }
+  protected logQueryAndOptions(
+    logger: MongodbQueryLog,
+    query: object,
+    options: object | undefined,
+    func: string
+  ): MongodbQueryLog {
+    return logger.raw('db.', this.collection.collectionName, `.${func}(`, query).raw(options ? ', ' : '', options, ')')
   }
 
   createQueryOptions(): object | undefined {

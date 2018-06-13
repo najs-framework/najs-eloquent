@@ -16,17 +16,34 @@ class MongodbQueryBuilder extends MongodbQueryBuilderBase_1.MongodbQueryBuilderB
     getClassName() {
         return constants_1.NajsEloquent.QueryBuilder.MongodbQueryBuilder;
     }
-    async get() {
+    get() {
+        const query = this.resolveMongodbConditionConverter().convert();
+        const options = this.createQueryOptions();
         const logger = this.resolveMongodbQueryLog();
-        const result = await this.createQuery(false, logger);
-        logger.end();
-        return result;
+        this.logQueryAndOptions(logger, query, options, 'find')
+            .raw('.toArray()')
+            .end();
+        return this.collection.find(query, options).toArray();
     }
     first() {
-        throw new Error('Not implemented.');
+        const query = this.resolveMongodbConditionConverter().convert();
+        const options = this.createQueryOptions();
+        const logger = this.resolveMongodbQueryLog();
+        this.logQueryAndOptions(logger, query, options, 'findOne').end();
+        return this.collection.findOne(query, options);
     }
     count() {
-        throw new Error('Not implemented.');
+        if (this.fields.select) {
+            this.fields.select = [];
+        }
+        if (!lodash_1.isEmpty(this.ordering)) {
+            this.ordering = {};
+        }
+        const query = this.resolveMongodbConditionConverter().convert();
+        const options = this.createQueryOptions();
+        const logger = this.resolveMongodbQueryLog();
+        this.logQueryAndOptions(logger, query, options, 'count').end();
+        return this.collection.count(query);
     }
     update(data) {
         throw new Error('Not implemented.');
@@ -41,18 +58,8 @@ class MongodbQueryBuilder extends MongodbQueryBuilderBase_1.MongodbQueryBuilderB
         throw new Error('Not implemented.');
     }
     // -------------------------------------------------------------------------------------------------------------------
-    createQuery(isFindOne, logger) {
-        const query = this.resolveMongodbConditionConverter().convert();
-        const options = this.createQueryOptions();
-        // if (isFindOne) {
-        //   logger.raw('db.', this.collection.collectionName, '.findOne(', query, options ? ', ' : '', options, ')')
-        //   return this.collection.findOne(query, options)
-        // } else {
-        logger
-            .raw('db.', this.collection.collectionName, '.find(', query, options ? ', ' : '', options, ')')
-            .raw('.toArray()');
-        return this.collection.find(query, options).toArray();
-        // }
+    logQueryAndOptions(logger, query, options, func) {
+        return logger.raw('db.', this.collection.collectionName, `.${func}(`, query).raw(options ? ', ' : '', options, ')');
     }
     createQueryOptions() {
         const options = {};
