@@ -63,7 +63,10 @@ export class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase
   }
 
   update(data: Object): Promise<object> {
-    throw new Error('Not implemented.')
+    const query = this.resolveMongodbConditionConverter().convert()
+    return this.collection.updateMany(query, data).then(function(response) {
+      return response.result
+    })
   }
 
   delete(): Promise<object> {

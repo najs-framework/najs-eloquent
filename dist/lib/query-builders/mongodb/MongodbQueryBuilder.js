@@ -46,7 +46,10 @@ class MongodbQueryBuilder extends MongodbQueryBuilderBase_1.MongodbQueryBuilderB
         return this.collection.count(query);
     }
     update(data) {
-        throw new Error('Not implemented.');
+        const query = this.resolveMongodbConditionConverter().convert();
+        return this.collection.updateMany(query, data).then(function (response) {
+            return response.result;
+        });
     }
     delete() {
         throw new Error('Not implemented.');
