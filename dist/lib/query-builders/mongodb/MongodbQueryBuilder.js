@@ -46,13 +46,19 @@ class MongodbQueryBuilder extends MongodbQueryBuilderBase_1.MongodbQueryBuilderB
         return this.collection.count(query);
     }
     update(data) {
-        const query = this.resolveMongodbConditionConverter().convert();
-        return this.collection.updateMany(query, data).then(function (response) {
+        const conditions = this.resolveMongodbConditionConverter().convert();
+        return this.collection.updateMany(conditions, data).then(function (response) {
             return response.result;
         });
     }
     delete() {
-        throw new Error('Not implemented.');
+        const conditions = this.isNotUsedOrEmptyCondition();
+        if (conditions === false) {
+            return Promise.resolve({ n: 0, ok: 1 });
+        }
+        return this.collection.deleteMany(conditions).then(function (response) {
+            return response.result;
+        });
     }
     async restore() {
         if (!this.softDelete) {

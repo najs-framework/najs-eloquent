@@ -17,9 +17,6 @@ describe('Coverage fill', function() {
   it('implements IAutoload and returns "NajsEloquent.QueryBuilder.Mongodb.MongodbQueryBuilder" as className', function() {
     const query = new MongodbQueryBuilder('User', <any>{})
     try {
-      query.delete()
-    } catch (error) {}
-    try {
       query.execute()
     } catch (error) {}
   })
@@ -593,68 +590,69 @@ describe('MongodbQueryBuilder', function() {
       })
     })
 
-    // describe('.delete()', function() {
-    //   it('can delete data of collection, returns delete result of mongoose', async function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     const result = await query.where('first_name', 'peter').delete()
-    //     expect(result).toEqual({ n: 1, ok: 1 })
-    //     const count = await new MongooseQueryBuilder('User').count()
-    //     expect(count).toEqual(6)
-    //   })
+    describe('.delete()', function() {
+      it('can delete data of collection, returns delete result of mongoose', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query.where('first_name', 'peter').delete()
+        expect(result).toEqual({ n: 1, ok: 1 })
+        const count = await new MongodbQueryBuilder('User', collectionUsers).count()
+        expect(count).toEqual(6)
+      })
 
-    //   it('can delete data by query builder, case 1', async function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     const result = await query.where('age', 1001).delete()
-    //     expect(result).toEqual({ n: 1, ok: 1 })
-    //     const count = await new MongooseQueryBuilder('User').count()
-    //     expect(count).toEqual(5)
-    //   })
+      it('can delete data by query builder, case 1', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query.where('age', 1001).delete()
+        expect(result).toEqual({ n: 1, ok: 1 })
+        const count = await new MongodbQueryBuilder('User', collectionUsers).count()
+        expect(count).toEqual(5)
+      })
 
-    //   it('can delete data by query builder, case 2: multiple documents', async function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     const result = await query
-    //       .where('first_name', 'tony')
-    //       .orWhere('first_name', 'jane')
-    //       .delete()
-    //     expect(result).toEqual({ n: 3, ok: 1 })
-    //     const count = await new MongooseQueryBuilder('User').count()
-    //     expect(count).toEqual(2)
-    //   })
+      it('can delete data by query builder, case 2: multiple documents', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query
+          .where('first_name', 'tony')
+          .orWhere('first_name', 'jane')
+          .delete()
+        expect(result).toEqual({ n: 3, ok: 1 })
+        const count = await new MongodbQueryBuilder('User', collectionUsers).count()
+        expect(count).toEqual(2)
+      })
 
-    //   it('can delete data by query builder, case 3', async function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     const result = await query
-    //       .where('first_name', 'john')
-    //       .where('last_name', 'doe')
-    //       .delete()
-    //     expect(result).toEqual({ n: 1, ok: 1 })
-    //     const count = await new MongooseQueryBuilder('User').count()
-    //     expect(count).toEqual(1)
-    //   })
+      it('can delete data by query builder, case 3', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query
+          .where('first_name', 'john')
+          .where('last_name', 'doe')
+          .delete()
+        expect(result).toEqual({ n: 1, ok: 1 })
+        const count = await new MongodbQueryBuilder('User', collectionUsers).count()
+        expect(count).toEqual(1)
+      })
 
-    //   it('can not call delete without using any .where() statement', async function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     const result = await query.delete()
-    //     expect(result).toEqual({ n: 0, ok: 1 })
-    //   })
+      it('can not call delete without using any .where() statement', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query.delete()
+        expect(result).toEqual({ n: 0, ok: 1 })
+      })
 
-    //   it('can not call delete if query is empty', async function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     const result = await query.select('any').delete()
-    //     expect(result).toEqual({ n: 0, ok: 1 })
-    //   })
+      it('can not call delete if query is empty', async function() {
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        const result = await query.select('any').delete()
+        expect(result).toEqual({ n: 0, ok: 1 })
+      })
 
-    //   it('can delete by native() function', async function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     const result = await query
-    //       .native(function(model: any) {
-    //         return model.remove({})
-    //       })
-    //       .execute()
-    //     expect(result).toEqual({ n: 1, ok: 1 })
-    //     const count = await new MongooseQueryBuilder('User').count()
-    //     expect(count).toEqual(0)
-    //   })
+      //   it('can delete by native() function', async function() {
+      //     const query = new MongooseQueryBuilder('User')
+      //     const result = await query
+      //       .native(function(model: any) {
+      //         return model.remove({})
+      //       })
+      //       .execute()
+      //     expect(result).toEqual({ n: 1, ok: 1 })
+      //     const count = await new MongooseQueryBuilder('User').count()
+      //     expect(count).toEqual(0)
+      //   })
+    })
 
     describe('.restore()', function() {
       it('does nothing if Model do not support SoftDeletes', async function() {
