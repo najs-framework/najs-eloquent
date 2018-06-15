@@ -47,6 +47,9 @@ class MongodbQueryBuilder extends MongodbQueryBuilderBase_1.MongodbQueryBuilderB
     }
     update(data) {
         const conditions = this.resolveMongodbConditionConverter().convert();
+        this.resolveMongodbQueryLog()
+            .raw('db.', this.collection.collectionName, '.updateMany(', conditions, ', ', data, ')')
+            .end();
         return this.collection.updateMany(conditions, data).then(function (response) {
             return response.result;
         });
@@ -56,6 +59,9 @@ class MongodbQueryBuilder extends MongodbQueryBuilderBase_1.MongodbQueryBuilderB
         if (conditions === false) {
             return Promise.resolve({ n: 0, ok: 1 });
         }
+        this.resolveMongodbQueryLog()
+            .raw('db.', this.collection.collectionName, '.deleteMany(', conditions, ')')
+            .end();
         return this.collection.deleteMany(conditions).then(function (response) {
             return response.result;
         });
@@ -69,11 +75,13 @@ class MongodbQueryBuilder extends MongodbQueryBuilderBase_1.MongodbQueryBuilderB
             return { n: 0, nModified: 0, ok: 1 };
         }
         const query = this.resolveMongodbConditionConverter().convert();
-        return this.collection
-            .updateMany(query, {
+        const data = {
             $set: { [this.softDelete.deletedAt]: this.convention.getNullValueFor(this.softDelete.deletedAt) }
-        })
-            .then(function (response) {
+        };
+        this.resolveMongodbQueryLog()
+            .raw('db.', this.collection.collectionName, '.updateMany(', conditions, ', ', data, ')')
+            .end();
+        return this.collection.updateMany(query, data).then(function (response) {
             return response.result;
         });
     }

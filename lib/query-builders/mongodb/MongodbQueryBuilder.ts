@@ -65,6 +65,9 @@ export class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase
 
   update(data: Object): Promise<object> {
     const conditions = this.resolveMongodbConditionConverter().convert()
+    this.resolveMongodbQueryLog()
+      .raw('db.', this.collection.collectionName, '.updateMany(', conditions, ', ', data, ')')
+      .end()
     return this.collection.updateMany(conditions, data).then(function(response) {
       return response.result
     })
@@ -75,7 +78,9 @@ export class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase
     if (conditions === false) {
       return Promise.resolve({ n: 0, ok: 1 })
     }
-
+    this.resolveMongodbQueryLog()
+      .raw('db.', this.collection.collectionName, '.deleteMany(', conditions, ')')
+      .end()
     return this.collection.deleteMany(conditions).then(function(response) {
       return response.result
     })
@@ -92,13 +97,15 @@ export class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase
     }
 
     const query = this.resolveMongodbConditionConverter().convert()
-    return this.collection
-      .updateMany(query, {
-        $set: { [this.softDelete.deletedAt]: this.convention.getNullValueFor(this.softDelete.deletedAt) }
-      })
-      .then(function(response) {
-        return response.result
-      })
+    const data = {
+      $set: { [this.softDelete.deletedAt]: this.convention.getNullValueFor(this.softDelete.deletedAt) }
+    }
+    this.resolveMongodbQueryLog()
+      .raw('db.', this.collection.collectionName, '.updateMany(', conditions, ', ', data, ')')
+      .end()
+    return this.collection.updateMany(query, data).then(function(response) {
+      return response.result
+    })
   }
 
   execute(): Promise<any> {

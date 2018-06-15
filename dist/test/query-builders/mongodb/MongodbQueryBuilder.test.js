@@ -319,6 +319,7 @@ describe('MongodbQueryBuilder', function () {
             it('can update data of collection, returns update result of mongoose', async function () {
                 const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers);
                 const result = await query.where('first_name', 'peter').update({ $set: { age: 19 } });
+                expect_query_log('raw', 'db.users.updateMany({"first_name":"peter"}, {"$set":{"age":19}})');
                 expect(result).toEqual({ n: 1, nModified: 1, ok: 1 });
                 const updatedResult = await new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers)
                     .where('first_name', 'peter')
@@ -328,11 +329,13 @@ describe('MongodbQueryBuilder', function () {
             it('returns empty update result if no row matched', async function () {
                 const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers);
                 const result = await query.where('first_name', 'no-one').update({ $set: { age: 19 } });
+                expect_query_log('raw', 'db.users.updateMany({"first_name":"no-one"}, {"$set":{"age":19}})');
                 expect(result).toEqual({ n: 0, nModified: 0, ok: 1 });
             });
             it('can update data by query builder, case 1', async function () {
                 const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers);
                 const result = await query.where('age', 1000).update({ $set: { age: 1001 } });
+                expect_query_log('raw', 'db.users.updateMany({"age":1000}, {"$set":{"age":1001}})');
                 expect(result).toEqual({ n: 1, nModified: 1, ok: 1 });
                 const updatedResult = await new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers).where('first_name', 'thor').first();
                 expect_match_user(updatedResult, Object.assign({}, dataset[3], { age: 1001 }));
@@ -341,6 +344,7 @@ describe('MongodbQueryBuilder', function () {
                 const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers);
                 query.where('first_name', 'tony').orWhere('first_name', 'jane');
                 const result = await query.update({ $inc: { age: 1 } });
+                expect_query_log('raw', 'db.users.updateMany({"$or":[{"first_name":"tony"},{"first_name":"jane"}]}, {"$inc":{"age":1}})');
                 expect(result).toEqual({ n: 3, nModified: 3, ok: 1 });
                 const updatedResults = await new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers)
                     .where('first_name', 'tony')
@@ -356,6 +360,7 @@ describe('MongodbQueryBuilder', function () {
                     .where('first_name', 'tony')
                     .where('last_name', 'stewart')
                     .update({ $inc: { age: 1 } });
+                expect_query_log('raw', 'db.users.updateMany({"first_name":"tony","last_name":"stewart"}, {"$inc":{"age":1}})');
                 expect(result).toEqual({ n: 1, nModified: 1, ok: 1 });
                 const updatedResult = await new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers)
                     .where('first_name', 'tony')
@@ -368,6 +373,7 @@ describe('MongodbQueryBuilder', function () {
             it('can delete data of collection, returns delete result of mongoose', async function () {
                 const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers);
                 const result = await query.where('first_name', 'peter').delete();
+                expect_query_log('raw', 'db.users.deleteMany({"first_name":"peter"})');
                 expect(result).toEqual({ n: 1, ok: 1 });
                 const count = await new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers).count();
                 expect(count).toEqual(6);
@@ -375,6 +381,7 @@ describe('MongodbQueryBuilder', function () {
             it('can delete data by query builder, case 1', async function () {
                 const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers);
                 const result = await query.where('age', 1001).delete();
+                expect_query_log('raw', 'db.users.deleteMany({"age":1001})');
                 expect(result).toEqual({ n: 1, ok: 1 });
                 const count = await new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers).count();
                 expect(count).toEqual(5);
@@ -385,6 +392,7 @@ describe('MongodbQueryBuilder', function () {
                     .where('first_name', 'tony')
                     .orWhere('first_name', 'jane')
                     .delete();
+                expect_query_log('raw', 'db.users.deleteMany({"$or":[{"first_name":"tony"},{"first_name":"jane"}]})');
                 expect(result).toEqual({ n: 3, ok: 1 });
                 const count = await new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers).count();
                 expect(count).toEqual(2);
@@ -395,6 +403,7 @@ describe('MongodbQueryBuilder', function () {
                     .where('first_name', 'john')
                     .where('last_name', 'doe')
                     .delete();
+                expect_query_log('raw', 'db.users.deleteMany({"first_name":"john","last_name":"doe"})');
                 expect(result).toEqual({ n: 1, ok: 1 });
                 const count = await new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers).count();
                 expect(count).toEqual(1);
@@ -446,6 +455,7 @@ describe('MongodbQueryBuilder', function () {
                     .onlyTrashed()
                     .where('name', 'role-0')
                     .restore();
+                expect_query_log('raw', 'db.roles.updateMany({"deleted_at":{"$ne":null},"name":"role-0"}, {"$set":{"deleted_at":null}})');
                 expect(result).toEqual({ n: 1, nModified: 1, ok: 1 });
                 const count = await new MongodbQueryBuilder_1.MongodbQueryBuilder('Role', collectionRoles, {
                     deletedAt: 'deleted_at',
@@ -464,6 +474,7 @@ describe('MongodbQueryBuilder', function () {
                     .orWhere('name', 'role-2')
                     .orWhere('name', 'role-3')
                     .restore();
+                expect_query_log('raw', 'db.roles.updateMany({"$or":[{"name":"role-1"},{"name":"role-2"},{"name":"role-3"}]}, {"$set":{"deleted_at":null}})');
                 expect(result).toEqual({ n: 3, nModified: 3, ok: 1 });
                 const count = await new MongodbQueryBuilder_1.MongodbQueryBuilder('Role', collectionRoles, {
                     deletedAt: 'deleted_at',
