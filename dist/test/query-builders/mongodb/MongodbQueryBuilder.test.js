@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 require("../../../lib/query-log/FlipFlopQueryLog");
-// import * as Sinon from 'sinon'
+const Sinon = require("sinon");
 const QueryLogFacade_1 = require("../../../lib/facades/global/QueryLogFacade");
 const MongodbProviderFacade_1 = require("../../../lib/facades/global/MongodbProviderFacade");
 const MongodbQueryBuilder_1 = require("../../../lib/query-builders/mongodb/MongodbQueryBuilder");
@@ -11,16 +11,6 @@ const DummyDriver_1 = require("../../../lib/drivers/DummyDriver");
 const EloquentDriverProviderFacade_1 = require("../../../lib/facades/global/EloquentDriverProviderFacade");
 const MongodbQueryBuilderBase_1 = require("../../../lib/query-builders/mongodb/MongodbQueryBuilderBase");
 EloquentDriverProviderFacade_1.EloquentDriverProvider.register(DummyDriver_1.DummyDriver, 'dummy');
-// ---------------------------------------------------------------------------------------------------------------------
-describe('Coverage fill', function () {
-    it('implements IAutoload and returns "NajsEloquent.QueryBuilder.Mongodb.MongodbQueryBuilder" as className', function () {
-        const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', {});
-        try {
-            query.execute();
-        }
-        catch (error) { }
-    });
-});
 describe('MongodbQueryBuilder', function () {
     it('implements IAutoload and returns "NajsEloquent.QueryBuilder.Mongodb.MongodbQueryBuilder" as className', function () {
         const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', {});
@@ -30,181 +20,38 @@ describe('MongodbQueryBuilder', function () {
         const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', {});
         expect(query).toBeInstanceOf(MongodbQueryBuilderBase_1.MongodbQueryBuilderBase);
     });
-    // describe('constructor()', function() {
-    //   it('is created by modelName', function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     expect(query['mongooseModel'].modelName).toEqual('User')
-    //   })
-    //   it('is created by modelName + primaryKey', function() {
-    //     const query = new MongooseQueryBuilder('User', undefined, 'test')
-    //     expect(query.getPrimaryKey()).toEqual('test')
-    //     expect(query['mongooseModel'].modelName).toEqual('User')
-    //   })
-    //   it('throws exception if model not found', function() {
-    //     try {
-    //       new MongooseQueryBuilder('NotFound')
-    //     } catch (error) {
-    //       expect(error.message).toEqual('Model NotFound Not Found')
-    //       return
-    //     }
-    //     expect('it').toEqual('should throw exception')
-    //   })
-    // })
-    // describe('protected .getQuery()', function() {
-    //   it('just build getQuery once', function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     query.limit(10)
-    //     expect(query['hasMongooseQuery']).toBeUndefined()
-    //     query['getQuery']()
-    //     expect(query['hasMongooseQuery']).toBe(true)
-    //     expect(query['getQuery']() === query['mongooseQuery']).toBe(true)
-    //     expect(query['hasMongooseQuery']).toBe(true)
-    //   })
-    //   it('builds query for find by default', function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     expect(query['getQuery']()['op']).toEqual('find')
-    //   })
-    //   it('can build query for findOne', function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     expect(query['getQuery'](true)['op']).toEqual('findOne')
-    //   })
-    // })
-    // describe('protected .getQueryConvention()', function() {
-    //   it('converts id to _id if using .select()', function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     expect(query.select('id').toObject()).toEqual({
-    //       select: ['_id']
-    //     })
-    //   })
-    //   it('converts id to _id if using .orderBy()', function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     expect(query.orderBy('id').toObject()).toEqual({
-    //       orderBy: { _id: 'asc' }
-    //     })
-    //   })
-    //   it('converts id to _id if using .orderByAsc()', function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     expect(query.orderByAsc('id').toObject()).toEqual({
-    //       orderBy: { _id: 'asc' }
-    //     })
-    //   })
-    //   it('converts id to _id if using .orderByDesc()', function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     expect(query.orderByDesc('id').toObject()).toEqual({
-    //       orderBy: { _id: 'desc' }
-    //     })
-    //   })
-    //   it('converts id to _id if using .where', function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     expect(
-    //       query
-    //         .where('id', 1)
-    //         .where('id', '<>', 2)
-    //         .toObject()
-    //     ).toEqual({
-    //       conditions: { $and: [{ _id: 1 }, { _id: { $ne: 2 } }] }
-    //     })
-    //   })
-    //   it('converts id to _id if using .orWhere', function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     expect(
-    //       query
-    //         .orWhere('id', 1)
-    //         .orWhereIn('id', [3, 4])
-    //         .toObject()
-    //     ).toEqual({
-    //       conditions: { $or: [{ _id: 1 }, { _id: { $in: [3, 4] } }] }
-    //     })
-    //   })
-    // })
-    // describe('protected .passDataToMongooseQuery()', function() {
-    //   it('never passes to mongooseQuery.select if .select() was not used', function() {
-    //     const nativeQuery = UserModel.find()
-    //     const selectSpy = Sinon.spy(nativeQuery, 'select')
-    //     const query = new MongooseQueryBuilder('User')
-    //     query['passDataToMongooseQuery'](nativeQuery)
-    //     expect(selectSpy.notCalled).toBe(true)
-    //   })
-    //   it('passes to mongooseQuery.select with selectedFields.join(" ") if .select() was used', function() {
-    //     const nativeQuery = UserModel.find()
-    //     const selectSpy = Sinon.spy(nativeQuery, 'select')
-    //     const query = new MongooseQueryBuilder('User')
-    //     query.select('first_name', 'last_name')
-    //     query['passDataToMongooseQuery'](nativeQuery)
-    //     expect(selectSpy.calledWith('first_name last_name')).toBe(true)
-    //   })
-    //   it('never passes to mongooseQuery.limit if .limit() was not used', function() {
-    //     const nativeQuery = UserModel.find()
-    //     const limitSpy = Sinon.spy(nativeQuery, 'limit')
-    //     const query = new MongooseQueryBuilder('User')
-    //     query['passDataToMongooseQuery'](nativeQuery)
-    //     expect(limitSpy.notCalled).toBe(true)
-    //   })
-    //   it('passes to mongooseQuery.limit with limitNumber if .limit() was used', function() {
-    //     const nativeQuery = UserModel.find()
-    //     const limitSpy = Sinon.spy(nativeQuery, 'limit')
-    //     const query = new MongooseQueryBuilder('User')
-    //     query.limit(20)
-    //     query['passDataToMongooseQuery'](nativeQuery)
-    //     expect(limitSpy.calledWith(20)).toBe(true)
-    //   })
-    //   it('never passes to mongooseQuery.sort if .orderBy() .orderByAsc() .orderByDesc were not used', function() {
-    //     const nativeQuery = UserModel.find()
-    //     const sortSpy = Sinon.spy(nativeQuery, 'sort')
-    //     const query = new MongooseQueryBuilder('User')
-    //     query['passDataToMongooseQuery'](nativeQuery)
-    //     expect(sortSpy.notCalled).toBe(true)
-    //   })
-    //   it('passes to mongooseQuery.sort with transformed ordering if .orderBy() was used', function() {
-    //     const nativeQuery = UserModel.find()
-    //     const sortSpy = Sinon.spy(nativeQuery, 'sort')
-    //     const query = new MongooseQueryBuilder('User')
-    //     query.orderBy('first_name')
-    //     query['passDataToMongooseQuery'](nativeQuery)
-    //     expect(sortSpy.calledWith({ first_name: 1 })).toBe(true)
-    //   })
-    //   it('passes to mongooseQuery.sort with transformed ordering if .orderByAsc() was used', function() {
-    //     const nativeQuery = UserModel.find()
-    //     const sortSpy = Sinon.spy(nativeQuery, 'sort')
-    //     const query = new MongooseQueryBuilder('User')
-    //     query.orderByAsc('first_name.child')
-    //     query['passDataToMongooseQuery'](nativeQuery)
-    //     expect(sortSpy.calledWith({ 'first_name.child': 1 })).toBe(true)
-    //   })
-    //   it('passes to mongooseQuery.sort with transformed ordering if .orderByDesc() was used', function() {
-    //     const nativeQuery = UserModel.find()
-    //     const sortSpy = Sinon.spy(nativeQuery, 'sort')
-    //     const query = new MongooseQueryBuilder('User')
-    //     query.orderByDesc('first_name.child')
-    //     query['passDataToMongooseQuery'](nativeQuery)
-    //     expect(sortSpy.calledWith({ 'first_name.child': -1 })).toBe(true)
-    //   })
-    // })
-    // describe('.native()', function() {
-    //   it('is chain-able', function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     expect(
-    //       query.native(function(model) {
-    //         return model.find()
-    //       })
-    //     ).toEqual(query)
-    //   })
-    //   it('passes instance of Mongoose Model if there is no query builder function was used', function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     query.native(function(model) {
-    //       expect(model === query['mongooseModel']).toBe(true)
-    //       return model.find()
-    //     })
-    //   })
-    //   it('passes getQuery(false) result if there is a query builder functions was used', function() {
-    //     const query = new MongooseQueryBuilder('User')
-    //     query.limit(10)
-    //     query.native(function(nativeQuery: any) {
-    //       expect(nativeQuery === query['mongooseQuery']).toBe(true)
-    //       return nativeQuery
-    //     })
-    //   })
-    // })
+    describe('.native()', function () {
+        it('passes instance of collection, conditions, and options to handler', async function () {
+            const collection = {};
+            const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collection);
+            query.where('a', 1).limit(10);
+            const result = query.native(async function (passed, conditions, options) {
+                expect(conditions).toEqual({ a: 1 });
+                expect(options).toEqual({ limit: 10 });
+                expect(passed === collection).toBe(true);
+                return { result: 'anything' };
+            });
+            expect(result === query).toBe(true);
+        });
+    });
+    describe('.execute()', function () {
+        it('calls .get() if there is no result from .native()', function () {
+            const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', {});
+            const getStub = Sinon.stub(query, 'get');
+            getStub.returns('anything');
+            expect(query.where('test', 'true').execute()).toEqual('anything');
+            expect(getStub.calledWith()).toBe(true);
+        });
+        it('resolve promise "nativeHandlePromise" and return response or response.result', async function () {
+            const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', {});
+            query['nativeHandlePromise'] = Promise.resolve('anything');
+            expect(await query.execute()).toEqual('anything');
+            expect(query['nativeHandlePromise']).toBeUndefined();
+            query['nativeHandlePromise'] = Promise.resolve({ result: 'anything' });
+            expect(await query.execute()).toEqual('anything');
+            expect(query['nativeHandlePromise']).toBeUndefined();
+        });
+    });
     describe('.createQueryOptions()', function () {
         it('undefined if there is no option', function () {
             const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', {});
@@ -386,41 +233,41 @@ describe('MongodbQueryBuilder', function () {
                 expect_query_log('raw', 'db.users.findOne({"first_name":"tony","last_name":"stewart"})');
                 expect_match_user(result, dataset[5]);
             });
-            // it('can find data by native() before using query functions of query builder', async function() {
-            //   const query = new MongodbQueryBuilder('User', collectionUsers)
-            //   const result = await query
-            //     .native(function(model: any) {
-            //       return model.findOne({
-            //         first_name: 'tony'
-            //       })
-            //     })
-            //     .first()
-            //   expect_match_user(result, dataset[2])
-            // })
-            // it('can find data by native() after using query functions of query builder', async function() {
-            //   const query = new MongooseQueryBuilder('User')
-            //   const result = await query
-            //     .where('age', 40)
-            //     .orWhere('age', 1000)
-            //     .native(function(nativeQuery: any) {
-            //       return nativeQuery.sort({ last_name: -1 })
-            //     })
-            //     .first()
-            //   expect_match_user(result, dataset[5])
-            // })
-            // it('can find data by native() and modified after using query functions of query builder', async function() {
-            //   const query = new MongooseQueryBuilder('User')
-            //   const result = await query
-            //     .where('age', 40)
-            //     .orWhere('age', 1000)
-            //     .native(function(nativeQuery: any) {
-            //       return nativeQuery.findOne({
-            //         first_name: 'thor'
-            //       })
-            //     })
-            //     .first()
-            //   expect_match_user(result, dataset[3])
-            // })
+            it('can find data by .native() before using query functions of query builder', async function () {
+                const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers);
+                const result = await query
+                    .native(function (collection) {
+                    return collection.findOne({
+                        first_name: 'tony'
+                    });
+                })
+                    .execute();
+                expect_match_user(result, dataset[2]);
+            });
+            it('can find data by native() after using query functions of query builder', async function () {
+                const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers);
+                const result = await query
+                    .where('age', 40)
+                    .orWhere('age', 1000)
+                    .native(function (collection, conditions) {
+                    return collection.findOne(conditions, { sort: [['last_name', -1]] });
+                })
+                    .execute();
+                expect_match_user(result, dataset[5]);
+            });
+            it('can find data by native() and modified after using query functions of query builder', async function () {
+                const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers);
+                const result = await query
+                    .where('age', 40)
+                    .orWhere('age', 1000)
+                    .native(function (collection) {
+                    return collection.findOne({
+                        first_name: 'thor'
+                    });
+                })
+                    .execute();
+                expect_match_user(result, dataset[3]);
+            });
         });
         describe('.count()', function () {
             it('counts all data of collection and returns a Number', async function () {
@@ -562,17 +409,17 @@ describe('MongodbQueryBuilder', function () {
                 const result = await query.select('any').delete();
                 expect(result).toEqual({ n: 0, ok: 1 });
             });
-            //   it('can delete by native() function', async function() {
-            //     const query = new MongooseQueryBuilder('User')
-            //     const result = await query
-            //       .native(function(model: any) {
-            //         return model.remove({})
-            //       })
-            //       .execute()
-            //     expect(result).toEqual({ n: 1, ok: 1 })
-            //     const count = await new MongooseQueryBuilder('User').count()
-            //     expect(count).toEqual(0)
-            //   })
+            it('can delete by native() function', async function () {
+                const query = new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers);
+                const result = await query
+                    .native(function (collection) {
+                    return collection.remove({});
+                })
+                    .execute();
+                expect(result).toEqual({ n: 1, ok: 1 });
+                const count = await new MongodbQueryBuilder_1.MongodbQueryBuilder('User', collectionUsers).count();
+                expect(count).toEqual(0);
+            });
         });
         describe('.restore()', function () {
             it('does nothing if Model do not support SoftDeletes', async function () {

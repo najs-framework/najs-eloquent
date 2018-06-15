@@ -78,7 +78,19 @@ class MongodbQueryBuilder extends MongodbQueryBuilderBase_1.MongodbQueryBuilderB
         });
     }
     execute() {
-        throw new Error('Not implemented.');
+        if (this.nativeHandlePromise) {
+            return this.nativeHandlePromise.then((response) => {
+                this.nativeHandlePromise = undefined;
+                return response.result || response;
+            });
+        }
+        return this.get();
+    }
+    native(handler) {
+        const conditions = this.resolveMongodbConditionConverter().convert();
+        const options = this.createQueryOptions();
+        this.nativeHandlePromise = handler(this.collection, conditions, options);
+        return this;
     }
     // -------------------------------------------------------------------------------------------------------------------
     logQueryAndOptions(logger, query, options, func) {

@@ -12,6 +12,7 @@ export class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase
   implements NajsEloquent.QueryBuilder.IFetchResultQuery<T> {
   protected modelName: string
   protected collection: Collection
+  protected nativeHandlePromise: any
   protected primaryKey: string
 
   constructor(
@@ -101,7 +102,22 @@ export class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase
   }
 
   execute(): Promise<any> {
-    throw new Error('Not implemented.')
+    if (this.nativeHandlePromise) {
+      return this.nativeHandlePromise.then((response: any) => {
+        this.nativeHandlePromise = undefined
+        return response.result || response
+      })
+    }
+    return this.get()
+  }
+
+  native(
+    handler: (collection: Collection, conditions: object, options?: object) => Promise<any>
+  ): { execute(): Promise<any> } {
+    const conditions = this.resolveMongodbConditionConverter().convert()
+    const options = this.createQueryOptions()
+    this.nativeHandlePromise = handler(this.collection, conditions, options)
+    return this
   }
 
   // -------------------------------------------------------------------------------------------------------------------
