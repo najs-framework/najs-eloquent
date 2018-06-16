@@ -47,7 +47,7 @@ export class RelationDataBucket implements NajsEloquent.Relation.IRelationDataBu
   }
 
   makeModelFromRecord(name: string, record: Object): NajsEloquent.Model.IModel<any> {
-    const model: any = make(this.modelMap[name], [record])
+    const model: any = make(this.modelMap[name], [record, false])
     model['relationDataBucket'] = this
     return model
   }

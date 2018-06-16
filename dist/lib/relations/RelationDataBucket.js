@@ -35,7 +35,7 @@ class RelationDataBucket {
         return collect(records.map(item => this.newInstance(name, item)));
     }
     makeModelFromRecord(name, record) {
-        const model = najs_binding_1.make(this.modelMap[name], [record]);
+        const model = najs_binding_1.make(this.modelMap[name], [record, false]);
         model['relationDataBucket'] = this;
         return model;
     }

@@ -83,7 +83,7 @@ describe('RelationDataBucket', function() {
       const param = {}
       expect(relationDataBucket.makeModelFromRecord('test', param) === instance).toBe(true)
       expect(instance['relationDataBucket'] === relationDataBucket).toBe(true)
-      expect(makeStub.calledWith('Model', [param])).toBe(true)
+      expect(makeStub.calledWith('Model', [param, false])).toBe(true)
       makeStub.restore()
     })
   })

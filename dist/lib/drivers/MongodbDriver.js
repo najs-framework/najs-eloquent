@@ -2,10 +2,13 @@
 /// <reference types="najs-event" />
 /// <reference path="../contracts/Driver.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
+require("../wrappers/MongodbQueryBuilderWrapper");
+require("../query-builders/mongodb/MongodbQueryBuilder");
 const constants_1 = require("../constants");
 const Record_1 = require("../model/Record");
 const RecordDriverBase_1 = require("./RecordDriverBase");
 const MongodbProviderFacade_1 = require("../facades/global/MongodbProviderFacade");
+const najs_binding_1 = require("najs-binding");
 const Moment = require("moment");
 class MongodbDriver extends RecordDriverBase_1.RecordBaseDriver {
     getClassName() {
@@ -19,6 +22,7 @@ class MongodbDriver extends RecordDriverBase_1.RecordBaseDriver {
         }
         if (typeof data === 'object') {
             if (isGuarded) {
+                this.attributes = new Record_1.Record();
                 model.fill(data);
             }
             else {
@@ -39,41 +43,49 @@ class MongodbDriver extends RecordDriverBase_1.RecordBaseDriver {
         return typeof this.attributes.getAttribute(this.getPrimaryKeyName()) === 'undefined';
     }
     newQuery(dataBucket) {
-        return {};
-        // return make<NajsEloquent.Wrapper.IQueryBuilderWrapper<T>>(NajsEloquent.Wrapper.MongooseQueryBuilderWrapper, [
-        //   this.modelName,
-        //   this.getRecordName(),
-        //   make(NajsEloquent.QueryBuilder.MongooseQueryBuilder, [this.modelName, this.softDeletesSetting]),
-        //   dataBucket
-        // ])
+        return najs_binding_1.make(constants_1.NajsEloquent.Wrapper.MongodbQueryBuilderWrapper, [
+            this.modelName,
+            this.getRecordName(),
+            najs_binding_1.make(constants_1.NajsEloquent.QueryBuilder.MongodbQueryBuilder, [
+                this.modelName,
+                this.collection,
+                this.softDeletesSetting,
+                this.getPrimaryKeyName()
+            ]),
+            dataBucket
+        ]);
     }
     async delete(softDeletes) {
-        throw new Error('Not implemented');
+        // throw new Error('Not implemented')
     }
     async restore() {
-        // if (this.softDeletesSetting) {
-        //   return new Promise((resolve, reject) => {
-        //     this.collection.update
-        //   })
-        // }
-        // return false
+        // throw new Error('Not implemented')
     }
     async save() {
         const isNew = this.isNew();
         if (this.timestampsSetting) {
-            this.setAttribute(this.timestampsSetting.updatedAt, Moment().toDate());
+            this.setAttributeIfNeeded(this.timestampsSetting.updatedAt, Moment().toDate());
             if (isNew) {
-                this.setAttribute(this.timestampsSetting.createdAt, Moment().toDate());
+                this.setAttributeIfNeeded(this.timestampsSetting.createdAt, Moment().toDate());
             }
         }
+        if (this.softDeletesSetting) {
+            // tslint:disable-next-line
+            this.setAttributeIfNeeded(this.softDeletesSetting.deletedAt, null);
+        }
         return new Promise((resolve, reject) => {
-            this.collection.save(this.attributes, function (error, result) {
+            this.collection.save(this.attributes.toObject(), function (error, result) {
                 if (error) {
                     return reject(error);
                 }
                 resolve(result);
             });
         });
+    }
+    setAttributeIfNeeded(attribute, value) {
+        if (typeof this.attributes.getAttribute(attribute) === 'undefined') {
+            this.attributes.setAttribute(attribute, value);
+        }
     }
     getModelComponentName() {
         return undefined;

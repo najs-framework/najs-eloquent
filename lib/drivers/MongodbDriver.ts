@@ -1,11 +1,14 @@
 /// <reference types="najs-event" />
 /// <reference path="../contracts/Driver.ts" />
 
+import '../wrappers/MongodbQueryBuilderWrapper'
+import '../query-builders/mongodb/MongodbQueryBuilder'
 import { NajsEloquent } from '../constants'
 import { Record } from '../model/Record'
 import { RecordBaseDriver } from './RecordDriverBase'
 import { MongodbProviderFacade } from '../facades/global/MongodbProviderFacade'
 import { Collection } from 'mongodb'
+import { make } from 'najs-binding'
 import * as Moment from 'moment'
 
 export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.Eloquent.Driver<Record> {
@@ -27,6 +30,7 @@ export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.El
 
     if (typeof data === 'object') {
       if (isGuarded) {
+        this.attributes = new Record()
         model.fill(data)
       } else {
         this.attributes = new Record(data)
@@ -49,47 +53,57 @@ export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.El
   }
 
   newQuery<T>(dataBucket?: NajsEloquent.Relation.IRelationDataBucket): NajsEloquent.Wrapper.IQueryBuilderWrapper<T> {
-    return <any>{}
-    // return make<NajsEloquent.Wrapper.IQueryBuilderWrapper<T>>(NajsEloquent.Wrapper.MongooseQueryBuilderWrapper, [
-    //   this.modelName,
-    //   this.getRecordName(),
-    //   make(NajsEloquent.QueryBuilder.MongooseQueryBuilder, [this.modelName, this.softDeletesSetting]),
-    //   dataBucket
-    // ])
+    return make<NajsEloquent.Wrapper.IQueryBuilderWrapper<T>>(NajsEloquent.Wrapper.MongodbQueryBuilderWrapper, [
+      this.modelName,
+      this.getRecordName(),
+      make(NajsEloquent.QueryBuilder.MongodbQueryBuilder, [
+        this.modelName,
+        this.collection,
+        this.softDeletesSetting,
+        this.getPrimaryKeyName()
+      ]),
+      dataBucket
+    ])
   }
 
   async delete(softDeletes: boolean): Promise<any> {
-    throw new Error('Not implemented')
+    // throw new Error('Not implemented')
   }
 
   async restore(): Promise<any> {
-    // if (this.softDeletesSetting) {
-    //   return new Promise((resolve, reject) => {
-    //     this.collection.update
-    //   })
-    // }
-    // return false
+    // throw new Error('Not implemented')
   }
 
   async save(): Promise<any> {
     const isNew = this.isNew()
 
     if (this.timestampsSetting) {
-      this.setAttribute(this.timestampsSetting.updatedAt, Moment().toDate())
+      this.setAttributeIfNeeded(this.timestampsSetting.updatedAt, Moment().toDate())
 
       if (isNew) {
-        this.setAttribute(this.timestampsSetting.createdAt, Moment().toDate())
+        this.setAttributeIfNeeded(this.timestampsSetting.createdAt, Moment().toDate())
       }
     }
 
+    if (this.softDeletesSetting) {
+      // tslint:disable-next-line
+      this.setAttributeIfNeeded(this.softDeletesSetting.deletedAt, null)
+    }
+
     return new Promise((resolve, reject) => {
-      this.collection.save(this.attributes, function(error, result) {
+      this.collection.save(this.attributes.toObject(), function(error, result) {
         if (error) {
           return reject(error)
         }
         resolve(result)
       })
     })
+  }
+
+  setAttributeIfNeeded(attribute: string, value: any) {
+    if (typeof this.attributes.getAttribute(attribute) === 'undefined') {
+      this.attributes.setAttribute(attribute, value)
+    }
   }
 
   getModelComponentName(): string | undefined {

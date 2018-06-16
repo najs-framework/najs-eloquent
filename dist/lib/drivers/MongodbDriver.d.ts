@@ -1,4 +1,6 @@
 /// <reference path="../contracts/Driver.d.ts" />
+import '../wrappers/MongodbQueryBuilderWrapper';
+import '../query-builders/mongodb/MongodbQueryBuilder';
 import { Record } from '../model/Record';
 import { RecordBaseDriver } from './RecordDriverBase';
 import { Collection } from 'mongodb';
@@ -14,6 +16,7 @@ export declare class MongodbDriver extends RecordBaseDriver implements Najs.Cont
     delete(softDeletes: boolean): Promise<any>;
     restore(): Promise<any>;
     save(): Promise<any>;
+    setAttributeIfNeeded(attribute: string, value: any): void;
     getModelComponentName(): string | undefined;
     getModelComponentOrder(components: string[]): string[];
 }
