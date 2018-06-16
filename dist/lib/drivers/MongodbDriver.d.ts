@@ -15,7 +15,7 @@ export declare class MongodbDriver extends RecordBaseDriver implements Najs.Cont
     newQuery<T>(dataBucket?: NajsEloquent.Relation.IRelationDataBucket): NajsEloquent.Wrapper.IQueryBuilderWrapper<T>;
     delete(softDeletes: boolean): Promise<any>;
     restore(): Promise<any>;
-    save(): Promise<any>;
+    save(fillData?: boolean): Promise<any>;
     setAttributeIfNeeded(attribute: string, value: any): void;
     getModelComponentName(): string | undefined;
     getModelComponentOrder(components: string[]): string[];

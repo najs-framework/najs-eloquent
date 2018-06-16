@@ -121,21 +121,100 @@ describe('MongodbDriver', function () {
         });
     });
     describe('.delete()', function () {
-        it('should work', function () {
+        it('does nothing if softDeletes is true but has no softDeletesSetting', async function () {
             const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
-            try {
-                driver.delete(true);
-            }
-            catch (error) { }
+            const isNewStub = Sinon.stub(driver, 'isNew');
+            isNewStub.returns(true);
+            const setAttributeSpy = Sinon.spy(driver, 'setAttribute');
+            const saveStub = Sinon.stub(driver, 'save');
+            saveStub.returns(Promise.resolve('anything'));
+            expect(await driver.delete(true)).toBe(undefined);
+            expect(setAttributeSpy.called).toBe(false);
+            expect(saveStub.called).toBe(false);
+        });
+        it('calls .setAttributeIfNeeded() then calls and returns .save()', async function () {
+            const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
+            driver.setRecord(new Record_1.Record());
+            const isNewStub = Sinon.stub(driver, 'isNew');
+            isNewStub.returns(false);
+            driver['softDeletesSetting'] = { deletedAt: 'deleted_at', overrideMethods: true };
+            const setAttributeSpy = Sinon.spy(driver, 'setAttribute');
+            const saveStub = Sinon.stub(driver, 'save');
+            saveStub.returns(Promise.resolve('anything'));
+            expect(await driver.delete(true)).toBe('anything');
+            expect(setAttributeSpy.calledWith('deleted_at')).toBe(true);
+            expect(saveStub.called).toBe(true);
+        });
+        it('does nothing if softDeletes is false and isNew() returns true', async function () {
+            const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
+            const collection = {
+                deleteOne() {
+                    return Promise.resolve('anything');
+                }
+            };
+            driver['collection'] = collection;
+            const isNewStub = Sinon.stub(driver, 'isNew');
+            isNewStub.returns(true);
+            const deleteOneSpy = Sinon.spy(collection, 'deleteOne');
+            const saveStub = Sinon.stub(driver, 'save');
+            saveStub.returns(Promise.resolve('anything'));
+            expect(await driver.delete(false)).toBe(undefined);
+            expect(deleteOneSpy.called).toBe(false);
+        });
+        it('calls and returns this.collection.deleteOne with {_id: ...}', async function () {
+            const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
+            driver.setRecord(new Record_1.Record({ _id: 'xxx' }));
+            const collection = {
+                deleteOne() {
+                    return Promise.resolve('anything');
+                }
+            };
+            driver['collection'] = collection;
+            const isNewStub = Sinon.stub(driver, 'isNew');
+            isNewStub.returns(false);
+            const deleteOneSpy = Sinon.spy(collection, 'deleteOne');
+            const saveStub = Sinon.stub(driver, 'save');
+            saveStub.returns(Promise.resolve('anything'));
+            expect(await driver.delete(false)).toEqual('anything');
+            expect(deleteOneSpy.calledWith({ _id: 'xxx' })).toBe(true);
         });
     });
     describe('.restore()', function () {
-        it('should work', function () {
+        it('does nothing if the .isNew() return true', async function () {
             const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
-            try {
-                driver.restore();
-            }
-            catch (error) { }
+            const isNewStub = Sinon.stub(driver, 'isNew');
+            isNewStub.returns(true);
+            const setAttributeSpy = Sinon.spy(driver, 'setAttribute');
+            const saveStub = Sinon.stub(driver, 'save');
+            saveStub.returns(Promise.resolve('anything'));
+            expect(await driver.restore()).toBe(undefined);
+            expect(setAttributeSpy.called).toBe(false);
+            expect(saveStub.called).toBe(false);
+        });
+        it('does nothing if the this.softDeletesSetting is not found', async function () {
+            const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
+            const isNewStub = Sinon.stub(driver, 'isNew');
+            isNewStub.returns(false);
+            const setAttributeSpy = Sinon.spy(driver, 'setAttribute');
+            const saveStub = Sinon.stub(driver, 'save');
+            saveStub.returns(Promise.resolve('anything'));
+            expect(await driver.restore()).toBe(undefined);
+            expect(setAttributeSpy.called).toBe(false);
+            expect(saveStub.called).toBe(false);
+        });
+        it('calls .setAttributeIfNeeded() then calls and returns .save()', async function () {
+            const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
+            driver.setRecord(new Record_1.Record());
+            const isNewStub = Sinon.stub(driver, 'isNew');
+            isNewStub.returns(false);
+            driver['softDeletesSetting'] = { deletedAt: 'deleted_at', overrideMethods: true };
+            const setAttributeSpy = Sinon.spy(driver, 'setAttribute');
+            const saveStub = Sinon.stub(driver, 'save');
+            saveStub.returns(Promise.resolve('anything'));
+            expect(await driver.restore()).toBe('anything');
+            // tslint:disable-next-line
+            expect(setAttributeSpy.calledWith('deleted_at', null)).toBe(true);
+            expect(saveStub.called).toBe(true);
         });
     });
     describe('.save()', function () {
@@ -200,6 +279,22 @@ describe('MongodbDriver', function () {
             expect(setAttributeIfNeededSpy.callCount).toEqual(1);
             // tslint:disable-next-line
             expect(setAttributeIfNeededSpy.firstCall.calledWith('deleted_at', null)).toBe(true);
+        });
+        it('never calls this.setAttributeIfNeeded() if the first params is false', function () {
+            const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
+            driver.setRecord(new Record_1.Record());
+            driver['collection'] = {
+                save(data, callback) {
+                    callback(undefined, 'anything');
+                }
+            };
+            const isNewStub = Sinon.stub(driver, 'isNew');
+            isNewStub.returns(true);
+            const setAttributeIfNeededSpy = Sinon.spy(driver, 'setAttributeIfNeeded');
+            driver['timestampsSetting'] = { createdAt: 'created_at', updatedAt: 'updated_at' };
+            driver['softDeletesSetting'] = { deletedAt: 'deleted_at', overrideMethods: true };
+            driver.save(false);
+            expect(setAttributeIfNeededSpy.callCount).toEqual(0);
         });
         it('calls this.collection.save() and promisify the result, case 1 success', function () {
             const driver = new MongodbDriver_1.MongodbDriver(modelInstance);

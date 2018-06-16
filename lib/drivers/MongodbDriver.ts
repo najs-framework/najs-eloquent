@@ -67,27 +67,41 @@ export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.El
   }
 
   async delete(softDeletes: boolean): Promise<any> {
-    // throw new Error('Not implemented')
+    if (softDeletes && this.softDeletesSetting) {
+      this.setAttribute(this.softDeletesSetting.deletedAt, Moment().toDate())
+      return this.save(false)
+    }
+
+    if (!this.isNew()) {
+      const primaryKey = this.getPrimaryKeyName()
+      return this.collection.deleteOne({ [primaryKey]: this.attributes.getAttribute(primaryKey) })
+    }
   }
 
   async restore(): Promise<any> {
-    // throw new Error('Not implemented')
+    if (!this.isNew() && this.softDeletesSetting) {
+      // tslint:disable-next-line
+      this.setAttribute(this.softDeletesSetting.deletedAt, null)
+      return this.save(false)
+    }
   }
 
-  async save(): Promise<any> {
-    const isNew = this.isNew()
+  async save(fillData: boolean = true): Promise<any> {
+    if (fillData) {
+      const isNew = this.isNew()
 
-    if (this.timestampsSetting) {
-      this.setAttributeIfNeeded(this.timestampsSetting.updatedAt, Moment().toDate())
+      if (this.timestampsSetting) {
+        this.setAttributeIfNeeded(this.timestampsSetting.updatedAt, Moment().toDate())
 
-      if (isNew) {
-        this.setAttributeIfNeeded(this.timestampsSetting.createdAt, Moment().toDate())
+        if (isNew) {
+          this.setAttributeIfNeeded(this.timestampsSetting.createdAt, Moment().toDate())
+        }
       }
-    }
 
-    if (this.softDeletesSetting) {
-      // tslint:disable-next-line
-      this.setAttributeIfNeeded(this.softDeletesSetting.deletedAt, null)
+      if (this.softDeletesSetting) {
+        // tslint:disable-next-line
+        this.setAttributeIfNeeded(this.softDeletesSetting.deletedAt, null)
+      }
     }
 
     return new Promise((resolve, reject) => {

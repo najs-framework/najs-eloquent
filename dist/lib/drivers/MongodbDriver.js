@@ -56,22 +56,35 @@ class MongodbDriver extends RecordDriverBase_1.RecordBaseDriver {
         ]);
     }
     async delete(softDeletes) {
-        // throw new Error('Not implemented')
+        if (softDeletes && this.softDeletesSetting) {
+            this.setAttribute(this.softDeletesSetting.deletedAt, Moment().toDate());
+            return this.save(false);
+        }
+        if (!this.isNew()) {
+            const primaryKey = this.getPrimaryKeyName();
+            return this.collection.deleteOne({ [primaryKey]: this.attributes.getAttribute(primaryKey) });
+        }
     }
     async restore() {
-        // throw new Error('Not implemented')
-    }
-    async save() {
-        const isNew = this.isNew();
-        if (this.timestampsSetting) {
-            this.setAttributeIfNeeded(this.timestampsSetting.updatedAt, Moment().toDate());
-            if (isNew) {
-                this.setAttributeIfNeeded(this.timestampsSetting.createdAt, Moment().toDate());
-            }
-        }
-        if (this.softDeletesSetting) {
+        if (!this.isNew() && this.softDeletesSetting) {
             // tslint:disable-next-line
-            this.setAttributeIfNeeded(this.softDeletesSetting.deletedAt, null);
+            this.setAttribute(this.softDeletesSetting.deletedAt, null);
+            return this.save(false);
+        }
+    }
+    async save(fillData = true) {
+        if (fillData) {
+            const isNew = this.isNew();
+            if (this.timestampsSetting) {
+                this.setAttributeIfNeeded(this.timestampsSetting.updatedAt, Moment().toDate());
+                if (isNew) {
+                    this.setAttributeIfNeeded(this.timestampsSetting.createdAt, Moment().toDate());
+                }
+            }
+            if (this.softDeletesSetting) {
+                // tslint:disable-next-line
+                this.setAttributeIfNeeded(this.softDeletesSetting.deletedAt, null);
+            }
         }
         return new Promise((resolve, reject) => {
             this.collection.save(this.attributes.toObject(), function (error, result) {
