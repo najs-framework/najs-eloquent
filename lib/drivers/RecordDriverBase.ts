@@ -34,6 +34,7 @@ export class RecordBaseDriver {
   setRecord(value: Record): void {
     this.attributes = value
   }
+
   useEloquentProxy() {
     return true
   }
