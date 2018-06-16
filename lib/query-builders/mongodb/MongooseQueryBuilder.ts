@@ -212,20 +212,5 @@ export class MongooseQueryBuilder<T> extends MongodbQueryBuilderBase
       Document & T
     >
   }
-
-  protected getQueryConvention(): NajsEloquent.QueryBuilder.IQueryConvention {
-    return {
-      formatFieldName(name: any) {
-        if (name === 'id') {
-          return '_id'
-        }
-        return name
-      },
-      getNullValueFor(name: any) {
-        // tslint:disable-next-line
-        return null
-      }
-    }
-  }
 }
 register(MongooseQueryBuilder)

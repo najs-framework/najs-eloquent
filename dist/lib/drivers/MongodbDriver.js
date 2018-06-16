@@ -76,7 +76,7 @@ class MongodbDriver extends RecordDriverBase_1.RecordBaseDriver {
         if (fillData) {
             const isNew = this.isNew();
             if (this.timestampsSetting) {
-                this.setAttributeIfNeeded(this.timestampsSetting.updatedAt, Moment().toDate());
+                this.setAttribute(this.timestampsSetting.updatedAt, Moment().toDate());
                 if (isNew) {
                     this.setAttributeIfNeeded(this.timestampsSetting.createdAt, Moment().toDate());
                 }

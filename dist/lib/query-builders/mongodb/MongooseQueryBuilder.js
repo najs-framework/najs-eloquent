@@ -167,20 +167,6 @@ class MongooseQueryBuilder extends MongodbQueryBuilderBase_1.MongodbQueryBuilder
     createQuery(findOne, logger) {
         return this.passDataToMongooseQuery(this.getQuery(findOne, logger), logger);
     }
-    getQueryConvention() {
-        return {
-            formatFieldName(name) {
-                if (name === 'id') {
-                    return '_id';
-                }
-                return name;
-            },
-            getNullValueFor(name) {
-                // tslint:disable-next-line
-                return null;
-            }
-        };
-    }
 }
 MongooseQueryBuilder.className = constants_1.NajsEloquent.QueryBuilder.MongooseQueryBuilder;
 exports.MongooseQueryBuilder = MongooseQueryBuilder;

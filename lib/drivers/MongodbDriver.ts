@@ -91,7 +91,7 @@ export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.El
       const isNew = this.isNew()
 
       if (this.timestampsSetting) {
-        this.setAttributeIfNeeded(this.timestampsSetting.updatedAt, Moment().toDate())
+        this.setAttribute(this.timestampsSetting.updatedAt, Moment().toDate())
 
         if (isNew) {
           this.setAttributeIfNeeded(this.timestampsSetting.createdAt, Moment().toDate())

@@ -14,6 +14,7 @@ const FactoryFacade_1 = require("./../../lib/facades/global/FactoryFacade");
 const RelationType_1 = require("../../lib/relations/RelationType");
 EloquentDriverProviderFacade_1.EloquentDriverProviderFacade.register(MongooseDriver_1.MongooseDriver, 'mongoose', true);
 describe('HasOneOrMany', function () {
+    jest.setTimeout(30000);
     it('extends Relation, implements IAutoload with class name NajsEloquent.Relation.HasOneOrMany', function () {
         const relation = new HasOneOrMany_1.HasOneOrMany({}, 'test');
         expect(relation).toBeInstanceOf(Relation_1.Relation);

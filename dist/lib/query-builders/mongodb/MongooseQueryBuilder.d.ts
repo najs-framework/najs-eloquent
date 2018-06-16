@@ -30,5 +30,4 @@ export declare class MongooseQueryBuilder<T> extends MongodbQueryBuilderBase imp
     protected passOrderingToQuery(query: MongooseQuery<T>, logger?: MongodbQueryLog): void;
     protected passDataToMongooseQuery(query: MongooseQuery<T>, logger?: MongodbQueryLog): MongooseQuery<T>;
     protected createQuery(findOne: boolean, logger?: MongodbQueryLog): DocumentQuery<(Document & T)[] | null, Document & T>;
-    protected getQueryConvention(): NajsEloquent.QueryBuilder.IQueryConvention;
 }

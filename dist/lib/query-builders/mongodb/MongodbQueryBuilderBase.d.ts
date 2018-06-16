@@ -12,4 +12,5 @@ export declare abstract class MongodbQueryBuilderBase extends GenericQueryBuilde
     protected resolveMongodbConditionConverter(): MongodbConditionConverter;
     protected resolveMongodbQueryLog(): MongodbQueryLog;
     protected isNotUsedOrEmptyCondition(): false | Object;
+    protected getQueryConvention(): NajsEloquent.QueryBuilder.IQueryConvention;
 }

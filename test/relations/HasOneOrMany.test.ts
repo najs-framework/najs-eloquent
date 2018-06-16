@@ -15,6 +15,8 @@ import { RelationType } from '../../lib/relations/RelationType'
 EloquentDriverProviderFacade.register(MongooseDriver, 'mongoose', true)
 
 describe('HasOneOrMany', function() {
+  jest.setTimeout(30000)
+
   it('extends Relation, implements IAutoload with class name NajsEloquent.Relation.HasOneOrMany', function() {
     const relation = new HasOneOrMany(<any>{}, 'test')
     expect(relation).toBeInstanceOf(Relation)

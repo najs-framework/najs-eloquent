@@ -226,9 +226,11 @@ describe('MongodbDriver', function () {
                     callback(undefined, 'anything');
                 }
             };
+            const setAttributeSpy = Sinon.spy(driver, 'setAttribute');
             const setAttributeIfNeededSpy = Sinon.spy(driver, 'setAttributeIfNeeded');
             driver.save();
             expect(setAttributeIfNeededSpy.callCount).toEqual(0);
+            expect(setAttributeSpy.callCount).toEqual(0);
         });
         it('calls this.setAttributeIfNeeded() for updatedAt if timestamps settings found, but not call for createdAt if isNew is false', function () {
             const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
@@ -240,11 +242,13 @@ describe('MongodbDriver', function () {
             };
             const isNewStub = Sinon.stub(driver, 'isNew');
             isNewStub.returns(false);
+            const setAttributeSpy = Sinon.spy(driver, 'setAttribute');
             const setAttributeIfNeededSpy = Sinon.spy(driver, 'setAttributeIfNeeded');
             driver['timestampsSetting'] = { createdAt: 'created_at', updatedAt: 'updated_at' };
             driver.save();
-            expect(setAttributeIfNeededSpy.callCount).toEqual(1);
-            expect(setAttributeIfNeededSpy.calledWith('updated_at')).toBe(true);
+            expect(setAttributeSpy.callCount).toEqual(1);
+            expect(setAttributeIfNeededSpy.callCount).toEqual(0);
+            expect(setAttributeSpy.calledWith('updated_at')).toBe(true);
         });
         it('calls this.setAttributeIfNeeded() for updatedAt if timestamps settings found, and for createdAt if isNew is true', function () {
             const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
@@ -256,12 +260,14 @@ describe('MongodbDriver', function () {
             };
             const isNewStub = Sinon.stub(driver, 'isNew');
             isNewStub.returns(true);
+            const setAttributeSpy = Sinon.spy(driver, 'setAttribute');
             const setAttributeIfNeededSpy = Sinon.spy(driver, 'setAttributeIfNeeded');
             driver['timestampsSetting'] = { createdAt: 'created_at', updatedAt: 'updated_at' };
             driver.save();
-            expect(setAttributeIfNeededSpy.callCount).toEqual(2);
-            expect(setAttributeIfNeededSpy.firstCall.calledWith('updated_at')).toBe(true);
-            expect(setAttributeIfNeededSpy.secondCall.calledWith('created_at')).toBe(true);
+            expect(setAttributeSpy.callCount).toEqual(1);
+            expect(setAttributeIfNeededSpy.callCount).toEqual(1);
+            expect(setAttributeSpy.calledWith('updated_at')).toBe(true);
+            expect(setAttributeIfNeededSpy.calledWith('created_at')).toBe(true);
         });
         it('calls this.setAttributeIfNeeded() for deletedAt if soft delete is found', function () {
             const driver = new MongodbDriver_1.MongodbDriver(modelInstance);

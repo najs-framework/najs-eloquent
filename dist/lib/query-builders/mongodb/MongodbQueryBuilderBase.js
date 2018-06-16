@@ -39,5 +39,19 @@ class MongodbQueryBuilderBase extends GenericQueryBuilder_1.GenericQueryBuilder 
         }
         return conditions;
     }
+    getQueryConvention() {
+        return {
+            formatFieldName(name) {
+                if (name === 'id') {
+                    return '_id';
+                }
+                return name;
+            },
+            getNullValueFor(name) {
+                // tslint:disable-next-line
+                return null;
+            }
+        };
+    }
 }
 exports.MongodbQueryBuilderBase = MongodbQueryBuilderBase;
