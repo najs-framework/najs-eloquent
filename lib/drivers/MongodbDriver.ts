@@ -48,14 +48,6 @@ export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.El
     return typeof this.attributes.getAttribute(this.getPrimaryKeyName()) === 'undefined'
   }
 
-  getModelComponentName(): string | undefined {
-    return undefined
-  }
-
-  getModelComponentOrder(components: string[]): string[] {
-    return components
-  }
-
   newQuery<T>(dataBucket?: NajsEloquent.Relation.IRelationDataBucket): NajsEloquent.Wrapper.IQueryBuilderWrapper<T> {
     return <any>{}
     // return make<NajsEloquent.Wrapper.IQueryBuilderWrapper<T>>(NajsEloquent.Wrapper.MongooseQueryBuilderWrapper, [
@@ -66,7 +58,9 @@ export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.El
     // ])
   }
 
-  async delete(softDeletes: boolean): Promise<any> {}
+  async delete(softDeletes: boolean): Promise<any> {
+    throw new Error('Not implemented')
+  }
 
   async restore(): Promise<any> {
     // if (this.softDeletesSetting) {
@@ -96,5 +90,13 @@ export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.El
         resolve(result)
       })
     })
+  }
+
+  getModelComponentName(): string | undefined {
+    return undefined
+  }
+
+  getModelComponentOrder(components: string[]): string[] {
+    return components
   }
 }

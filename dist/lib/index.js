@@ -31,6 +31,8 @@ const MongooseQueryBuilder_1 = require("./query-builders/mongodb/MongooseQueryBu
 const MongodbQueryLog_1 = require("./query-builders/mongodb/MongodbQueryLog");
 const QueryBuilderWrapper_1 = require("./wrappers/QueryBuilderWrapper");
 const MongooseQueryBuilderWrapper_1 = require("./wrappers/MongooseQueryBuilderWrapper");
+const MongodbQueryBuilder_1 = require("./query-builders/mongodb/MongodbQueryBuilder");
+const MongodbQueryBuilderWrapper_1 = require("./wrappers/MongodbQueryBuilderWrapper");
 // package facades
 var QueryLogFacade_1 = require("./facades/global/QueryLogFacade");
 exports.QueryLogFacade = QueryLogFacade_1.QueryLogFacade;
@@ -87,12 +89,14 @@ exports.NajsEloquent = {
         GenericQueryBuilder: GenericQueryBuilder_1.GenericQueryBuilder,
         Mongodb: {
             MongodbConditionConverter: MongodbConditionConverter_1.MongodbConditionConverter,
+            MongodbQueryBuilder: MongodbQueryBuilder_1.MongodbQueryBuilder,
             MongooseQueryBuilder: MongooseQueryBuilder_1.MongooseQueryBuilder,
             MongodbQueryLog: MongodbQueryLog_1.MongodbQueryLog
         }
     },
     Wrapper: {
         QueryBuilderWrapper: QueryBuilderWrapper_1.QueryBuilderWrapper,
+        MongodbQueryBuilderWrapper: MongodbQueryBuilderWrapper_1.MongodbQueryBuilderWrapper,
         MongooseQueryBuilderWrapper: MongooseQueryBuilderWrapper_1.MongooseQueryBuilderWrapper
     }
 };

@@ -32,6 +32,8 @@ import { MongooseQueryBuilder } from './query-builders/mongodb/MongooseQueryBuil
 import { MongodbQueryLog } from './query-builders/mongodb/MongodbQueryLog'
 import { QueryBuilderWrapper } from './wrappers/QueryBuilderWrapper'
 import { MongooseQueryBuilderWrapper } from './wrappers/MongooseQueryBuilderWrapper'
+import { MongodbQueryBuilder } from './query-builders/mongodb/MongodbQueryBuilder'
+import { MongodbQueryBuilderWrapper } from './wrappers/MongodbQueryBuilderWrapper'
 
 export type Faker = ChanceFaker
 export type Model<T> = NajsEloquent.Model.IModel<T> & T
@@ -88,12 +90,14 @@ export const NajsEloquent: BuiltinClasses = {
     GenericQueryBuilder: GenericQueryBuilder,
     Mongodb: {
       MongodbConditionConverter: MongodbConditionConverter,
+      MongodbQueryBuilder: MongodbQueryBuilder,
       MongooseQueryBuilder: MongooseQueryBuilder,
       MongodbQueryLog: MongodbQueryLog
     }
   },
   Wrapper: {
     QueryBuilderWrapper: QueryBuilderWrapper,
+    MongodbQueryBuilderWrapper: MongodbQueryBuilderWrapper,
     MongooseQueryBuilderWrapper: MongooseQueryBuilderWrapper
   }
 }

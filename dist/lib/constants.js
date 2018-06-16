@@ -50,6 +50,7 @@ exports.NajsEloquent = {
     },
     Wrapper: {
         QueryBuilderWrapper: 'NajsEloquent.Wrapper.QueryBuilderWrapper',
+        MongodbQueryBuilderWrapper: 'NajsEloquent.Wrapper.MongodbQueryBuilderWrapper',
         MongooseQueryBuilderWrapper: 'NajsEloquent.Wrapper.MongooseQueryBuilderWrapper'
     },
     Relation: {

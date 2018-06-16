@@ -18,6 +18,8 @@ import { MongooseQueryBuilder } from './query-builders/mongodb/MongooseQueryBuil
 import { MongodbQueryLog } from './query-builders/mongodb/MongodbQueryLog';
 import { QueryBuilderWrapper } from './wrappers/QueryBuilderWrapper';
 import { MongooseQueryBuilderWrapper } from './wrappers/MongooseQueryBuilderWrapper';
+import { MongodbQueryBuilderWrapper } from './wrappers/MongodbQueryBuilderWrapper';
+import { MongodbQueryBuilder } from './query-builders/mongodb/MongodbQueryBuilder';
 export declare type BuiltinClasses = {
     FacadeContainer: IFacadeContainer;
     Model: {
@@ -43,12 +45,14 @@ export declare type BuiltinClasses = {
         GenericQueryBuilder: typeof GenericQueryBuilder;
         Mongodb: {
             MongodbConditionConverter: typeof MongodbConditionConverter;
+            MongodbQueryBuilder: typeof MongodbQueryBuilder;
             MongooseQueryBuilder: typeof MongooseQueryBuilder;
             MongodbQueryLog: typeof MongodbQueryLog;
         };
     };
     Wrapper: {
         QueryBuilderWrapper: typeof QueryBuilderWrapper;
+        MongodbQueryBuilderWrapper: typeof MongodbQueryBuilderWrapper;
         MongooseQueryBuilderWrapper: typeof MongooseQueryBuilderWrapper;
     };
 };

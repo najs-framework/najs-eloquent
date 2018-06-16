@@ -38,12 +38,6 @@ class MongodbDriver extends RecordDriverBase_1.RecordBaseDriver {
     isNew() {
         return typeof this.attributes.getAttribute(this.getPrimaryKeyName()) === 'undefined';
     }
-    getModelComponentName() {
-        return undefined;
-    }
-    getModelComponentOrder(components) {
-        return components;
-    }
     newQuery(dataBucket) {
         return {};
         // return make<NajsEloquent.Wrapper.IQueryBuilderWrapper<T>>(NajsEloquent.Wrapper.MongooseQueryBuilderWrapper, [
@@ -53,7 +47,9 @@ class MongodbDriver extends RecordDriverBase_1.RecordBaseDriver {
         //   dataBucket
         // ])
     }
-    async delete(softDeletes) { }
+    async delete(softDeletes) {
+        throw new Error('Not implemented');
+    }
     async restore() {
         // if (this.softDeletesSetting) {
         //   return new Promise((resolve, reject) => {
@@ -78,6 +74,12 @@ class MongodbDriver extends RecordDriverBase_1.RecordBaseDriver {
                 resolve(result);
             });
         });
+    }
+    getModelComponentName() {
+        return undefined;
+    }
+    getModelComponentOrder(components) {
+        return components;
     }
 }
 exports.MongodbDriver = MongodbDriver;

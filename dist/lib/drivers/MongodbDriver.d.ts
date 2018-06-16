@@ -10,10 +10,10 @@ export declare class MongodbDriver extends RecordBaseDriver implements Najs.Cont
     getRecordName(): string;
     getPrimaryKeyName(): string;
     isNew(): boolean;
-    getModelComponentName(): string | undefined;
-    getModelComponentOrder(components: string[]): string[];
     newQuery<T>(dataBucket?: NajsEloquent.Relation.IRelationDataBucket): NajsEloquent.Wrapper.IQueryBuilderWrapper<T>;
     delete(softDeletes: boolean): Promise<any>;
     restore(): Promise<any>;
     save(): Promise<any>;
+    getModelComponentName(): string | undefined;
+    getModelComponentOrder(components: string[]): string[];
 }
