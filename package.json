@@ -32,7 +32,8 @@
       "**/test/**/*.test.ts",
       "**/test/**/*.test.js"
     ],
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupTestFrameworkScriptFile": "./jestSetup.js"
   },
   "files": [
     "dist/**/*"
