@@ -8,6 +8,7 @@ import { init_mongodb, delete_collection_use_mongodb } from '../../util'
 import { DummyDriver } from '../../../lib/drivers/DummyDriver'
 import { EloquentDriverProvider } from '../../../lib/facades/global/EloquentDriverProviderFacade'
 import { MongodbQueryBuilderBase } from '../../../lib/query-builders/mongodb/MongodbQueryBuilderBase'
+const Moment = require('moment')
 
 EloquentDriverProvider.register(DummyDriver, 'dummy')
 
@@ -426,6 +427,37 @@ describe('MongodbQueryBuilder', function() {
           .where('last_name', 'stewart')
           .first()
         expect_match_user(updatedResult, Object.assign({}, dataset[5], { age: 42 }))
+      })
+
+      it('auto add updatedAt field to $set if timestamps options is on', async function() {
+        const now = new Date(1988, 4, 16)
+        Moment.now = () => now
+
+        const query = new MongodbQueryBuilder('User', collectionUsers)
+        query['timestamps'] = { createdAt: 'created_at', updatedAt: 'updated_at' }
+        const result = await query
+          .where('first_name', 'tony')
+          .where('last_name', 'stewart')
+          .update({ $inc: { age: 1 } })
+
+        expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
+        const updatedResult = await new MongodbQueryBuilder('User', collectionUsers)
+          .where('first_name', 'tony')
+          .where('last_name', 'stewart')
+          .first()
+        expect_match_user(updatedResult, Object.assign({}, dataset[5], { age: 43, updated_at: now }))
+
+        const result2 = await query
+          .where('first_name', 'tony')
+          .where('last_name', 'stewart')
+          .update({ $set: { age: 44 } })
+
+        expect(result2).toEqual({ n: 1, nModified: 1, ok: 1 })
+        const updatedResult2 = await new MongodbQueryBuilder('User', collectionUsers)
+          .where('first_name', 'tony')
+          .where('last_name', 'stewart')
+          .first()
+        expect_match_user(updatedResult2, Object.assign({}, dataset[5], { age: 44, updated_at: now }))
       })
     })
 

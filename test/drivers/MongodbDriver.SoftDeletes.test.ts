@@ -113,56 +113,56 @@ describe('MongodbDriver.SoftDeletes', function() {
       await model.forceDelete()
     })
 
-    // it('works with static functions', async function() {
-    //   const now = new Date(1988, 4, 16)
-    //   Moment.now = () => now
-    //   expect(await SoftDeleteModel['count']()).toEqual(0)
-    //   const notDeletedModel = new SoftDeleteModel({
-    //     name: 'test'
-    //   })
-    //   await notDeletedModel.save()
+    it('works with static functions', async function() {
+      const now = new Date(1988, 4, 16)
+      Moment.now = () => now
+      expect(await SoftDeleteModel['count']()).toEqual(0)
+      const notDeletedModel = new SoftDeleteModel({
+        name: 'test'
+      })
+      await notDeletedModel.save()
 
-    //   const deletedModel = new SoftDeleteModel({
-    //     name: 'test'
-    //   })
-    //   await deletedModel.delete()
+      const deletedModel = new SoftDeleteModel({
+        name: 'test'
+      })
+      await deletedModel.delete()
 
-    //   expect(await SoftDeleteModel['count']()).toEqual(1)
-    //   expect(await SoftDeleteModel['withTrashed']().count()).toEqual(2)
-    //   expect(await SoftDeleteModel['onlyTrashed']().count()).toEqual(1)
-    //   await notDeletedModel.forceDelete()
-    //   await deletedModel.forceDelete()
-    // })
+      expect(await SoftDeleteModel['count']()).toEqual(1)
+      expect(await SoftDeleteModel['withTrashed']().count()).toEqual(2)
+      expect(await SoftDeleteModel['onlyTrashed']().count()).toEqual(1)
+      await notDeletedModel.forceDelete()
+      await deletedModel.forceDelete()
+    })
 
-    // it('does not override .find or .findOne when use .native()', async function() {
-    //   const model = new SoftDeleteModel()
+    it('does not override .find or .findOne when use .native()', async function() {
+      const model = new SoftDeleteModel()
 
-    //   const now = new Date(1988, 4, 16)
-    //   Moment.now = () => now
+      const now = new Date(1988, 4, 16)
+      Moment.now = () => now
 
-    //   const notDeletedModel = new SoftDeleteModel({
-    //     name: 'test'
-    //   })
-    //   await notDeletedModel.save()
+      const notDeletedModel = new SoftDeleteModel({
+        name: 'test'
+      })
+      await notDeletedModel.save()
 
-    //   const deletedModel = new SoftDeleteModel({
-    //     name: 'test'
-    //   })
-    //   await deletedModel.delete()
+      const deletedModel = new SoftDeleteModel({
+        name: 'test'
+      })
+      await deletedModel.delete()
 
-    //   expect(await model.count()).toEqual(1)
-    //   expect(await model.withTrashed().count()).toEqual(2)
-    //   expect(await model.onlyTrashed().count()).toEqual(1)
-    //   expect(
-    //     await model
-    //       .newQuery()
-    //       .native(function(model: any) {
-    //         return model.find()
-    //       })
-    //       .count()
-    //   ).toEqual(2)
-    //   await notDeletedModel.forceDelete()
-    //   await deletedModel.forceDelete()
-    // })
+      expect(await model.count()).toEqual(1)
+      expect(await model.withTrashed().count()).toEqual(2)
+      expect(await model.onlyTrashed().count()).toEqual(1)
+      // expect(
+      //   await (model as any)
+      //     .newQuery()
+      //     .native(function(collection: any, conditions: any) {
+      //       return collection.find(conditions)
+      //     })
+      //     .count()
+      // ).toEqual(2)
+      await notDeletedModel.forceDelete()
+      await deletedModel.forceDelete()
+    })
   })
 })

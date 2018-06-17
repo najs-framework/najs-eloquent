@@ -64,6 +64,7 @@ export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.El
         this.modelName,
         this.collection,
         this.softDeletesSetting,
+        this.timestampsSetting,
         this.getPrimaryKeyName()
       ]),
       dataBucket
@@ -76,7 +77,7 @@ export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.El
       return this.save(false)
     }
 
-    if (!this.isNew()) {
+    if (!softDeletes && !this.isNew()) {
       const primaryKey = this.getPrimaryKeyName()
       return this.collection.deleteOne({ [primaryKey]: this.attributes.getAttribute(primaryKey) })
     }

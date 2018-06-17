@@ -5,6 +5,7 @@ import { Eloquent } from '../../lib/model/Eloquent'
 import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverProviderFacade'
 import { MongodbDriver } from '../../lib/drivers/MongodbDriver'
 import { init_mongodb, delete_collection_use_mongodb } from '../util'
+import { ObjectId } from 'bson'
 const Moment = require('moment')
 
 EloquentDriverProvider.register(MongodbDriver, 'mongodb', true)
@@ -84,32 +85,34 @@ describe('MongodbDriver.Timestamps', function() {
     expect(updatedModel.updated_at).toEqual(updatedAt)
   })
 
-  // it('works with QueryBuilder.update(), one document', async function() {
-  //   const createdAt = new Date(1988, 4, 16)
-  //   Moment.now = () => createdAt
+  it('works with QueryBuilder.update(), one document', async function() {
+    const createdAt = new Date(1988, 4, 16)
+    Moment.now = () => createdAt
 
-  //   const model = new TimestampModelDefault()
-  //   await model.save()
+    const model = new TimestampModelDefault()
+    await model.save()
 
-  //   const updatedAt = new Date(2000, 0, 1)
-  //   Moment.now = () => updatedAt
+    const updatedAt = new Date(2000, 0, 1)
+    Moment.now = () => updatedAt
 
-  //   await model.where('id', model['id']).update({})
-  //   const updatedModel = await model.findOrFail(model.id)
-  //   expect(updatedModel.updated_at).toEqual(updatedAt)
-  // })
+    await model.where('id', model['id']).update({})
+    const updatedModel = await model.findOrFail(model.id)
+    expect(updatedModel.updated_at).toEqual(updatedAt)
+  })
 
-  // it('works with QueryBuilder.update(), multiple documents', async function() {
-  //   const model = new TimestampModelDefault()
+  it('works with QueryBuilder.update(), multiple documents', async function() {
+    const model = new TimestampModelDefault()
 
-  //   const now = new Date(2010, 0, 1)
-  //   Moment.now = () => now
-  //   const idList = await model.pluck('id')
-  //   await model.whereIn('id', Object.keys(idList)).update({})
+    const now = new Date(2010, 0, 1)
+    Moment.now = () => now
+    const idList = await model.pluck('id')
+    await model.whereIn('id', Object.keys(idList).map(item => ObjectId.createFromHexString(item))).update({})
 
-  //   const documents = await model.get()
-  //   expect(documents.map((item: any) => item.updated_at).all()).toEqual([now, now, now])
-  // })
+    const documents = await model.get()
+    for (let i = 0; i < documents.count(); i++) {
+      expect(documents.get(i)!.updated_at).toEqual(now)
+    }
+  })
 
   class CustomTimestampModel extends Eloquent<Timestamps> {
     static timestamps = {

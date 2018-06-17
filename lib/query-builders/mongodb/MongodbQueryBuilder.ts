@@ -7,11 +7,13 @@ import { isEmpty } from 'lodash'
 import { MongodbQueryBuilderBase } from './MongodbQueryBuilderBase'
 import { MongodbQueryLog } from './MongodbQueryLog'
 import { NajsEloquent as NajsEloquentClasses } from '../../constants'
+import * as Moment from 'moment'
 
 export class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase
   implements NajsEloquent.QueryBuilder.IFetchResultQuery<T> {
   protected modelName: string
   protected collection: Collection
+  protected timestamps?: NajsEloquent.Model.ITimestampsSetting
   protected nativeHandlePromise: any
   protected primaryKey: string
 
@@ -19,11 +21,13 @@ export class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase
     modelName: string,
     collection: Collection,
     softDelete?: NajsEloquent.Model.ISoftDeletesSetting | undefined,
+    timestamps?: NajsEloquent.Model.ITimestampsSetting | undefined,
     primaryKey: string = '_id'
   ) {
     super(softDelete)
     this.modelName = modelName
     this.collection = collection
+    this.timestamps = timestamps
     this.primaryKey = primaryKey
   }
 
@@ -65,6 +69,13 @@ export class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase
 
   update(data: Object): Promise<object> {
     const conditions = this.resolveMongodbConditionConverter().convert()
+
+    if (this.timestamps) {
+      if (typeof data['$set'] === 'undefined') {
+        data['$set'] = {}
+      }
+      data['$set'][this.timestamps.updatedAt] = Moment().toDate()
+    }
     this.resolveMongodbQueryLog()
       .raw('db.', this.collection.collectionName, '.updateMany(', conditions, ', ', data, ')')
       .end()

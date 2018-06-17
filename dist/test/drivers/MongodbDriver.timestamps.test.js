@@ -7,6 +7,7 @@ const Eloquent_1 = require("../../lib/model/Eloquent");
 const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
 const MongodbDriver_1 = require("../../lib/drivers/MongodbDriver");
 const util_1 = require("../util");
+const bson_1 = require("bson");
 const Moment = require('moment');
 EloquentDriverProviderFacade_1.EloquentDriverProvider.register(MongodbDriver_1.MongodbDriver, 'mongodb', true);
 class User extends Eloquent_1.Eloquent {
@@ -57,26 +58,28 @@ describe('MongodbDriver.Timestamps', function () {
         const updatedModel = await model.fresh();
         expect(updatedModel.updated_at).toEqual(updatedAt);
     });
-    // it('works with QueryBuilder.update(), one document', async function() {
-    //   const createdAt = new Date(1988, 4, 16)
-    //   Moment.now = () => createdAt
-    //   const model = new TimestampModelDefault()
-    //   await model.save()
-    //   const updatedAt = new Date(2000, 0, 1)
-    //   Moment.now = () => updatedAt
-    //   await model.where('id', model['id']).update({})
-    //   const updatedModel = await model.findOrFail(model.id)
-    //   expect(updatedModel.updated_at).toEqual(updatedAt)
-    // })
-    // it('works with QueryBuilder.update(), multiple documents', async function() {
-    //   const model = new TimestampModelDefault()
-    //   const now = new Date(2010, 0, 1)
-    //   Moment.now = () => now
-    //   const idList = await model.pluck('id')
-    //   await model.whereIn('id', Object.keys(idList)).update({})
-    //   const documents = await model.get()
-    //   expect(documents.map((item: any) => item.updated_at).all()).toEqual([now, now, now])
-    // })
+    it('works with QueryBuilder.update(), one document', async function () {
+        const createdAt = new Date(1988, 4, 16);
+        Moment.now = () => createdAt;
+        const model = new TimestampModelDefault();
+        await model.save();
+        const updatedAt = new Date(2000, 0, 1);
+        Moment.now = () => updatedAt;
+        await model.where('id', model['id']).update({});
+        const updatedModel = await model.findOrFail(model.id);
+        expect(updatedModel.updated_at).toEqual(updatedAt);
+    });
+    it('works with QueryBuilder.update(), multiple documents', async function () {
+        const model = new TimestampModelDefault();
+        const now = new Date(2010, 0, 1);
+        Moment.now = () => now;
+        const idList = await model.pluck('id');
+        await model.whereIn('id', Object.keys(idList).map(item => bson_1.ObjectId.createFromHexString(item))).update({});
+        const documents = await model.get();
+        for (let i = 0; i < documents.count(); i++) {
+            expect(documents.get(i).updated_at).toEqual(now);
+        }
+    });
     class CustomTimestampModel extends Eloquent_1.Eloquent {
         getClassName() {
             return 'CustomTimestampModel';

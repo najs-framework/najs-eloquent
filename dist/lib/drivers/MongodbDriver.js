@@ -53,6 +53,7 @@ class MongodbDriver extends RecordDriverBase_1.RecordBaseDriver {
                 this.modelName,
                 this.collection,
                 this.softDeletesSetting,
+                this.timestampsSetting,
                 this.getPrimaryKeyName()
             ]),
             dataBucket
@@ -63,7 +64,7 @@ class MongodbDriver extends RecordDriverBase_1.RecordBaseDriver {
             this.setAttribute(this.softDeletesSetting.deletedAt, Moment().toDate());
             return this.save(false);
         }
-        if (!this.isNew()) {
+        if (!softDeletes && !this.isNew()) {
             const primaryKey = this.getPrimaryKeyName();
             return this.collection.deleteOne({ [primaryKey]: this.attributes.getAttribute(primaryKey) });
         }

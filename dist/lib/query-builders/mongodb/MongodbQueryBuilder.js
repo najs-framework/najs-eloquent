@@ -6,11 +6,13 @@ const najs_binding_1 = require("najs-binding");
 const lodash_1 = require("lodash");
 const MongodbQueryBuilderBase_1 = require("./MongodbQueryBuilderBase");
 const constants_1 = require("../../constants");
+const Moment = require("moment");
 class MongodbQueryBuilder extends MongodbQueryBuilderBase_1.MongodbQueryBuilderBase {
-    constructor(modelName, collection, softDelete, primaryKey = '_id') {
+    constructor(modelName, collection, softDelete, timestamps, primaryKey = '_id') {
         super(softDelete);
         this.modelName = modelName;
         this.collection = collection;
+        this.timestamps = timestamps;
         this.primaryKey = primaryKey;
     }
     getClassName() {
@@ -47,6 +49,12 @@ class MongodbQueryBuilder extends MongodbQueryBuilderBase_1.MongodbQueryBuilderB
     }
     update(data) {
         const conditions = this.resolveMongodbConditionConverter().convert();
+        if (this.timestamps) {
+            if (typeof data['$set'] === 'undefined') {
+                data['$set'] = {};
+            }
+            data['$set'][this.timestamps.updatedAt] = Moment().toDate();
+        }
         this.resolveMongodbQueryLog()
             .raw('db.', this.collection.collectionName, '.updateMany(', conditions, ', ', data, ')')
             .end();

@@ -6,9 +6,10 @@ import { MongodbQueryLog } from './MongodbQueryLog';
 export declare class MongodbQueryBuilder<T> extends MongodbQueryBuilderBase implements NajsEloquent.QueryBuilder.IFetchResultQuery<T> {
     protected modelName: string;
     protected collection: Collection;
+    protected timestamps?: NajsEloquent.Model.ITimestampsSetting;
     protected nativeHandlePromise: any;
     protected primaryKey: string;
-    constructor(modelName: string, collection: Collection, softDelete?: NajsEloquent.Model.ISoftDeletesSetting | undefined, primaryKey?: string);
+    constructor(modelName: string, collection: Collection, softDelete?: NajsEloquent.Model.ISoftDeletesSetting | undefined, timestamps?: NajsEloquent.Model.ITimestampsSetting | undefined, primaryKey?: string);
     getClassName(): string;
     get(): Promise<T[]>;
     first(): Promise<T | null>;
