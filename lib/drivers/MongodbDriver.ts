@@ -40,6 +40,10 @@ export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.El
     }
   }
 
+  shouldBeProxied(key: string): boolean {
+    return key !== 'options' && key !== 'schema'
+  }
+
   getRecordName(): string {
     return this.collection.collectionName
   }

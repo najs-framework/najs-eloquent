@@ -87,6 +87,17 @@ describe('MongodbDriver', function() {
     })
   })
 
+  describe('.shouldBeProxied()', function() {
+    it('returns true if the key is not "options" and "schema"', function() {
+      const driver = new MongodbDriver(modelInstance)
+      expect(driver.shouldBeProxied('a')).toBe(true)
+      expect(driver.shouldBeProxied('b')).toBe(true)
+      expect(driver.shouldBeProxied('test')).toBe(true)
+      expect(driver.shouldBeProxied('options')).toBe(false)
+      expect(driver.shouldBeProxied('schema')).toBe(false)
+    })
+  })
+
   describe('.getRecordName()', function() {
     it('returns this.collection.collectionName', function() {
       const driver = new MongodbDriver(modelInstance)

@@ -33,6 +33,9 @@ class MongodbDriver extends RecordDriverBase_1.RecordBaseDriver {
             this.attributes = new Record_1.Record();
         }
     }
+    shouldBeProxied(key) {
+        return key !== 'options' && key !== 'schema';
+    }
     getRecordName() {
         return this.collection.collectionName;
     }

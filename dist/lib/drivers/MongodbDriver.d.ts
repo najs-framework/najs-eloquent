@@ -9,6 +9,7 @@ export declare class MongodbDriver extends RecordBaseDriver implements Najs.Cont
     protected eventEmitter?: Najs.Contracts.Event.AsyncEventEmitter;
     getClassName(): string;
     initialize(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: Object): void;
+    shouldBeProxied(key: string): boolean;
     getRecordName(): string;
     getPrimaryKeyName(): string;
     isNew(): boolean;
