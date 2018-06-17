@@ -2,7 +2,7 @@
 import '../wrappers/MongodbQueryBuilderWrapper';
 import '../query-builders/mongodb/MongodbQueryBuilder';
 import { Record } from '../model/Record';
-import { RecordBaseDriver } from './RecordDriverBase';
+import { RecordBaseDriver } from './based/RecordDriverBase';
 import { Collection } from 'mongodb';
 export declare class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.Eloquent.Driver<Record> {
     protected collection: Collection;
@@ -18,6 +18,4 @@ export declare class MongodbDriver extends RecordBaseDriver implements Najs.Cont
     restore(): Promise<any>;
     save(fillData?: boolean): Promise<any>;
     setAttributeIfNeeded(attribute: string, value: any): void;
-    getModelComponentName(): string | undefined;
-    getModelComponentOrder(components: string[]): string[];
 }

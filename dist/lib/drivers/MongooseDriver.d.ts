@@ -4,9 +4,9 @@
 import '../wrappers/MongooseQueryBuilderWrapper';
 import '../query-builders/mongodb/MongooseQueryBuilder';
 import { Document, Model, Schema, SchemaDefinition, SchemaOptions } from 'mongoose';
-export declare class MongooseDriver<Record extends Object> implements Najs.Contracts.Eloquent.Driver<Record> {
+import { DriverBase } from './based/DriverBase';
+export declare class MongooseDriver<Record extends Object> extends DriverBase<Document & Record> implements Najs.Contracts.Eloquent.Driver<Record> {
     static className: string;
-    static GlobalEventEmitter: Najs.Contracts.Event.AsyncEventEmitter;
     protected attributes: Document & Record;
     protected queryLogGroup: string;
     protected modelName: string;
@@ -21,13 +21,8 @@ export declare class MongooseDriver<Record extends Object> implements Najs.Contr
     protected initializeModelIfNeeded(model: NajsEloquent.Model.IModel<any>): void;
     protected getMongooseSchema(model: NajsEloquent.Model.IModel<any>): Schema;
     protected createAttributesByData(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: any): void;
-    protected getCollectionName(): string;
     getRecordName(): string;
-    getRecord(): Record;
-    setRecord(value: Document & Record): void;
-    useEloquentProxy(): boolean;
     shouldBeProxied(key: string): boolean;
-    proxify(type: 'get' | 'set', target: any, key: string, value?: any): any;
     hasAttribute(name: string): boolean;
     getAttribute<T>(name: string): T;
     setAttribute<T>(name: string, value: T): boolean;
@@ -41,9 +36,4 @@ export declare class MongooseDriver<Record extends Object> implements Najs.Contr
     isModified(name: string): boolean;
     getModified(): string[];
     isNew(): boolean;
-    isSoftDeleted(): boolean;
-    formatAttributeName(name: string): string;
-    getModelComponentName(): string | undefined;
-    getModelComponentOrder(components: string[]): string[];
-    getEventEmitter(global: boolean): Najs.Contracts.Event.AsyncEventEmitter;
 }

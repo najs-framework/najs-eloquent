@@ -39,6 +39,8 @@ register(User)
 const modelInstance: any = new User()
 
 describe('MongooseDriver', function() {
+  jest.setTimeout(20000)
+
   beforeAll(async function() {
     await init_mongoose(MongooseProvider.getMongooseInstance(), 'drivers_mongoose_driver')
   })
@@ -245,24 +247,6 @@ describe('MongooseDriver', function() {
     })
 
     it('auto creates a schema by "schema" and "options" settings from Model', function() {})
-  })
-
-  describe('protected .getCollectionName()', function() {
-    it('returns plural version with snake case', function() {
-      const driver = new MongooseDriver(modelInstance)
-      const dataset = {
-        TestSomething: 'test_somethings',
-        User: 'users',
-        Company: 'companies',
-        Shoe: 'shoes',
-        CompanyTax: 'company_taxes'
-      }
-
-      for (const name in dataset) {
-        driver['modelName'] = name
-        expect(driver['getCollectionName']()).toEqual(dataset[name])
-      }
-    })
   })
 
   describe('.getRecordName()', function() {
@@ -584,20 +568,6 @@ describe('MongooseDriver', function() {
       const components = ['a', 'b', 'c']
       const driver = new MongooseDriver(modelInstance)
       expect(driver.getModelComponentOrder(components) === components).toBe(true)
-    })
-  })
-
-  describe('.getEventEmitter()', function() {
-    it('returns the global EventEmitter if the param is true', function() {
-      const driver = new MongooseDriver(modelInstance)
-      expect(driver.getEventEmitter(true) === MongooseDriver.GlobalEventEmitter).toBe(true)
-    })
-
-    it('creates and returns the EventEmitter if the param is false', function() {
-      const driver = new MongooseDriver(modelInstance)
-      expect(driver['eventEmitter']).toBeUndefined()
-      expect(driver.getEventEmitter(false) === driver['eventEmitter']).toBe(true)
-      expect(driver.getEventEmitter(false) === driver['eventEmitter']).toBe(true)
     })
   })
 })

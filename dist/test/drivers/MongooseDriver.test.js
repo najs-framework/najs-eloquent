@@ -32,6 +32,7 @@ User.className = 'User';
 najs_binding_1.register(User);
 const modelInstance = new User();
 describe('MongooseDriver', function () {
+    jest.setTimeout(20000);
     beforeAll(async function () {
         await util_1.init_mongoose(MongooseProviderFacade_1.MongooseProvider.getMongooseInstance(), 'drivers_mongoose_driver');
     });
@@ -195,22 +196,6 @@ describe('MongooseDriver', function () {
             expect(getSchemaSpy.called).toBe(true);
         });
         it('auto creates a schema by "schema" and "options" settings from Model', function () { });
-    });
-    describe('protected .getCollectionName()', function () {
-        it('returns plural version with snake case', function () {
-            const driver = new MongooseDriver_1.MongooseDriver(modelInstance);
-            const dataset = {
-                TestSomething: 'test_somethings',
-                User: 'users',
-                Company: 'companies',
-                Shoe: 'shoes',
-                CompanyTax: 'company_taxes'
-            };
-            for (const name in dataset) {
-                driver['modelName'] = name;
-                expect(driver['getCollectionName']()).toEqual(dataset[name]);
-            }
-        });
     });
     describe('.getRecordName()', function () {
         it('returns collection name of attributes if attributes && attributes.collection is not undefined', function () {
@@ -499,18 +484,6 @@ describe('MongooseDriver', function () {
             const components = ['a', 'b', 'c'];
             const driver = new MongooseDriver_1.MongooseDriver(modelInstance);
             expect(driver.getModelComponentOrder(components) === components).toBe(true);
-        });
-    });
-    describe('.getEventEmitter()', function () {
-        it('returns the global EventEmitter if the param is true', function () {
-            const driver = new MongooseDriver_1.MongooseDriver(modelInstance);
-            expect(driver.getEventEmitter(true) === MongooseDriver_1.MongooseDriver.GlobalEventEmitter).toBe(true);
-        });
-        it('creates and returns the EventEmitter if the param is false', function () {
-            const driver = new MongooseDriver_1.MongooseDriver(modelInstance);
-            expect(driver['eventEmitter']).toBeUndefined();
-            expect(driver.getEventEmitter(false) === driver['eventEmitter']).toBe(true);
-            expect(driver.getEventEmitter(false) === driver['eventEmitter']).toBe(true);
         });
     });
 });

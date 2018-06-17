@@ -11,11 +11,11 @@ const MongooseProviderFacade_1 = require("../facades/global/MongooseProviderFaca
 const SoftDelete_1 = require("./mongoose/SoftDelete");
 const mongoose_1 = require("mongoose");
 const lodash_1 = require("lodash");
-const pluralize_1 = require("pluralize");
-const najs_event_1 = require("najs-event");
+const DriverBase_1 = require("./based/DriverBase");
 const setupTimestampMoment = require('mongoose-timestamps-moment').setupTimestamp;
-class MongooseDriver {
+class MongooseDriver extends DriverBase_1.DriverBase {
     constructor(model) {
+        super();
         this.modelName = model.getModelName();
         this.queryLogGroup = 'all';
         this.schema = model.getSettingProperty('schema', {});
@@ -55,7 +55,7 @@ class MongooseDriver {
         }
         if (!schema || !(schema instanceof mongoose_1.Schema)) {
             mongoose_1.Schema.prototype['setupTimestamp'] = setupTimestampMoment;
-            schema = new mongoose_1.Schema(this.schema, Object.assign({ collection: this.getCollectionName() }, this.options));
+            schema = new mongoose_1.Schema(this.schema, Object.assign({ collection: this.formatRecordName() }, this.options));
         }
         return schema;
     }
@@ -75,32 +75,14 @@ class MongooseDriver {
             }
         }
     }
-    getCollectionName() {
-        return pluralize_1.plural(lodash_1.snakeCase(this.modelName));
-    }
     getRecordName() {
-        return this.attributes ? this.attributes.collection.name : this.getCollectionName();
-    }
-    getRecord() {
-        return this.attributes;
-    }
-    setRecord(value) {
-        this.attributes = value;
-    }
-    useEloquentProxy() {
-        return true;
+        return this.attributes ? this.attributes.collection.name : this.formatRecordName();
     }
     shouldBeProxied(key) {
         if (key === 'schema' || key === 'options') {
             return false;
         }
         return true;
-    }
-    proxify(type, target, key, value) {
-        if (type === 'get') {
-            return this.getAttribute(key);
-        }
-        return this.setAttribute(key, value);
     }
     hasAttribute(name) {
         return typeof this.schema[name] !== 'undefined';
@@ -150,31 +132,6 @@ class MongooseDriver {
     isNew() {
         return this.attributes.isNew;
     }
-    isSoftDeleted() {
-        if (this.softDeletesSetting) {
-            return this.attributes.get(this.softDeletesSetting.deletedAt) !== null;
-        }
-        return false;
-    }
-    formatAttributeName(name) {
-        return lodash_1.snakeCase(name);
-    }
-    getModelComponentName() {
-        return undefined;
-    }
-    getModelComponentOrder(components) {
-        return components;
-    }
-    getEventEmitter(global) {
-        if (global) {
-            return MongooseDriver.GlobalEventEmitter;
-        }
-        if (!this.eventEmitter) {
-            this.eventEmitter = najs_event_1.EventEmitterFactory.create(true);
-        }
-        return this.eventEmitter;
-    }
 }
 MongooseDriver.className = constants_1.NajsEloquent.Driver.MongooseDriver;
-MongooseDriver.GlobalEventEmitter = najs_event_1.EventEmitterFactory.create(true);
 exports.MongooseDriver = MongooseDriver;

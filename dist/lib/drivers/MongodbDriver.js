@@ -6,7 +6,7 @@ require("../wrappers/MongodbQueryBuilderWrapper");
 require("../query-builders/mongodb/MongodbQueryBuilder");
 const constants_1 = require("../constants");
 const Record_1 = require("../model/Record");
-const RecordDriverBase_1 = require("./RecordDriverBase");
+const RecordDriverBase_1 = require("./based/RecordDriverBase");
 const MongodbProviderFacade_1 = require("../facades/global/MongodbProviderFacade");
 const najs_binding_1 = require("najs-binding");
 const Moment = require("moment");
@@ -103,12 +103,6 @@ class MongodbDriver extends RecordDriverBase_1.RecordBaseDriver {
         if (typeof this.attributes.getAttribute(attribute) === 'undefined') {
             this.attributes.setAttribute(attribute, value);
         }
-    }
-    getModelComponentName() {
-        return undefined;
-    }
-    getModelComponentOrder(components) {
-        return components;
     }
 }
 exports.MongodbDriver = MongodbDriver;

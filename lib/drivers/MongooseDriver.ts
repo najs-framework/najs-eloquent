@@ -9,14 +9,13 @@ import { NajsEloquent } from '../constants'
 import { MongooseProvider } from '../facades/global/MongooseProviderFacade'
 import { SoftDelete } from './mongoose/SoftDelete'
 import { Document, Model, Schema, SchemaDefinition, SchemaOptions } from 'mongoose'
-import { isFunction, snakeCase } from 'lodash'
-import { plural } from 'pluralize'
-import { EventEmitterFactory } from 'najs-event'
+import { isFunction } from 'lodash'
+import { DriverBase } from './based/DriverBase'
 const setupTimestampMoment = require('mongoose-timestamps-moment').setupTimestamp
 
-export class MongooseDriver<Record extends Object> implements Najs.Contracts.Eloquent.Driver<Record> {
+export class MongooseDriver<Record extends Object> extends DriverBase<Document & Record>
+  implements Najs.Contracts.Eloquent.Driver<Record> {
   static className: string = NajsEloquent.Driver.MongooseDriver
-  static GlobalEventEmitter: Najs.Contracts.Event.AsyncEventEmitter = EventEmitterFactory.create(true)
 
   protected attributes: Document & Record
   protected queryLogGroup: string
@@ -28,6 +27,7 @@ export class MongooseDriver<Record extends Object> implements Najs.Contracts.Elo
   protected eventEmitter?: Najs.Contracts.Event.AsyncEventEmitter
 
   constructor(model: NajsEloquent.Model.IModel<any> & NajsEloquent.Model.IModelSetting) {
+    super()
     this.modelName = model.getModelName()
     this.queryLogGroup = 'all'
     this.schema = model.getSettingProperty('schema', {})
@@ -76,7 +76,7 @@ export class MongooseDriver<Record extends Object> implements Najs.Contracts.Elo
 
     if (!schema || !(schema instanceof Schema)) {
       Schema.prototype['setupTimestamp'] = setupTimestampMoment
-      schema = new Schema(this.schema, Object.assign({ collection: this.getCollectionName() }, this.options))
+      schema = new Schema(this.schema, Object.assign({ collection: this.formatRecordName() }, this.options))
     }
     return schema
   }
@@ -98,24 +98,8 @@ export class MongooseDriver<Record extends Object> implements Najs.Contracts.Elo
     }
   }
 
-  protected getCollectionName(): string {
-    return plural(snakeCase(this.modelName))
-  }
-
   getRecordName(): string {
-    return this.attributes ? this.attributes.collection.name : this.getCollectionName()
-  }
-
-  getRecord(): Record {
-    return this.attributes
-  }
-
-  setRecord(value: Document & Record): void {
-    this.attributes = value
-  }
-
-  useEloquentProxy() {
-    return true
+    return this.attributes ? this.attributes.collection.name : this.formatRecordName()
   }
 
   shouldBeProxied(key: string): boolean {
@@ -123,13 +107,6 @@ export class MongooseDriver<Record extends Object> implements Najs.Contracts.Elo
       return false
     }
     return true
-  }
-
-  proxify(type: 'get' | 'set', target: any, key: string, value?: any): any {
-    if (type === 'get') {
-      return this.getAttribute(key)
-    }
-    return this.setAttribute(key, value)
   }
 
   hasAttribute(name: string): boolean {
@@ -191,34 +168,5 @@ export class MongooseDriver<Record extends Object> implements Najs.Contracts.Elo
 
   isNew(): boolean {
     return this.attributes.isNew
-  }
-
-  isSoftDeleted(): boolean {
-    if (this.softDeletesSetting) {
-      return this.attributes.get(this.softDeletesSetting.deletedAt) !== null
-    }
-    return false
-  }
-
-  formatAttributeName(name: string): string {
-    return snakeCase(name)
-  }
-
-  getModelComponentName(): string | undefined {
-    return undefined
-  }
-
-  getModelComponentOrder(components: string[]): string[] {
-    return components
-  }
-
-  getEventEmitter(global: boolean) {
-    if (global) {
-      return MongooseDriver.GlobalEventEmitter
-    }
-    if (!this.eventEmitter) {
-      this.eventEmitter = EventEmitterFactory.create(true)
-    }
-    return this.eventEmitter
   }
 }

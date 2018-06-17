@@ -6,7 +6,7 @@ const util_1 = require("../util");
 const Eloquent_1 = require("../../lib/model/Eloquent");
 const MongodbDriver_1 = require("../../lib/drivers/MongodbDriver");
 const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
-const RecordDriverBase_1 = require("../../lib/drivers/RecordDriverBase");
+const RecordDriverBase_1 = require("../../lib/drivers/based/RecordDriverBase");
 const najs_binding_1 = require("najs-binding");
 const Record_1 = require("../../lib/model/Record");
 const MongodbQueryBuilderWrapper_1 = require("../../lib/wrappers/MongodbQueryBuilderWrapper");
@@ -376,20 +376,6 @@ describe('MongodbDriver', function () {
             driver.setAttributeIfNeeded('null', null);
             // tslint:disable-next-line
             expect(setAttributeSpy.calledWith('null', null)).toBe(false);
-        });
-    });
-    describe('.getModelComponentName()', function () {
-        it('returns undefined', function () {
-            const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
-            expect(driver.getModelComponentName()).toBeUndefined();
-        });
-    });
-    describe('.getModelComponentOrder()', function () {
-        it('returns the same instance of components and ordering', function () {
-            const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
-            const components = ['c', 'a', 'b'];
-            expect(driver.getModelComponentOrder(components) === components).toBe(true);
-            expect(driver.getModelComponentOrder(components)).toEqual(['c', 'a', 'b']);
         });
     });
 });

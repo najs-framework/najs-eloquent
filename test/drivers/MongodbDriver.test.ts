@@ -4,7 +4,7 @@ import { init_mongodb, delete_collection_use_mongodb } from '../util'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { MongodbDriver } from '../../lib/drivers/MongodbDriver'
 import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverProviderFacade'
-import { RecordBaseDriver } from '../../lib/drivers/RecordDriverBase'
+import { RecordBaseDriver } from '../../lib/drivers/based/RecordDriverBase'
 import { register } from 'najs-binding'
 import { Record } from '../../lib/model/Record'
 import { MongodbQueryBuilderWrapper } from '../../lib/wrappers/MongodbQueryBuilderWrapper'
@@ -441,22 +441,6 @@ describe('MongodbDriver', function() {
       driver.setAttributeIfNeeded('null', null)
       // tslint:disable-next-line
       expect(setAttributeSpy.calledWith('null', null)).toBe(false)
-    })
-  })
-
-  describe('.getModelComponentName()', function() {
-    it('returns undefined', function() {
-      const driver = new MongodbDriver(modelInstance)
-      expect(driver.getModelComponentName()).toBeUndefined()
-    })
-  })
-
-  describe('.getModelComponentOrder()', function() {
-    it('returns the same instance of components and ordering', function() {
-      const driver = new MongodbDriver(modelInstance)
-      const components = ['c', 'a', 'b']
-      expect(driver.getModelComponentOrder(components) === components).toBe(true)
-      expect(driver.getModelComponentOrder(components)).toEqual(['c', 'a', 'b'])
     })
   })
 })

@@ -1,8 +1,7 @@
 import 'jest'
 import * as Sinon from 'sinon'
-import { Record } from '../../lib/model/Record'
-import { RecordBaseDriver } from '../../lib/drivers/RecordDriverBase'
-import { AsyncEventEmitter } from 'najs-event/dist/lib/emitters/AsyncEventEmitter'
+import { Record } from '../../../lib/model/Record'
+import { RecordBaseDriver } from '../../../lib/drivers/based/RecordDriverBase'
 
 const baseModel = {
   getModelName() {
@@ -71,31 +70,6 @@ describe('RecordBaseDriver', function() {
     })
   })
 
-  describe('.getRecord()', function() {
-    it('simply returns this.attributes', function() {
-      const driver = new RecordBaseDriver(<any>baseModel)
-      const record = new Record({})
-      driver.setRecord(record)
-      expect(driver.getRecord() === record).toBe(true)
-    })
-  })
-
-  describe('.setRecord()', function() {
-    it('simply assigns value to this.attributes', function() {
-      const driver = new RecordBaseDriver(<any>baseModel)
-      const record = new Record({})
-      driver.setRecord(record)
-      expect(driver.getRecord() === record).toBe(true)
-    })
-  })
-
-  describe('.useEloquentProxy()', function() {
-    it('always returns true', function() {
-      const driver = new RecordBaseDriver(<any>baseModel)
-      expect(driver.useEloquentProxy()).toBe(true)
-    })
-  })
-
   describe('.shouldBeProxied()', function() {
     it('returns true if the key is not "options"', function() {
       const driver = new RecordBaseDriver(<any>baseModel)
@@ -103,22 +77,6 @@ describe('RecordBaseDriver', function() {
       expect(driver.shouldBeProxied('b')).toBe(true)
       expect(driver.shouldBeProxied('test')).toBe(true)
       expect(driver.shouldBeProxied('options')).toBe(false)
-    })
-  })
-
-  describe('.proxify()', function() {
-    it('forwards to .getAttribute() or .setAttribute()', function() {
-      const driver = new RecordBaseDriver(<any>baseModel)
-      const getAttributeStub = Sinon.stub(driver, 'getAttribute')
-      getAttributeStub.returns('get-attribute')
-      const setAttributeStub = Sinon.stub(driver, 'setAttribute')
-      setAttributeStub.returns('set-attribute')
-
-      expect(driver.proxify('get', {}, 'key')).toEqual('get-attribute')
-      expect(getAttributeStub.calledWith('key')).toBe(true)
-
-      expect(driver.proxify('set', {}, 'key', 'value')).toEqual('set-attribute')
-      expect(setAttributeStub.calledWith('key', 'value')).toBe(true)
     })
   })
 
@@ -216,69 +174,6 @@ describe('RecordBaseDriver', function() {
 
       expect(driver.getModified()).toEqual(['a', 'b'])
       expect(getModifiedStub.calledWith()).toBe(true)
-    })
-  })
-
-  describe('.formatAttributeName()', function() {
-    it('transforms name to snakeCase()', function() {
-      const dataset = {
-        Test: 'test',
-        test: 'test',
-        someThing: 'some_thing',
-        Some_Thing_Awesome: 'some_thing_awesome'
-      }
-      const driver = new RecordBaseDriver(<any>baseModel)
-      for (const name in dataset) {
-        expect(driver.formatAttributeName(name)).toEqual(dataset[name])
-      }
-    })
-  })
-
-  describe('.formatRecordName()', function() {
-    it('transforms name to snakeCase() then plural() it', function() {
-      const dataset = {
-        Test: 'tests',
-        company: 'companies',
-        EmployeePassword: 'employee_passwords'
-      }
-      const driver = new RecordBaseDriver(<any>baseModel)
-      for (const name in dataset) {
-        driver['modelName'] = name
-        expect(driver.formatRecordName()).toEqual(dataset[name])
-      }
-    })
-  })
-
-  describe('.isSoftDeleted()', function() {
-    it('returns false if this.softDeletesSetting is not found', function() {
-      const driver = new RecordBaseDriver(<any>baseModel)
-      expect(driver.isSoftDeleted()).toBe(false)
-    })
-
-    it('returns true if this.attributes contains soft delete key and not null', function() {
-      const driver = new RecordBaseDriver(<any>baseModel)
-      const record = new Record({ deleted_at: new Date() })
-      driver.setRecord(record)
-
-      driver['softDeletesSetting'] = { deletedAt: 'deleted_at', overrideMethods: false }
-      expect(driver.isSoftDeleted()).toBe(true)
-      // tslint:disable-next-line
-      record.setAttribute('deleted_at', null)
-      expect(driver.isSoftDeleted()).toBe(false)
-    })
-  })
-
-  describe('.getEventEmitter()', function() {
-    it('returns "RecordBaseDriver.GlobalEventEmitter" if global is true', function() {
-      const driver = new RecordBaseDriver(<any>baseModel)
-      expect(driver.getEventEmitter(true) === RecordBaseDriver.GlobalEventEmitter).toBe(true)
-    })
-
-    it('creates an EventEmitter and assigned to this.eventEmitter if needed', function() {
-      const driver = new RecordBaseDriver(<any>baseModel)
-      expect(driver['eventEmitter']).toBeUndefined()
-      expect(driver.getEventEmitter(false)).toBeInstanceOf(AsyncEventEmitter)
-      expect(driver.getEventEmitter(false) === driver['eventEmitter']).toBe(true)
     })
   })
 })

@@ -5,7 +5,7 @@ import '../wrappers/MongodbQueryBuilderWrapper'
 import '../query-builders/mongodb/MongodbQueryBuilder'
 import { NajsEloquent } from '../constants'
 import { Record } from '../model/Record'
-import { RecordBaseDriver } from './RecordDriverBase'
+import { RecordBaseDriver } from './based/RecordDriverBase'
 import { MongodbProviderFacade } from '../facades/global/MongodbProviderFacade'
 import { Collection } from 'mongodb'
 import { make } from 'najs-binding'
@@ -123,13 +123,5 @@ export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.El
     if (typeof this.attributes.getAttribute(attribute) === 'undefined') {
       this.attributes.setAttribute(attribute, value)
     }
-  }
-
-  getModelComponentName(): string | undefined {
-    return undefined
-  }
-
-  getModelComponentOrder(components: string[]): string[] {
-    return components
   }
 }
