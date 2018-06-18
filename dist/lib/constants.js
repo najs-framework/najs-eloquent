@@ -45,6 +45,7 @@ exports.NajsEloquent = {
     Provider: {
         ComponentProvider: 'NajsEloquent.Provider.ComponentProvider',
         DriverProvider: 'NajsEloquent.Provider.DriverProvider',
+        KnexProvider: 'NajsEloquent.Provider.KnexProvider',
         MongodbProvider: 'NajsEloquent.Provider.MongodbProvider',
         MongooseProvider: 'NajsEloquent.Provider.MongooseProvider'
     },

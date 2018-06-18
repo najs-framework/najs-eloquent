@@ -22,6 +22,8 @@ import { DynamicAttribute } from './model/components/DynamicAttribute'
 import { StaticQuery } from './model/components/StaticQuery'
 import { DriverProvider } from './providers/DriverProvider'
 import { ComponentProvider } from './providers/ComponentProvider'
+import { KnexProvider as KnexProviderClass } from './providers/KnexProvider'
+import { MongodbProvider as MongodbProviderClass } from './providers/MongodbProvider'
 import { MongooseProvider as MongooseProviderClass } from './providers/MongooseProvider'
 import { ChanceFaker } from './factory/FactoryManager'
 import { EloquentDriverProvider } from './facades/global/EloquentDriverProviderFacade'
@@ -84,6 +86,8 @@ export const NajsEloquent: BuiltinClasses = {
   Provider: {
     DriverProvider: DriverProvider,
     ComponentProvider: ComponentProvider,
+    KnexProvider: KnexProviderClass,
+    MongodbProvider: MongodbProviderClass,
     MongooseProvider: MongooseProviderClass
   },
   QueryBuilder: {

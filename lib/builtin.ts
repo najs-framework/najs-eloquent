@@ -11,6 +11,8 @@ import { StaticQuery } from './model/components/StaticQuery'
 import { DynamicAttribute } from './model/components/DynamicAttribute'
 import { DriverProvider } from './providers/DriverProvider'
 import { ComponentProvider } from './providers/ComponentProvider'
+import { KnexProvider } from './providers/KnexProvider'
+import { MongodbProvider } from './providers/MongodbProvider'
 import { MongooseProvider } from './providers/MongooseProvider'
 import { GenericQueryBuilder } from './query-builders/GenericQueryBuilder'
 import { MongodbConditionConverter } from './query-builders/mongodb/MongodbConditionConverter'
@@ -40,6 +42,8 @@ export type BuiltinClasses = {
   Provider: {
     DriverProvider: typeof DriverProvider
     ComponentProvider: typeof ComponentProvider
+    KnexProvider: typeof KnexProvider
+    MongodbProvider: typeof MongodbProvider
     MongooseProvider: typeof MongooseProvider
   }
   QueryBuilder: {

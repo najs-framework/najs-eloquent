@@ -22,6 +22,8 @@ const DynamicAttribute_1 = require("./model/components/DynamicAttribute");
 const StaticQuery_1 = require("./model/components/StaticQuery");
 const DriverProvider_1 = require("./providers/DriverProvider");
 const ComponentProvider_1 = require("./providers/ComponentProvider");
+const KnexProvider_1 = require("./providers/KnexProvider");
+const MongodbProvider_1 = require("./providers/MongodbProvider");
 const MongooseProvider_1 = require("./providers/MongooseProvider");
 const EloquentDriverProviderFacade_1 = require("./facades/global/EloquentDriverProviderFacade");
 const MongooseDriver_1 = require("./drivers/MongooseDriver");
@@ -83,6 +85,8 @@ exports.NajsEloquent = {
     Provider: {
         DriverProvider: DriverProvider_1.DriverProvider,
         ComponentProvider: ComponentProvider_1.ComponentProvider,
+        KnexProvider: KnexProvider_1.KnexProvider,
+        MongodbProvider: MongodbProvider_1.MongodbProvider,
         MongooseProvider: MongooseProvider_1.MongooseProvider
     },
     QueryBuilder: {
