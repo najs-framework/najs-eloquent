@@ -7,16 +7,15 @@ import { GenericQueryCondition } from './GenericQueryCondition'
 import { GenericQueryConditionHelpers } from './GenericQueryConditionHelpers'
 import { flatten } from 'lodash'
 import { array_unique } from '../util/functions'
+import { QueryBuilderBase } from './QueryBuilderBase'
 
 export type QueryBuilderSoftDelete = {
   deletedAt: string
 }
 
 export interface GenericQueryBuilder extends NajsEloquent.QueryBuilder.IConditionQuery {}
-export class GenericQueryBuilder
+export class GenericQueryBuilder extends QueryBuilderBase
   implements NajsEloquent.QueryBuilder.IBasicQuery, NajsEloquent.QueryBuilder.ISoftDeleteQuery {
-  protected isUsed: boolean
-  protected name: string
   protected fields: {
     select?: string[]
     distinct?: string[]
@@ -26,31 +25,17 @@ export class GenericQueryBuilder
   protected ordering: Object
   protected limitNumber: number
   protected conditions: GenericQueryCondition[]
-  protected convention: NajsEloquent.QueryBuilder.IQueryConvention
   protected softDelete?: QueryBuilderSoftDelete
   protected addSoftDeleteCondition: boolean
-  protected logGroup: string
 
   constructor(softDelete?: QueryBuilderSoftDelete) {
+    super()
     this.fields = {}
     this.ordering = {}
     this.conditions = []
-    this.convention = this.getQueryConvention()
     this.softDelete = softDelete
     this.isUsed = false
     this.addSoftDeleteCondition = !!softDelete ? true : false
-  }
-
-  protected getQueryConvention(): NajsEloquent.QueryBuilder.IQueryConvention {
-    return {
-      formatFieldName(name: any) {
-        return name
-      },
-      getNullValueFor(name: any) {
-        // tslint:disable-next-line
-        return null
-      }
-    }
   }
 
   protected getConditions(): Object[] {
@@ -66,20 +51,6 @@ export class GenericQueryBuilder
     return this
   }
 
-  queryName(name: string): this {
-    this.name = name
-    return this
-  }
-
-  getPrimaryKeyName(): string {
-    return this.convention.formatFieldName('id')
-  }
-
-  setLogGroup(group: string): this {
-    this.logGroup = group
-    return this
-  }
-
   select(field: string): this
   select(fields: string[]): this
   select(...fields: Array<string | string[]>): this
@@ -91,14 +62,6 @@ export class GenericQueryBuilder
     this.isUsed = true
     this.ordering[this.convention.formatFieldName(field)] = direction
     return this
-  }
-
-  orderByAsc(field: string): this {
-    return this.orderBy(field, 'asc')
-  }
-
-  orderByDesc(field: string): this {
-    return this.orderBy(field, 'desc')
   }
 
   limit(records: number): this {

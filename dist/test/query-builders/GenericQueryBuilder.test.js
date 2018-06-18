@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const Sinon = require("sinon");
 const GenericQueryBuilder_1 = require("../../lib/query-builders/GenericQueryBuilder");
+const QueryBuilderBase_1 = require("../../lib/query-builders/QueryBuilderBase");
 const TestConvention = {
     formatFieldName(name) {
         return 'formatted:' + name;
@@ -12,6 +13,10 @@ const TestConvention = {
     }
 };
 describe('GenericQueryBuilder', function () {
+    it('extends QueryBuilderBase', function () {
+        const query = new GenericQueryBuilder_1.GenericQueryBuilder();
+        expect(query).toBeInstanceOf(QueryBuilderBase_1.QueryBuilderBase);
+    });
     describe('implements IBasicQuery', function () {
         describe('.getPrimaryKeyName()', function () {
             it('calls and returns convention.formatFieldName("id") by default', function () {
@@ -576,6 +581,7 @@ describe('GenericQueryBuilder', function () {
                 // tslint:disable-next-line
                 expect(whereSpy.calledWith('a', '=', null)).toBe(true);
                 expect(getNullValueForSpy.calledWith('a')).toBe(true);
+                getNullValueForSpy.restore();
             });
             it('calls QueryCondition.buildQuery with "and" + operator "=" and value from convention', function () {
                 const query = new GenericQueryBuilder_1.GenericQueryBuilder();
@@ -633,6 +639,7 @@ describe('GenericQueryBuilder', function () {
                 // tslint:disable-next-line
                 expect(orWhereSpy.calledWith('a', '=', null)).toBe(true);
                 expect(getNullValueForSpy.calledWith('a')).toBe(true);
+                getNullValueForSpy.restore();
             });
             it('calls QueryCondition.buildQuery with "or" + operator "=" and value from convention', function () {
                 const query = new GenericQueryBuilder_1.GenericQueryBuilder();
@@ -664,6 +671,7 @@ describe('GenericQueryBuilder', function () {
                 // tslint:disable-next-line
                 expect(whereSpy.calledWith('a', '<>', null)).toBe(true);
                 expect(getNullValueForSpy.calledWith('a')).toBe(true);
+                getNullValueForSpy.restore();
             });
             it('calls QueryCondition.buildQuery with "and" + operator "<>" and value from convention', function () {
                 const query = new GenericQueryBuilder_1.GenericQueryBuilder();
@@ -721,6 +729,7 @@ describe('GenericQueryBuilder', function () {
                 // tslint:disable-next-line
                 expect(orWhereSpy.calledWith('a', '<>', null)).toBe(true);
                 expect(getNullValueForSpy.calledWith('a')).toBe(true);
+                getNullValueForSpy.restore();
             });
             it('calls QueryCondition.buildQuery with "or" + operator "<>" and value from convention', function () {
                 const query = new GenericQueryBuilder_1.GenericQueryBuilder();

@@ -1,6 +1,7 @@
 import 'jest'
 import * as Sinon from 'sinon'
 import { GenericQueryBuilder } from '../../lib/query-builders/GenericQueryBuilder'
+import { QueryBuilderBase } from '../../lib/query-builders/QueryBuilderBase'
 
 const TestConvention = {
   formatFieldName(name: any) {
@@ -12,6 +13,11 @@ const TestConvention = {
 }
 
 describe('GenericQueryBuilder', function() {
+  it('extends QueryBuilderBase', function() {
+    const query = new GenericQueryBuilder()
+    expect(query).toBeInstanceOf(QueryBuilderBase)
+  })
+
   describe('implements IBasicQuery', function() {
     describe('.getPrimaryKeyName()', function() {
       it('calls and returns convention.formatFieldName("id") by default', function() {
@@ -633,6 +639,7 @@ describe('GenericQueryBuilder', function() {
         // tslint:disable-next-line
         expect(whereSpy.calledWith('a', '=', null)).toBe(true)
         expect(getNullValueForSpy.calledWith('a')).toBe(true)
+        getNullValueForSpy.restore()
       })
 
       it('calls QueryCondition.buildQuery with "and" + operator "=" and value from convention', function() {
@@ -695,6 +702,7 @@ describe('GenericQueryBuilder', function() {
         // tslint:disable-next-line
         expect(orWhereSpy.calledWith('a', '=', null)).toBe(true)
         expect(getNullValueForSpy.calledWith('a')).toBe(true)
+        getNullValueForSpy.restore()
       })
 
       it('calls QueryCondition.buildQuery with "or" + operator "=" and value from convention', function() {
@@ -729,6 +737,7 @@ describe('GenericQueryBuilder', function() {
         // tslint:disable-next-line
         expect(whereSpy.calledWith('a', '<>', null)).toBe(true)
         expect(getNullValueForSpy.calledWith('a')).toBe(true)
+        getNullValueForSpy.restore()
       })
 
       it('calls QueryCondition.buildQuery with "and" + operator "<>" and value from convention', function() {
@@ -791,6 +800,7 @@ describe('GenericQueryBuilder', function() {
         // tslint:disable-next-line
         expect(orWhereSpy.calledWith('a', '<>', null)).toBe(true)
         expect(getNullValueForSpy.calledWith('a')).toBe(true)
+        getNullValueForSpy.restore()
       })
 
       it('calls QueryCondition.buildQuery with "or" + operator "<>" and value from convention', function() {

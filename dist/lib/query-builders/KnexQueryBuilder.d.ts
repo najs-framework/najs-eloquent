@@ -1,12 +1,16 @@
 /// <reference path="interfaces/ISoftDeleteQuery.d.ts" />
 import * as Knex from 'knex';
-export declare class KnexQueryBuilder {
+import { QueryBuilderBase } from './QueryBuilderBase';
+export interface KnexQueryBuilder extends NajsEloquent.QueryBuilder.IBasicQuery, NajsEloquent.QueryBuilder.ISoftDeleteQuery, NajsEloquent.QueryBuilder.IConditionQuery {
+}
+export declare class KnexQueryBuilder extends QueryBuilderBase {
     protected softDelete?: {
         deletedAt: string;
     };
-    protected knex: Knex.Config;
-    constructor(softDelete?: {
+    protected table: string;
+    protected knex: Knex.QueryBuilder;
+    constructor(table: string, primaryKeyName: string, softDelete?: {
         deletedAt: string;
     });
-    select(...fields: Array<string | string[]>): this;
+    orderBy(field: string, direction?: string): this;
 }
