@@ -11,7 +11,7 @@ declare namespace Najs.Contracts.Eloquent {
         /**
          * Create an knex instance
          */
-        createKnex(config?: Config): Knex;
+        create(config?: Config): Knex;
         /**
          * Create an knex instance
          */

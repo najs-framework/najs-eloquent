@@ -13,28 +13,44 @@ export interface KnexQueryBuilder
 export class KnexQueryBuilder extends QueryBuilderBase {
   protected softDelete?: { deletedAt: string }
   protected table: string
-  protected knexQueryBuilder: Knex.QueryBuilder
+  protected knexQueryBuilder: Knex.QueryBuilder | null
 
   constructor(table: string, primaryKeyName: string, softDelete?: { deletedAt: string }) {
     super()
     this.table = table
     this.primaryKeyName = primaryKeyName
     this.softDelete = softDelete
-    this.knexQueryBuilder = KnexProvider.createQueryBuilder(table)
+  }
+
+  getKnexQueryBuilder() {
+    if (!this.knexQueryBuilder) {
+      this.knexQueryBuilder = KnexProvider.createQueryBuilder(this.table)
+    }
+    return this.knexQueryBuilder
   }
 
   orderBy(field: string, direction?: string): this {
     this.isUsed = true
-    this.knexQueryBuilder.orderBy(field, direction)
+    this.getKnexQueryBuilder().orderBy(field, direction)
     return this
   }
 
-  withTrashed() {
-    return this
-  }
+  // withTrashed() {
+  //   return this
+  // }
 
-  onlyTrashed() {
-    return this
+  // onlyTrashed() {
+  //   return this
+  // }
+
+  // -------------------------------------------------------------------------------------------------------------------
+
+  get(): Promise<object[]> {
+    return new Promise(resolve => {
+      // const query = this.knexQueryBuilder.toQuery()
+      // console.log(query)
+      this.getKnexQueryBuilder().then(resolve)
+    })
   }
 }
 
@@ -46,9 +62,9 @@ const methods = [
 
 // implicit forwards method to knex
 for (const name of methods) {
-  KnexQueryBuilder.prototype[name] = function() {
+  KnexQueryBuilder.prototype[name] = function(this: KnexQueryBuilder) {
     this['isUsed'] = true
-    this['knexQueryBuilder'][name](...arguments)
+    this.getKnexQueryBuilder()[name](...arguments)
     return this
   }
 }

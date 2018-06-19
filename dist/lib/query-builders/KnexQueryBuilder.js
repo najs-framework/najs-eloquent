@@ -10,18 +10,31 @@ class KnexQueryBuilder extends QueryBuilderBase_1.QueryBuilderBase {
         this.table = table;
         this.primaryKeyName = primaryKeyName;
         this.softDelete = softDelete;
-        this.knexQueryBuilder = KnexProviderFacade_1.KnexProvider.createQueryBuilder(table);
+    }
+    getKnexQueryBuilder() {
+        if (!this.knexQueryBuilder) {
+            this.knexQueryBuilder = KnexProviderFacade_1.KnexProvider.createQueryBuilder(this.table);
+        }
+        return this.knexQueryBuilder;
     }
     orderBy(field, direction) {
         this.isUsed = true;
-        this.knexQueryBuilder.orderBy(field, direction);
+        this.getKnexQueryBuilder().orderBy(field, direction);
         return this;
     }
-    withTrashed() {
-        return this;
-    }
-    onlyTrashed() {
-        return this;
+    // withTrashed() {
+    //   return this
+    // }
+    // onlyTrashed() {
+    //   return this
+    // }
+    // -------------------------------------------------------------------------------------------------------------------
+    get() {
+        return new Promise(resolve => {
+            // const query = this.knexQueryBuilder.toQuery()
+            // console.log(query)
+            this.getKnexQueryBuilder().then(resolve);
+        });
     }
 }
 exports.KnexQueryBuilder = KnexQueryBuilder;
@@ -34,7 +47,7 @@ const methods = [
 for (const name of methods) {
     KnexQueryBuilder.prototype[name] = function () {
         this['isUsed'] = true;
-        this['knexQueryBuilder'][name](...arguments);
+        this.getKnexQueryBuilder()[name](...arguments);
         return this;
     };
 }

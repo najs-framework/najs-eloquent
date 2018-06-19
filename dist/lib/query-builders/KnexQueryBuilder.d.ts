@@ -8,11 +8,11 @@ export declare class KnexQueryBuilder extends QueryBuilderBase {
         deletedAt: string;
     };
     protected table: string;
-    protected knexQueryBuilder: Knex.QueryBuilder;
+    protected knexQueryBuilder: Knex.QueryBuilder | null;
     constructor(table: string, primaryKeyName: string, softDelete?: {
         deletedAt: string;
     });
+    getKnexQueryBuilder(): Knex.QueryBuilder;
     orderBy(field: string, direction?: string): this;
-    withTrashed(): this;
-    onlyTrashed(): this;
+    get(): Promise<object[]>;
 }

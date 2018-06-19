@@ -10,17 +10,17 @@ class KnexProvider extends najs_facade_1.Facade {
         return constants_1.NajsEloquent.Provider.KnexProvider;
     }
     setDefaultConfig(config) {
-        this.config = config;
+        this.defaultConfig = config;
         return this;
     }
     getDefaultConfig() {
-        return this.config;
+        return this.defaultConfig;
     }
-    createKnex(config) {
-        return Knex(config || this.config);
+    create(config) {
+        return Knex(config || this.defaultConfig);
     }
     createQueryBuilder(table, config) {
-        return this.createKnex(config)(table);
+        return this.create(config)(table);
     }
 }
 exports.KnexProvider = KnexProvider;

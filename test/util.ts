@@ -42,7 +42,7 @@ export function init_knex(database: string): Promise<any> {
 
     const dropDatabaseSql = `DROP DATABASE IF EXISTS ${database}`
     const createDatabaseSql = `CREATE DATABASE ${database} DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_bin`
-    const knex = KnexProviderFacade.createKnex()
+    const knex = KnexProviderFacade.create()
     knex.raw(dropDatabaseSql).then(function(result) {
       knex.raw(createDatabaseSql).then(function(result) {
         connection['database'] = database
@@ -58,7 +58,7 @@ export function init_knex(database: string): Promise<any> {
 
 export function knex_run_sql(sql: string): Promise<any> {
   return new Promise(resolve => {
-    KnexProviderFacade.createKnex()
+    KnexProviderFacade.create()
       .raw(sql)
       .then(resolve)
   })

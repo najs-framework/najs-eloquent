@@ -41,7 +41,7 @@ function init_knex(database) {
         });
         const dropDatabaseSql = `DROP DATABASE IF EXISTS ${database}`;
         const createDatabaseSql = `CREATE DATABASE ${database} DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_bin`;
-        const knex = KnexProviderFacade_1.KnexProviderFacade.createKnex();
+        const knex = KnexProviderFacade_1.KnexProviderFacade.create();
         knex.raw(dropDatabaseSql).then(function (result) {
             knex.raw(createDatabaseSql).then(function (result) {
                 connection['database'] = database;
@@ -57,7 +57,7 @@ function init_knex(database) {
 exports.init_knex = init_knex;
 function knex_run_sql(sql) {
     return new Promise(resolve => {
-        KnexProviderFacade_1.KnexProviderFacade.createKnex()
+        KnexProviderFacade_1.KnexProviderFacade.create()
             .raw(sql)
             .then(resolve);
     });

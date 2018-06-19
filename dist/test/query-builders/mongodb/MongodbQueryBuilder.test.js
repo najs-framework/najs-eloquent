@@ -83,7 +83,6 @@ describe('MongodbQueryBuilder', function () {
         });
     });
     describe('implements IFetchResultQuery', function () {
-        jest.setTimeout(10000);
         const dataset = [
             { first_name: 'john', last_name: 'doe', age: 30 },
             { first_name: 'jane', last_name: 'doe', age: 25 },
