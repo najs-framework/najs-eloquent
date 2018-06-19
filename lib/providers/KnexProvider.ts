@@ -6,7 +6,7 @@ import { Facade } from 'najs-facade'
 import { QueryBuilder, Config } from 'knex'
 import { register } from 'najs-binding'
 
-export class KnexProvider extends Facade implements Najs.Contracts.Eloquent.KnexProvider<QueryBuilder, Config> {
+export class KnexProvider extends Facade implements Najs.Contracts.Eloquent.KnexProvider<Knex, QueryBuilder, Config> {
   protected config: Config
 
   getClassName() {
@@ -23,8 +23,12 @@ export class KnexProvider extends Facade implements Najs.Contracts.Eloquent.Knex
     return this.config
   }
 
-  create(table: string, config?: Config): QueryBuilder {
-    return Knex(config || this.config)(table)
+  createKnex(config?: Config): Knex {
+    return Knex(config || this.config)
+  }
+
+  createQueryBuilder(table: string, config?: Config): QueryBuilder {
+    return this.createKnex(config)(table)
   }
 }
 register(KnexProvider, NajsEloquent.Provider.KnexProvider)

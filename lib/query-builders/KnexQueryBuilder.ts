@@ -13,25 +13,31 @@ export interface KnexQueryBuilder
 export class KnexQueryBuilder extends QueryBuilderBase {
   protected softDelete?: { deletedAt: string }
   protected table: string
-  protected knex: Knex.QueryBuilder
+  protected knexQueryBuilder: Knex.QueryBuilder
 
   constructor(table: string, primaryKeyName: string, softDelete?: { deletedAt: string }) {
     super()
     this.table = table
     this.primaryKeyName = primaryKeyName
     this.softDelete = softDelete
-    this.knex = KnexProvider.create(table)
+    this.knexQueryBuilder = KnexProvider.createQueryBuilder(table)
   }
 
   orderBy(field: string, direction?: string): this {
     this.isUsed = true
-    this.knex.orderBy(field, direction)
+    this.knexQueryBuilder.orderBy(field, direction)
+    return this
+  }
+
+  withTrashed() {
+    return this
+  }
+
+  onlyTrashed() {
     return this
   }
 }
 
-// getPrimaryKeyName orderByAsc orderByDesc
-// withTrashed onlyTrashed
 const methods = [
   // NajsEloquent.QueryBuilder.IBasicQuery
   'select',
@@ -42,7 +48,7 @@ const methods = [
 for (const name of methods) {
   KnexQueryBuilder.prototype[name] = function() {
     this['isUsed'] = true
-    this['knex'][name](...arguments)
+    this['knexQueryBuilder'][name](...arguments)
     return this
   }
 }

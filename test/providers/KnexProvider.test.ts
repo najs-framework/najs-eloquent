@@ -29,12 +29,12 @@ describe('KnexProvider', function() {
     })
   })
 
-  describe('.create()', function() {
+  describe('.createKnex()', function() {
     it('calls knex() with default config, then passes table to the result function', function() {
       const knexProvider = new KnexProvider()
       const config = { client: 'mysql' }
       knexProvider.setDefaultConfig(config)
-      const result = knexProvider.create('table')
+      const result = knexProvider.createKnex(config)('table')
       expect(result['client']['config'] === config).toBe(true)
       expect(result.toQuery()).toEqual('select * from `table`')
     })
@@ -45,7 +45,29 @@ describe('KnexProvider', function() {
       knexProvider.setDefaultConfig(defaultConfig)
 
       const config = { client: 'mysql' }
-      const result = knexProvider.create('table', config)
+      const result = knexProvider.createKnex(config)('table')
+      expect(result['client']['config'] === config).toBe(true)
+      expect(result.toQuery()).toEqual('select * from `table`')
+    })
+  })
+
+  describe('.createQueryBuilder()', function() {
+    it('calls knex() with default config, then passes table to the result function', function() {
+      const knexProvider = new KnexProvider()
+      const config = { client: 'mysql' }
+      knexProvider.setDefaultConfig(config)
+      const result = knexProvider.createQueryBuilder('table')
+      expect(result['client']['config'] === config).toBe(true)
+      expect(result.toQuery()).toEqual('select * from `table`')
+    })
+
+    it('calls knex() with passed config, then passes table to the result function', function() {
+      const knexProvider = new KnexProvider()
+      const defaultConfig = { client: 'mysql' }
+      knexProvider.setDefaultConfig(defaultConfig)
+
+      const config = { client: 'mysql' }
+      const result = knexProvider.createQueryBuilder('table', config)
       expect(result['client']['config'] === config).toBe(true)
       expect(result.toQuery()).toEqual('select * from `table`')
     })
