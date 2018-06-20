@@ -1,11 +1,17 @@
 import 'jest'
 import * as Sinon from 'sinon'
+import * as NajsBinding from 'najs-binding'
 import { init_knex, knex_run_sql } from '../util'
 import { KnexQueryBuilder } from '../../lib/query-builders/KnexQueryBuilder'
 
 describe('KnexQueryBuilder', function() {
   beforeAll(async function() {
     return init_knex('najs_eloquent_knex_query_builder')
+  })
+
+  it('implements Autoload under name "NajsEloquent.QueryBuilder.KnexQueryBuilder"', function() {
+    const query = new KnexQueryBuilder('users', 'id')
+    expect(query.getClassName()).toEqual('NajsEloquent.QueryBuilder.KnexQueryBuilder')
   })
 
   const methods = [
@@ -169,6 +175,17 @@ describe('KnexQueryBuilder', function() {
       //   expect_match_user(result[1], dataset[5])
       //   expect_match_user(result[2], dataset[2])
       // })
+    })
+  })
+
+  describe('.resolveKnexQueryLog()', function() {
+    it('calls make("NajsEloquent.QueryBuilder.KnexQueryLog") to resolve the instance of KnexQueryLog', function() {
+      const makeStub = Sinon.stub(NajsBinding, 'make')
+      makeStub.returns('anything')
+      const query = new KnexQueryBuilder('users', 'id')
+      query.resolveKnexQueryLog()
+      expect(makeStub.calledWith('NajsEloquent.QueryBuilder.KnexQueryLog', [])).toBe(true)
+      makeStub.restore()
     })
   })
 })

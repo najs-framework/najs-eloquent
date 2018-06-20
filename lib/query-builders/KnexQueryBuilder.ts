@@ -1,16 +1,20 @@
 /// <reference path="interfaces/ISoftDeleteQuery.ts" />
 
+import './KnexQueryLog'
 import * as Knex from 'knex'
 import { KnexProvider } from './../facades/global/KnexProviderFacade'
 import { QueryFunctions } from '../constants'
 import { QueryBuilderBase } from './QueryBuilderBase'
+import { KnexQueryLog } from './KnexQueryLog'
+import { NajsEloquent } from '../constants'
+import { make, register } from 'najs-binding'
 
 export interface KnexQueryBuilder
   extends NajsEloquent.QueryBuilder.IBasicQuery,
     NajsEloquent.QueryBuilder.ISoftDeleteQuery,
     NajsEloquent.QueryBuilder.IConditionQuery {}
 
-export class KnexQueryBuilder extends QueryBuilderBase {
+export class KnexQueryBuilder extends QueryBuilderBase implements Najs.Contracts.Autoload {
   protected softDelete?: { deletedAt: string }
   protected table: string
   protected knexQueryBuilder: Knex.QueryBuilder | null
@@ -20,6 +24,10 @@ export class KnexQueryBuilder extends QueryBuilderBase {
     this.table = table
     this.primaryKeyName = primaryKeyName
     this.softDelete = softDelete
+  }
+
+  getClassName() {
+    return NajsEloquent.QueryBuilder.KnexQueryBuilder
   }
 
   getKnexQueryBuilder() {
@@ -47,10 +55,14 @@ export class KnexQueryBuilder extends QueryBuilderBase {
 
   get(): Promise<object[]> {
     return new Promise(resolve => {
-      // const query = this.knexQueryBuilder.toQuery()
-      // console.log(query)
-      this.getKnexQueryBuilder().then(resolve)
+      const queryBuilder = this.getKnexQueryBuilder()
+      this.resolveKnexQueryLog().log(this)
+      queryBuilder.then(resolve)
     })
+  }
+
+  resolveKnexQueryLog(): KnexQueryLog {
+    return make(NajsEloquent.QueryBuilder.KnexQueryLog, [])
   }
 }
 
@@ -68,3 +80,4 @@ for (const name of methods) {
     return this
   }
 }
+register(KnexQueryBuilder, NajsEloquent.QueryBuilder.KnexQueryBuilder)

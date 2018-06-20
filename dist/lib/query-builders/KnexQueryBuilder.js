@@ -1,15 +1,21 @@
 "use strict";
 /// <reference path="interfaces/ISoftDeleteQuery.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
+require("./KnexQueryLog");
 const KnexProviderFacade_1 = require("./../facades/global/KnexProviderFacade");
 const constants_1 = require("../constants");
 const QueryBuilderBase_1 = require("./QueryBuilderBase");
+const constants_2 = require("../constants");
+const najs_binding_1 = require("najs-binding");
 class KnexQueryBuilder extends QueryBuilderBase_1.QueryBuilderBase {
     constructor(table, primaryKeyName, softDelete) {
         super();
         this.table = table;
         this.primaryKeyName = primaryKeyName;
         this.softDelete = softDelete;
+    }
+    getClassName() {
+        return constants_2.NajsEloquent.QueryBuilder.KnexQueryBuilder;
     }
     getKnexQueryBuilder() {
         if (!this.knexQueryBuilder) {
@@ -31,10 +37,13 @@ class KnexQueryBuilder extends QueryBuilderBase_1.QueryBuilderBase {
     // -------------------------------------------------------------------------------------------------------------------
     get() {
         return new Promise(resolve => {
-            // const query = this.knexQueryBuilder.toQuery()
-            // console.log(query)
-            this.getKnexQueryBuilder().then(resolve);
+            const queryBuilder = this.getKnexQueryBuilder();
+            this.resolveKnexQueryLog().log(this);
+            queryBuilder.then(resolve);
         });
+    }
+    resolveKnexQueryLog() {
+        return najs_binding_1.make(constants_2.NajsEloquent.QueryBuilder.KnexQueryLog, []);
     }
 }
 exports.KnexQueryBuilder = KnexQueryBuilder;
@@ -51,3 +60,4 @@ for (const name of methods) {
         return this;
     };
 }
+najs_binding_1.register(KnexQueryBuilder, constants_2.NajsEloquent.QueryBuilder.KnexQueryBuilder);

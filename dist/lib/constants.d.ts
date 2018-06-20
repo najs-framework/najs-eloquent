@@ -28,6 +28,8 @@ export declare const NajsEloquent: {
         MongodbQueryBuilder: string;
         MongodbConditionConverter: string;
         MongodbQueryLog: string;
+        KnexQueryLog: string;
+        KnexQueryBuilder: string;
     };
     Database: {
         Seeder: string;

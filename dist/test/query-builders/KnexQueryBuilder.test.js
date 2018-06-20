@@ -2,11 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const Sinon = require("sinon");
+const NajsBinding = require("najs-binding");
 const util_1 = require("../util");
 const KnexQueryBuilder_1 = require("../../lib/query-builders/KnexQueryBuilder");
 describe('KnexQueryBuilder', function () {
     beforeAll(async function () {
         return util_1.init_knex('najs_eloquent_knex_query_builder');
+    });
+    it('implements Autoload under name "NajsEloquent.QueryBuilder.KnexQueryBuilder"', function () {
+        const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+        expect(query.getClassName()).toEqual('NajsEloquent.QueryBuilder.KnexQueryBuilder');
     });
     const methods = [
         'orderBy',
@@ -158,6 +163,16 @@ describe('KnexQueryBuilder', function () {
             //   expect_match_user(result[1], dataset[5])
             //   expect_match_user(result[2], dataset[2])
             // })
+        });
+    });
+    describe('.resolveKnexQueryLog()', function () {
+        it('calls make("NajsEloquent.QueryBuilder.KnexQueryLog") to resolve the instance of KnexQueryLog', function () {
+            const makeStub = Sinon.stub(NajsBinding, 'make');
+            makeStub.returns('anything');
+            const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+            query.resolveKnexQueryLog();
+            expect(makeStub.calledWith('NajsEloquent.QueryBuilder.KnexQueryLog', [])).toBe(true);
+            makeStub.restore();
         });
     });
 });
