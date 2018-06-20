@@ -4,6 +4,7 @@ require("jest");
 const Sinon = require("sinon");
 const NajsBinding = require("najs-binding");
 const util_1 = require("../util");
+const QueryLogFacade_1 = require("../../lib/facades/global/QueryLogFacade");
 const KnexQueryBuilder_1 = require("../../lib/query-builders/KnexQueryBuilder");
 describe('KnexQueryBuilder', function () {
     beforeAll(async function () {
@@ -90,79 +91,83 @@ describe('KnexQueryBuilder', function () {
           `);
             }
         });
+        beforeEach(function () {
+            QueryLogFacade_1.QueryLog.clear().enable();
+        });
         function expect_match_user(result, expected) {
             for (const name in expected) {
                 expect(result[name]).toEqual(expected[name]);
             }
         }
+        function expect_query_log(query, attribute = 'sql', index = 0) {
+            expect(QueryLogFacade_1.QueryLog.pull()[index]['query'][attribute]).toEqual(query);
+        }
         describe('.get()', function () {
             it('gets all data of collection and return an instance of Collection<Eloquent<T>>', async function () {
                 const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
                 const result = await query.get();
+                expect_query_log('select * from `users`');
                 expect(result.length).toEqual(7);
                 for (let i = 0; i < 7; i++) {
                     expect_match_user(result[i], dataset[i]);
                 }
             });
-            // it('returns an empty collection if no result', async function() {
-            //   const query = new MongodbQueryBuilder('User', collectionUsers)
-            //   const result = await query.where('first_name', 'no-one').get()
-            //   expect_query_log('raw', 'db.users.find({"first_name":"no-one"}).toArray()')
-            //   expect(result.length === 0).toBe(true)
-            // })
-            // it('can get data by query builder, case 1', async function() {
-            //   const query = new MongodbQueryBuilder('User', collectionUsers)
-            //   const result = await query.where('age', 1000).get()
-            //   expect_query_log('raw', 'db.users.find({"age":1000}).toArray()')
-            //   expect(result.length).toEqual(1)
-            //   expect_match_user(result[0], dataset[3])
-            // })
-            // it('can get data by query builder, case 2', async function() {
-            //   const query = new MongodbQueryBuilder('User', collectionUsers)
-            //   const result = await query.where('age', 40).get()
-            //   expect_query_log('raw', 'db.users.find({"age":40}).toArray()')
-            //   expect(result.length).toEqual(2)
-            //   expect_match_user(result[0], dataset[2])
-            //   expect_match_user(result[1], dataset[5])
-            // })
-            // it('can get data by query builder, case 3', async function() {
-            //   const query = new MongodbQueryBuilder('User', collectionUsers)
-            //   const result = await query
-            //     .where('age', 40)
-            //     .where('last_name', 'stark')
-            //     .get()
-            //   expect_query_log('raw', 'db.users.find({"age":40,"last_name":"stark"}).toArray()')
-            //   expect(result.length).toEqual(1)
-            //   expect_match_user(result[0], dataset[2])
-            // })
-            // it('can get data by query builder, case 4', async function() {
-            //   const query = new MongodbQueryBuilder('User', collectionUsers)
-            //   const result = await query
-            //     .where('age', 40)
-            //     .orWhere('first_name', 'peter')
-            //     .get()
-            //   expect_query_log('raw', 'db.users.find({"$or":[{"age":40},{"first_name":"peter"}]}).toArray()')
-            //   expect(result.length).toEqual(3)
-            //   expect_match_user(result[0], dataset[2])
-            //   expect_match_user(result[1], dataset[5])
-            //   expect_match_user(result[2], dataset[6])
-            // })
-            // it('can get data by query builder, case 5', async function() {
-            //   const query = new MongodbQueryBuilder('User', collectionUsers)
-            //   const result = await query
-            //     .where('age', 40)
-            //     .orWhere('first_name', 'peter')
-            //     .orderBy('_id', 'desc')
-            //     .get()
-            //   expect_query_log(
-            //     'raw',
-            //     'db.users.find({"$or":[{"age":40},{"first_name":"peter"}]}, {"sort":[["_id",-1]]}).toArray()'
-            //   )
-            //   expect(result.length).toEqual(3)
-            //   expect_match_user(result[0], dataset[6])
-            //   expect_match_user(result[1], dataset[5])
-            //   expect_match_user(result[2], dataset[2])
-            // })
+            it('returns an empty collection if no result', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query.where('first_name', 'no-one').get();
+                expect_query_log("select * from `users` where `first_name` = 'no-one'");
+                expect(result.length === 0).toBe(true);
+            });
+            it('can get data by query builder, case 1', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query.where('age', 1000).get();
+                expect_query_log('select * from `users` where `age` = 1000');
+                expect(result.length).toEqual(1);
+                expect_match_user(result[0], dataset[3]);
+            });
+            it('can get data by query builder, case 2', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query.where('age', 40).get();
+                expect_query_log('select * from `users` where `age` = 40');
+                expect(result.length).toEqual(2);
+                expect_match_user(result[0], dataset[2]);
+                expect_match_user(result[1], dataset[5]);
+            });
+            it('can get data by query builder, case 3', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query
+                    .where('age', 40)
+                    .where('last_name', 'stark')
+                    .get();
+                expect_query_log("select * from `users` where `age` = 40 and `last_name` = 'stark'");
+                expect(result.length).toEqual(1);
+                expect_match_user(result[0], dataset[2]);
+            });
+            it('can get data by query builder, case 4', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query
+                    .where('age', 40)
+                    .orWhere('first_name', 'peter')
+                    .get();
+                expect_query_log("select * from `users` where `age` = 40 or `first_name` = 'peter'");
+                expect(result.length).toEqual(3);
+                expect_match_user(result[0], dataset[2]);
+                expect_match_user(result[1], dataset[5]);
+                expect_match_user(result[2], dataset[6]);
+            });
+            it('can get data by query builder, case 5', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query
+                    .where('age', 40)
+                    .orWhere('first_name', 'peter')
+                    .orderBy('id', 'desc')
+                    .get();
+                expect_query_log("select * from `users` where `age` = 40 or `first_name` = 'peter' order by `id` desc");
+                expect(result.length).toEqual(3);
+                expect_match_user(result[0], dataset[6]);
+                expect_match_user(result[1], dataset[5]);
+                expect_match_user(result[2], dataset[2]);
+            });
         });
     });
     describe('.resolveKnexQueryLog()', function () {
