@@ -276,6 +276,39 @@ describe('KnexQueryBuilder', function() {
       //   expect_match_user(result, dataset[3])
       // })
     })
+
+    describe('.count()', function() {
+      it('counts all data of collection and returns a Number', async function() {
+        const query = new KnexQueryBuilder('users', 'id')
+        const result = await query.count()
+        expect_query_log('select count(*) from `users`')
+        expect(result).toEqual(7)
+      })
+
+      it('returns 0 if no result', async function() {
+        const query = new KnexQueryBuilder('users', 'id')
+        const result = await query.where('first_name', 'no-one').count()
+        expect_query_log("select count(*) from `users` where `first_name` = 'no-one'")
+        expect(result).toEqual(0)
+      })
+
+      it('overrides select even .select was used', async function() {
+        const query = new KnexQueryBuilder('users', 'id')
+        const result = await query.select('id', 'first_name').count()
+        expect_query_log('select count(*) from `users`')
+        expect(result).toEqual(7)
+      })
+
+      it('can count items by query builder', async function() {
+        const query = new KnexQueryBuilder('users', 'id')
+        const result = await query
+          .where('age', 18)
+          .orWhere('first_name', 'tony')
+          .count()
+        expect_query_log("select count(*) from `users` where `age` = 18 or `first_name` = 'tony'")
+        expect(result).toEqual(2)
+      })
+    })
   })
 
   describe('.resolveKnexQueryLog()', function() {
