@@ -18,5 +18,6 @@ export declare class KnexQueryBuilder extends QueryBuilderBase implements Najs.C
     getKnexQueryBuilder(): Knex.QueryBuilder;
     orderBy(field: string, direction?: string): this;
     get(): Promise<object[]>;
+    first(): Promise<object | null>;
     resolveKnexQueryLog(): KnexQueryLog;
 }

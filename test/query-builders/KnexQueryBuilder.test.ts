@@ -188,6 +188,94 @@ describe('KnexQueryBuilder', function() {
         expect_match_user(result[2], dataset[2])
       })
     })
+
+    describe('.first()', function() {
+      it('finds first document of collection and return an instance of Eloquent<T>', async function() {
+        const query = new KnexQueryBuilder('users', 'id')
+        const result = await query.first()
+        expect_query_log('select * from `users` limit 1')
+        expect_match_user(result, dataset[0])
+      })
+
+      it('finds first document of collection and return an instance of Eloquent<T>', async function() {
+        const query = new KnexQueryBuilder('users', 'id')
+        const result = await query.orderBy('id', 'desc').first()
+        expect_query_log('select * from `users` order by `id` desc limit 1')
+        expect_match_user(result, dataset[6])
+      })
+
+      it('returns null if no result', async function() {
+        const query = new KnexQueryBuilder('users', 'id')
+        const result = await query.where('first_name', 'no-one').first()
+        expect_query_log("select * from `users` where `first_name` = 'no-one' limit 1")
+        expect(result).toBeNull()
+      })
+
+      it('can find data by query builder, case 1', async function() {
+        const query = new KnexQueryBuilder('users', 'id')
+        const result = await query.where('age', 1000).first()
+        expect_query_log('select * from `users` where `age` = 1000 limit 1')
+        expect_match_user(result, dataset[3])
+      })
+
+      it('can find data by query builder, case 2', async function() {
+        const query = new KnexQueryBuilder('users', 'id')
+        const result = await query
+          .where('age', 40)
+          .orWhere('first_name', 'jane')
+          .first()
+        expect_query_log("select * from `users` where `age` = 40 or `first_name` = 'jane' limit 1")
+        expect_match_user(result, dataset[1])
+      })
+
+      it('can find data by query builder, case 3', async function() {
+        const query = new KnexQueryBuilder('users', 'id')
+        const result = await query
+          .where('first_name', 'tony')
+          .where('last_name', 'stewart')
+          .first()
+        expect_query_log("select * from `users` where `first_name` = 'tony' and `last_name` = 'stewart' limit 1")
+        expect_match_user(result, dataset[5])
+      })
+
+      // it('can find data by .native() before using query functions of query builder', async function() {
+      //   const query = new KnexQueryBuilder('users', 'id')
+      //   const result = await query
+      //     .native(function(collection) {
+      //       return collection.findOne({
+      //         first_name: 'tony'
+      //       })
+      //     })
+      //     .execute()
+      //   expect_match_user(result, dataset[2])
+      // })
+
+      // it('can find data by native() after using query functions of query builder', async function() {
+      //   const query = new MongodbQueryBuilder('User', collectionUsers)
+      //   const result = await query
+      //     .where('age', 40)
+      //     .orWhere('age', 1000)
+      //     .native(function(collection, conditions) {
+      //       return collection.findOne(conditions, { sort: [['last_name', -1]] })
+      //     })
+      //     .execute()
+      //   expect_match_user(result, dataset[5])
+      // })
+
+      // it('can find data by native() and modified after using query functions of query builder', async function() {
+      //   const query = new MongodbQueryBuilder('User', collectionUsers)
+      //   const result = await query
+      //     .where('age', 40)
+      //     .orWhere('age', 1000)
+      //     .native(function(collection) {
+      //       return collection.findOne({
+      //         first_name: 'thor'
+      //       })
+      //     })
+      //     .execute()
+      //   expect_match_user(result, dataset[3])
+      // })
+    })
   })
 
   describe('.resolveKnexQueryLog()', function() {
