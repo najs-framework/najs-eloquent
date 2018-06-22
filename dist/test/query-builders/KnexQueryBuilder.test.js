@@ -356,6 +356,67 @@ describe('KnexQueryBuilder', function () {
             //   expect_match_user(updatedResult2, Object.assign({}, dataset[5], { age: 44, updated_at: now }))
             // })
         });
+        describe('.delete()', function () {
+            it('can delete data of collection, returns delete result of mongoose', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query.where('first_name', 'peter').delete();
+                expect_query_log("delete from `users` where `first_name` = 'peter'");
+                expect(result).toEqual(1);
+                const count = await new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id').count();
+                expect(count).toEqual(6);
+            });
+            it('can delete data by query builder, case 1', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query.where('age', 1001).delete();
+                expect_query_log('delete from `users` where `age` = 1001');
+                expect(result).toEqual(1);
+                const count = await new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id').count();
+                expect(count).toEqual(5);
+            });
+            it('can delete data by query builder, case 2: multiple documents', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query
+                    .where('first_name', 'tony')
+                    .orWhere('first_name', 'jane')
+                    .delete();
+                expect_query_log("delete from `users` where `first_name` = 'tony' or `first_name` = 'jane'");
+                expect(result).toEqual(3);
+                const count = await new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id').count();
+                expect(count).toEqual(2);
+            });
+            it('can delete data by query builder, case 3', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query
+                    .where('first_name', 'john')
+                    .where('last_name', 'doe')
+                    .delete();
+                expect_query_log("delete from `users` where `first_name` = 'john' and `last_name` = 'doe'");
+                expect(result).toEqual(1);
+                const count = await new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id').count();
+                expect(count).toEqual(1);
+            });
+            // it('can not call delete without using any .where() statement', async function() {
+            //   const query = new MongodbQueryBuilder('User', collectionUsers)
+            //   const result = await query.delete()
+            //   expect(result).toEqual({ n: 0, ok: 1 })
+            // })
+            // it('can not call delete if query is empty', async function() {
+            //   const query = new MongodbQueryBuilder('User', collectionUsers)
+            //   const result = await query.select('any').delete()
+            //   expect(result).toEqual({ n: 0, ok: 1 })
+            // })
+            // it('can delete by native() function', async function() {
+            //   const query = new MongodbQueryBuilder('User', collectionUsers)
+            //   const result = await query
+            //     .native(function(collection) {
+            //       return collection.remove({})
+            //     })
+            //     .execute()
+            //   expect(result).toEqual({ n: 1, ok: 1 })
+            //   const count = await new MongodbQueryBuilder('User', collectionUsers).count()
+            //   expect(count).toEqual(0)
+            // })
+        });
     });
     describe('.resolveKnexQueryLog()', function () {
         it('calls make("NajsEloquent.QueryBuilder.KnexQueryLog") to resolve the instance of KnexQueryLog', function () {
