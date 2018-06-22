@@ -67,6 +67,14 @@ class KnexQueryBuilder extends QueryBuilderBase_1.QueryBuilderBase {
             });
         });
     }
+    update(data) {
+        return new Promise(resolve => {
+            const queryBuilder = this.getKnexQueryBuilder();
+            queryBuilder.update(data);
+            this.resolveKnexQueryLog().log(this);
+            queryBuilder.then(resolve);
+        });
+    }
     resolveKnexQueryLog() {
         return najs_binding_1.make(constants_2.NajsEloquent.QueryBuilder.KnexQueryLog, []);
     }

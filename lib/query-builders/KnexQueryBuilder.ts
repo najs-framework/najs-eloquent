@@ -89,6 +89,15 @@ export class KnexQueryBuilder extends QueryBuilderBase implements Najs.Contracts
     })
   }
 
+  update(data: Object): Promise<object> {
+    return new Promise(resolve => {
+      const queryBuilder = this.getKnexQueryBuilder()
+      queryBuilder.update(data)
+      this.resolveKnexQueryLog().log(this)
+      queryBuilder.then(resolve)
+    })
+  }
+
   resolveKnexQueryLog(): KnexQueryLog {
     return make(NajsEloquent.QueryBuilder.KnexQueryLog, [])
   }

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const KnexProviderFacade_1 = require("./../../lib/facades/global/KnexProviderFacade");
 require("jest");
 const Sinon = require("sinon");
 const NajsBinding = require("najs-binding");
@@ -276,6 +277,84 @@ describe('KnexQueryBuilder', function () {
                 expect_query_log("select count(*) from `users` where `age` = 18 or `first_name` = 'tony'");
                 expect(result).toEqual(2);
             });
+        });
+        describe('.update()', function () {
+            it('can update data of collection, returns update result of mongoose', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query.where('first_name', 'peter').update({ age: 19 });
+                expect_query_log("update `users` set `age` = 19 where `first_name` = 'peter'");
+                expect(result).toEqual(1);
+                const updatedResult = await new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id').where('first_name', 'peter').first();
+                expect_match_user(updatedResult, Object.assign({}, dataset[6], { age: 19 }));
+            });
+            it('returns empty update result if no row matched', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query.where('first_name', 'no-one').update({ age: 19 });
+                expect_query_log("update `users` set `age` = 19 where `first_name` = 'no-one'");
+                expect(result).toEqual(0);
+            });
+            it('can update data by query builder, case 1', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query.where('age', 1000).update({ age: 1001 });
+                expect_query_log('update `users` set `age` = 1001 where `age` = 1000');
+                expect(result).toEqual(1);
+                const updatedResult = await new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id').where('first_name', 'thor').first();
+                expect_match_user(updatedResult, Object.assign({}, dataset[3], { age: 1001 }));
+            });
+            it('can update data by query builder, case 2: multiple documents', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                query.where('first_name', 'tony').orWhere('first_name', 'jane');
+                const result = await query.update({ age: KnexProviderFacade_1.KnexProvider.create().raw('`age` + 1') });
+                expect_query_log("update `users` set `age` = `age` + 1 where `first_name` = 'tony' or `first_name` = 'jane'");
+                expect(result).toEqual(3);
+                const updatedResults = await new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id')
+                    .where('first_name', 'tony')
+                    .orWhere('first_name', 'jane')
+                    .get();
+                expect_match_user(updatedResults[0], Object.assign({}, dataset[1], { age: 26 }));
+                expect_match_user(updatedResults[1], Object.assign({}, dataset[2], { age: 41 }));
+                expect_match_user(updatedResults[2], Object.assign({}, dataset[5], { age: 41 }));
+            });
+            it('can update data by query builder, case 3', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query
+                    .where('first_name', 'tony')
+                    .where('last_name', 'stewart')
+                    .update({ age: KnexProviderFacade_1.KnexProvider.create().raw('`age` + 1') });
+                expect_query_log("update `users` set `age` = `age` + 1 where `first_name` = 'tony' and `last_name` = 'stewart'");
+                expect(result).toEqual(1);
+                const updatedResult = await new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id')
+                    .where('first_name', 'tony')
+                    .where('last_name', 'stewart')
+                    .first();
+                expect_match_user(updatedResult, Object.assign({}, dataset[5], { age: 42 }));
+            });
+            // it('auto add updatedAt field to $set if timestamps options is on', async function() {
+            //   const now = new Date(1988, 4, 16)
+            //   Moment.now = () => now
+            //   const query = new MongodbQueryBuilder('User', collectionUsers)
+            //   query['timestamps'] = { createdAt: 'created_at', updatedAt: 'updated_at' }
+            //   const result = await query
+            //     .where('first_name', 'tony')
+            //     .where('last_name', 'stewart')
+            //     .update({ $inc: { age: 1 } })
+            //   expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
+            //   const updatedResult = await new MongodbQueryBuilder('User', collectionUsers)
+            //     .where('first_name', 'tony')
+            //     .where('last_name', 'stewart')
+            //     .first()
+            //   expect_match_user(updatedResult, Object.assign({}, dataset[5], { age: 43, updated_at: now }))
+            //   const result2 = await query
+            //     .where('first_name', 'tony')
+            //     .where('last_name', 'stewart')
+            //     .update({ $set: { age: 44 } })
+            //   expect(result2).toEqual({ n: 1, nModified: 1, ok: 1 })
+            //   const updatedResult2 = await new MongodbQueryBuilder('User', collectionUsers)
+            //     .where('first_name', 'tony')
+            //     .where('last_name', 'stewart')
+            //     .first()
+            //   expect_match_user(updatedResult2, Object.assign({}, dataset[5], { age: 44, updated_at: now }))
+            // })
         });
     });
     describe('.resolveKnexQueryLog()', function () {
