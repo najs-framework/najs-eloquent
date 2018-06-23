@@ -18,12 +18,16 @@ export class KnexQueryBuilder extends QueryBuilderBase implements Najs.Contracts
   protected softDelete?: { deletedAt: string }
   protected table: string
   protected knexQueryBuilder: Knex.QueryBuilder | null
+  protected addSoftDeleteCondition: boolean
+  protected addedSoftDeleteCondition: boolean
 
   constructor(table: string, primaryKeyName: string, softDelete?: { deletedAt: string }) {
     super()
     this.table = table
     this.primaryKeyName = primaryKeyName
     this.softDelete = softDelete
+    this.addSoftDeleteCondition = !!softDelete ? true : false
+    this.addedSoftDeleteCondition = false
   }
 
   getClassName() {
@@ -34,6 +38,10 @@ export class KnexQueryBuilder extends QueryBuilderBase implements Najs.Contracts
     if (!this.knexQueryBuilder) {
       this.knexQueryBuilder = KnexProvider.createQueryBuilder(this.table)
     }
+    if (this.softDelete && this.addSoftDeleteCondition && !this.addedSoftDeleteCondition) {
+      this.knexQueryBuilder.whereNull(this.softDelete.deletedAt)
+      this.addedSoftDeleteCondition = true
+    }
     return this.knexQueryBuilder
   }
 
@@ -43,13 +51,24 @@ export class KnexQueryBuilder extends QueryBuilderBase implements Najs.Contracts
     return this
   }
 
-  // withTrashed() {
-  //   return this
-  // }
+  withTrashed() {
+    if (this.softDelete) {
+      this.addSoftDeleteCondition = false
+      this.isUsed = true
+    }
 
-  // onlyTrashed() {
-  //   return this
-  // }
+    return this
+  }
+
+  onlyTrashed() {
+    if (this.softDelete) {
+      this.addSoftDeleteCondition = false
+      this.whereNotNull(this.softDelete.deletedAt)
+      this.isUsed = true
+    }
+
+    return this
+  }
 
   // -------------------------------------------------------------------------------------------------------------------
 
@@ -89,7 +108,7 @@ export class KnexQueryBuilder extends QueryBuilderBase implements Najs.Contracts
     })
   }
 
-  update(data: Object): Promise<object> {
+  update(data: Object): Promise<number> {
     return new Promise(resolve => {
       const queryBuilder = this.getKnexQueryBuilder()
       queryBuilder.update(data)
@@ -98,7 +117,7 @@ export class KnexQueryBuilder extends QueryBuilderBase implements Najs.Contracts
     })
   }
 
-  delete(): Promise<object> {
+  delete(): Promise<number> {
     return new Promise(resolve => {
       const queryBuilder = this.getKnexQueryBuilder()
       queryBuilder.delete()
@@ -106,6 +125,20 @@ export class KnexQueryBuilder extends QueryBuilderBase implements Najs.Contracts
       queryBuilder.then(resolve)
     })
   }
+
+  // restore(): Promise<number> {
+  //   return new Promise(resolve => {
+  //     if (!this.softDelete) {
+  //       resolve(0)
+  //     }
+
+  //     const queryBuilder = this.getKnexQueryBuilder()
+  //     const data = { [this.softDelete!.deletedAt]: this.convention.getNullValueFor(this.softDelete!.deletedAt) }
+  //     queryBuilder.update(data)
+  //     this.resolveKnexQueryLog().log(this)
+  //     queryBuilder.then(resolve)
+  //   })
+  // }
 
   resolveKnexQueryLog(): KnexQueryLog {
     return make(NajsEloquent.QueryBuilder.KnexQueryLog, [])

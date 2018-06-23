@@ -11,16 +11,20 @@ export declare class KnexQueryBuilder extends QueryBuilderBase implements Najs.C
     };
     protected table: string;
     protected knexQueryBuilder: Knex.QueryBuilder | null;
+    protected addSoftDeleteCondition: boolean;
+    protected addedSoftDeleteCondition: boolean;
     constructor(table: string, primaryKeyName: string, softDelete?: {
         deletedAt: string;
     });
     getClassName(): string;
     getKnexQueryBuilder(): Knex.QueryBuilder;
     orderBy(field: string, direction?: string): this;
+    withTrashed(): this;
+    onlyTrashed(): this;
     get(): Promise<object[]>;
     first(): Promise<object | null>;
     count(): Promise<number>;
-    update(data: Object): Promise<object>;
-    delete(): Promise<object>;
+    update(data: Object): Promise<number>;
+    delete(): Promise<number>;
     resolveKnexQueryLog(): KnexQueryLog;
 }

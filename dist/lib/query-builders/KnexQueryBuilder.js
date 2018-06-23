@@ -13,6 +13,8 @@ class KnexQueryBuilder extends QueryBuilderBase_1.QueryBuilderBase {
         this.table = table;
         this.primaryKeyName = primaryKeyName;
         this.softDelete = softDelete;
+        this.addSoftDeleteCondition = !!softDelete ? true : false;
+        this.addedSoftDeleteCondition = false;
     }
     getClassName() {
         return constants_2.NajsEloquent.QueryBuilder.KnexQueryBuilder;
@@ -21,6 +23,10 @@ class KnexQueryBuilder extends QueryBuilderBase_1.QueryBuilderBase {
         if (!this.knexQueryBuilder) {
             this.knexQueryBuilder = KnexProviderFacade_1.KnexProvider.createQueryBuilder(this.table);
         }
+        if (this.softDelete && this.addSoftDeleteCondition && !this.addedSoftDeleteCondition) {
+            this.knexQueryBuilder.whereNull(this.softDelete.deletedAt);
+            this.addedSoftDeleteCondition = true;
+        }
         return this.knexQueryBuilder;
     }
     orderBy(field, direction) {
@@ -28,12 +34,21 @@ class KnexQueryBuilder extends QueryBuilderBase_1.QueryBuilderBase {
         this.getKnexQueryBuilder().orderBy(field, direction);
         return this;
     }
-    // withTrashed() {
-    //   return this
-    // }
-    // onlyTrashed() {
-    //   return this
-    // }
+    withTrashed() {
+        if (this.softDelete) {
+            this.addSoftDeleteCondition = false;
+            this.isUsed = true;
+        }
+        return this;
+    }
+    onlyTrashed() {
+        if (this.softDelete) {
+            this.addSoftDeleteCondition = false;
+            this.whereNotNull(this.softDelete.deletedAt);
+            this.isUsed = true;
+        }
+        return this;
+    }
     // -------------------------------------------------------------------------------------------------------------------
     get() {
         return new Promise(resolve => {
@@ -83,6 +98,18 @@ class KnexQueryBuilder extends QueryBuilderBase_1.QueryBuilderBase {
             queryBuilder.then(resolve);
         });
     }
+    // restore(): Promise<number> {
+    //   return new Promise(resolve => {
+    //     if (!this.softDelete) {
+    //       resolve(0)
+    //     }
+    //     const queryBuilder = this.getKnexQueryBuilder()
+    //     const data = { [this.softDelete!.deletedAt]: this.convention.getNullValueFor(this.softDelete!.deletedAt) }
+    //     queryBuilder.update(data)
+    //     this.resolveKnexQueryLog().log(this)
+    //     queryBuilder.then(resolve)
+    //   })
+    // }
     resolveKnexQueryLog() {
         return najs_binding_1.make(constants_2.NajsEloquent.QueryBuilder.KnexQueryLog, []);
     }

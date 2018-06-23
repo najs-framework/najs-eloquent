@@ -64,6 +64,55 @@ describe('KnexQueryBuilder', function () {
             });
         });
     }
+    describe('.withTrashed()', function () {
+        it('does nothing if there is no softDelete setting', function () {
+            const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+            expect(query['isUsed']).toBe(false);
+            expect(query.withTrashed() === query).toBe(true);
+            expect(query['isUsed']).toBe(false);
+        });
+        it('sets this.addSoftDeleteCondition = false and this.isUsed = false', function () {
+            const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id', { deletedAt: 'deleted_at' });
+            expect(query['isUsed']).toBe(false);
+            expect(query['addSoftDeleteCondition']).toBe(true);
+            expect(query.withTrashed() === query).toBe(true);
+            expect(query['isUsed']).toBe(true);
+            expect(query['addSoftDeleteCondition']).toBe(false);
+        });
+    });
+    describe('.onlyTrashed()', function () {
+        it('does nothing if there is no softDelete setting', function () {
+            const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+            expect(query['isUsed']).toBe(false);
+            expect(query.onlyTrashed() === query).toBe(true);
+            expect(query['isUsed']).toBe(false);
+        });
+        it('sets this.addSoftDeleteCondition = false and this.isUsed = false but it already call this.whereNotNull()', function () {
+            const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id', { deletedAt: 'deleted_at' });
+            expect(query['isUsed']).toBe(false);
+            expect(query['addSoftDeleteCondition']).toBe(true);
+            expect(query.onlyTrashed() === query).toBe(true);
+            expect(query['isUsed']).toBe(true);
+            expect(query['addSoftDeleteCondition']).toBe(false);
+            expect(query['knexQueryBuilder'].toQuery()).toEqual('select * from `users` where `deleted_at` is not null');
+        });
+    });
+    describe('.getKnexQueryBuilder()', function () {
+        it('creates this.knexQueryBuilder if it not found and keep returning that instance', function () {
+            const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+            expect(query['knexQueryBuilder']).toBeUndefined();
+            const result = query.getKnexQueryBuilder();
+            expect(query['knexQueryBuilder']).not.toBeUndefined();
+            expect(result === query.getKnexQueryBuilder()).toBe(true);
+        });
+        it('adds .whereNull() to query builder if the query has soft delete and have not added soft delete condition', function () {
+            const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id', { deletedAt: 'deleted_at' });
+            expect(query.getKnexQueryBuilder().toQuery()).toEqual('select * from `users` where `deleted_at` is null');
+            const newQuery = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id', { deletedAt: 'deleted_at' });
+            newQuery['addedSoftDeleteCondition'] = true;
+            expect(newQuery.getKnexQueryBuilder().toQuery()).toEqual('select * from `users`');
+        });
+    });
     describe('implements IFetchResultQuery', function () {
         const dataset = [
             { first_name: 'john', last_name: 'doe', age: 30 },
@@ -415,6 +464,64 @@ describe('KnexQueryBuilder', function () {
             //   expect(result).toEqual({ n: 1, ok: 1 })
             //   const count = await new MongodbQueryBuilder('User', collectionUsers).count()
             //   expect(count).toEqual(0)
+            // })
+        });
+        describe('.restore()', function () {
+            // it('does nothing if Model do not support SoftDeletes', async function() {
+            //   const query = new KnexQueryBuilder('users', 'id')
+            //   const result = await query.where('first_name', 'peter').restore()
+            //   expect(QueryLog.pull()).toHaveLength(0)
+            //   expect(result).toEqual(0)
+            // })
+            // it('can not call restore if query is empty', async function() {
+            //   const query = new KnexQueryBuilder('users', 'id', {
+            //     deletedAt: 'deleted_at'
+            //   })
+            //   const result = await query.withTrashed().restore()
+            //   expect(QueryLog.pull()).toHaveLength(0)
+            //   expect(result).toEqual(0)
+            // })
+            // it('can restore data by query builder, case 1', async function() {
+            //   const query = new MongodbQueryBuilder('Role', collectionRoles, {
+            //     deletedAt: 'deleted_at',
+            //     overrideMethods: true
+            //   })
+            //   const result = await query
+            //     .onlyTrashed()
+            //     .where('name', 'role-0')
+            //     .restore()
+            //   expect_query_log(
+            //     'raw',
+            //     'db.roles.updateMany({"deleted_at":{"$ne":null},"name":"role-0"}, {"$set":{"deleted_at":null}})'
+            //   )
+            //   expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
+            //   const count = await new MongodbQueryBuilder('Role', collectionRoles, {
+            //     deletedAt: 'deleted_at',
+            //     overrideMethods: true
+            //   }).count()
+            //   expect(count).toEqual(1)
+            // })
+            // it('can restore data by query builder, case 2: multiple documents', async function() {
+            //   const query = new MongodbQueryBuilder('Role', collectionRoles, {
+            //     deletedAt: 'deleted_at',
+            //     overrideMethods: true
+            //   })
+            //   const result = await query
+            //     .withTrashed()
+            //     .where('name', 'role-1')
+            //     .orWhere('name', 'role-2')
+            //     .orWhere('name', 'role-3')
+            //     .restore()
+            //   expect_query_log(
+            //     'raw',
+            //     'db.roles.updateMany({"$or":[{"name":"role-1"},{"name":"role-2"},{"name":"role-3"}]}, {"$set":{"deleted_at":null}})'
+            //   )
+            //   expect(result).toEqual({ n: 3, nModified: 3, ok: 1 })
+            //   const count = await new MongodbQueryBuilder('Role', collectionRoles, {
+            //     deletedAt: 'deleted_at',
+            //     overrideMethods: true
+            //   }).count()
+            //   expect(count).toEqual(4)
             // })
         });
     });

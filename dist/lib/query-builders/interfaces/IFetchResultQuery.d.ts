@@ -18,15 +18,15 @@ declare namespace NajsEloquent.QueryBuilder {
          *
          * @param {Object} data
          */
-        update(data: Object): Promise<object>;
+        update(data: Object): Promise<any>;
         /**
          * Delete all records which match the query.
          */
-        delete(): Promise<object>;
+        delete(): Promise<any>;
         /**
          * Restore all records which match the query.
          */
-        restore(): Promise<object>;
+        restore(): Promise<any>;
         /**
          * Execute query and returns raw result.
          */
