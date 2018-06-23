@@ -4,6 +4,7 @@ import { Facade } from 'najs-facade';
 import { QueryBuilder, Config } from 'knex';
 export declare class KnexProvider extends Facade implements Najs.Contracts.Eloquent.KnexProvider<Knex, QueryBuilder, Config> {
     protected defaultConfig: Config;
+    protected defaultKnex?: Knex;
     getClassName(): string;
     setDefaultConfig(config: Config): this;
     getDefaultConfig(): Config;

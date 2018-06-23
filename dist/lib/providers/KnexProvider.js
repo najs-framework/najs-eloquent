@@ -11,16 +11,23 @@ class KnexProvider extends najs_facade_1.Facade {
     }
     setDefaultConfig(config) {
         this.defaultConfig = config;
+        this.defaultKnex = undefined;
         return this;
     }
     getDefaultConfig() {
         return this.defaultConfig;
     }
     create(config) {
-        return Knex(config || this.defaultConfig);
+        if (!config) {
+            if (!this.defaultKnex) {
+                this.defaultKnex = Knex(this.defaultConfig);
+            }
+            return this.defaultKnex;
+        }
+        return Knex(config);
     }
     createQueryBuilder(table, config) {
-        return this.create(config)(table);
+        return this.create(config).table(table);
     }
 }
 exports.KnexProvider = KnexProvider;
