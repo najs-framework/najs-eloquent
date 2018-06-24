@@ -26,5 +26,6 @@ export declare class KnexQueryBuilder extends QueryBuilderBase implements Najs.C
     count(): Promise<number>;
     update(data: Object): Promise<number>;
     delete(): Promise<number>;
+    restore(): Promise<number>;
     resolveKnexQueryLog(): KnexQueryLog;
 }

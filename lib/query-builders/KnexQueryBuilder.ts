@@ -126,19 +126,19 @@ export class KnexQueryBuilder extends QueryBuilderBase implements Najs.Contracts
     })
   }
 
-  // restore(): Promise<number> {
-  //   return new Promise(resolve => {
-  //     if (!this.softDelete) {
-  //       resolve(0)
-  //     }
+  restore(): Promise<number> {
+    return new Promise(resolve => {
+      if (!this.softDelete) {
+        resolve(0)
+      }
 
-  //     const queryBuilder = this.getKnexQueryBuilder()
-  //     const data = { [this.softDelete!.deletedAt]: this.convention.getNullValueFor(this.softDelete!.deletedAt) }
-  //     queryBuilder.update(data)
-  //     this.resolveKnexQueryLog().log(this)
-  //     queryBuilder.then(resolve)
-  //   })
-  // }
+      const queryBuilder = this.getKnexQueryBuilder()
+      const data = { [this.softDelete!.deletedAt]: this.convention.getNullValueFor(this.softDelete!.deletedAt) }
+      queryBuilder.update(data)
+      this.resolveKnexQueryLog().log(this)
+      queryBuilder.then(resolve)
+    })
+  }
 
   resolveKnexQueryLog(): KnexQueryLog {
     return make(NajsEloquent.QueryBuilder.KnexQueryLog, [])

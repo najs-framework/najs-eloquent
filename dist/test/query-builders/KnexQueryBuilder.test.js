@@ -140,6 +140,20 @@ describe('KnexQueryBuilder', function () {
           ('${item.first_name}', '${item.last_name}', ${item.age})
           `);
             }
+            await util_1.knex_run_sql(`CREATE TABLE roles (
+          id INT NOT NULL AUTO_INCREMENT,
+          name VARCHAR(255),
+          deleted_at DATETIME,
+          PRIMARY KEY (id)
+        )`);
+            for (let i = 0; i < 10; i++) {
+                await util_1.knex_run_sql(`
+          INSERT INTO roles
+          (name, deleted_at)
+          VALUES
+          ('role-${i}', '2018-06-01 00:00:00')
+          `);
+            }
         });
         beforeEach(function () {
             QueryLogFacade_1.QueryLog.clear().enable();
@@ -467,62 +481,36 @@ describe('KnexQueryBuilder', function () {
             // })
         });
         describe('.restore()', function () {
-            // it('does nothing if Model do not support SoftDeletes', async function() {
-            //   const query = new KnexQueryBuilder('users', 'id')
-            //   const result = await query.where('first_name', 'peter').restore()
-            //   expect(QueryLog.pull()).toHaveLength(0)
-            //   expect(result).toEqual(0)
-            // })
-            // it('can not call restore if query is empty', async function() {
-            //   const query = new KnexQueryBuilder('users', 'id', {
-            //     deletedAt: 'deleted_at'
-            //   })
-            //   const result = await query.withTrashed().restore()
-            //   expect(QueryLog.pull()).toHaveLength(0)
-            //   expect(result).toEqual(0)
-            // })
-            // it('can restore data by query builder, case 1', async function() {
-            //   const query = new MongodbQueryBuilder('Role', collectionRoles, {
-            //     deletedAt: 'deleted_at',
-            //     overrideMethods: true
-            //   })
-            //   const result = await query
-            //     .onlyTrashed()
-            //     .where('name', 'role-0')
-            //     .restore()
-            //   expect_query_log(
-            //     'raw',
-            //     'db.roles.updateMany({"deleted_at":{"$ne":null},"name":"role-0"}, {"$set":{"deleted_at":null}})'
-            //   )
-            //   expect(result).toEqual({ n: 1, nModified: 1, ok: 1 })
-            //   const count = await new MongodbQueryBuilder('Role', collectionRoles, {
-            //     deletedAt: 'deleted_at',
-            //     overrideMethods: true
-            //   }).count()
-            //   expect(count).toEqual(1)
-            // })
-            // it('can restore data by query builder, case 2: multiple documents', async function() {
-            //   const query = new MongodbQueryBuilder('Role', collectionRoles, {
-            //     deletedAt: 'deleted_at',
-            //     overrideMethods: true
-            //   })
-            //   const result = await query
-            //     .withTrashed()
-            //     .where('name', 'role-1')
-            //     .orWhere('name', 'role-2')
-            //     .orWhere('name', 'role-3')
-            //     .restore()
-            //   expect_query_log(
-            //     'raw',
-            //     'db.roles.updateMany({"$or":[{"name":"role-1"},{"name":"role-2"},{"name":"role-3"}]}, {"$set":{"deleted_at":null}})'
-            //   )
-            //   expect(result).toEqual({ n: 3, nModified: 3, ok: 1 })
-            //   const count = await new MongodbQueryBuilder('Role', collectionRoles, {
-            //     deletedAt: 'deleted_at',
-            //     overrideMethods: true
-            //   }).count()
-            //   expect(count).toEqual(4)
-            // })
+            it('does nothing if Model do not support SoftDeletes', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query.where('first_name', 'peter').restore();
+                expect(QueryLogFacade_1.QueryLog.pull()).toHaveLength(0);
+                expect(result).toEqual(0);
+            });
+            it('can restore data by query builder, case 1', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('roles', 'id', { deletedAt: 'deleted_at' });
+                const result = await query
+                    .onlyTrashed()
+                    .where('name', 'role-0')
+                    .restore();
+                expect_query_log("update `roles` set `deleted_at` = NULL where `deleted_at` is not null and `name` = 'role-0'");
+                expect(result).toEqual(1);
+                const count = await new KnexQueryBuilder_1.KnexQueryBuilder('roles', 'id', { deletedAt: 'deleted_at' }).count();
+                expect(count).toEqual(1);
+            });
+            it('can restore data by query builder, case 2: multiple documents', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('roles', 'id', { deletedAt: 'deleted_at' });
+                const result = await query
+                    .withTrashed()
+                    .where('name', 'role-1')
+                    .orWhere('name', 'role-2')
+                    .orWhere('name', 'role-3')
+                    .restore();
+                expect_query_log("update `roles` set `deleted_at` = NULL where `name` = 'role-1' or `name` = 'role-2' or `name` = 'role-3'");
+                expect(result).toEqual(3);
+                const count = await new KnexQueryBuilder_1.KnexQueryBuilder('roles', 'id', { deletedAt: 'deleted_at' }).count();
+                expect(count).toEqual(4);
+            });
         });
     });
     describe('.resolveKnexQueryLog()', function () {

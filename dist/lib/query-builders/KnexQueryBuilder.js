@@ -98,18 +98,18 @@ class KnexQueryBuilder extends QueryBuilderBase_1.QueryBuilderBase {
             queryBuilder.then(resolve);
         });
     }
-    // restore(): Promise<number> {
-    //   return new Promise(resolve => {
-    //     if (!this.softDelete) {
-    //       resolve(0)
-    //     }
-    //     const queryBuilder = this.getKnexQueryBuilder()
-    //     const data = { [this.softDelete!.deletedAt]: this.convention.getNullValueFor(this.softDelete!.deletedAt) }
-    //     queryBuilder.update(data)
-    //     this.resolveKnexQueryLog().log(this)
-    //     queryBuilder.then(resolve)
-    //   })
-    // }
+    restore() {
+        return new Promise(resolve => {
+            if (!this.softDelete) {
+                resolve(0);
+            }
+            const queryBuilder = this.getKnexQueryBuilder();
+            const data = { [this.softDelete.deletedAt]: this.convention.getNullValueFor(this.softDelete.deletedAt) };
+            queryBuilder.update(data);
+            this.resolveKnexQueryLog().log(this);
+            queryBuilder.then(resolve);
+        });
+    }
     resolveKnexQueryLog() {
         return najs_binding_1.make(constants_2.NajsEloquent.QueryBuilder.KnexQueryLog, []);
     }
