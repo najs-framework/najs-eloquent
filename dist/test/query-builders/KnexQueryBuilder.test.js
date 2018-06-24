@@ -97,6 +97,17 @@ describe('KnexQueryBuilder', function () {
             expect(query['knexQueryBuilder'].toQuery()).toEqual('select * from `users` where `deleted_at` is not null');
         });
     });
+    describe('.native()', function () {
+        it('calls .getKnexQueryBuilder() and passes the result to handle (the first param)', function () {
+            const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+            const getKnexQueryBuilderSpy = Sinon.spy(query, 'getKnexQueryBuilder');
+            query.native(function (queryBuilder) {
+                queryBuilder.where('test', '<>', 1);
+            });
+            expect(getKnexQueryBuilderSpy.called).toBe(true);
+            expect(query.getKnexQueryBuilder().toQuery()).toEqual('select * from `users` where `test` <> 1');
+        });
+    });
     describe('.getKnexQueryBuilder()', function () {
         it('creates this.knexQueryBuilder if it not found and keep returning that instance', function () {
             const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
@@ -276,41 +287,28 @@ describe('KnexQueryBuilder', function () {
                 expect_query_log("select * from `users` where `first_name` = 'tony' and `last_name` = 'stewart' limit 1");
                 expect_match_user(result, dataset[5]);
             });
-            // it('can find data by .native() before using query functions of query builder', async function() {
-            //   const query = new KnexQueryBuilder('users', 'id')
-            //   const result = await query
-            //     .native(function(collection) {
-            //       return collection.findOne({
-            //         first_name: 'tony'
-            //       })
-            //     })
-            //     .execute()
-            //   expect_match_user(result, dataset[2])
-            // })
-            // it('can find data by native() after using query functions of query builder', async function() {
-            //   const query = new MongodbQueryBuilder('User', collectionUsers)
-            //   const result = await query
-            //     .where('age', 40)
-            //     .orWhere('age', 1000)
-            //     .native(function(collection, conditions) {
-            //       return collection.findOne(conditions, { sort: [['last_name', -1]] })
-            //     })
-            //     .execute()
-            //   expect_match_user(result, dataset[5])
-            // })
-            // it('can find data by native() and modified after using query functions of query builder', async function() {
-            //   const query = new MongodbQueryBuilder('User', collectionUsers)
-            //   const result = await query
-            //     .where('age', 40)
-            //     .orWhere('age', 1000)
-            //     .native(function(collection) {
-            //       return collection.findOne({
-            //         first_name: 'thor'
-            //       })
-            //     })
-            //     .execute()
-            //   expect_match_user(result, dataset[3])
-            // })
+            it('can find data by .native() before using query functions of query builder', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query
+                    .native(function (queryBuilder) {
+                    queryBuilder.where('first_name', 'tony');
+                })
+                    .first();
+                expect_query_log("select * from `users` where `first_name` = 'tony' limit 1");
+                expect_match_user(result, dataset[2]);
+            });
+            it('can find data by native() after using query functions of query builder', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('users', 'id');
+                const result = await query
+                    .where('age', 40)
+                    .orWhere('age', 1000)
+                    .native(function (queryBuilder) {
+                    return queryBuilder.orderBy('last_name', 'desc');
+                })
+                    .first();
+                expect_query_log('select * from `users` where `age` = 40 or `age` = 1000 order by `last_name` desc limit 1');
+                expect_match_user(result, dataset[5]);
+            });
         });
         describe('.count()', function () {
             it('counts all data of collection and returns a Number', async function () {
@@ -510,6 +508,17 @@ describe('KnexQueryBuilder', function () {
                 expect(result).toEqual(3);
                 const count = await new KnexQueryBuilder_1.KnexQueryBuilder('roles', 'id', { deletedAt: 'deleted_at' }).count();
                 expect(count).toEqual(4);
+            });
+        });
+        describe('.execute()', function () {
+            it('simply calls .then() from knex query builder and resolve the result', async function () {
+                const query = new KnexQueryBuilder_1.KnexQueryBuilder('roles', 'id');
+                const result = await query
+                    .native(function (queryBuilder) {
+                    queryBuilder.limit(10).first();
+                })
+                    .execute();
+                expect(result['name']).toEqual('role-0');
             });
         });
     });

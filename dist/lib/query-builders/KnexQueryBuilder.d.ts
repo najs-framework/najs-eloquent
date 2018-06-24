@@ -27,5 +27,7 @@ export declare class KnexQueryBuilder extends QueryBuilderBase implements Najs.C
     update(data: Object): Promise<number>;
     delete(): Promise<number>;
     restore(): Promise<number>;
+    execute(): Promise<any>;
+    native(handler: (queryBuilder: Knex.QueryBuilder) => void): this;
     resolveKnexQueryLog(): KnexQueryLog;
 }

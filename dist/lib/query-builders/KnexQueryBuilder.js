@@ -110,6 +110,15 @@ class KnexQueryBuilder extends QueryBuilderBase_1.QueryBuilderBase {
             queryBuilder.then(resolve);
         });
     }
+    execute() {
+        return new Promise(resolve => {
+            return this.getKnexQueryBuilder().then(resolve);
+        });
+    }
+    native(handler) {
+        handler(this.getKnexQueryBuilder());
+        return this;
+    }
     resolveKnexQueryLog() {
         return najs_binding_1.make(constants_2.NajsEloquent.QueryBuilder.KnexQueryLog, []);
     }
