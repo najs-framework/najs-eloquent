@@ -53,6 +53,7 @@ exports.NajsEloquent = {
     },
     Wrapper: {
         QueryBuilderWrapper: 'NajsEloquent.Wrapper.QueryBuilderWrapper',
+        KnexQueryBuilderWrapper: 'NajsEloquent.Wrapper.KnexQueryBuilderWrapper',
         MongodbQueryBuilderWrapper: 'NajsEloquent.Wrapper.MongodbQueryBuilderWrapper',
         MongooseQueryBuilderWrapper: 'NajsEloquent.Wrapper.MongooseQueryBuilderWrapper'
     },

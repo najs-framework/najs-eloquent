@@ -3,9 +3,9 @@ import './KnexQueryLog';
 import * as Knex from 'knex';
 import { QueryBuilderBase } from './QueryBuilderBase';
 import { KnexQueryLog } from './KnexQueryLog';
-export interface KnexQueryBuilder extends NajsEloquent.QueryBuilder.IBasicQuery, NajsEloquent.QueryBuilder.ISoftDeleteQuery, NajsEloquent.QueryBuilder.IConditionQuery {
+export interface KnexQueryBuilder<T> extends NajsEloquent.QueryBuilder.IBasicQuery, NajsEloquent.QueryBuilder.ISoftDeleteQuery, NajsEloquent.QueryBuilder.IConditionQuery {
 }
-export declare class KnexQueryBuilder extends QueryBuilderBase implements Najs.Contracts.Autoload, NajsEloquent.QueryBuilder.IFetchResultQuery {
+export declare class KnexQueryBuilder<T> extends QueryBuilderBase implements Najs.Contracts.Autoload, NajsEloquent.QueryBuilder.IFetchResultQuery<T> {
     protected softDelete?: {
         deletedAt: string;
     };
@@ -21,8 +21,8 @@ export declare class KnexQueryBuilder extends QueryBuilderBase implements Najs.C
     orderBy(field: string, direction?: string): this;
     withTrashed(): this;
     onlyTrashed(): this;
-    get(): Promise<object[]>;
-    first(): Promise<object | null>;
+    get(): Promise<T[]>;
+    first(): Promise<T | null>;
     count(): Promise<number>;
     update(data: Object): Promise<number>;
     delete(): Promise<number>;

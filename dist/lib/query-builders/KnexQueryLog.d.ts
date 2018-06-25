@@ -6,5 +6,5 @@ export declare class KnexQueryLog implements Najs.Contracts.Autoload {
     name(name: string): this;
     sql(sql: string): this;
     end(): void;
-    log(queryBuilder: KnexQueryBuilder): void;
+    log(queryBuilder: KnexQueryBuilder<any>): void;
 }

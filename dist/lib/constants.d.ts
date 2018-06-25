@@ -50,6 +50,7 @@ export declare const NajsEloquent: {
     };
     Wrapper: {
         QueryBuilderWrapper: string;
+        KnexQueryBuilderWrapper: string;
         MongodbQueryBuilderWrapper: string;
         MongooseQueryBuilderWrapper: string;
     };

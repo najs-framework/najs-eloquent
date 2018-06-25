@@ -9,13 +9,13 @@ import { KnexQueryLog } from './KnexQueryLog'
 import { NajsEloquent } from '../constants'
 import { make, register } from 'najs-binding'
 
-export interface KnexQueryBuilder
+export interface KnexQueryBuilder<T>
   extends NajsEloquent.QueryBuilder.IBasicQuery,
     NajsEloquent.QueryBuilder.ISoftDeleteQuery,
     NajsEloquent.QueryBuilder.IConditionQuery {}
 
-export class KnexQueryBuilder extends QueryBuilderBase
-  implements Najs.Contracts.Autoload, NajsEloquent.QueryBuilder.IFetchResultQuery {
+export class KnexQueryBuilder<T> extends QueryBuilderBase
+  implements Najs.Contracts.Autoload, NajsEloquent.QueryBuilder.IFetchResultQuery<T> {
   protected softDelete?: { deletedAt: string }
   protected table: string
   protected knexQueryBuilder: Knex.QueryBuilder | null
@@ -73,7 +73,7 @@ export class KnexQueryBuilder extends QueryBuilderBase
 
   // -------------------------------------------------------------------------------------------------------------------
 
-  get(): Promise<object[]> {
+  get(): Promise<T[]> {
     return new Promise(resolve => {
       const queryBuilder = this.getKnexQueryBuilder()
       this.resolveKnexQueryLog().log(this)
@@ -81,7 +81,7 @@ export class KnexQueryBuilder extends QueryBuilderBase
     })
   }
 
-  first(): Promise<object | null> {
+  first(): Promise<T | null> {
     return new Promise(resolve => {
       const queryBuilder = this.getKnexQueryBuilder()
       queryBuilder.first()
@@ -166,7 +166,7 @@ const methods = [
 
 // implicit forwards method to knex
 for (const name of methods) {
-  KnexQueryBuilder.prototype[name] = function(this: KnexQueryBuilder) {
+  KnexQueryBuilder.prototype[name] = function(this: KnexQueryBuilder<any>) {
     this['isUsed'] = true
     this.getKnexQueryBuilder()[name](...arguments)
     return this

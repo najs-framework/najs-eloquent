@@ -32,7 +32,7 @@ export class KnexQueryLog implements Najs.Contracts.Autoload {
     QueryLog.push(this.data)
   }
 
-  log(queryBuilder: KnexQueryBuilder) {
+  log(queryBuilder: KnexQueryBuilder<any>) {
     if (queryBuilder['name']) {
       this.name(queryBuilder['name'])
     }
