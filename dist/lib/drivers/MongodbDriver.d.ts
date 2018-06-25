@@ -6,7 +6,6 @@ import { RecordBaseDriver } from './based/RecordDriverBase';
 import { Collection } from 'mongodb';
 export declare class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.Eloquent.Driver<Record> {
     protected collection: Collection;
-    protected eventEmitter?: Najs.Contracts.Event.AsyncEventEmitter;
     getClassName(): string;
     initialize(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: Object): void;
     shouldBeProxied(key: string): boolean;

@@ -1,4 +1,3 @@
-/// <reference types="najs-event" />
 /// <reference path="../contracts/Driver.ts" />
 
 import '../wrappers/MongodbQueryBuilderWrapper'
@@ -13,8 +12,6 @@ import * as Moment from 'moment'
 
 export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.Eloquent.Driver<Record> {
   protected collection: Collection
-
-  protected eventEmitter?: Najs.Contracts.Event.AsyncEventEmitter
 
   getClassName() {
     return NajsEloquent.Driver.MongodbDriver

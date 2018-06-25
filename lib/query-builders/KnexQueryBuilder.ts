@@ -14,7 +14,8 @@ export interface KnexQueryBuilder
     NajsEloquent.QueryBuilder.ISoftDeleteQuery,
     NajsEloquent.QueryBuilder.IConditionQuery {}
 
-export class KnexQueryBuilder extends QueryBuilderBase implements Najs.Contracts.Autoload {
+export class KnexQueryBuilder extends QueryBuilderBase
+  implements Najs.Contracts.Autoload, NajsEloquent.QueryBuilder.IFetchResultQuery {
   protected softDelete?: { deletedAt: string }
   protected table: string
   protected knexQueryBuilder: Knex.QueryBuilder | null

@@ -1,5 +1,4 @@
 "use strict";
-/// <reference types="najs-event" />
 /// <reference path="../contracts/Driver.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 require("../wrappers/MongodbQueryBuilderWrapper");

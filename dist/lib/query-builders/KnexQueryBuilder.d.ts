@@ -5,7 +5,7 @@ import { QueryBuilderBase } from './QueryBuilderBase';
 import { KnexQueryLog } from './KnexQueryLog';
 export interface KnexQueryBuilder extends NajsEloquent.QueryBuilder.IBasicQuery, NajsEloquent.QueryBuilder.ISoftDeleteQuery, NajsEloquent.QueryBuilder.IConditionQuery {
 }
-export declare class KnexQueryBuilder extends QueryBuilderBase implements Najs.Contracts.Autoload {
+export declare class KnexQueryBuilder extends QueryBuilderBase implements Najs.Contracts.Autoload, NajsEloquent.QueryBuilder.IFetchResultQuery {
     protected softDelete?: {
         deletedAt: string;
     };
