@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const KnexProviderFacade_1 = require("./../../lib/facades/global/KnexProviderFacade");
 require("jest");
 const Sinon = require("sinon");
 const NajsBinding = require("najs-binding");
 const util_1 = require("../util");
 const QueryLogFacade_1 = require("../../lib/facades/global/QueryLogFacade");
 const KnexQueryBuilder_1 = require("../../lib/query-builders/KnexQueryBuilder");
+const KnexProviderFacade_1 = require("../../lib/facades/global/KnexProviderFacade");
 describe('KnexQueryBuilder', function () {
     beforeAll(async function () {
         return util_1.init_knex('najs_eloquent_knex_query_builder');

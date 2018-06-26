@@ -15,6 +15,8 @@ export class KnexDriver extends RecordBaseDriver {
     this.tableName = model.getSettingProperty('table', this.formatRecordName())
   }
 
+  initialize(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: Object): void {}
+
   getClassName() {
     return NajsEloquent.Driver.KnexDriver
   }

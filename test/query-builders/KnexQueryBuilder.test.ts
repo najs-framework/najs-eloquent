@@ -1,10 +1,10 @@
-import { KnexProvider } from './../../lib/facades/global/KnexProviderFacade'
 import 'jest'
 import * as Sinon from 'sinon'
 import * as NajsBinding from 'najs-binding'
 import { init_knex, knex_run_sql } from '../util'
 import { QueryLog } from '../../lib/facades/global/QueryLogFacade'
 import { KnexQueryBuilder } from '../../lib/query-builders/KnexQueryBuilder'
+import { KnexProvider } from '../../lib/facades/global/KnexProviderFacade'
 
 describe('KnexQueryBuilder', function() {
   beforeAll(async function() {

@@ -9,6 +9,7 @@ class KnexDriver extends RecordDriverBase_1.RecordBaseDriver {
         this.isNewRecord = true;
         this.tableName = model.getSettingProperty('table', this.formatRecordName());
     }
+    initialize(model, isGuarded, data) { }
     getClassName() {
         return constants_1.NajsEloquent.Driver.KnexDriver;
     }
