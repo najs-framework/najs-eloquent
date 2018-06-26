@@ -6,15 +6,15 @@ const RecordDriverBase_1 = require("./based/RecordDriverBase");
 class KnexDriver extends RecordDriverBase_1.RecordBaseDriver {
     constructor(model) {
         super(model);
-        this.isNewRecord = true;
         this.tableName = model.getSettingProperty('table', this.formatRecordName());
+        this.primaryKeyName = model.getSettingProperty('primaryKey', 'id');
     }
     initialize(model, isGuarded, data) { }
     getClassName() {
         return constants_1.NajsEloquent.Driver.KnexDriver;
     }
     shouldBeProxied(key) {
-        return key !== 'table';
+        return key !== 'table' && key !== 'primaryKey';
     }
     getRecordName() {
         return this.tableName;

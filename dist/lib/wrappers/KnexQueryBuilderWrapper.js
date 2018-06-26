@@ -7,14 +7,12 @@ class KnexQueryBuilderWrapper extends QueryBuilderWrapper_1.QueryBuilderWrapper 
     getClassName() {
         return constants_1.NajsEloquent.Wrapper.KnexQueryBuilderWrapper;
     }
-    /**
-     * Create a mongoose native query
-     * @param handler
-     */
     native(handler) {
-        ;
-        this.queryBuilder.native(handler);
+        this.getKnexQueryBuilder().native(handler);
         return this;
+    }
+    getKnexQueryBuilder() {
+        return this.queryBuilder;
     }
 }
 KnexQueryBuilderWrapper.className = constants_1.NajsEloquent.Wrapper.KnexQueryBuilderWrapper;

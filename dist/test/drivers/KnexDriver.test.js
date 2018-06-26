@@ -35,12 +35,13 @@ describe('KnexDriver', function () {
         expect(driver.getClassName()).toEqual('NajsEloquent.Driver.KnexDriver');
     });
     describe('.shouldBeProxied()', function () {
-        it('returns true if the key is not "table"', function () {
+        it('returns true if the key is not "table" and "primaryKey"', function () {
             const driver = new KnexDriver_1.KnexDriver(modelInstance);
             expect(driver.shouldBeProxied('a')).toBe(true);
             expect(driver.shouldBeProxied('b')).toBe(true);
             expect(driver.shouldBeProxied('test')).toBe(true);
             expect(driver.shouldBeProxied('table')).toBe(false);
+            expect(driver.shouldBeProxied('primaryKey')).toBe(false);
         });
     });
     describe('.getRecordName()', function () {

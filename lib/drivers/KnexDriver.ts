@@ -5,14 +5,13 @@ import { RecordBaseDriver } from './based/RecordDriverBase'
 
 export class KnexDriver extends RecordBaseDriver {
   protected tableName: string
-  protected primaryKeyName?: string
-  protected isNewRecord: boolean
+  protected primaryKeyName: string
 
   constructor(model: NajsEloquent.Model.IModel<any> & NajsEloquent.Model.IModelSetting) {
     super(model)
 
-    this.isNewRecord = true
     this.tableName = model.getSettingProperty('table', this.formatRecordName())
+    this.primaryKeyName = model.getSettingProperty('primaryKey', 'id')
   }
 
   initialize(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: Object): void {}
@@ -22,7 +21,7 @@ export class KnexDriver extends RecordBaseDriver {
   }
 
   shouldBeProxied(key: string): boolean {
-    return key !== 'table'
+    return key !== 'table' && key !== 'primaryKey'
   }
 
   getRecordName(): string {
