@@ -6,28 +6,45 @@ const constants_1 = require("../constants");
 const najs_facade_1 = require("najs-facade");
 const najs_binding_1 = require("najs-binding");
 class KnexProvider extends najs_facade_1.Facade {
+    constructor() {
+        super();
+        this.configurations = {};
+        this.instances = {};
+    }
     getClassName() {
         return constants_1.NajsEloquent.Provider.KnexProvider;
     }
-    setDefaultConfig(config) {
-        this.defaultConfig = config;
-        this.defaultKnex = undefined;
+    setConfig(name, config) {
+        this.configurations[name] = config;
+        this.instances[name] = undefined;
         return this;
     }
+    getConfig(name) {
+        return this.configurations[name];
+    }
+    setDefaultConfig(config) {
+        return this.setConfig('default', config);
+    }
     getDefaultConfig() {
-        return this.defaultConfig;
+        return this.getConfig('default');
     }
-    create(config) {
-        if (!config) {
-            if (!this.defaultKnex) {
-                this.defaultKnex = Knex(this.defaultConfig);
-            }
-            return this.defaultKnex;
+    create(arg1, arg2) {
+        if (typeof arg1 === 'object') {
+            return Knex(arg1);
         }
-        return Knex(config);
+        if (typeof arg1 === 'undefined') {
+            arg1 = 'default';
+        }
+        if (typeof arg2 !== 'undefined') {
+            this.setConfig(arg1, arg2);
+        }
+        if (!this.instances[arg1]) {
+            this.instances[arg1] = Knex(this.configurations[arg1]);
+        }
+        return this.instances[arg1];
     }
-    createQueryBuilder(table, config) {
-        return this.create(config).table(table);
+    createQueryBuilder(table, arg1, arg2) {
+        return this.create(arg1, arg2).table(table);
     }
 }
 exports.KnexProvider = KnexProvider;

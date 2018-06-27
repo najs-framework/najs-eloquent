@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
+const Sinon = require("sinon");
 const najs_facade_1 = require("najs-facade");
 const KnexProvider_1 = require("../../lib/providers/KnexProvider");
 describe('KnexProvider', function () {
@@ -9,22 +10,40 @@ describe('KnexProvider', function () {
         expect(knexProvider).toBeInstanceOf(najs_facade_1.Facade);
         expect(knexProvider.getClassName()).toEqual('NajsEloquent.Provider.KnexProvider');
     });
-    describe('.setDefaultConfig()', function () {
-        it('simply assigns to this.defaultConfig', function () {
+    describe('.setConfig()', function () {
+        it('simply assigns to this.configurations[name]', function () {
             const knexProvider = new KnexProvider_1.KnexProvider();
-            expect(knexProvider.getDefaultConfig()).toBeUndefined();
+            expect(knexProvider.getConfig('test')).toBeUndefined();
             const config = {};
-            knexProvider.setDefaultConfig(config);
-            expect(knexProvider.getDefaultConfig() === config).toBe(true);
+            expect(knexProvider.setConfig('test', config) === knexProvider).toBe(true);
+            expect(knexProvider.getConfig('test') === config).toBe(true);
         });
-        it('clears this.defaultKnex instance', function () {
+        it('clears instance in this.instances[name] instance', function () {
+            const knexProvider = new KnexProvider_1.KnexProvider();
+            knexProvider['instances']['test'] = {};
+            knexProvider.setConfig('test', {});
+            expect(knexProvider['instances']['test']).toBeUndefined();
+        });
+    });
+    describe('.getConfig()', function () {
+        it('simply returns config from this.configurations', function () {
             const knexProvider = new KnexProvider_1.KnexProvider();
             const config = {};
+            knexProvider['configurations']['test'] = config;
+            expect(knexProvider.getConfig('test') === config).toBe(true);
+        });
+    });
+    describe('.setDefaultConfig()', function () {
+        it('calls .setConfig() with name = default', function () {
+            const knexProvider = new KnexProvider_1.KnexProvider();
+            const setConfigStub = Sinon.stub(knexProvider, 'setConfig');
+            const config = {};
             knexProvider.setDefaultConfig(config);
+            expect(setConfigStub.calledWith('default', config)).toBe(true);
         });
     });
     describe('.getDefaultConfig()', function () {
-        it('simply returns to this.defaultConfig', function () {
+        it('calls and returns this.getConfig() with name = default', function () {
             const knexProvider = new KnexProvider_1.KnexProvider();
             expect(knexProvider.getDefaultConfig()).toBeUndefined();
             const config = {};
@@ -33,24 +52,43 @@ describe('KnexProvider', function () {
         });
     });
     describe('.create()', function () {
-        it('calls knex() with this.defaultConfig if the config param is not passed', function () {
+        it('calls knex() with default config and cached the result in this.instances if the config param is not passed', function () {
             const knexProvider = new KnexProvider_1.KnexProvider();
             const config = { client: 'mysql' };
             knexProvider.setDefaultConfig(config);
             const result = knexProvider.create();
+            expect(result === knexProvider['instances']['default']).toBe(true);
+            expect(result['client']['config'] === config).toBe(true);
+            expect(knexProvider.create() === result).toBe(true);
+        });
+        it('calls Knex() and creates instance if the first argument is object, this instance is not cached', function () {
+            const knexProvider = new KnexProvider_1.KnexProvider();
+            const config = { client: 'mysql' };
+            const a = knexProvider.create(config);
+            const b = knexProvider.create(config);
+            expect(a !== b).toBe(true);
+        });
+        it('creates cached instance by config with name', function () {
+            const knexProvider = new KnexProvider_1.KnexProvider();
+            const config = { client: 'mysql' };
+            knexProvider.setConfig('test', config);
+            const result = knexProvider.create('test');
+            expect(result === knexProvider['instances']['test']).toBe(true);
+            expect(knexProvider.create('test') === result).toBe(true);
             expect(result['client']['config'] === config).toBe(true);
         });
-        it('calls knex() with passed config, this case always create new knex instance', function () {
+        it('sets config by name then creates a cached instance at the same time', function () {
             const knexProvider = new KnexProvider_1.KnexProvider();
-            const defaultConfig = { client: 'mysql' };
-            knexProvider.setDefaultConfig(defaultConfig);
             const config = { client: 'mysql' };
-            const result = knexProvider.create(config);
+            const result = knexProvider.create('test', config);
+            expect(config === knexProvider['configurations']['test']).toBe(true);
+            expect(result === knexProvider['instances']['test']).toBe(true);
+            expect(knexProvider.create('test') === result).toBe(true);
             expect(result['client']['config'] === config).toBe(true);
         });
     });
     describe('.createQueryBuilder()', function () {
-        it('calls .create() with default config, then passes table to the result function', function () {
+        it('calls .create() and passes arg1, arg2, then passes table to the result function', function () {
             const knexProvider = new KnexProvider_1.KnexProvider();
             const config = { client: 'mysql' };
             knexProvider.setDefaultConfig(config);

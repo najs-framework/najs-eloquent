@@ -7,36 +7,63 @@ import { QueryBuilder, Config } from 'knex'
 import { register } from 'najs-binding'
 
 export class KnexProvider extends Facade implements Najs.Contracts.Eloquent.KnexProvider<Knex, QueryBuilder, Config> {
-  protected defaultConfig: Config
-  protected defaultKnex?: Knex
+  protected configurations: {
+    [name: string]: Config
+  }
+  protected instances: {
+    [name: string]: Knex | undefined
+  }
+
+  constructor() {
+    super()
+    this.configurations = {}
+    this.instances = {}
+  }
 
   getClassName() {
     return NajsEloquent.Provider.KnexProvider
   }
 
-  setDefaultConfig(config: Config): this {
-    this.defaultConfig = config
-    this.defaultKnex = undefined
+  setConfig(name: string, config: Config): this {
+    this.configurations[name] = config
+    this.instances[name] = undefined
 
     return this
   }
 
+  getConfig(name: string): Config {
+    return this.configurations[name]
+  }
+
+  setDefaultConfig(config: Config): this {
+    return this.setConfig('default', config)
+  }
+
   getDefaultConfig(): Config {
-    return this.defaultConfig
+    return this.getConfig('default')
   }
 
-  create(config?: Config): Knex {
-    if (!config) {
-      if (!this.defaultKnex) {
-        this.defaultKnex = Knex(this.defaultConfig)
-      }
-      return this.defaultKnex
+  create(arg1?: string | Config, arg2?: Config): Knex {
+    if (typeof arg1 === 'object') {
+      return Knex(<object>arg1)
     }
-    return Knex(config!)
+
+    if (typeof arg1 === 'undefined') {
+      arg1 = 'default'
+    }
+
+    if (typeof arg2 !== 'undefined') {
+      this.setConfig(arg1, arg2)
+    }
+
+    if (!this.instances[arg1]) {
+      this.instances[arg1] = Knex(this.configurations[arg1])
+    }
+    return this.instances[arg1]!
   }
 
-  createQueryBuilder(table: string, config?: Config): QueryBuilder {
-    return this.create(config).table(table)
+  createQueryBuilder(table: string, arg1?: Config | string, arg2?: Config): QueryBuilder {
+    return this.create(<any>arg1, <any>arg2).table(table)
   }
 }
 register(KnexProvider, NajsEloquent.Provider.KnexProvider)
