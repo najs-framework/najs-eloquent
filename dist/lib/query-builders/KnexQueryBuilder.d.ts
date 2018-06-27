@@ -10,10 +10,11 @@ export declare class KnexQueryBuilder<T> extends QueryBuilderBase implements Naj
         deletedAt: string;
     };
     protected table: string;
+    protected configName?: string;
     protected knexQueryBuilder: Knex.QueryBuilder | null;
     protected addSoftDeleteCondition: boolean;
     protected addedSoftDeleteCondition: boolean;
-    constructor(table: string, primaryKeyName: string, softDelete?: {
+    constructor(table: string, primaryKeyName: string, configName?: string, softDelete?: {
         deletedAt: string;
     });
     getClassName(): string;

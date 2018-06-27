@@ -8,10 +8,11 @@ const QueryBuilderBase_1 = require("./QueryBuilderBase");
 const constants_2 = require("../constants");
 const najs_binding_1 = require("najs-binding");
 class KnexQueryBuilder extends QueryBuilderBase_1.QueryBuilderBase {
-    constructor(table, primaryKeyName, softDelete) {
+    constructor(table, primaryKeyName, configName, softDelete) {
         super();
         this.table = table;
         this.primaryKeyName = primaryKeyName;
+        this.configName = configName;
         this.softDelete = softDelete;
         this.addSoftDeleteCondition = !!softDelete ? true : false;
         this.addedSoftDeleteCondition = false;
@@ -21,7 +22,7 @@ class KnexQueryBuilder extends QueryBuilderBase_1.QueryBuilderBase {
     }
     getKnexQueryBuilder() {
         if (!this.knexQueryBuilder) {
-            this.knexQueryBuilder = KnexProviderFacade_1.KnexProvider.createQueryBuilder(this.table);
+            this.knexQueryBuilder = KnexProviderFacade_1.KnexProvider.createQueryBuilder(this.table, this.configName);
         }
         if (this.softDelete && this.addSoftDeleteCondition && !this.addedSoftDeleteCondition) {
             this.knexQueryBuilder.whereNull(this.softDelete.deletedAt);

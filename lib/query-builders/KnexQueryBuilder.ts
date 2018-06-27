@@ -18,14 +18,16 @@ export class KnexQueryBuilder<T> extends QueryBuilderBase
   implements Najs.Contracts.Autoload, NajsEloquent.QueryBuilder.IFetchResultQuery<T> {
   protected softDelete?: { deletedAt: string }
   protected table: string
+  protected configName?: string
   protected knexQueryBuilder: Knex.QueryBuilder | null
   protected addSoftDeleteCondition: boolean
   protected addedSoftDeleteCondition: boolean
 
-  constructor(table: string, primaryKeyName: string, softDelete?: { deletedAt: string }) {
+  constructor(table: string, primaryKeyName: string, configName?: string, softDelete?: { deletedAt: string }) {
     super()
     this.table = table
     this.primaryKeyName = primaryKeyName
+    this.configName = configName
     this.softDelete = softDelete
     this.addSoftDeleteCondition = !!softDelete ? true : false
     this.addedSoftDeleteCondition = false
@@ -37,7 +39,7 @@ export class KnexQueryBuilder<T> extends QueryBuilderBase
 
   getKnexQueryBuilder() {
     if (!this.knexQueryBuilder) {
-      this.knexQueryBuilder = KnexProvider.createQueryBuilder(this.table)
+      this.knexQueryBuilder = KnexProvider.createQueryBuilder(this.table, <any>this.configName)
     }
     if (this.softDelete && this.addSoftDeleteCondition && !this.addedSoftDeleteCondition) {
       this.knexQueryBuilder.whereNull(this.softDelete.deletedAt)

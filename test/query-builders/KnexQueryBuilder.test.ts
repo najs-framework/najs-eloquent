@@ -77,7 +77,7 @@ describe('KnexQueryBuilder', function() {
     })
 
     it('sets this.addSoftDeleteCondition = false and this.isUsed = false', function() {
-      const query = new KnexQueryBuilder('users', 'id', { deletedAt: 'deleted_at' })
+      const query = new KnexQueryBuilder('users', 'id', 'default', { deletedAt: 'deleted_at' })
       expect(query['isUsed']).toBe(false)
       expect(query['addSoftDeleteCondition']).toBe(true)
       expect(query.withTrashed() === query).toBe(true)
@@ -95,7 +95,7 @@ describe('KnexQueryBuilder', function() {
     })
 
     it('sets this.addSoftDeleteCondition = false and this.isUsed = false but it already call this.whereNotNull()', function() {
-      const query = new KnexQueryBuilder('users', 'id', { deletedAt: 'deleted_at' })
+      const query = new KnexQueryBuilder('users', 'id', 'default', { deletedAt: 'deleted_at' })
       expect(query['isUsed']).toBe(false)
       expect(query['addSoftDeleteCondition']).toBe(true)
       expect(query.onlyTrashed() === query).toBe(true)
@@ -127,10 +127,10 @@ describe('KnexQueryBuilder', function() {
     })
 
     it('adds .whereNull() to query builder if the query has soft delete and have not added soft delete condition', function() {
-      const query = new KnexQueryBuilder('users', 'id', { deletedAt: 'deleted_at' })
+      const query = new KnexQueryBuilder('users', 'id', 'default', { deletedAt: 'deleted_at' })
       expect(query.getKnexQueryBuilder().toQuery()).toEqual('select * from `users` where `deleted_at` is null')
 
-      const newQuery = new KnexQueryBuilder('users', 'id', { deletedAt: 'deleted_at' })
+      const newQuery = new KnexQueryBuilder('users', 'id', 'default', { deletedAt: 'deleted_at' })
       newQuery['addedSoftDeleteCondition'] = true
       expect(newQuery.getKnexQueryBuilder().toQuery()).toEqual('select * from `users`')
     })
@@ -548,19 +548,19 @@ describe('KnexQueryBuilder', function() {
       })
 
       it('can restore data by query builder, case 1', async function() {
-        const query = new KnexQueryBuilder('roles', 'id', { deletedAt: 'deleted_at' })
+        const query = new KnexQueryBuilder('roles', 'id', 'default', { deletedAt: 'deleted_at' })
         const result = await query
           .onlyTrashed()
           .where('name', 'role-0')
           .restore()
         expect_query_log("update `roles` set `deleted_at` = NULL where `deleted_at` is not null and `name` = 'role-0'")
         expect(result).toEqual(1)
-        const count = await new KnexQueryBuilder('roles', 'id', { deletedAt: 'deleted_at' }).count()
+        const count = await new KnexQueryBuilder('roles', 'id', 'default', { deletedAt: 'deleted_at' }).count()
         expect(count).toEqual(1)
       })
 
       it('can restore data by query builder, case 2: multiple documents', async function() {
-        const query = new KnexQueryBuilder('roles', 'id', { deletedAt: 'deleted_at' })
+        const query = new KnexQueryBuilder('roles', 'id', 'default', { deletedAt: 'deleted_at' })
         const result = await query
           .withTrashed()
           .where('name', 'role-1')
@@ -571,7 +571,7 @@ describe('KnexQueryBuilder', function() {
           "update `roles` set `deleted_at` = NULL where `name` = 'role-1' or `name` = 'role-2' or `name` = 'role-3'"
         )
         expect(result).toEqual(3)
-        const count = await new KnexQueryBuilder('roles', 'id', { deletedAt: 'deleted_at' }).count()
+        const count = await new KnexQueryBuilder('roles', 'id', 'default', { deletedAt: 'deleted_at' }).count()
         expect(count).toEqual(4)
       })
     })
