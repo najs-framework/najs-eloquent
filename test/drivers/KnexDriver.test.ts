@@ -1,10 +1,13 @@
 import 'jest'
+import * as Sinon from 'sinon'
 import { init_knex, knex_run_sql } from '../util'
 import { Eloquent } from '../../lib/model/Eloquent'
 import { register } from 'najs-binding'
 import { KnexDriver } from '../../lib/drivers/KnexDriver'
 import { RecordBaseDriver } from '../../lib/drivers/based/RecordDriverBase'
 import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverProviderFacade'
+import { KnexQueryBuilder } from '../../lib/query-builders/KnexQueryBuilder'
+import { KnexQueryBuilderWrapper } from '../../lib/wrappers/KnexQueryBuilderWrapper'
 
 EloquentDriverProvider.register(KnexDriver, 'knex')
 
@@ -45,6 +48,35 @@ describe('KnexDriver', function() {
     const driver = new KnexDriver(modelInstance)
     expect(driver).toBeInstanceOf(RecordBaseDriver)
     expect(driver.getClassName()).toEqual('NajsEloquent.Driver.KnexDriver')
+  })
+
+  describe('.initialize()', function() {
+    it('calls super.initialize()', function() {
+      const superInitialize = Sinon.spy(RecordBaseDriver.prototype, 'initialize')
+
+      const driver = new KnexDriver(modelInstance)
+      driver.initialize(modelInstance, true)
+      expect(superInitialize.calledWith(modelInstance, true)).toBe(true)
+      superInitialize.restore()
+    })
+  })
+
+  describe('.newQuery()', function() {
+    it('returns MongodbQueryBuilderWrapper which wrap MongodbQueryBuilder', function() {
+      const driver = new KnexDriver(modelInstance)
+      driver.initialize(modelInstance, true)
+      const queryBuilderWrapper = driver.newQuery()
+      expect(queryBuilderWrapper).toBeInstanceOf(KnexQueryBuilderWrapper)
+      expect(queryBuilderWrapper['modelName']).toEqual(driver['modelName'])
+      expect(queryBuilderWrapper['queryBuilder']).toBeInstanceOf(KnexQueryBuilder)
+    })
+
+    it('transfers RelationDataBucket to new query', function() {
+      const driver = new KnexDriver(modelInstance)
+      driver.initialize(modelInstance, true)
+      const queryBuilderWrapper = driver.newQuery(<any>'any')
+      expect(queryBuilderWrapper['relationDataBucket']).toEqual('any')
+    })
   })
 
   describe('.shouldBeProxied()', function() {
