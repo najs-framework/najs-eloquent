@@ -7,6 +7,7 @@ class KnexDriver extends RecordDriverBase_1.RecordBaseDriver {
     constructor(model) {
         super(model);
         this.tableName = model.getSettingProperty('table', this.formatRecordName());
+        this.connectionName = model.getSettingProperty('connection', 'default');
         this.primaryKeyName = model.getSettingProperty('primaryKey', 'id');
     }
     initialize(model, isGuarded, data) { }
@@ -14,7 +15,7 @@ class KnexDriver extends RecordDriverBase_1.RecordBaseDriver {
         return constants_1.NajsEloquent.Driver.KnexDriver;
     }
     shouldBeProxied(key) {
-        return key !== 'table' && key !== 'primaryKey';
+        return key !== 'table' && key !== 'primaryKey' && key !== 'connection';
     }
     getRecordName() {
         return this.tableName;

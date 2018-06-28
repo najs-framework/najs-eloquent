@@ -19,22 +19,7 @@ export class MongodbDriver extends RecordBaseDriver implements Najs.Contracts.El
 
   initialize(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: Object): void {
     this.collection = MongodbProviderFacade.getDatabase().collection(this.formatRecordName())
-
-    if (data instanceof Record) {
-      this.attributes = data
-      return
-    }
-
-    if (typeof data === 'object') {
-      if (isGuarded) {
-        this.attributes = new Record()
-        model.fill(data)
-      } else {
-        this.attributes = new Record(data)
-      }
-    } else {
-      this.attributes = new Record()
-    }
+    super.initialize(model, isGuarded, data)
   }
 
   shouldBeProxied(key: string): boolean {

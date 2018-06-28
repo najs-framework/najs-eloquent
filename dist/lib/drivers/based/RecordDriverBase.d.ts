@@ -6,6 +6,7 @@ export declare class RecordBaseDriver extends DriverBase<Record> {
     protected softDeletesSetting?: NajsEloquent.Model.ISoftDeletesSetting;
     protected timestampsSetting?: NajsEloquent.Model.ITimestampsSetting;
     constructor(model: NajsEloquent.Model.IModel<any> & NajsEloquent.Model.IModelSetting);
+    initialize(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: Object): void;
     shouldBeProxied(key: string): boolean;
     hasAttribute(name: string): boolean;
     getAttribute<T>(name: string): T;

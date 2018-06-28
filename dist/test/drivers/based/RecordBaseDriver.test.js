@@ -67,6 +67,48 @@ describe('RecordBaseDriver', function () {
             expect(driver['softDeletesSetting']).toBeUndefined();
         });
     });
+    describe('.initialize()', function () {
+        const model = {
+            fill() { },
+            getModelName() {
+                return 'Test';
+            },
+            hasSoftDeletes() {
+                return false;
+            },
+            hasTimestamps() {
+                return false;
+            }
+        };
+        it('creates new instance of Record and assigns to this.attributes if data is not found', function () {
+            const driver = new RecordDriverBase_1.RecordBaseDriver(model);
+            driver.initialize(model, true);
+            expect(driver['attributes']).toBeInstanceOf(Record_1.Record);
+        });
+        it('assigns data to this.attributes if data is Record instance', function () {
+            const driver = new RecordDriverBase_1.RecordBaseDriver(model);
+            const record = new Record_1.Record();
+            driver.initialize(model, true, record);
+            expect(driver['attributes'] === record).toBe(true);
+        });
+        it('creates new Record with data if data is object and isGuarded = false', function () {
+            const driver = new RecordDriverBase_1.RecordBaseDriver(model);
+            const data = {};
+            const fillSpy = Sinon.spy(model, 'fill');
+            driver.initialize(model, false, data);
+            expect(driver['attributes']['data'] === data).toBe(true);
+            expect(fillSpy.called).toBe(false);
+            fillSpy.restore();
+        });
+        it('creates new Record and calls model.fill(data) if data is object and isGuarded = true', function () {
+            const driver = new RecordDriverBase_1.RecordBaseDriver(model);
+            const data = {};
+            const fillSpy = Sinon.spy(model, 'fill');
+            driver.initialize(model, true, data);
+            expect(fillSpy.calledWith(data)).toBe(true);
+            fillSpy.restore();
+        });
+    });
     describe('.shouldBeProxied()', function () {
         it('returns true if the key is not "options"', function () {
             const driver = new RecordDriverBase_1.RecordBaseDriver(baseModel);

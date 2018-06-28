@@ -21,6 +21,24 @@ export class RecordBaseDriver extends DriverBase<Record> {
     }
   }
 
+  initialize(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: Object): void {
+    if (data instanceof Record) {
+      this.attributes = data
+      return
+    }
+
+    if (typeof data === 'object') {
+      if (isGuarded) {
+        this.attributes = new Record()
+        model.fill(data)
+      } else {
+        this.attributes = new Record(data)
+      }
+    } else {
+      this.attributes = new Record()
+    }
+  }
+
   shouldBeProxied(key: string): boolean {
     return key !== 'options'
   }

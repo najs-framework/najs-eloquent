@@ -4,7 +4,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("../wrappers/MongodbQueryBuilderWrapper");
 require("../query-builders/mongodb/MongodbQueryBuilder");
 const constants_1 = require("../constants");
-const Record_1 = require("../model/Record");
 const RecordDriverBase_1 = require("./based/RecordDriverBase");
 const MongodbProviderFacade_1 = require("../facades/global/MongodbProviderFacade");
 const najs_binding_1 = require("najs-binding");
@@ -15,22 +14,7 @@ class MongodbDriver extends RecordDriverBase_1.RecordBaseDriver {
     }
     initialize(model, isGuarded, data) {
         this.collection = MongodbProviderFacade_1.MongodbProviderFacade.getDatabase().collection(this.formatRecordName());
-        if (data instanceof Record_1.Record) {
-            this.attributes = data;
-            return;
-        }
-        if (typeof data === 'object') {
-            if (isGuarded) {
-                this.attributes = new Record_1.Record();
-                model.fill(data);
-            }
-            else {
-                this.attributes = new Record_1.Record(data);
-            }
-        }
-        else {
-            this.attributes = new Record_1.Record();
-        }
+        super.initialize(model, isGuarded, data);
     }
     shouldBeProxied(key) {
         return key !== 'options' && key !== 'schema';

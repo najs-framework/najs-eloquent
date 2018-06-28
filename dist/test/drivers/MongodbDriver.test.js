@@ -42,33 +42,12 @@ describe('MongodbDriver', function () {
             expect(driver['collection']).not.toBeUndefined();
             expect(driver['collection'].collectionName).toEqual('users');
         });
-        it('creates new instance of Record and assigns to this.attributes if data is not found', function () {
+        it('calls super.initialize()', function () {
+            const superInitialize = Sinon.spy(RecordDriverBase_1.RecordBaseDriver.prototype, 'initialize');
             const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
             driver.initialize(modelInstance, true);
-            expect(driver['attributes']).toBeInstanceOf(Record_1.Record);
-        });
-        it('assigns data to this.attributes if data is Record instance', function () {
-            const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
-            const record = new Record_1.Record();
-            driver.initialize(modelInstance, true, record);
-            expect(driver['attributes'] === record).toBe(true);
-        });
-        it('creates new Record with data if data is object and isGuarded = false', function () {
-            const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
-            const data = {};
-            const fillSpy = Sinon.spy(modelInstance, 'fill');
-            driver.initialize(modelInstance, false, data);
-            expect(driver['attributes']['data'] === data).toBe(true);
-            expect(fillSpy.called).toBe(false);
-            fillSpy.restore();
-        });
-        it('creates new Record and calls model.fill(data) if data is object and isGuarded = true', function () {
-            const driver = new MongodbDriver_1.MongodbDriver(modelInstance);
-            const data = {};
-            const fillSpy = Sinon.spy(modelInstance, 'fill');
-            driver.initialize(modelInstance, true, data);
-            expect(fillSpy.calledWith(data)).toBe(true);
-            fillSpy.restore();
+            expect(superInitialize.calledWith(modelInstance, true)).toBe(true);
+            superInitialize.restore();
         });
     });
     describe('.shouldBeProxied()', function () {
