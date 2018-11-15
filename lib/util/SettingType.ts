@@ -1,4 +1,4 @@
-/// <reference path="interfaces/ISettingReader.ts" />
+/// <reference path="../definitions/utils/IClassSetting.ts" />
 
 import { array_unique } from './functions'
 

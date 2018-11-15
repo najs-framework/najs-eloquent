@@ -4,6 +4,13 @@
 namespace Najs.Contracts.Eloquent {
   export interface DriverProvider extends Najs.Contracts.Autoload {
     /**
+     * Determine that driver is register or not.
+     *
+     * @param driverClass Driver class
+     */
+    has(driverClass: any): boolean
+
+    /**
      * Create a driver instance
      *
      * @param {Model} model

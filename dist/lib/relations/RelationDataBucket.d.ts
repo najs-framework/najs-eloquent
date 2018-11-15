@@ -1,20 +1,25 @@
-/// <reference path="interfaces/IRelationDataBucket.d.ts" />
-/// <reference path="../../../lib/collect.js/index.d.ts" />
-export declare class RelationDataBucket implements NajsEloquent.Relation.IRelationDataBucket {
-    static className: string;
-    protected modelMap: Object;
-    protected bucket: Object;
-    protected loaded: Object;
+/// <reference path="../definitions/relations/IRelationDataBucket.d.ts" />
+/// <reference path="../../../lib/definitions/collect.js/index.d.ts" />
+import Model = NajsEloquent.Model.IModel;
+import IRelationDataBucket = NajsEloquent.Relation.IRelationDataBucket;
+import IRelationDataBucketMetadata = NajsEloquent.Relation.IRelationDataBucketMetadata;
+import Autoload = Najs.Contracts.Autoload;
+import { DataBuffer } from '../data/DataBuffer';
+export declare class RelationDataBucket implements Autoload, IRelationDataBucket {
+    protected bucket: {
+        [key in string]: {
+            data: DataBuffer<object>;
+            meta: {
+                loaded: string[];
+            };
+        };
+    };
     constructor();
     getClassName(): string;
-    register(name: string, modelName: string): this;
-    newInstance<T>(name: string, record: Object): T;
-    newCollection<T>(name: string, records: Object[]): CollectJs.Collection<T>;
-    makeModelFromRecord(name: string, record: Object): NajsEloquent.Model.IModel<any>;
-    makeCollectionFromRecords(name: string, records: Object[]): CollectJs.Collection<NajsEloquent.Model.IModel<any>>;
-    markRelationLoaded(modelName: string, relationName: string, loaded?: boolean): this;
-    isRelationLoaded(modelName: string, relationName: string): boolean;
-    getAttributes(name: string, attribute: string, allowDuplicated?: boolean): any[];
-    filter(name: string, key: string, value: any, getFirstOnly?: boolean): Object[];
-    convertToStringIfValueIsObjectID(value: any): any;
+    add(model: Model): this;
+    makeModel<M extends Model = Model>(model: M, data: any): M;
+    makeCollection<M extends Model = Model>(model: M, data: any[]): CollectJs.Collection<M>;
+    getDataOf<M extends Model = Model>(model: M): DataBuffer<object>;
+    getMetadataOf(model: Model): IRelationDataBucketMetadata;
+    createKey(model: Model): string;
 }

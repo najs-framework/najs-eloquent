@@ -1,13 +1,20 @@
-/// <reference path="../collect.js/index.d.ts" />
-/// <reference path="../model/interfaces/IModel.ts" />
-/// <reference path="../factory/interfaces/FactoryDefinition.ts" />
+/// <reference path="./FactoryBuilder.ts" />
+/// <reference path="../definitions/collect.js/index.d.ts" />
+/// <reference path="../definitions/model/IModel.ts" />
+/// <reference path="../definitions/factory/IFactoryDefinition.ts" />
+
+import Model = NajsEloquent.Model.IModel
+import ModelDefinition = NajsEloquent.Model.ModelDefinition
+import IFactoryDefinition = NajsEloquent.Factory.IFactoryDefinition
 
 namespace Najs.Contracts.Eloquent {
   export interface FactoryFunction {
-    <T>(className: string | { new (): T }): Najs.Contracts.Eloquent.FactoryBuilder<T>
-    <T>(className: string | { new (): T }, name: string): Najs.Contracts.Eloquent.FactoryBuilder<T>
-    <T>(className: string | { new (): T }, amount: number): Najs.Contracts.Eloquent.FactoryBuilder<T>
-    <T>(className: string | { new (): T }, name: string, amount: number): Najs.Contracts.Eloquent.FactoryBuilder<T>
+    <T extends Model>(className: ModelDefinition<T>): FactoryBuilder<T>
+    <T extends Model>(className: ModelDefinition<T>, name: string): FactoryBuilder<T>
+    <T extends Model>(className: ModelDefinition<T>, amount: number): FactoryBuilder<CollectJs.Collection<T>>
+    <T extends Model>(className: ModelDefinition<T>, name: string, amount: number): FactoryBuilder<
+      CollectJs.Collection<T>
+    >
   }
 
   export interface FactoryManager {
@@ -18,7 +25,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {Function} definition
      * @param {string} name
      */
-    define(className: string | { new (): any }, definition: NajsEloquent.Factory.FactoryDefinition, name?: string): this
+    define<T extends Model>(className: ModelDefinition<T>, definition: IFactoryDefinition, name?: string): this
 
     /**
      * Define a class with a given short-name.
@@ -27,11 +34,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string} name
      * @param {Function} definition
      */
-    defineAs(
-      className: string | { new (): any },
-      name: string,
-      definition: NajsEloquent.Factory.FactoryDefinition
-    ): this
+    defineAs<T extends Model>(className: ModelDefinition<T>, name: string, definition: IFactoryDefinition): this
 
     /**
      * Define a state with a given set of attributes.
@@ -40,7 +43,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string} state
      * @param {Function} definition
      */
-    state(className: string | { new (): any }, state: string, definition: NajsEloquent.Factory.FactoryDefinition): this
+    state<T extends Model>(className: ModelDefinition<T>, state: string, definition: IFactoryDefinition): this
 
     /**
      * Create a builder for the given model.
@@ -48,28 +51,28 @@ namespace Najs.Contracts.Eloquent {
      * @param {string|Function} className
      * @param {string} name
      */
-    of<T>(className: string | { new (): T }, name?: string): FactoryBuilder<T>
+    of<T extends Model>(className: ModelDefinition<T>, name?: string): FactoryBuilder<T>
 
     /**
      * Create an instance of the given model and persist it to the database.
      *
      * @param {string|Function} className
      */
-    create<T>(className: string | { new (): T }): Promise<T>
+    create<T extends Model>(className: ModelDefinition<T>): Promise<T>
     /**
      * Create an instance of the given model and persist it to the database.
      *
      * @param {string|Function} className
      * @param {Object} attributes
      */
-    create<T>(className: string | { new (): T }, attributes: object): Promise<T>
+    create<T extends Model>(className: ModelDefinition<T>, attributes: object): Promise<T>
     /**
      * Create a collection of models and persist them to the database.
      *
      * @param {string|Function} className
      * @param {number} amount
      */
-    create<T>(className: string | { new (): T }, amount: number): Promise<CollectJs.Collection<T>>
+    create<T extends Model>(className: ModelDefinition<T>, amount: number): Promise<CollectJs.Collection<T>>
     /**
      * Create a collection of models and persist them to the database.
      *
@@ -77,7 +80,11 @@ namespace Najs.Contracts.Eloquent {
      * @param {number} amount
      * @param {Object} attributes
      */
-    create<T>(className: string | { new (): T }, amount: number, attributes: object): Promise<CollectJs.Collection<T>>
+    create<T extends Model>(
+      className: ModelDefinition<T>,
+      amount: number,
+      attributes: object
+    ): Promise<CollectJs.Collection<T>>
 
     /**
      * Create an instance of the given model and type and persist it to the database.
@@ -85,7 +92,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string|Function} className
      * @param {string} name
      */
-    createAs<T>(className: string | { new (): T }, name: string): Promise<T>
+    createAs<T extends Model>(className: ModelDefinition<T>, name: string): Promise<T>
     /**
      * Create an instance of the given model and type and persist it to the database.
      *
@@ -93,7 +100,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string} name
      * @param {Object} attributes
      */
-    createAs<T>(className: string | { new (): T }, name: string, attributes: object): Promise<T>
+    createAs<T extends Model>(className: ModelDefinition<T>, name: string, attributes: object): Promise<T>
     /**
      * Create a collection of models and type and persist it to the database.
      *
@@ -101,7 +108,11 @@ namespace Najs.Contracts.Eloquent {
      * @param {string} name
      * @param {number} amount
      */
-    createAs<T>(className: string | { new (): T }, name: string, amount: number): Promise<CollectJs.Collection<T>>
+    createAs<T extends Model>(
+      className: ModelDefinition<T>,
+      name: string,
+      amount: number
+    ): Promise<CollectJs.Collection<T>>
     /**
      * Create a collection of models and type and persist it to the database.
      *
@@ -110,8 +121,8 @@ namespace Najs.Contracts.Eloquent {
      * @param {number} amount
      * @param {Object} attributes
      */
-    createAs<T>(
-      className: string | { new (): T },
+    createAs<T extends Model>(
+      className: ModelDefinition<T>,
       name: string,
       amount: number,
       attributes: object
@@ -122,21 +133,21 @@ namespace Najs.Contracts.Eloquent {
      *
      * @param {string|Function} className
      */
-    make<T>(className: string | { new (): T }): T
+    make<T extends Model>(className: ModelDefinition<T>): T
     /**
      * Create an instance of the given model.
      *
      * @param {string|Function} className
      * @param {Object} attributes
      */
-    make<T>(className: string | { new (): T }, attributes: object): T
+    make<T extends Model>(className: ModelDefinition<T>, attributes: object): T
     /**
      * Create a collection of models.
      *
      * @param {string|Function} className
      * @param {number} amount
      */
-    make<T>(className: string | { new (): T }, amount: number): CollectJs.Collection<T>
+    make<T extends Model>(className: ModelDefinition<T>, amount: number): CollectJs.Collection<T>
     /**
      * Create a collection of models.
      *
@@ -144,7 +155,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {number} amount
      * @param {Object} attributes
      */
-    make<T>(className: string | { new (): T }, amount: number, attributes: object): CollectJs.Collection<T>
+    make<T extends Model>(className: ModelDefinition<T>, amount: number, attributes: object): CollectJs.Collection<T>
 
     /**
      * Create an instance of the given model and type.
@@ -152,7 +163,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string|Function} className
      * @param {string} name
      */
-    makeAs<T>(className: string | { new (): T }, name: string): T
+    makeAs<T extends Model>(className: ModelDefinition<T>, name: string): T
     /**
      * Create an instance of the given model and type.
      *
@@ -160,7 +171,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string} name
      * @param {Object} attributes
      */
-    makeAs<T>(className: string | { new (): T }, name: string, attributes: object): T
+    makeAs<T extends Model>(className: ModelDefinition<T>, name: string, attributes: object): T
     /**
      * Create a collection of models. and type.
      *
@@ -168,7 +179,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string} name
      * @param {number} amount
      */
-    makeAs<T>(className: string | { new (): T }, name: string, amount: number): CollectJs.Collection<T>
+    makeAs<T extends Model>(className: ModelDefinition<T>, name: string, amount: number): CollectJs.Collection<T>
     /**
      * Create a collection of models. and type.
      *
@@ -177,8 +188,8 @@ namespace Najs.Contracts.Eloquent {
      * @param {number} amount
      * @param {Object} attributes
      */
-    makeAs<T>(
-      className: string | { new (): T },
+    makeAs<T extends Model>(
+      className: ModelDefinition<T>,
       name: string,
       amount: number,
       attributes: object
@@ -189,21 +200,21 @@ namespace Najs.Contracts.Eloquent {
      *
      * @param {string|Function} className
      */
-    raw<T>(className: string | { new (): T }): T
+    raw<T extends Model>(className: ModelDefinition<T>): T
     /**
      * Create the raw attribute array for a given model.
      *
      * @param {string|Function} className
      * @param {Object} attributes
      */
-    raw<T>(className: string | { new (): T }, attributes: object): T
+    raw<T extends Model>(className: ModelDefinition<T>, attributes: object): T
     /**
      * Create an array of raw attribute arrays.
      *
      * @param {string|Function} className
      * @param {number} amount
      */
-    raw<T>(className: string | { new (): T }, amount: number): T[]
+    raw<T extends Model>(className: ModelDefinition<T>, amount: number): T[]
     /**
      * Create an array of raw attribute arrays.
      *
@@ -211,7 +222,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {number} amount
      * @param {Object} attributes
      */
-    raw<T>(className: string | { new (): T }, amount: number, attributes: object): T[]
+    raw<T extends Model>(className: ModelDefinition<T>, amount: number, attributes: object): T[]
 
     /**
      * Create the raw attribute array for a given named model.
@@ -219,7 +230,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string|Function} className
      * @param {string} name
      */
-    rawOf<T>(className: string | { new (): T }, name: string): T
+    rawOf<T extends Model>(className: ModelDefinition<T>, name: string): T
     /**
      * Create the raw attribute array for a given named model.
      *
@@ -227,7 +238,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {string} name
      * @param {Object} attributes
      */
-    rawOf<T>(className: string | { new (): T }, name: string, attributes: object): T
+    rawOf<T extends Model>(className: ModelDefinition<T>, name: string, attributes: object): T
     /**
      * Create an array of raw attribute arrays for a given named model.
      *
@@ -236,7 +247,7 @@ namespace Najs.Contracts.Eloquent {
      * @param {number} amount
      * @param {Object} attributes
      */
-    rawOf<T>(className: string | { new (): T }, name: string, amount: number): T[]
+    rawOf<T extends Model>(className: ModelDefinition<T>, name: string, amount: number): T[]
     /**
      * Create an array of raw attribute arrays for a given named model.
      *
@@ -245,6 +256,6 @@ namespace Najs.Contracts.Eloquent {
      * @param {number} amount
      * @param {Object} attributes
      */
-    rawOf<T>(className: string | { new (): T }, name: string, amount: number, attributes: object): T[]
+    rawOf<T extends Model>(className: ModelDefinition<T>, name: string, amount: number, attributes: object): T[]
   }
 }

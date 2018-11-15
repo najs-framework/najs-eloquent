@@ -1,17 +1,16 @@
 /// <reference path="../contracts/FactoryBuilder.ts" />
+/// <reference path="../definitions/collect.js/index.d.ts" />
 
 import { register, make } from 'najs-binding'
 import { range, flatten, isFunction, isPlainObject } from 'lodash'
 import collect from 'collect.js'
 import { ChanceFaker } from './FactoryManager'
-import { Eloquent } from '../model/Eloquent'
-import { NajsEloquent } from '../constants'
-import { Collection } from 'collect.js'
+import { Model } from '../model/Model'
+import { NajsEloquent as NajsEloquentClasses } from '../constants'
+import { make_collection } from '../util/factory'
 
-export interface FactoryBuilder<T extends Eloquent>
-  extends Najs.Contracts.Eloquent.FactoryBuilder<T>,
-    Najs.Contracts.Eloquent.FactoryBuilderCollection<T> {}
-export class FactoryBuilder<T extends Eloquent> {
+export interface FactoryBuilder<T extends Model> extends Najs.Contracts.Eloquent.FactoryBuilder<T> {}
+export class FactoryBuilder<T extends Model> {
   protected className: string
   protected name: string
   protected definitions: Object
@@ -29,7 +28,7 @@ export class FactoryBuilder<T extends Eloquent> {
   }
 
   getClassName() {
-    return NajsEloquent.Factory.FactoryBuilder
+    return NajsEloquentClasses.Factory.FactoryBuilder
   }
 
   times(amount: number): any {
@@ -47,28 +46,26 @@ export class FactoryBuilder<T extends Eloquent> {
   async create(attributes?: Object): Promise<any> {
     const result = this.make(<any>attributes)
 
-    if (result instanceof Eloquent) {
-      await result['save']()
+    if (result instanceof Model) {
+      await result.save()
       return result
     }
 
-    return (result as Collection<T>).each(async (item: Eloquent) => {
-      await item['save']()
+    return (result as CollectJs.Collection<T>).each(async (item: Model) => {
+      await item.save()
     })
   }
 
   make(attributes?: Object): any {
     if (typeof this.amount === 'undefined') {
-      return this.makeInstance(attributes)
+      return this.makeModelInstance(attributes)
     }
 
     if (this.amount < 1) {
-      return make<Eloquent>(this.className, []).newCollection([])
+      return make_collection([])
     }
 
-    return make<Eloquent>(this.className, []).newCollection(
-      range(0, this.amount).map((item: any) => this.getRawAttributes(attributes))
-    )
+    return make_collection(range(0, this.amount), item => this.makeModelInstance(attributes))
   }
 
   raw(attributes?: Object): any {
@@ -83,12 +80,11 @@ export class FactoryBuilder<T extends Eloquent> {
     return collect(range(0, this.amount).map((item: any) => this.getRawAttributes(attributes)))
   }
 
-  protected makeInstance(attributes?: Object): any {
-    // The false value is isGuarded
+  makeModelInstance(attributes?: Object): any {
     return make(this.className, [this.getRawAttributes(attributes), false])
   }
 
-  protected getRawAttributes(attributes?: Object): any {
+  getRawAttributes(attributes?: Object): any {
     if (!this.definitions[this.className] || !isFunction(this.definitions[this.className][this.name])) {
       throw new ReferenceError(`Unable to locate factory with name [${this.name}] [${this.className}].`)
     }
@@ -100,7 +96,7 @@ export class FactoryBuilder<T extends Eloquent> {
     return this.triggerReferenceAttributes(Object.assign(this.applyStates(definition, attributes), attributes))
   }
 
-  protected applyStates(definition: Object, attributes?: Object): Object {
+  applyStates(definition: Object, attributes?: Object): Object {
     if (typeof this.activeStates === 'undefined') {
       return definition
     }
@@ -118,13 +114,13 @@ export class FactoryBuilder<T extends Eloquent> {
     return definition
   }
 
-  protected triggerReferenceAttributes(attributes: Object): Object {
+  triggerReferenceAttributes(attributes: Object): Object {
     for (const name in attributes) {
       if (isFunction(attributes[name])) {
         attributes[name] = attributes[name].call(undefined, attributes)
       }
 
-      if (attributes[name] instanceof Eloquent) {
+      if (attributes[name] instanceof Model) {
         attributes[name] = attributes[name].getPrimaryKey()
       }
 
@@ -135,4 +131,4 @@ export class FactoryBuilder<T extends Eloquent> {
     return attributes
   }
 }
-register(FactoryBuilder, NajsEloquent.Factory.FactoryBuilder)
+register(FactoryBuilder, NajsEloquentClasses.Factory.FactoryBuilder)

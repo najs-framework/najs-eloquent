@@ -1,163 +1,98 @@
-/// <reference types="najs-event" />
 /// <reference types="najs-binding" />
-/// <reference path="../model/interfaces/IModel.ts" />
-/// <reference path="../relations/interfaces/IRelationDataBucket.ts" />
-/// <reference path="../wrappers/interfaces/IQueryBuilderWrapper.ts" />
+/// <reference path="../definitions/model/IModel.ts" />
+/// <reference path="../definitions/features/IEventFeature.ts" />
+/// <reference path="../definitions/features/IQueryFeature.ts" />
+/// <reference path="../definitions/features/ISettingFeature.ts" />
+/// <reference path="../definitions/features/IFillableFeature.ts" />
+/// <reference path="../definitions/features/ISerializationFeature.ts" />
+/// <reference path="../definitions/features/ITimestampsFeature.ts" />
+/// <reference path="../definitions/features/ISoftDeletesFeature.ts" />
+/// <reference path="../definitions/features/IRelationFeature.ts" />
 
 namespace Najs.Contracts.Eloquent {
-  export interface Driver<NativeRecord> extends Najs.Contracts.Autoload {
+  export interface Driver<T = any> extends Najs.Contracts.Autoload {
     /**
-     * Initialize driver for a model.
+     * Get RecordManager instance.
+     */
+    getRecordManager(): NajsEloquent.Feature.IRecordManager<T>
+
+    /**
+     * Get SettingFeature instance.
+     */
+    getSettingFeature(): NajsEloquent.Feature.ISettingFeature
+
+    /**
+     * Get EventFeature instance.
+     */
+    getEventFeature(): NajsEloquent.Feature.IEventFeature
+
+    /**
+     * Get QueryFeature instance.
+     */
+    getQueryFeature(): NajsEloquent.Feature.IQueryFeature
+
+    /**
+     * Get FillableFeature instance.
+     */
+    getFillableFeature(): NajsEloquent.Feature.IFillableFeature
+
+    /**
+     * Get SerializationFeature instance.
+     */
+    getSerializationFeature(): NajsEloquent.Feature.ISerializationFeature
+
+    /**
+     * Get TimestampsFeature instance.
+     */
+    getTimestampsFeature(): NajsEloquent.Feature.ITimestampsFeature
+
+    /**
+     * Get SoftDeletesFeature instance.
+     */
+    getSoftDeletesFeature(): NajsEloquent.Feature.ISoftDeletesFeature
+
+    /**
+     * Get GlobalEventEmitter instance.
+     */
+    getGlobalEventEmitter(): Najs.Contracts.Event.AsyncEventEmitter
+
+    /**
+     * Get RelationFeature instance.
+     */
+    getRelationFeature(): NajsEloquent.Feature.IRelationFeature
+
+    /**
+     * Make new instance of model
      *
-     * @param {Eloquent} model the attached model
+     * @param {Model} model
+     * @param {object} data
      * @param {boolean} isGuarded
-     * @param {Object|NativeRecord} data
      */
-    initialize(model: NajsEloquent.Model.IModel<any>, isGuarded: boolean, data?: NativeRecord | Object): void
+    makeModel<M extends NajsEloquent.Model.IModel>(model: M, data?: T | object | string, isGuarded?: boolean): M
 
     /**
-     * Get the record's name, i.e
-     *  - With MySQL it is a table's name
-     *  - With Mongoose it is a collection's name
+     * Proxy a model instance
+     *
+     * @param {Model} model
      */
-    getRecordName(): string
+    applyProxy<M extends NajsEloquent.Model.IModel>(model: M): M
 
     /**
-     * Get the native record instance.
+     * Determine that the attribute should be proxied or not
+     *
+     * @param {Model} model
+     * @param {string} name
      */
-    getRecord(): NativeRecord
+    shouldBeProxied(model: NajsEloquent.Model.IModel, name: string): boolean
 
     /**
-     * Set the native record instance.
-     */
-    setRecord(record: NativeRecord): void
-
-    /**
-     * Determine that this driver depends on EloquentProxy.
-     */
-    useEloquentProxy(): boolean
-
-    /**
-     * Determine given key should be forward to driver or not.
-     */
-    shouldBeProxied(key: string): boolean
-
-    /**
-     * Perform Eloquent proxy
+     * Perform proxy for model.
      *
      * @param {string} type
-     * @param {Eloquent} target
-     * @param {string} key
+     * @param {Model} model
+     * @param {string} name
      * @param {any} value
      */
-    proxify(type: 'get' | 'set', target: any, key: string, value?: any): any
-
-    /**
-     * Determine given attribute is in the model or not.
-     *
-     * @param name
-     */
-    hasAttribute(name: string): boolean
-
-    /**
-     * Get given attribute value.
-     *
-     * @param {string} name
-     */
-    getAttribute<T>(name: string): T
-
-    /**
-     * Set given attribute with given value.
-     *
-     * @param {string} name
-     * @param {mixed} value
-     */
-    setAttribute<T>(name: string, value: T): boolean
-
-    /**
-     * Get the primary key name.
-     */
-    getPrimaryKeyName(): string
-
-    /**
-     * Get raw object data of the native record.
-     */
-    toObject(): object
-
-    /**
-     * Create and return new query builder.
-     */
-    newQuery<T>(dataBucket?: NajsEloquent.Relation.IRelationDataBucket): NajsEloquent.Wrapper.IQueryBuilderWrapper<T>
-
-    /**
-     * Delete the attached model.
-     *
-     * @param {boolean} softDeletes
-     */
-    delete(softDeletes: boolean): Promise<boolean>
-
-    /**
-     * Restore the attached model
-     */
-    restore(): Promise<boolean>
-
-    /**
-     * Save the attached model
-     */
-    save(): Promise<boolean>
-
-    /**
-     * Mark given attribute is modified.
-     *
-     * @param {string} name
-     */
-    markModified(name: string): void
-
-    /**
-     * Determine the field is modified or not.
-     */
-    isModified(name: string): boolean
-
-    /**
-     * Get modified fields name.
-     */
-    getModified(): string[]
-
-    /**
-     * Determine the model is new or not.
-     */
-    isNew(): boolean
-
-    /**
-     * Determine the model is soft-deleted or not.
-     */
-    isSoftDeleted(): boolean
-
-    /**
-     * Format given attribute name
-     *
-     * @param {string} name
-     */
-    formatAttributeName(name: string): string
-
-    /**
-     * Return the component name which design to attach to Model.
-     */
-    getModelComponentName(): string | undefined
-
-    /**
-     * Sort the given components name to correct order.
-     *
-     * @param {string[]} components
-     */
-    getModelComponentOrder(components: string[]): string[]
-
-    /**
-     * Get EventEmitter instance. If global is true return the global EventEmitter, otherwise returns an local which
-     * created and attached for a model only.
-     *
-     * @param {boolean} global
-     */
-    getEventEmitter(global: boolean): Najs.Contracts.Event.AsyncEventEmitter
+    proxify(type: 'get' | 'set', model: NajsEloquent.Model.IModel, name: string, value?: any): any
   }
 }

@@ -1,20 +1,23 @@
 /// <reference path="../contracts/FactoryManager.ts" />
 /// <reference path="../contracts/FactoryBuilder.ts" />
-/// <reference path="../model/interfaces/IModel.ts" />
+/// <reference path="../definitions/model/IModel.ts" />
+/// <reference path="../definitions/factory/IFactoryDefinition.ts" />
 /// <reference types="chance" />
+
+import ModelDefinition = NajsEloquent.Model.ModelDefinition
+import IFactoryDefinition = NajsEloquent.Factory.IFactoryDefinition
 
 import './FactoryBuilder'
 import { Facade } from 'najs-facade'
 import { register, make, getClassName } from 'najs-binding'
-import { Eloquent } from '../model/Eloquent'
 import { Chance } from 'chance'
-import { NajsEloquent } from '../constants'
+import { NajsEloquent as NajsEloquentClasses } from '../constants'
 
 export type ChanceFaker = Chance.Chance
 
 export interface FactoryManager extends Najs.Contracts.Eloquent.FactoryManager {}
 export class FactoryManager extends Facade implements Najs.Contracts.Eloquent.FactoryManager {
-  static className: string = NajsEloquent.Factory.FactoryManager
+  static className: string = NajsEloquentClasses.Factory.FactoryManager
 
   protected faker: ChanceFaker
   protected definitions: Object
@@ -28,11 +31,11 @@ export class FactoryManager extends Facade implements Najs.Contracts.Eloquent.Fa
   }
 
   getClassName() {
-    return NajsEloquent.Factory.FactoryManager
+    return NajsEloquentClasses.Factory.FactoryManager
   }
 
-  protected addDefinition(bag: string, className: any, name: string, definition: any) {
-    const modelName = this.parseModelName(className)
+  private addDefinition(bag: string, className: any, name: string, definition: any) {
+    const modelName = this.getModelName(className)
     if (!this[bag][modelName]) {
       this[bag][modelName] = {}
     }
@@ -40,37 +43,28 @@ export class FactoryManager extends Facade implements Najs.Contracts.Eloquent.Fa
     return this
   }
 
-  private parseModelName(className: string | { new (): any }): string {
+  protected getModelName(className: ModelDefinition): string {
     if (typeof className === 'function') {
-      Eloquent.register(<any>className)
       return getClassName(className)
     }
     return className
   }
 
-  define(
-    className: string | { new (): any },
-    definition: NajsEloquent.Factory.FactoryDefinition,
-    name: string = 'default'
-  ): this {
+  define(className: ModelDefinition, definition: IFactoryDefinition, name: string = 'default'): this {
     return this.addDefinition('definitions', className, name, definition)
   }
 
-  defineAs(
-    className: string | { new (): any },
-    name: string,
-    definition: NajsEloquent.Factory.FactoryDefinition
-  ): this {
+  defineAs(className: ModelDefinition, name: string, definition: IFactoryDefinition): this {
     return this.define(className, definition, name)
   }
 
-  state(className: string | { new (): any }, state: string, definition: NajsEloquent.Factory.FactoryDefinition): this {
+  state(className: ModelDefinition, state: string, definition: IFactoryDefinition): this {
     return this.addDefinition('states', className, state, definition)
   }
 
-  of(className: string | { new (): any }, name: string = 'default'): Najs.Contracts.Eloquent.FactoryBuilder<any> {
-    return make<Najs.Contracts.Eloquent.FactoryBuilder<any>>(NajsEloquent.Factory.FactoryBuilder, [
-      this.parseModelName(className),
+  of(className: ModelDefinition, name: string = 'default'): Najs.Contracts.Eloquent.FactoryBuilder<any> {
+    return make<Najs.Contracts.Eloquent.FactoryBuilder<any>>(NajsEloquentClasses.Factory.FactoryBuilder, [
+      this.getModelName(className),
       name,
       this.definitions,
       this.states,
@@ -100,4 +94,4 @@ for (const name in funcs) {
   }
 }
 
-register(FactoryManager, NajsEloquent.Factory.FactoryManager)
+register(FactoryManager, NajsEloquentClasses.Factory.FactoryManager)

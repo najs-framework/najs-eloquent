@@ -1,62 +1,69 @@
 export declare const NajsEloquent: {
     Driver: {
-        Component: {
-            StaticQuery: string;
-        };
-        DummyDriver: string;
-        MongooseDriver: string;
+        MemoryDriver: string;
         MongodbDriver: string;
-        KnexDriver: string;
-    };
-    Model: {
-        Component: {
-            ModelAttribute: string;
-            DynamicAttribute: string;
-            ModelSetting: string;
-            ModelFillable: string;
-            ModelQuery: string;
-            ModelTimestamps: string;
-            ModelSerialization: string;
-            ModelSoftDeletes: string;
-            ModelActiveRecord: string;
-            ModelEvent: string;
-            ModelRelation: string;
+        MongooseDriver: string;
+        Memory: {
+            MemoryDataSource: string;
+            MemoryQueryBuilderFactory: string;
+            MemoryExecutorFactory: string;
+            RecordFilter: string;
+            RecordConditionMatcherFactory: string;
         };
-    };
-    QueryBuilder: {
-        MongooseQueryBuilder: string;
-        MongodbQueryBuilder: string;
-        MongodbConditionConverter: string;
-        MongodbQueryLog: string;
-        KnexQueryLog: string;
-        KnexQueryBuilder: string;
-    };
-    Database: {
-        Seeder: string;
+        Mongodb: {
+            MongodbExecutorFactory: string;
+            MongodbQueryBuilderFactory: string;
+            MongodbConditionMatcherFactory: string;
+        };
+        Mongoose: {
+            MongooseDocumentManager: string;
+            MongooseQueryBuilderFactory: string;
+            MongooseExecutorFactory: string;
+        };
+        Knex: {
+            KnexWrapper: string;
+        };
     };
     Factory: {
         FactoryManager: string;
         FactoryBuilder: string;
     };
+    Feature: {
+        RecordManager: string;
+        SettingFeature: string;
+        EventFeature: string;
+        FillableFeature: string;
+        SerializationFeature: string;
+        QueryFeature: string;
+        TimestampsFeature: string;
+        SoftDeletesFeature: string;
+        RelationFeature: string;
+    };
+    Provider: {
+        DriverProvider: string;
+        MemoryDataSourceProvider: string;
+        MomentProvider: string;
+        MongodbProvider: string;
+        MongooseProvider: string;
+        KnexProvider: string;
+    };
+    QueryBuilder: {
+        MongodbConditionConverter: string;
+    };
     QueryLog: {
         FlipFlopQueryLog: string;
     };
-    Provider: {
-        ComponentProvider: string;
-        DriverProvider: string;
-        KnexProvider: string;
-        MongodbProvider: string;
-        MongooseProvider: string;
-    };
-    Wrapper: {
-        QueryBuilderWrapper: string;
-        KnexQueryBuilderWrapper: string;
-        MongodbQueryBuilderWrapper: string;
-        MongooseQueryBuilderWrapper: string;
-    };
     Relation: {
+        Relationship: {
+            HasOne: string;
+            BelongsTo: string;
+            HasMany: string;
+            BelongsToMany: string;
+            MorphOne: string;
+            MorphMany: string;
+            MorphTo: string;
+        };
         RelationDataBucket: string;
-        HasOneOrMany: string;
     };
 };
 export declare const QueryFunctions: {

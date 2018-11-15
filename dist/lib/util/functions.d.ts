@@ -20,3 +20,4 @@ export declare type DotNotationInfo = {
     parts: string[];
 };
 export declare function parse_string_with_dot_notation(input: string): DotNotationInfo;
+export declare function override_setting_property_of_model(model: object, property: string, values: string[]): void;

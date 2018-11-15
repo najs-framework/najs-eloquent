@@ -1,20 +1,21 @@
 import 'jest'
 import * as Sinon from 'sinon'
 import * as NajsBinding from 'najs-binding'
+import * as Utils from '../../lib/util/factory'
 import collect from 'collect.js'
 import { FactoryBuilder } from '../../lib/factory/FactoryBuilder'
-import { DummyDriver } from '../../lib/drivers/DummyDriver'
-import { EloquentDriverProvider } from '../../lib/facades/global/EloquentDriverProviderFacade'
-import { Eloquent } from '../../lib/model/Eloquent'
+import { MemoryDriver } from '../../lib/drivers/memory/MemoryDriver'
+import { DriverProvider } from '../../lib/facades/global/DriverProviderFacade'
+import { Model } from '../../lib/model/Model'
 
-EloquentDriverProvider.register(DummyDriver, 'dummy', true)
+DriverProvider.register(MemoryDriver, 'memory', true)
 
-class Model extends Eloquent {
+class TestModel extends Model {
   getClassName() {
-    return 'Model'
+    return 'TestModel'
   }
 }
-NajsBinding.register(Model)
+NajsBinding.register(TestModel)
 
 describe('FactoryBuilder', function() {
   describe('constructor()', function() {
@@ -34,7 +35,7 @@ describe('FactoryBuilder', function() {
   })
 
   describe('.getClassName()', function() {
-    it('implements Autoload and returns class name NajsEloquent.Factory.FactoryBuilder', function() {
+    it('implements Autoload under name "NajsEloquent.Factory.FactoryBuilder"', function() {
       const faker = {}
       const definitions = {}
       const states = {}
@@ -92,7 +93,7 @@ describe('FactoryBuilder', function() {
     it('calls .make() and if the result is instance of Eloquent, it calls .save() and returns result', async function() {
       const builder = new FactoryBuilder('Class', 'name', {}, {}, <any>{})
       const makeStub = Sinon.stub(builder, 'make')
-      const model = new Model()
+      const model = new TestModel()
       model['save'] = Sinon.spy(function() {})
 
       makeStub.returns(model)
@@ -113,7 +114,7 @@ describe('FactoryBuilder', function() {
     it('calls .make() and loop all model in Collection, calls .save() and returns result', async function() {
       const builder = new FactoryBuilder('Class', 'name', {}, {}, <any>{})
       const makeStub = Sinon.stub(builder, 'make')
-      const model = new Model()
+      const model = new TestModel()
       model['save'] = Sinon.spy(function() {})
 
       makeStub.returns(collect([model, model]))
@@ -133,22 +134,22 @@ describe('FactoryBuilder', function() {
   })
 
   describe('.make()', function() {
-    it('simply calls .makeInstance() and returns result if there is no "amount"', function() {
+    it('simply calls .makeModelInstance() and returns result if there is no "amount"', function() {
       const builder = new FactoryBuilder('Class', 'name', {}, {}, <any>{})
-      const makeInstanceStub = Sinon.stub(builder, <any>'makeInstance')
-      makeInstanceStub.returns('anything')
+      const makeModelInstanceStub = Sinon.stub(builder, 'makeModelInstance')
+      makeModelInstanceStub.returns('anything')
 
       expect(builder.make()).toEqual('anything')
-      expect(makeInstanceStub.calledWith()).toBe(true)
+      expect(makeModelInstanceStub.calledWith()).toBe(true)
 
       const params = {}
       expect(builder.make(params)).toEqual('anything')
-      expect(makeInstanceStub.calledWith(params)).toBe(true)
+      expect(makeModelInstanceStub.calledWith(params)).toBe(true)
     })
 
-    it('calls .make().newCollection() with empty array if "amount" < 1', function() {
-      const builder = new FactoryBuilder('Model', 'name', {}, {}, <any>{})
-      const newCollectionSpy = Sinon.spy(Model.prototype, 'newCollection')
+    it('calls make_collection() with empty array if "amount" < 1', function() {
+      const builder = new FactoryBuilder('TestModel', 'name', {}, {}, <any>{})
+      const makeCollectionSpy = Sinon.spy(Utils, 'make_collection')
 
       expect(
         builder
@@ -156,27 +157,31 @@ describe('FactoryBuilder', function() {
           .make()
           .count()
       ).toEqual(0)
-      expect(newCollectionSpy.calledWith([])).toBe(true)
-      newCollectionSpy.restore()
+      expect(makeCollectionSpy.calledWith([])).toBe(true)
+      makeCollectionSpy.restore()
     })
 
-    it('calls .make().newCollection() with .getRawAttributes() result n times', function() {
-      const builder = new FactoryBuilder('Model', 'name', {}, {}, <any>{})
-      const newCollectionSpy = Sinon.spy(Model.prototype, 'newCollection')
+    it('maps and create data using range() then calls make_collection() and mapped by .makeModelInstance()', function() {
+      const builder = new FactoryBuilder('TestModel', 'name', {}, {}, <any>{})
+      const makeCollectionSpy = Sinon.spy(Utils, 'make_collection')
 
-      const getRawAttributesStub = Sinon.stub(builder, <any>'getRawAttributes')
-      getRawAttributesStub.returns('anything')
+      const makeModelInstanceStub = Sinon.stub(builder, 'makeModelInstance')
+      makeModelInstanceStub.returns('anything')
 
+      const attributes = {}
       expect(
         builder
           .times(3)
-          .make()
+          .make(attributes)
           .count()
       ).toEqual(3)
-      expect(getRawAttributesStub.callCount).toEqual(3)
 
-      expect(newCollectionSpy.calledWith(['anything', 'anything', 'anything'])).toBe(true)
-      newCollectionSpy.restore()
+      expect(makeModelInstanceStub.getCall(0).calledWith(attributes)).toBe(true)
+      expect(makeModelInstanceStub.getCall(1).calledWith(attributes)).toBe(true)
+      expect(makeModelInstanceStub.getCall(2).calledWith(attributes)).toBe(true)
+      expect(makeModelInstanceStub.callCount).toEqual(3)
+      expect(makeCollectionSpy.calledWith([0, 1, 2])).toBe(true)
+      makeCollectionSpy.restore()
     })
   })
 
@@ -214,25 +219,24 @@ describe('FactoryBuilder', function() {
     })
   })
 
-  describe('protected .makeInstance()', function() {
+  describe('.makeModelInstance()', function() {
     it('calls .make() to create instance of model with 2 params, 1st from .getRawAttribute(), 2nd is isGuarded always = false', function() {
-      const builder = new FactoryBuilder('Model', 'name', {}, {}, <any>{})
+      const builder = new FactoryBuilder('TestModel', 'name', {}, {}, <any>{})
       const makeSpy = Sinon.spy(NajsBinding, 'make')
       const getRawAttributesStub = Sinon.stub(builder, <any>'getRawAttributes')
       getRawAttributesStub.returns('anything')
 
-      const firstInstance = builder['makeInstance']()
-      expect(firstInstance).toBeInstanceOf(Eloquent)
+      const firstInstance = builder.makeModelInstance()
+      expect(firstInstance).toBeInstanceOf(TestModel)
       expect(firstInstance).toBeInstanceOf(Model)
       expect(getRawAttributesStub.calledWith()).toBe(true)
-      expect(makeSpy.calledWith('Model', ['anything', false])).toBe(true)
+      expect(makeSpy.calledWith('TestModel', ['anything', false])).toBe(true)
 
       const attributes = {}
-      const secondInstance = builder['makeInstance'](attributes)
-      expect(secondInstance).toBeInstanceOf(Eloquent)
+      const secondInstance = builder.makeModelInstance(attributes)
       expect(secondInstance).toBeInstanceOf(Model)
       expect(getRawAttributesStub.calledWith(attributes)).toBe(true)
-      expect(makeSpy.calledWith('Model', ['anything', false])).toBe(true)
+      expect(makeSpy.calledWith('TestModel', ['anything', false])).toBe(true)
 
       makeSpy.restore()
     })
@@ -240,12 +244,12 @@ describe('FactoryBuilder', function() {
 
   describe('protected .getRawAttributes()', function() {
     it('throws an exception if definition not defined in "definitions"', function() {
-      const builder = new FactoryBuilder('Model', 'name', {}, {}, <any>{})
+      const builder = new FactoryBuilder('TestModel', 'name', {}, {}, <any>{})
       try {
-        builder['getRawAttributes']({})
+        builder.getRawAttributes({})
       } catch (error) {
         expect(error).toBeInstanceOf(ReferenceError)
-        expect(error.message).toEqual('Unable to locate factory with name [name] [Model].')
+        expect(error.message).toEqual('Unable to locate factory with name [name] [TestModel].')
         return
       }
       expect('should not reach here').toEqual('hmm')
@@ -253,7 +257,7 @@ describe('FactoryBuilder', function() {
 
     it('throws an exception if definition is not a function', function() {
       const builder = new FactoryBuilder(
-        'Model',
+        'TestModel',
         'name',
         {
           Model: {
@@ -264,10 +268,10 @@ describe('FactoryBuilder', function() {
         <any>{}
       )
       try {
-        builder['getRawAttributes']({})
+        builder.getRawAttributes({})
       } catch (error) {
         expect(error).toBeInstanceOf(ReferenceError)
-        expect(error.message).toEqual('Unable to locate factory with name [name] [Model].')
+        expect(error.message).toEqual('Unable to locate factory with name [name] [TestModel].')
         return
       }
       expect('should not reach here').toEqual('hmm')
@@ -275,10 +279,10 @@ describe('FactoryBuilder', function() {
 
     it('calls definition to get definition value, then call .applyStates() and .triggerReferenceAttributes()', function() {
       const builder = new FactoryBuilder(
-        'Model',
+        'TestModel',
         'name',
         {
-          Model: {
+          TestModel: {
             name: function(faker: any, attributes: any) {
               return {
                 a: 1,
@@ -290,30 +294,30 @@ describe('FactoryBuilder', function() {
         {},
         <any>{}
       )
-      const applyStatesSpy = Sinon.spy(builder, <any>'applyStates')
-      const triggerReferenceAttributesSpy = Sinon.spy(builder, <any>'triggerReferenceAttributes')
+      const applyStatesSpy = Sinon.spy(builder, 'applyStates')
+      const triggerReferenceAttributesSpy = Sinon.spy(builder, 'triggerReferenceAttributes')
 
-      const result = builder['getRawAttributes']()
+      const result = builder.getRawAttributes()
       expect(result).toEqual({ a: 1, b: 2 })
       expect(applyStatesSpy.called).toBe(true)
       expect(triggerReferenceAttributesSpy.called).toBe(true)
     })
   })
 
-  describe('protected .applyStates()', function() {
+  describe('.applyStates()', function() {
     it('returns definition if there is no "activeStates"', function() {
-      const builder = new FactoryBuilder('Model', 'name', {}, {}, <any>{})
+      const builder = new FactoryBuilder('TestModel', 'name', {}, {}, <any>{})
       const definition = {}
-      expect(builder['applyStates'](definition, {}) === definition).toBe(true)
+      expect(builder.applyStates(definition, {}) === definition).toBe(true)
     })
 
     it('loops all activeState and throw an exception if not defined in "definedState"', function() {
-      const builder = new FactoryBuilder('Model', 'name', {}, {}, <any>{})
+      const builder = new FactoryBuilder('TestModel', 'name', {}, {}, <any>{})
       try {
-        builder.states('test')['applyStates']({}, {})
+        builder.states('test').applyStates({}, {})
       } catch (error) {
         expect(error).toBeInstanceOf(ReferenceError)
-        expect(error.message).toEqual('Unable to locate [test] state for [Model].')
+        expect(error.message).toEqual('Unable to locate [test] state for [TestModel].')
         return
       }
       expect('should not reach here').toEqual('hmm')
@@ -321,7 +325,7 @@ describe('FactoryBuilder', function() {
 
     it('loops all "activeState" and throw an exception if stateDefinition is not a function', function() {
       const builder = new FactoryBuilder(
-        'Model',
+        'TestModel',
         'name',
         {},
         {
@@ -332,10 +336,10 @@ describe('FactoryBuilder', function() {
         <any>{}
       )
       try {
-        builder.states('test')['applyStates']({}, {})
+        builder.states('test').applyStates({}, {})
       } catch (error) {
         expect(error).toBeInstanceOf(ReferenceError)
-        expect(error.message).toEqual('Unable to locate [test] state for [Model].')
+        expect(error.message).toEqual('Unable to locate [test] state for [TestModel].')
         return
       }
       expect('should not reach here').toEqual('hmm')
@@ -343,11 +347,11 @@ describe('FactoryBuilder', function() {
 
     it('loops all "activeState" and call state definition, then merge the result to definition', function() {
       const builder = new FactoryBuilder(
-        'Model',
+        'TestModel',
         'name',
         {},
         {
-          Model: {
+          TestModel: {
             test: function(faker: any, attributes: any) {
               return {
                 a: 1,
@@ -361,14 +365,14 @@ describe('FactoryBuilder', function() {
       )
       const definition = { a: 10 }
       builder.states('test')
-      expect(builder['applyStates'](definition, { c: 'test' }) === definition).toBe(true)
+      expect(builder.applyStates(definition, { c: 'test' }) === definition).toBe(true)
       expect(definition).toEqual({ a: 1, b: 2, c: 'test' })
     })
   })
 
   describe('protected .triggerReferenceAttributes()', function() {
     it('calls a function and reassign value if the property of attribute is a function', function() {
-      const builder = new FactoryBuilder('Model', 'name', {}, {}, <any>{})
+      const builder = new FactoryBuilder('TestModel', 'name', {}, {}, <any>{})
       const attributes = {
         a: 1,
         b: 2,
@@ -379,25 +383,25 @@ describe('FactoryBuilder', function() {
           return 'string'
         }
       }
-      expect(builder['triggerReferenceAttributes'](attributes)).toEqual({ a: 1, b: 2, c: 3, d: 'string' })
+      expect(builder.triggerReferenceAttributes(attributes)).toEqual({ a: 1, b: 2, c: 3, d: 'string' })
     })
 
-    it('calls .getPrimaryKey() and reassign value if the property of attribute is an instance of Eloquent', function() {
-      const model = new Model()
+    it('calls .getPrimaryKey() and reassign value if the property of attribute is an instance of Model', function() {
+      const model = new TestModel()
       model.setPrimaryKey('test')
-      const builder = new FactoryBuilder('Model', 'name', {}, {}, <any>{})
+      const builder = new FactoryBuilder('TestModel', 'name', {}, {}, <any>{})
       const attributes = {
         a: 1,
         b: 2,
         c: model
       }
-      expect(builder['triggerReferenceAttributes'](attributes)).toEqual({ a: 1, b: 2, c: 'test' })
+      expect(builder.triggerReferenceAttributes(attributes)).toEqual({ a: 1, b: 2, c: 'test' })
     })
 
-    it('works if the property is a function with returns an instance of Eloquent', function() {
-      const model = new Model()
+    it('works if the property is a function with returns an instance of Model', function() {
+      const model = new TestModel()
       model.setPrimaryKey('test')
-      const builder = new FactoryBuilder('Model', 'name', {}, {}, <any>{})
+      const builder = new FactoryBuilder('TestModel', 'name', {}, {}, <any>{})
       const attributes = {
         a: 1,
         b: 2,
@@ -405,13 +409,13 @@ describe('FactoryBuilder', function() {
           return model
         }
       }
-      expect(builder['triggerReferenceAttributes'](attributes)).toEqual({ a: 1, b: 2, c: 'test' })
+      expect(builder.triggerReferenceAttributes(attributes)).toEqual({ a: 1, b: 2, c: 'test' })
     })
 
     it('works with nested object', function() {
-      const model = new Model()
+      const model = new TestModel()
       model.setPrimaryKey('test')
-      const builder = new FactoryBuilder('Model', 'name', {}, {}, <any>{})
+      const builder = new FactoryBuilder('TestModel', 'name', {}, {}, <any>{})
       const attributes = {
         a: 10,
         b: 20,
@@ -436,7 +440,7 @@ describe('FactoryBuilder', function() {
           }
         }
       }
-      expect(builder['triggerReferenceAttributes'](attributes)).toEqual({
+      expect(builder.triggerReferenceAttributes(attributes)).toEqual({
         a: 10,
         b: 20,
         child: { a: 1, b: 2, c: 3, d: 'test', e: 'test' },

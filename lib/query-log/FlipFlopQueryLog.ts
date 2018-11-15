@@ -1,10 +1,11 @@
 /// <reference path="../contracts/QueryLog.ts" />
 
-import * as Moment from 'moment'
 import { register } from 'najs-binding'
 import { Facade } from 'najs-facade'
 import { NajsEloquent } from '../constants'
 import { isString, isFunction } from 'lodash'
+import { MomentProvider } from '../facades/global/MomentProviderFacade'
+import { Moment } from 'moment'
 
 export class FlipFlopQueryLog extends Facade implements Najs.Contracts.Eloquent.QueryLog {
   static className: string = NajsEloquent.QueryLog.FlipFlopQueryLog
@@ -32,8 +33,8 @@ export class FlipFlopQueryLog extends Facade implements Najs.Contracts.Eloquent.
   protected parse_pull_arguments_starts_with_string(args: ArrayLike<any>) {
     return {
       group: args[0],
-      since: args[1] && Moment.isMoment(args[1]) ? args[1] : undefined,
-      until: args[2] && Moment.isMoment(args[2]) ? args[2] : undefined,
+      since: args[1] && MomentProvider.isMoment(args[1]) ? args[1] : undefined,
+      until: args[2] && MomentProvider.isMoment(args[2]) ? args[2] : undefined,
       transform: this.assign_if_last_argument_is('function', args)
     }
   }
@@ -41,7 +42,7 @@ export class FlipFlopQueryLog extends Facade implements Najs.Contracts.Eloquent.
   protected parse_pull_arguments_starts_with_moment(args: ArrayLike<any>) {
     return {
       since: args[0],
-      until: args[1] && Moment.isMoment(args[1]) ? args[1] : undefined,
+      until: args[1] && MomentProvider.isMoment(args[1]) ? args[1] : undefined,
       group: this.assign_if_last_argument_is('string', args),
       transform: args[1] && isFunction(args[1]) ? args[1] : args[2] && isFunction(args[2]) ? args[2] : undefined
     }
@@ -51,8 +52,8 @@ export class FlipFlopQueryLog extends Facade implements Najs.Contracts.Eloquent.
     return {
       transform: args[0],
       group: this.assign_if_last_argument_is('string', args),
-      since: args[1] && Moment.isMoment(args[1]) ? args[1] : undefined,
-      until: args[2] && Moment.isMoment(args[2]) ? args[2] : undefined
+      since: args[1] && MomentProvider.isMoment(args[1]) ? args[1] : undefined,
+      until: args[2] && MomentProvider.isMoment(args[2]) ? args[2] : undefined
     }
   }
 
@@ -77,13 +78,13 @@ export class FlipFlopQueryLog extends Facade implements Najs.Contracts.Eloquent.
     return this
   }
 
-  push(query: any, group: string = 'all'): any {
+  push(data: any, group: string = 'all'): any {
     if (!this.enabled) {
       return this
     }
     this[this.circle].push({
-      query: query,
-      when: Moment(),
+      data: data,
+      when: MomentProvider.make(),
       group: group
     })
     return this
@@ -93,7 +94,7 @@ export class FlipFlopQueryLog extends Facade implements Najs.Contracts.Eloquent.
     if (isString(args[0])) {
       return this.parse_pull_arguments_starts_with_string(args)
     }
-    if (Moment.isMoment(args[0])) {
+    if (MomentProvider.isMoment(args[0])) {
       return this.parse_pull_arguments_starts_with_moment(args)
     }
     if (isFunction(args[0])) {
@@ -116,10 +117,10 @@ export class FlipFlopQueryLog extends Facade implements Najs.Contracts.Eloquent.
         match = item.group === args['group']
       }
       if (match && args['since']) {
-        match = (item.when as Moment.Moment).isSameOrAfter(args['since'])
+        match = (item.when as Moment).isSameOrAfter(args['since'])
       }
       if (match && args['until']) {
-        match = (item.when as Moment.Moment).isSameOrBefore(args['until'])
+        match = (item.when as Moment).isSameOrBefore(args['until'])
       }
       if (match) {
         result.push(args['transform'] ? args['transform'](item) : item)
@@ -132,7 +133,7 @@ export class FlipFlopQueryLog extends Facade implements Najs.Contracts.Eloquent.
   }
 
   static sortByWhenAsc(a: Najs.Contracts.Eloquent.QueryLogItem<any>, b: Najs.Contracts.Eloquent.QueryLogItem<any>) {
-    return (a.when as Moment.Moment).toDate().getTime() - (b.when as Moment.Moment).toDate().getTime()
+    return (a.when as Moment).toDate().getTime() - (b.when as Moment).toDate().getTime()
   }
 }
-register(FlipFlopQueryLog)
+register(FlipFlopQueryLog, NajsEloquent.QueryLog.FlipFlopQueryLog)

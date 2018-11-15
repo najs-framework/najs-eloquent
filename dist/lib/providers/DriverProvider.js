@@ -1,5 +1,4 @@
 "use strict";
-/// <reference path="../contracts/DriverProvider.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_facade_1 = require("najs-facade");
 const najs_binding_1 = require("najs-binding");
@@ -8,6 +7,7 @@ class DriverProvider extends najs_facade_1.Facade {
     constructor() {
         super(...arguments);
         this.drivers = {};
+        this.driverInstances = {};
         this.binding = {};
     }
     getClassName() {
@@ -26,9 +26,20 @@ class DriverProvider extends najs_facade_1.Facade {
         return first;
     }
     createDriver(model, driverClass, isGuarded) {
-        const driver = najs_binding_1.make(driverClass, [model, isGuarded]);
-        // driver.createStaticMethods(<any>Object.getPrototypeOf(model).constructor)
-        return driver;
+        if (typeof this.driverInstances[driverClass] === 'undefined') {
+            this.driverInstances[driverClass] = najs_binding_1.make(driverClass, [model, isGuarded]);
+            // driver.createStaticMethods(<any>Object.getPrototypeOf(model).constructor)
+        }
+        return this.driverInstances[driverClass];
+    }
+    has(driver) {
+        for (const name in this.drivers) {
+            const item = this.drivers[name];
+            if (item.driverClassName === najs_binding_1.getClassName(driver)) {
+                return true;
+            }
+        }
+        return false;
     }
     create(model, isGuarded = true) {
         return this.createDriver(model, this.findDriverClassName(model), isGuarded);
@@ -57,4 +68,4 @@ class DriverProvider extends najs_facade_1.Facade {
 }
 DriverProvider.className = constants_1.NajsEloquent.Provider.DriverProvider;
 exports.DriverProvider = DriverProvider;
-najs_binding_1.register(DriverProvider);
+najs_binding_1.register(DriverProvider, constants_1.NajsEloquent.Provider.DriverProvider);

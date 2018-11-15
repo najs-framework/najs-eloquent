@@ -3,25 +3,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const Sinon = require("sinon");
 const NajsBinding = require("najs-binding");
-const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
+const DriverProvider_1 = require("../../lib/providers/DriverProvider");
+const DriverProviderFacade_1 = require("../../lib/facades/global/DriverProviderFacade");
 class FakeDriver {
     createStaticMethods() { }
 }
 FakeDriver.className = 'FakeDriver';
 describe('DriverProvider', function () {
+    it('implements IAutoload under name "NajsEloquent.Provider.DriverProvider"', function () {
+        const instance = new DriverProvider_1.DriverProvider();
+        expect(instance.getClassName()).toEqual('NajsEloquent.Provider.DriverProvider');
+    });
     describe('.register()', function () {
         it('registers class to ClassRegistry by using najs-binding if the driver is a function', function () {
             const registerSpy = Sinon.spy(NajsBinding, 'register');
-            const chainable = EloquentDriverProviderFacade_1.EloquentDriverProvider.register(FakeDriver, 'fake');
-            expect(chainable === EloquentDriverProviderFacade_1.EloquentDriverProvider).toBe(true);
+            const chainable = DriverProviderFacade_1.DriverProvider.register(FakeDriver, 'fake');
+            expect(chainable === DriverProviderFacade_1.DriverProvider).toBe(true);
             expect(registerSpy.calledWith(FakeDriver)).toBe(true);
             expect(NajsBinding.ClassRegistry.has(FakeDriver.className)).toBe(true);
-            expect(EloquentDriverProviderFacade_1.EloquentDriverProvider['drivers']['fake']).toEqual({
+            expect(DriverProviderFacade_1.DriverProvider['drivers']['fake']).toEqual({
                 driverClassName: 'FakeDriver',
                 isDefault: false
             });
-            EloquentDriverProviderFacade_1.EloquentDriverProvider.register(FakeDriver, 'fake', true);
-            expect(EloquentDriverProviderFacade_1.EloquentDriverProvider['drivers']['fake']).toEqual({
+            DriverProviderFacade_1.DriverProvider.register(FakeDriver, 'fake', true);
+            expect(DriverProviderFacade_1.DriverProvider['drivers']['fake']).toEqual({
                 driverClassName: 'FakeDriver',
                 isDefault: true
             });
@@ -29,18 +34,18 @@ describe('DriverProvider', function () {
         });
         it('registers class to ClassRegistry by using najs-binding if the driver is a function', function () {
             const registerSpy = Sinon.spy(NajsBinding, 'register');
-            EloquentDriverProviderFacade_1.EloquentDriverProvider.register('FakeDriver', 'fake');
+            DriverProviderFacade_1.DriverProvider.register('FakeDriver', 'fake');
             expect(registerSpy.calledWith(FakeDriver)).toBe(false);
             registerSpy.restore();
         });
     });
     describe('protected .findDefaultDriver()', function () {
         it('returns a empty string if there is no drivers registered', function () {
-            EloquentDriverProviderFacade_1.EloquentDriverProvider['drivers'] = {};
-            expect(EloquentDriverProviderFacade_1.EloquentDriverProvider['findDefaultDriver']()).toEqual('');
+            DriverProviderFacade_1.DriverProvider['drivers'] = {};
+            expect(DriverProviderFacade_1.DriverProvider['findDefaultDriver']()).toEqual('');
         });
         it('returns a the first driver if there is no item with isDefault = true', function () {
-            EloquentDriverProviderFacade_1.EloquentDriverProvider['drivers'] = {
+            DriverProviderFacade_1.DriverProvider['drivers'] = {
                 'test-1': {
                     driverClassName: 'Test1',
                     isDefault: false
@@ -50,10 +55,10 @@ describe('DriverProvider', function () {
                     isDefault: false
                 }
             };
-            expect(EloquentDriverProviderFacade_1.EloquentDriverProvider['findDefaultDriver']()).toEqual('Test1');
+            expect(DriverProviderFacade_1.DriverProvider['findDefaultDriver']()).toEqual('Test1');
         });
         it('returns a driver with isDefault = true', function () {
-            EloquentDriverProviderFacade_1.EloquentDriverProvider['drivers'] = {
+            DriverProviderFacade_1.DriverProvider['drivers'] = {
                 'test-1': {
                     driverClassName: 'Test1',
                     isDefault: false
@@ -67,7 +72,7 @@ describe('DriverProvider', function () {
                     isDefault: false
                 }
             };
-            expect(EloquentDriverProviderFacade_1.EloquentDriverProvider['findDefaultDriver']()).toEqual('FakeDriver');
+            expect(DriverProviderFacade_1.DriverProvider['findDefaultDriver']()).toEqual('FakeDriver');
         });
     });
     describe('protected .createDriver()', function () {
@@ -77,54 +82,77 @@ describe('DriverProvider', function () {
             makeStub.callsFake(() => ({
                 createStaticMethods() { }
             }));
-            EloquentDriverProviderFacade_1.EloquentDriverProvider['createDriver'](model, 'DriverClass');
+            DriverProviderFacade_1.DriverProvider['createDriver'](model, 'DriverClass');
             expect(makeStub.calledWith('DriverClass', [model]));
             makeStub.restore();
+        });
+        it('just create instance of driver 1 time', function () {
+            const model = {};
+            const driver = {};
+            DriverProviderFacade_1.DriverProvider['driverInstances']['test'] = driver;
+            const result = DriverProviderFacade_1.DriverProvider['createDriver'](model, 'test');
+            expect(driver === result).toBe(true);
+            expect(DriverProviderFacade_1.DriverProvider['createDriver'](model, 'test') === result).toBe(true);
         });
     });
     describe('.findDriverClassName()', function () {
         it('returns .findDefaultDriver() if there is no binding of model', function () {
-            const findDefaultDriverSpy = Sinon.spy(EloquentDriverProviderFacade_1.EloquentDriverProvider, 'findDefaultDriver');
-            EloquentDriverProviderFacade_1.EloquentDriverProvider.findDriverClassName('not-bind-yet');
-            expect(EloquentDriverProviderFacade_1.EloquentDriverProvider.findDriverClassName('not-bind-yet')).toEqual('FakeDriver');
+            const findDefaultDriverSpy = Sinon.spy(DriverProviderFacade_1.DriverProvider, 'findDefaultDriver');
+            DriverProviderFacade_1.DriverProvider.findDriverClassName('not-bind-yet');
+            expect(DriverProviderFacade_1.DriverProvider.findDriverClassName('not-bind-yet')).toEqual('FakeDriver');
             expect(findDefaultDriverSpy.called).toBe(true);
             findDefaultDriverSpy.restore();
         });
         it('returns .findDefaultDriver() if driver of model is not exists', function () {
-            const findDefaultDriverSpy = Sinon.spy(EloquentDriverProviderFacade_1.EloquentDriverProvider, 'findDefaultDriver');
-            EloquentDriverProviderFacade_1.EloquentDriverProvider.bind('bound-but-not-found', 'not-found');
-            EloquentDriverProviderFacade_1.EloquentDriverProvider.findDriverClassName('bound-but-not-found');
+            const findDefaultDriverSpy = Sinon.spy(DriverProviderFacade_1.DriverProvider, 'findDefaultDriver');
+            DriverProviderFacade_1.DriverProvider.bind('bound-but-not-found', 'not-found');
+            DriverProviderFacade_1.DriverProvider.findDriverClassName('bound-but-not-found');
             expect(findDefaultDriverSpy.called).toBe(true);
             findDefaultDriverSpy.restore();
         });
         it('returns driverClassName if has binding and driver exists', function () {
-            const findDefaultDriverSpy = Sinon.spy(EloquentDriverProviderFacade_1.EloquentDriverProvider, 'findDefaultDriver');
-            EloquentDriverProviderFacade_1.EloquentDriverProvider.bind('model', 'fake');
-            expect(EloquentDriverProviderFacade_1.EloquentDriverProvider.findDriverClassName('model')).toEqual('FakeDriver');
+            const findDefaultDriverSpy = Sinon.spy(DriverProviderFacade_1.DriverProvider, 'findDefaultDriver');
+            DriverProviderFacade_1.DriverProvider.bind('model', 'fake');
+            expect(DriverProviderFacade_1.DriverProvider.findDriverClassName('model')).toEqual('FakeDriver');
             expect(findDefaultDriverSpy.called).toBe(false);
             findDefaultDriverSpy.restore();
         });
     });
     describe('.bind()', function () {
         it('simply assigns driver and model to private binding variable', function () {
-            EloquentDriverProviderFacade_1.EloquentDriverProvider['binding'] = {};
-            expect(EloquentDriverProviderFacade_1.EloquentDriverProvider['binding']).toEqual({});
-            const chainable = EloquentDriverProviderFacade_1.EloquentDriverProvider.bind('model', 'driver');
-            expect(chainable === EloquentDriverProviderFacade_1.EloquentDriverProvider).toBe(true);
-            expect(EloquentDriverProviderFacade_1.EloquentDriverProvider['binding']).toEqual({ model: 'driver' });
-            EloquentDriverProviderFacade_1.EloquentDriverProvider.bind('model', 'driver-override');
-            expect(EloquentDriverProviderFacade_1.EloquentDriverProvider['binding']).toEqual({ model: 'driver-override' });
+            DriverProviderFacade_1.DriverProvider['binding'] = {};
+            expect(DriverProviderFacade_1.DriverProvider['binding']).toEqual({});
+            const chainable = DriverProviderFacade_1.DriverProvider.bind('model', 'driver');
+            expect(chainable === DriverProviderFacade_1.DriverProvider).toBe(true);
+            expect(DriverProviderFacade_1.DriverProvider['binding']).toEqual({ model: 'driver' });
+            DriverProviderFacade_1.DriverProvider.bind('model', 'driver-override');
+            expect(DriverProviderFacade_1.DriverProvider['binding']).toEqual({ model: 'driver-override' });
+        });
+    });
+    describe('.has()', function () {
+        it('returns false if the driver is not register under any name', function () {
+            class AnyDriver {
+            }
+            AnyDriver.className = 'AnyDriver';
+            expect(DriverProviderFacade_1.DriverProvider.has(AnyDriver)).toBe(false);
+        });
+        it('returns true if the given driver is registered under any name', function () {
+            class RegisteredDriver {
+            }
+            RegisteredDriver.className = 'RegisteredDriver';
+            DriverProviderFacade_1.DriverProvider.register(RegisteredDriver, 'any');
+            expect(DriverProviderFacade_1.DriverProvider.has(RegisteredDriver)).toBe(true);
         });
     });
     describe('.create()', function () {
         it('creates a driver instance with class name provided by .findDriverClassName()', function () {
-            const createDriverSpy = Sinon.spy(EloquentDriverProviderFacade_1.EloquentDriverProvider, 'createDriver');
-            const findDriverClassNameSpy = Sinon.spy(EloquentDriverProviderFacade_1.EloquentDriverProvider, 'findDriverClassName');
+            const createDriverSpy = Sinon.spy(DriverProviderFacade_1.DriverProvider, 'createDriver');
+            const findDriverClassNameSpy = Sinon.spy(DriverProviderFacade_1.DriverProvider, 'findDriverClassName');
             class Model {
             }
             Model.className = 'Test';
             const model = new Model();
-            const instance = EloquentDriverProviderFacade_1.EloquentDriverProvider.create(model);
+            const instance = DriverProviderFacade_1.DriverProvider.create(model);
             expect(findDriverClassNameSpy.calledWith(model)).toBe(true);
             expect(createDriverSpy.calledWith(model, 'FakeDriver')).toBe(true);
             expect(instance).toBeInstanceOf(FakeDriver);

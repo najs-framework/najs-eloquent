@@ -1,80 +1,192 @@
 "use strict";
-/// <reference path="interfaces/IModel.ts" />
+/// <reference path="../definitions/model/IModel.ts" />
+/// <reference path="../definitions/collect.js/index.d.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
-const ClassSetting_1 = require("../util/ClassSetting");
-const najs_binding_2 = require("najs-binding");
-const EloquentDriverProviderFacade_1 = require("../facades/global/EloquentDriverProviderFacade");
-const ModelSetting_1 = require("./components/ModelSetting");
-const ModelAttribute_1 = require("./components/ModelAttribute");
-const ModelFillable_1 = require("./components/ModelFillable");
-const ModelSerialization_1 = require("./components/ModelSerialization");
-const ModelActiveRecord_1 = require("./components/ModelActiveRecord");
-const ModelTimestamps_1 = require("./components/ModelTimestamps");
-const ModelSoftDeletes_1 = require("./components/ModelSoftDeletes");
-const ModelEvent_1 = require("./components/ModelEvent");
-const Event_1 = require("./Event");
-const collect = require('collect.js');
+const DriverProviderFacade_1 = require("../facades/global/DriverProviderFacade");
+const PrototypeManager_1 = require("../util/PrototypeManager");
+const ModelEvent_1 = require("./ModelEvent");
 class Model {
-    /**
-     * Model constructor.
-     *
-     * @param {Object|undefined} data
-     * @param {boolean|undefined} isGuarded
-     */
-    constructor(data, isGuarded = true) {
-        const className = najs_binding_2.getClassName(this);
-        if (!najs_binding_2.ClassRegistry.has(className)) {
-            najs_binding_2.register(Object.getPrototypeOf(this).constructor, className);
-        }
-        if (data !== ClassSetting_1.CREATE_SAMPLE) {
-            this.driver = EloquentDriverProviderFacade_1.EloquentDriverProvider.create(this);
-            this.driver.initialize(this, isGuarded, data);
-            this.attributes = this.driver.getRecord();
-        }
+    constructor(data, isGuarded) {
+        this.internalData = {
+            relations: {}
+        };
+        return this.makeDriver().makeModel(this, data, isGuarded);
+    }
+    makeDriver() {
+        this.driver = DriverProviderFacade_1.DriverProvider.create(this);
+        return this.driver;
     }
     getDriver() {
         return this.driver;
     }
     getModelName() {
-        return najs_binding_2.getClassName(this);
+        return najs_binding_1.getClassName(this);
     }
-    getRecordName() {
-        return this.driver.getRecordName();
+    newQuery(name) {
+        const query = this.driver.getQueryFeature().newQuery(this);
+        return typeof name !== 'undefined' ? query.queryName(name) : query;
     }
-    is(model) {
-        return this === model || this.getPrimaryKey().toString() === model.getPrimaryKey().toString();
+    /**
+     * Register a model class.
+     *
+     * @param modelClass
+     */
+    static register(modelClass) {
+        najs_binding_1.register(modelClass);
     }
-    newCollection(dataset) {
-        return collect(dataset.map(item => this.newInstance(item)));
+    static newQuery(name) {
+        return new this().newQuery(name);
     }
-    newInstance(data) {
-        return najs_binding_1.make(najs_binding_2.getClassName(this), [data]);
+    /**
+     * Set the query with given name
+     *
+     * @param {string} name
+     */
+    static queryName(name) {
+        return this.newQuery(name);
+    }
+    /**
+     * Set the query log group name
+     *
+     * @param {string} group QueryLog group
+     */
+    static setLogGroup(group) {
+        const query = this.newQuery();
+        return query.setLogGroup.apply(query, arguments);
+    }
+    static select() {
+        const query = this.newQuery();
+        return query.select.apply(query, arguments);
+    }
+    static limit() {
+        const query = this.newQuery();
+        return query.limit.apply(query, arguments);
+    }
+    static orderBy() {
+        const query = this.newQuery();
+        return query.orderBy.apply(query, arguments);
+    }
+    /**
+     * Add an "order by" clause to the query with direction ASC.
+     *
+     * @param {string} field
+     * @param {string} direction
+     */
+    static orderByAsc(field) {
+        const query = this.newQuery();
+        return query.orderByAsc.apply(query, arguments);
+    }
+    /**
+     * Add an "order by" clause to the query with direction DESC.
+     *
+     * @param {string} field
+     * @param {string} direction
+     */
+    static orderByDesc(field) {
+        const query = this.newQuery();
+        return query.orderByDesc.apply(query, arguments);
+    }
+    /**
+     * Consider all soft-deleted or not-deleted items.
+     */
+    static withTrashed() {
+        const query = this.newQuery();
+        return query.withTrashed.apply(query, arguments);
+    }
+    /**
+     * Consider soft-deleted items only.
+     */
+    static onlyTrashed() {
+        const query = this.newQuery();
+        return query.onlyTrashed.apply(query, arguments);
+    }
+    static where() {
+        const query = this.newQuery();
+        return query.where.apply(query, arguments);
+    }
+    static whereNot(field, value) {
+        const query = this.newQuery();
+        return query.whereNot.apply(query, arguments);
+    }
+    static whereIn(field, values) {
+        const query = this.newQuery();
+        return query.whereIn.apply(query, arguments);
+    }
+    static whereNotIn(field, values) {
+        const query = this.newQuery();
+        return query.whereNotIn.apply(query, arguments);
+    }
+    static whereNull(field) {
+        const query = this.newQuery();
+        return query.whereNull.apply(query, arguments);
+    }
+    static whereNotNull(field) {
+        const query = this.newQuery();
+        return query.whereNotNull.apply(query, arguments);
+    }
+    static whereBetween(field, range) {
+        const query = this.newQuery();
+        return query.whereBetween.apply(query, arguments);
+    }
+    static whereNotBetween(field, range) {
+        const query = this.newQuery();
+        return query.whereNotBetween.apply(query, arguments);
+    }
+    static get() {
+        const query = this.newQuery();
+        return query.get.apply(query, arguments);
+    }
+    /**
+     * Execute query and return result as a Collection.
+     */
+    static all() {
+        const query = this.newQuery();
+        return query.all.apply(query, arguments);
+    }
+    /**
+     * return count of the records.
+     */
+    static count() {
+        const query = this.newQuery();
+        return query.count.apply(query, arguments);
+    }
+    static pluck() {
+        const query = this.newQuery();
+        return query.pluck.apply(query, arguments);
+    }
+    /**
+     * Find first record by id.
+     *
+     * @param {string} id
+     */
+    static findById(id) {
+        const query = this.newQuery();
+        return query.findById.apply(query, arguments);
+    }
+    /**
+     * Find first record by id and throws NotFoundException if there is no record
+     * @param {string} id
+     */
+    static findOrFail(id) {
+        const query = this.newQuery();
+        return query.findOrFail.apply(query, arguments);
+    }
+    /**
+     * Find first record by id and throws NotFoundException if there is no record
+     * @param {string} id
+     */
+    static firstOrFail(id) {
+        const query = this.newQuery();
+        return query.firstOrFail.apply(query, arguments);
+    }
+    static with() {
+        const query = this.newQuery();
+        return query.with.apply(query, arguments);
     }
 }
-Model.Events = {
-    Creating: Event_1.Event.Creating,
-    Created: Event_1.Event.Created,
-    Saving: Event_1.Event.Saving,
-    Saved: Event_1.Event.Saved,
-    Updating: Event_1.Event.Updating,
-    Updated: Event_1.Event.Updated,
-    Deleting: Event_1.Event.Deleting,
-    Deleted: Event_1.Event.Deleted,
-    Restoring: Event_1.Event.Restoring,
-    Restored: Event_1.Event.Restored
-};
+// static start query methods ----------------------------------------------------------------------------------------
+Model.Event = ModelEvent_1.ModelEvent;
 exports.Model = Model;
-const defaultComponents = [
-    najs_binding_1.make(ModelSetting_1.ModelSetting.className),
-    najs_binding_1.make(ModelAttribute_1.ModelAttribute.className),
-    najs_binding_1.make(ModelFillable_1.ModelFillable.className),
-    najs_binding_1.make(ModelSerialization_1.ModelSerialization.className),
-    najs_binding_1.make(ModelActiveRecord_1.ModelActiveRecord.className),
-    najs_binding_1.make(ModelTimestamps_1.ModelTimestamps.className),
-    najs_binding_1.make(ModelSoftDeletes_1.ModelSoftDeletes.className),
-    najs_binding_1.make(ModelEvent_1.ModelEvent.className)
-];
-for (const component of defaultComponents) {
-    component.extend(Model.prototype, [], {});
-}
+PrototypeManager_1.PrototypeManager.stopFindingRelationsIn(Model.prototype);
+Object.defineProperty(Model.prototype, '_isNajsEloquentModel', { value: true });

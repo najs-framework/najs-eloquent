@@ -3,7 +3,7 @@ declare namespace Najs.Contracts.Eloquent {
         (item: QueryLogItem<T>): QueryLogItem<T>;
     };
     type QueryLogItem<T> = {
-        query: T;
+        data: T;
         when: Object;
         group: string;
     };
@@ -21,22 +21,22 @@ declare namespace Najs.Contracts.Eloquent {
          */
         disable(): this;
         /**
-         * Clear all query in the QueryLog
+         * Clear all data in the QueryLog
          */
         clear(): this;
         /**
-         * Push a query to log pool
+         * Push a data to log pool
          *
-         * @param {mixed} query
+         * @param {mixed} data
          */
-        push<T>(query: T): this;
+        push<T>(data: T): this;
         /**
-         * Push a query to log pool
+         * Push a data to log pool
          *
-         * @param {mixed} query
+         * @param {mixed} data
          * @param {string} group
          */
-        push<T>(query: T, group: string): this;
+        push<T>(data: T, group: string): this;
         /**
          * Get and delete all queries
          */

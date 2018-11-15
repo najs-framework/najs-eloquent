@@ -31,7 +31,7 @@ export declare class FlipFlopQueryLog extends Facade implements Najs.Contracts.E
     enable(): any;
     disable(): any;
     clear(): any;
-    push(query: any, group?: string): any;
+    push(data: any, group?: string): any;
     parsePullArguments(args: ArrayLike<any>): any;
     pull(): any;
     static sortByWhenAsc(a: Najs.Contracts.Eloquent.QueryLogItem<any>, b: Najs.Contracts.Eloquent.QueryLogItem<any>): number;

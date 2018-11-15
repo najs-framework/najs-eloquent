@@ -1,7 +1,10 @@
 /// <reference path="../contracts/FactoryManager.d.ts" />
 /// <reference path="../contracts/FactoryBuilder.d.ts" />
-/// <reference path="../model/interfaces/IModel.d.ts" />
+/// <reference path="../definitions/model/IModel.d.ts" />
+/// <reference path="../definitions/factory/IFactoryDefinition.d.ts" />
 /// <reference types="chance" />
+import ModelDefinition = NajsEloquent.Model.ModelDefinition;
+import IFactoryDefinition = NajsEloquent.Factory.IFactoryDefinition;
 import './FactoryBuilder';
 import { Facade } from 'najs-facade';
 export declare type ChanceFaker = Chance.Chance;
@@ -14,18 +17,10 @@ export declare class FactoryManager extends Facade implements Najs.Contracts.Elo
     protected states: Object;
     constructor();
     getClassName(): string;
-    protected addDefinition(bag: string, className: any, name: string, definition: any): this;
-    private parseModelName(className);
-    define(className: string | {
-        new (): any;
-    }, definition: NajsEloquent.Factory.FactoryDefinition, name?: string): this;
-    defineAs(className: string | {
-        new (): any;
-    }, name: string, definition: NajsEloquent.Factory.FactoryDefinition): this;
-    state(className: string | {
-        new (): any;
-    }, state: string, definition: NajsEloquent.Factory.FactoryDefinition): this;
-    of(className: string | {
-        new (): any;
-    }, name?: string): Najs.Contracts.Eloquent.FactoryBuilder<any>;
+    private addDefinition;
+    protected getModelName(className: ModelDefinition): string;
+    define(className: ModelDefinition, definition: IFactoryDefinition, name?: string): this;
+    defineAs(className: ModelDefinition, name: string, definition: IFactoryDefinition): this;
+    state(className: ModelDefinition, state: string, definition: IFactoryDefinition): this;
+    of(className: ModelDefinition, name?: string): Najs.Contracts.Eloquent.FactoryBuilder<any>;
 }

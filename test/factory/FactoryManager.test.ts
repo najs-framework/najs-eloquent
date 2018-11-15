@@ -1,19 +1,20 @@
 import 'jest'
 import * as Sinon from 'sinon'
+import { register } from 'najs-binding'
 import { Chance } from 'chance'
 import { Facade } from 'najs-facade'
-import { Eloquent } from '../../lib/model/Eloquent'
-import { DummyDriver } from '../../lib/drivers/DummyDriver'
-import { EloquentDriverProviderFacade } from '../../lib/facades/global/EloquentDriverProviderFacade'
-import { NajsEloquent } from '../../lib/constants'
+import { MemoryDriver } from '../../lib/drivers/memory/MemoryDriver'
+import { DriverProviderFacade } from '../../lib/facades/global/DriverProviderFacade'
 import { FactoryManager } from '../../lib/factory/FactoryManager'
 import { FactoryBuilder } from '../../lib/factory/FactoryBuilder'
 
+DriverProviderFacade.register(MemoryDriver, 'memory', true)
+
 describe('FactoryManager', function() {
-  it('extends Facade and implements IAutoload', function() {
+  it('extends Facade and implements IAutoload under name "NajsEloquent.Factory.FactoryManager"', function() {
     const factoryManager = new FactoryManager()
     expect(factoryManager).toBeInstanceOf(Facade)
-    expect(factoryManager.getClassName()).toEqual(NajsEloquent.Factory.FactoryManager)
+    expect(factoryManager.getClassName()).toEqual('NajsEloquent.Factory.FactoryManager')
   })
 
   describe('constructor()', function() {
@@ -23,39 +24,20 @@ describe('FactoryManager', function() {
     })
   })
 
-  describe('protected .parseModelName()', function() {
+  describe('protected .getModelName()', function() {
     it('returns if the param is a string', function() {
       const factoryManager = new FactoryManager()
-      expect(factoryManager['parseModelName']('Class')).toEqual('Class')
+      expect(factoryManager['getModelName']('Class')).toEqual('Class')
     })
 
-    it("calls Eloquent.register() and return a class's name if the param is Function", function() {
+    it("calls and returns a class's name by getClassName() of NajsBinding if the param is not string", function() {
       class Class {
         static className = 'Class'
       }
-      const registerStub = Sinon.stub(Eloquent, 'register')
+      register(Class)
 
       const factoryManager = new FactoryManager()
-      expect(factoryManager['parseModelName'](<any>Class)).toEqual('Class')
-      expect(registerStub.calledWith(Class)).toBe(true)
-
-      registerStub.restore()
-    })
-
-    it("calls Eloquent.register() and return a class's name if the param is Eloquent", function() {
-      EloquentDriverProviderFacade.register(DummyDriver, 'dummy', true)
-      class Class extends Eloquent {
-        getClassName() {
-          return 'Test'
-        }
-      }
-      const registerStub = Sinon.stub(Eloquent, 'register')
-
-      const factoryManager = new FactoryManager()
-      expect(factoryManager['parseModelName'](Class)).toEqual('Test')
-      expect(registerStub.calledWith(Class)).toBe(true)
-
-      registerStub.restore()
+      expect(factoryManager['getModelName'](<any>Class)).toEqual('Class')
     })
   })
 
@@ -76,29 +58,6 @@ describe('FactoryManager', function() {
         }
       })
       factoryManager.define('Class', <any>definition, 'test')
-      expect(factoryManager['definitions']).toEqual({
-        Class: {
-          test: definition,
-          default: definition
-        }
-      })
-    })
-
-    it('calls Eloquent.register() and return a className if the param is function or Eloquent', function() {
-      class Class {
-        static className = 'Class'
-      }
-
-      const definition = () => {}
-      const factoryManager = new FactoryManager()
-      expect(factoryManager['definitions']).toEqual({})
-      factoryManager.define(<any>Class, <any>definition)
-      expect(factoryManager['definitions']).toEqual({
-        Class: {
-          default: definition
-        }
-      })
-      factoryManager.define(<any>Class, <any>definition, 'test')
       expect(factoryManager['definitions']).toEqual({
         Class: {
           test: definition,

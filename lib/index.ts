@@ -1,107 +1,111 @@
-/// <reference path="collect.js/index.d.ts" />
 /// <reference path="contracts/Driver.ts" />
 /// <reference path="contracts/DriverProvider.ts" />
-/// <reference path="contracts/Component.ts" />
-/// <reference path="contracts/ComponentProvider.ts" />
+/// <reference path="contracts/FactoryBuilder.ts" />
+/// <reference path="contracts/FactoryManager.ts" />
+/// <reference path="contracts/MemoryDataSource.ts" />
+/// <reference path="contracts/MemoryDataSourceProvider.ts" />
+/// <reference path="contracts/MomentProvider.ts" />
 /// <reference path="contracts/QueryLog.ts" />
-/// <reference path="contracts/MongooseProvider.ts" />
-/// <reference path="model/interfaces/IModel.ts" />
-/// <reference path="model/interfaces/IModelQuery.ts" />
 
-import { BuiltinClasses } from './builtin'
-import { container as FacadeContainer } from './facades/container'
-import { ModelAttribute } from './model/components/ModelAttribute'
-import { ModelFillable } from './model/components/ModelFillable'
-import { ModelSerialization } from './model/components/ModelSerialization'
-import { ModelQuery } from './model/components/ModelQuery'
-import { ModelTimestamps } from './model/components/ModelTimestamps'
-import { ModelSoftDeletes } from './model/components/ModelSoftDeletes'
-import { ModelActiveRecord } from './model/components/ModelActiveRecord'
-import { ModelSetting } from './model/components/ModelSetting'
-import { DynamicAttribute } from './model/components/DynamicAttribute'
-import { StaticQuery } from './model/components/StaticQuery'
-import { DriverProvider } from './providers/DriverProvider'
-import { ComponentProvider } from './providers/ComponentProvider'
-import { KnexProvider as KnexProviderClass } from './providers/KnexProvider'
-import { MongodbProvider as MongodbProviderClass } from './providers/MongodbProvider'
-import { MongooseProvider as MongooseProviderClass } from './providers/MongooseProvider'
-import { ChanceFaker } from './factory/FactoryManager'
-import { EloquentDriverProvider } from './facades/global/EloquentDriverProviderFacade'
-import { MongooseDriver } from './drivers/MongooseDriver'
-import { GenericQueryBuilder } from './query-builders/GenericQueryBuilder'
-import { MongodbConditionConverter } from './query-builders/mongodb/MongodbConditionConverter'
-import { MongooseQueryBuilder } from './query-builders/mongodb/MongooseQueryBuilder'
-import { MongodbQueryLog } from './query-builders/mongodb/MongodbQueryLog'
-import { QueryBuilderWrapper } from './wrappers/QueryBuilderWrapper'
-import { MongooseQueryBuilderWrapper } from './wrappers/MongooseQueryBuilderWrapper'
-import { MongodbQueryBuilder } from './query-builders/mongodb/MongodbQueryBuilder'
-import { MongodbQueryBuilderWrapper } from './wrappers/MongodbQueryBuilderWrapper'
+/// <reference path="definitions/collect.js/index.d.ts" />
 
-export type Faker = ChanceFaker
-export type Model<T> = NajsEloquent.Model.IModel<T> & T
-export type ModelAsync<T> = Promise<NajsEloquent.Model.IModel<T> & T>
-export type Collection<T> = CollectJs.Collection<NajsEloquent.Model.IModel<T> & T>
-export type CollectionAsync<T> = Promise<CollectJs.Collection<NajsEloquent.Model.IModel<T> & T>>
+/// <reference path="definitions/data/IDataBuffer.ts" />
+/// <reference path="definitions/data/IDataCollector.ts" />
+/// <reference path="definitions/data/IDataReader.ts" />
 
-export { HasOne, HasOneRelation, HasMany, HasManyRelation, BelongsTo, BelongsToRelation } from './relations/types'
+/// <reference path="definitions/driver/IExecutor.ts" />
+/// <reference path="definitions/driver/IExecutorFactory.ts" />
 
-// package facades
-export { QueryLogFacade, QueryLog } from './facades/global/QueryLogFacade'
-export { EloquentDriverProviderFacade, EloquentDriverProvider } from './facades/global/EloquentDriverProviderFacade'
+/// <reference path="definitions/factory/IFactoryDefinition.ts" />
+
+/// <reference path="definitions/features/IEventFeature.ts" />
+/// <reference path="definitions/features/IFeature.ts" />
+/// <reference path="definitions/features/IFillableFeature.ts" />
+/// <reference path="definitions/features/IQueryFeature.ts" />
+/// <reference path="definitions/features/IRecordExecutor.ts" />
+/// <reference path="definitions/features/IRecordManager.ts" />
+/// <reference path="definitions/features/IRelationFeature.ts" />
+/// <reference path="definitions/features/ISerializationFeature.ts" />
+/// <reference path="definitions/features/ISettingFeature.ts" />
+/// <reference path="definitions/features/ISoftDeletesFeature.ts" />
+/// <reference path="definitions/features/ITimestampsFeature.ts" />
+
+/// <reference path="definitions/model/IModel.ts" />
+/// <reference path="definitions/model/IModelEvent.ts" />
+/// <reference path="definitions/model/IModelFillable.ts" />
+/// <reference path="definitions/model/IModelRecord.ts" />
+/// <reference path="definitions/model/IModelRelation.ts" />
+/// <reference path="definitions/model/IModelSerialization.ts" />
+/// <reference path="definitions/model/IModelSoftDeletes.ts" />
+/// <reference path="definitions/model/IModelTimestamps.ts" />
+
+/// <reference path="definitions/query-builders/IConditionMatcher.ts" />
+/// <reference path="definitions/query-builders/IConvention.ts" />
+/// <reference path="definitions/query-builders/IQueryBuilder.ts" />
+/// <reference path="definitions/query-builders/IQueryBuilderHandler.ts" />
+/// <reference path="definitions/query-builders/IQueryBuilderFactory.ts" />
+/// <reference path="definitions/query-builders/IQueryExecutor.ts" />
+
+/// <reference path="definitions/query-grammars/IAdvancedQuery.ts" />
+/// <reference path="definitions/query-grammars/IBasicConditionQuery.ts" />
+/// <reference path="definitions/query-grammars/IBasicQuery.ts" />
+/// <reference path="definitions/query-grammars/IConditionQuery.ts" />
+/// <reference path="definitions/query-grammars/IExecuteQuery.ts" />
+/// <reference path="definitions/query-grammars/IQuery.ts" />
+
+/// <reference path="definitions/relations/IBelongsToRelationship.ts" />
+/// <reference path="definitions/relations/IHasOneRelationship.ts" />
+/// <reference path="definitions/relations/IHasManyRelationship.ts" />
+/// <reference path="definitions/relations/IBelongsToManyRelationship.ts" />
+/// <reference path="definitions/relations/IPivotOptions.ts" />
+/// <reference path="definitions/relations/IRelationData.ts" />
+/// <reference path="definitions/relations/IRelationData.ts" />
+/// <reference path="definitions/relations/IRelationDataBucket.ts" />
+/// <reference path="definitions/relations/IRelationship.ts" />
+/// <reference path="definitions/relations/IRelationshipFactory.ts" />
+
+import { MemoryDataSourceProvider } from './facades/global/MemoryDataSourceProviderFacade'
+import { MemoryDataSource } from './drivers/memory/MemoryDataSource'
+import { Model } from './model/Model'
+import { Relationship } from './relations/Relationship'
+
+import { DriverProvider } from './facades/global/DriverProviderFacade'
+import { MemoryDriver } from './drivers/memory/MemoryDriver'
+
+MemoryDataSourceProvider.register(MemoryDataSource, 'memory', true)
+DriverProvider.register(MemoryDriver, 'memory')
+
+export const Relation: NajsEloquent.Relation.IRelationshipStatic = Relationship
+
+export { Model, Model as Eloquent }
+export { PivotModel as Pivot } from './relations/relationships/pivot/PivotModel'
+export { isModel, isCollection, isObjectId } from './util/helpers'
+export { Builtin as NajsEloquent } from './builtin'
+
+export type HasOne<T extends Model> = T | undefined | null
+export type HasMany<T extends Model> = CollectJs.Collection<T> | undefined
+export type BelongsTo<T extends Model> = T | undefined | null
+
+// prettier-ignore
+export type BelongsToMany<T extends Model, R extends Model = Model, K extends keyof any = 'pivot'> =
+  CollectJs.Collection<T & { readonly [P in K]: R }> | undefined
+
+export type MorphOne<T extends Model> = T | undefined | null
+export type MorphMany<T extends Model> = CollectJs.Collection<T> | undefined
+export type MorphTo<T extends Model> = T | undefined | null
+
 export {
-  EloquentComponentProviderFacade,
-  EloquentComponentProvider
-} from './facades/global/EloquentComponentProviderFacade'
-export { MongooseProviderFacade, MongooseProvider } from './facades/global/MongooseProviderFacade'
-export { FactoryFacade, Factory, factory } from './facades/global/FactoryFacade'
-
-// package error
-export { NotFoundError } from './errors/NotFoundError'
-
-// package model
-export { Eloquent, EloquentStaticMongoose } from './model/Eloquent'
-export { EloquentMongoose } from './model/EloquentMongoose'
-
-// package driver
-export { DummyDriver } from './drivers/DummyDriver'
-export { MongooseDriver } from './drivers/MongooseDriver'
-EloquentDriverProvider.register(MongooseDriver, 'mongoose', true)
-
-export const NajsEloquent: BuiltinClasses = {
-  FacadeContainer: FacadeContainer,
-  Model: {
-    Component: {
-      ModelAttribute: ModelAttribute,
-      ModelFillable: ModelFillable,
-      ModelSerialization: ModelSerialization,
-      ModelQuery: ModelQuery,
-      ModelTimestamps: ModelTimestamps,
-      ModelSoftDeletes: ModelSoftDeletes,
-      ModelActiveRecord: ModelActiveRecord,
-      ModelSetting: ModelSetting,
-      DynamicAttribute: DynamicAttribute,
-      StaticQuery: StaticQuery
-    }
-  },
-  Provider: {
-    DriverProvider: DriverProvider,
-    ComponentProvider: ComponentProvider,
-    KnexProvider: KnexProviderClass,
-    MongodbProvider: MongodbProviderClass,
-    MongooseProvider: MongooseProviderClass
-  },
-  QueryBuilder: {
-    GenericQueryBuilder: GenericQueryBuilder,
-    Mongodb: {
-      MongodbConditionConverter: MongodbConditionConverter,
-      MongodbQueryBuilder: MongodbQueryBuilder,
-      MongooseQueryBuilder: MongooseQueryBuilder,
-      MongodbQueryLog: MongodbQueryLog
-    }
-  },
-  Wrapper: {
-    QueryBuilderWrapper: QueryBuilderWrapper,
-    MongodbQueryBuilderWrapper: MongodbQueryBuilderWrapper,
-    MongooseQueryBuilderWrapper: MongooseQueryBuilderWrapper
-  }
-}
+  DriverProvider,
+  DriverProvider as ModelDriverProvider,
+  DriverProvider as EloquentDriverProvider,
+  DriverProviderFacade,
+  DriverProviderFacade as ModelDriverProviderFacade,
+  DriverProviderFacade as EloquentDriverProviderFacade
+} from './facades/global/DriverProviderFacade'
+export { factory, Factory, FactoryFacade } from './facades/global/FactoryFacade'
+export { QueryLog, QueryLogFacade } from './facades/global/QueryLogFacade'
+export {
+  MemoryDataSourceProvider,
+  MemoryDataSourceProviderFacade
+} from './facades/global/MemoryDataSourceProviderFacade'
+export { MomentProvider, MomentProviderFacade } from './facades/global/MomentProviderFacade'

@@ -1,4 +1,10 @@
-version: "2"
+version: '2'
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+        - typescript
 checks:
   argument-count:
     enabled: true
@@ -35,22 +41,24 @@ checks:
   similar-code:
     enabled: true
     config:
-      threshold: #language-specific defaults. overrides affect all languages.
+      threshold: 70
   identical-code:
     enabled: true
     config:
-      threshold: #language-specific defaults. overrides affect all languages.
+      threshold: 70
 exclude_patterns:
-- "config/"
-- "db/"
-- "dist/"
-- "features/"
-- "**/node_modules/"
-- "script/"
-- "**/spec/"
-- "**/test/"
-- "**/integration/"
-- "**/tests/"
-- "**/vendor/"
-- "**/*.d.ts"
-- "**/interfaces/"
+  - 'config/'
+  - 'db/'
+  - 'dist/'
+  - 'features/'
+  - '**/node_modules/'
+  - 'script/'
+  - '**/spec/'
+  - '**/test/'
+  - '**/errors'
+  - '**/integration/'
+  - '**/definitions/'
+  - '**/mixin/'
+  - '**/tests/'
+  - '**/vendor/'
+  - '**/*.d.ts'

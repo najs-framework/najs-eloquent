@@ -57,3 +57,11 @@ function parse_string_with_dot_notation(input) {
     return result;
 }
 exports.parse_string_with_dot_notation = parse_string_with_dot_notation;
+function override_setting_property_of_model(model, property, values) {
+    if (typeof model['internalData']['overridden'] === 'undefined') {
+        model['internalData']['overridden'] = {};
+    }
+    model['internalData']['overridden'][property] = true;
+    model[property] = values;
+}
+exports.override_setting_property_of_model = override_setting_property_of_model;

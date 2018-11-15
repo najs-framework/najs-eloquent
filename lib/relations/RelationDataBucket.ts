@@ -1,114 +1,70 @@
-/// <reference path="./interfaces/IRelationDataBucket.ts" />
-/// <reference path="../collect.js/index.d.ts" />
+/// <reference path="../definitions/relations/IRelationDataBucket.ts" />
+/// <reference path="../definitions/collect.js/index.d.ts" />
 
-import { make, register } from 'najs-binding'
-import { NajsEloquent } from '../constants'
-import { eq } from 'lodash'
-import { ObjectID } from 'bson'
-const collect = require('collect.js')
+import Model = NajsEloquent.Model.IModel
+import IRelationDataBucket = NajsEloquent.Relation.IRelationDataBucket
+import IRelationDataBucketMetadata = NajsEloquent.Relation.IRelationDataBucketMetadata
+import Autoload = Najs.Contracts.Autoload
+import { register, make, getClassName } from 'najs-binding'
+import { NajsEloquent as NajsEloquentClasses } from '../constants'
+import { relationFeatureOf } from '../util/accessors'
+import { DataBuffer } from '../data/DataBuffer'
+import { make_collection } from '../util/factory'
 
-export class RelationDataBucket implements NajsEloquent.Relation.IRelationDataBucket {
-  static className = NajsEloquent.Relation.RelationDataBucket
-
-  protected modelMap: Object
-  protected bucket: Object
-  protected loaded: Object
+export class RelationDataBucket implements Autoload, IRelationDataBucket {
+  protected bucket: {
+    [key in string]: {
+      data: DataBuffer<object>
+      meta: {
+        loaded: string[]
+      }
+    }
+  }
 
   constructor() {
-    this.modelMap = {}
     this.bucket = {}
-    this.loaded = {}
   }
 
   getClassName(): string {
-    return NajsEloquent.Relation.RelationDataBucket
+    return NajsEloquentClasses.Relation.RelationDataBucket
   }
 
-  register(name: string, modelName: string): this {
-    this.modelMap[name] = modelName
-    return this
-  }
-
-  newInstance<T>(name: string, record: Object): T {
-    if (!this.modelMap[name]) {
-      throw new ReferenceError(`"${name}" is not found or not registered yet.`)
-    }
-    const model: NajsEloquent.Model.IModel<any> = this.makeModelFromRecord(name, record)
-    if (typeof this.bucket[name] === 'undefined') {
-      this.bucket[name] = {}
-    }
-
-    this.bucket[name][model.getPrimaryKey()] = record
-    return <any>model
-  }
-
-  newCollection<T>(name: string, records: Object[]): CollectJs.Collection<T> {
-    return collect(records.map(item => this.newInstance(name, item)))
-  }
-
-  makeModelFromRecord(name: string, record: Object): NajsEloquent.Model.IModel<any> {
-    const model: any = make(this.modelMap[name], [record, false])
-    model['relationDataBucket'] = this
-    return model
-  }
-
-  makeCollectionFromRecords(name: string, records: Object[]): CollectJs.Collection<NajsEloquent.Model.IModel<any>> {
-    return collect(records.map(item => this.makeModelFromRecord(name, item)))
-  }
-
-  markRelationLoaded(modelName: string, relationName: string, loaded: boolean = true): this {
-    if (typeof this.loaded[modelName] === 'undefined') {
-      this.loaded[modelName] = {}
-    }
-    this.loaded[modelName][relationName] = loaded
+  add(model: Model): this {
+    this.getDataOf(model).add(relationFeatureOf(model).getRawDataForDataBucket(model))
 
     return this
   }
 
-  isRelationLoaded(modelName: string, relationName: string): boolean {
-    return typeof this.loaded[modelName] !== 'undefined' && this.loaded[modelName][relationName] === true
+  makeModel<M extends Model = Model>(model: M, data: any): M {
+    const instance = make<M>(getClassName(model), [data, false])
+
+    relationFeatureOf(instance).setDataBucket(instance, this as any)
+    return instance
   }
 
-  getAttributes(name: string, attribute: string, allowDuplicated: boolean = false): any[] {
-    if (typeof this.bucket[name] === 'undefined') {
-      return []
-    }
-    const result: any[] = []
-    for (const key in this.bucket[name]) {
-      const value = this.bucket[name][key][attribute]
-      if (typeof value === 'undefined' || value === null) {
-        continue
-      }
-      result.push(value)
-    }
-    return allowDuplicated ? result : Array.from(new Set(result))
+  makeCollection<M extends Model = Model>(model: M, data: any[]): CollectJs.Collection<M> {
+    return make_collection(data, item => this.makeModel(model, item))
   }
 
-  filter(name: string, key: string, value: any, getFirstOnly: boolean = false): Object[] {
-    if (typeof this.bucket[name] === 'undefined') {
-      return []
-    }
-    const result: any[] = []
+  getDataOf<M extends Model = Model>(model: M): DataBuffer<object> {
+    return this.bucket[this.createKey(model)].data
+  }
 
-    const convertedValue = this.convertToStringIfValueIsObjectID(value)
-    for (const id in this.bucket[name]) {
-      const compareValue = this.convertToStringIfValueIsObjectID(this.bucket[name][id][key])
-      if (eq(compareValue, convertedValue)) {
-        result.push(this.bucket[name][id])
+  getMetadataOf(model: Model): IRelationDataBucketMetadata {
+    return this.bucket[this.createKey(model)].meta
+  }
 
-        if (getFirstOnly) {
-          break
+  createKey(model: Model): string {
+    const key = relationFeatureOf(model).createKeyForDataBucket(model)
+    if (typeof this.bucket[key] === 'undefined') {
+      this.bucket[key] = {
+        data: new DataBuffer(model.getPrimaryKeyName(), relationFeatureOf(model).getDataReaderForDataBucket()),
+        meta: {
+          loaded: []
         }
       }
     }
-    return result
-  }
-
-  convertToStringIfValueIsObjectID(value: any) {
-    if (value instanceof ObjectID) {
-      return value.toHexString()
-    }
-    return value
+    return key
   }
 }
-register(RelationDataBucket)
+register(RelationDataBucket, NajsEloquentClasses.Relation.RelationDataBucket)

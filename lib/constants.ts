@@ -2,63 +2,70 @@ import { array_unique } from './util/functions'
 
 export const NajsEloquent = {
   Driver: {
-    Component: {
-      StaticQuery: 'NajsEloquent.Driver.Component.StaticQuery'
-    },
-    DummyDriver: 'NajsEloquent.Driver.DummyDriver',
-    MongooseDriver: 'NajsEloquent.Driver.MongooseDriver',
+    MemoryDriver: 'NajsEloquent.Driver.MemoryDriver',
     MongodbDriver: 'NajsEloquent.Driver.MongodbDriver',
-    KnexDriver: 'NajsEloquent.Driver.KnexDriver'
-  },
-  Model: {
-    Component: {
-      ModelAttribute: 'NajsEloquent.Model.Component.ModelAttribute',
-      DynamicAttribute: 'NajsEloquent.Model.Component.DynamicAttribute',
-      ModelSetting: 'NajsEloquent.Model.Component.ModelSetting',
-      ModelFillable: 'NajsEloquent.Model.Component.ModelFillable',
-      ModelQuery: 'NajsEloquent.Model.Component.ModelQuery',
-      ModelTimestamps: 'NajsEloquent.Model.Component.ModelTimestamps',
-      ModelSerialization: 'NajsEloquent.Model.Component.ModelSerialization',
-      ModelSoftDeletes: 'NajsEloquent.Model.Component.ModelSoftDeletes',
-      ModelActiveRecord: 'NajsEloquent.Model.Component.ModelActiveRecord',
-      ModelEvent: 'NajsEloquent.Model.Component.ModelEvent',
-      ModelRelation: 'NajsEloquent.Model.Component.ModelRelation'
+    MongooseDriver: 'NajsEloquent.Driver.MongooseDriver',
+    Memory: {
+      MemoryDataSource: 'NajsEloquent.Driver.Memory.MemoryDataSource',
+      MemoryQueryBuilderFactory: 'NajsEloquent.Driver.Memory.MemoryQueryBuilderFactory',
+      MemoryExecutorFactory: 'NajsEloquent.Driver.Memory.MemoryExecutorFactory',
+      RecordFilter: 'NajsEloquent.Driver.Memory.RecordFilter',
+      RecordConditionMatcherFactory: 'NajsEloquent.Driver.Memory.RecordConditionMatcherFactory'
+    },
+    Mongodb: {
+      MongodbExecutorFactory: 'NajsEloquent.Driver.Mongodb.MongodbExecutorFactory',
+      MongodbQueryBuilderFactory: 'NajsEloquent.Driver.Mongodb.MongodbQueryBuilderFactory',
+      MongodbConditionMatcherFactory: 'NajsEloquent.Driver.Mongodb.MongodbConditionMatcherFactory'
+    },
+    Mongoose: {
+      MongooseDocumentManager: 'NajsEloquent.Driver.Mongoose.MongooseDocumentManager',
+      MongooseQueryBuilderFactory: 'NajsEloquent.Driver.Mongoose.MongooseQueryBuilderFactory',
+      MongooseExecutorFactory: 'NajsEloquent.Driver.Mongoose.MongooseExecutorFactory'
+    },
+    Knex: {
+      KnexWrapper: 'NajsEloquent.Driver.Knex.KnexWrapper'
     }
-  },
-  QueryBuilder: {
-    MongooseQueryBuilder: 'NajsEloquent.QueryBuilder.Mongodb.MongooseQueryBuilder',
-    MongodbQueryBuilder: 'NajsEloquent.QueryBuilder.Mongodb.MongodbQueryBuilder',
-    MongodbConditionConverter: 'NajsEloquent.QueryBuilder.Mongodb.MongodbConditionConverter',
-    MongodbQueryLog: 'NajsEloquent.QueryBuilder.Mongodb.MongodbQueryLog',
-    KnexQueryLog: 'NajsEloquent.QueryBuilder.KnexQueryLog',
-    KnexQueryBuilder: 'NajsEloquent.QueryBuilder.KnexQueryBuilder'
-  },
-  Database: {
-    Seeder: 'NajsEloquent.Database.Seeder'
   },
   Factory: {
     FactoryManager: 'NajsEloquent.Factory.FactoryManager',
     FactoryBuilder: 'NajsEloquent.Factory.FactoryBuilder'
   },
+  Feature: {
+    RecordManager: 'NajsEloquent.Feature.RecordManager',
+    SettingFeature: 'NajsEloquent.Feature.SettingFeature',
+    EventFeature: 'NajsEloquent.Feature.EventFeature',
+    FillableFeature: 'NajsEloquent.Feature.FillableFeature',
+    SerializationFeature: 'NajsEloquent.Feature.SerializationFeature',
+    QueryFeature: 'NajsEloquent.Feature.QueryFeature',
+    TimestampsFeature: 'NajsEloquent.Feature.TimestampsFeature',
+    SoftDeletesFeature: 'NajsEloquent.Feature.SoftDeletesFeature',
+    RelationFeature: 'NajsEloquent.Feature.RelationFeature'
+  },
+  Provider: {
+    DriverProvider: 'NajsEloquent.Provider.DriverProvider',
+    MemoryDataSourceProvider: 'NajsEloquent.Provider.MemoryDataSourceProvider',
+    MomentProvider: 'NajsEloquent.Provider.MomentProvider',
+    MongodbProvider: 'NajsEloquent.Provider.MongodbProvider',
+    MongooseProvider: 'NajsEloquent.Provider.MongooseProvider',
+    KnexProvider: 'NajsEloquent.Provider.KnexProvider'
+  },
+  QueryBuilder: {
+    MongodbConditionConverter: 'NajsEloquent.QueryBuilder.MongodbConditionConverter'
+  },
   QueryLog: {
     FlipFlopQueryLog: 'NajsEloquent.QueryLog.FlipFlopQueryLog'
   },
-  Provider: {
-    ComponentProvider: 'NajsEloquent.Provider.ComponentProvider',
-    DriverProvider: 'NajsEloquent.Provider.DriverProvider',
-    KnexProvider: 'NajsEloquent.Provider.KnexProvider',
-    MongodbProvider: 'NajsEloquent.Provider.MongodbProvider',
-    MongooseProvider: 'NajsEloquent.Provider.MongooseProvider'
-  },
-  Wrapper: {
-    QueryBuilderWrapper: 'NajsEloquent.Wrapper.QueryBuilderWrapper',
-    KnexQueryBuilderWrapper: 'NajsEloquent.Wrapper.KnexQueryBuilderWrapper',
-    MongodbQueryBuilderWrapper: 'NajsEloquent.Wrapper.MongodbQueryBuilderWrapper',
-    MongooseQueryBuilderWrapper: 'NajsEloquent.Wrapper.MongooseQueryBuilderWrapper'
-  },
   Relation: {
-    RelationDataBucket: 'NajsEloquent.Relation.RelationDataBucket',
-    HasOneOrMany: 'NajsEloquent.Relation.HasOneOrMany'
+    Relationship: {
+      HasOne: 'NajsEloquent.Relation.Relationship.HasOne',
+      BelongsTo: 'NajsEloquent.Relation.Relationship.BelongsTo',
+      HasMany: 'NajsEloquent.Relation.Relationship.HasMany',
+      BelongsToMany: 'NajsEloquent.Relation.Relationship.BelongsToMany',
+      MorphOne: 'NajsEloquent.Relation.Relationship.MorphOne',
+      MorphMany: 'NajsEloquent.Relation.Relationship.MorphMany',
+      MorphTo: 'NajsEloquent.Relation.Relationship.MorphTo'
+    },
+    RelationDataBucket: 'NajsEloquent.Relation.RelationDataBucket'
   }
 }
 

@@ -1,62 +1,167 @@
-import { IFacadeContainer } from 'najs-facade';
-import { ModelAttribute } from './model/components/ModelAttribute';
-import { ModelFillable } from './model/components/ModelFillable';
-import { ModelSerialization } from './model/components/ModelSerialization';
-import { ModelQuery } from './model/components/ModelQuery';
-import { ModelTimestamps } from './model/components/ModelTimestamps';
-import { ModelSoftDeletes } from './model/components/ModelSoftDeletes';
-import { ModelActiveRecord } from './model/components/ModelActiveRecord';
-import { ModelSetting } from './model/components/ModelSetting';
-import { StaticQuery } from './model/components/StaticQuery';
-import { DynamicAttribute } from './model/components/DynamicAttribute';
+import { DataBuffer } from './data/DataBuffer';
+import { DataCollector } from './data/DataCollector';
+import { DataConditionMatcher } from './data/DataConditionMatcher';
+import { DriverBase } from './drivers/DriverBase';
+import { QueryLogBase } from './drivers/QueryLogBase';
+import { ExecutorBase } from './drivers/ExecutorBase';
+import { Record } from './drivers/Record';
+import { RecordConditionMatcher } from './drivers/RecordConditionMatcher';
+import { RecordConditionMatcherFactory } from './drivers/RecordConditionMatcherFactory';
+import { RecordDataReader } from './drivers/RecordDataReader';
+import { RecordDataSourceBase } from './drivers/RecordDataSourceBase';
+import { RecordExecutorBase } from './drivers/RecordExecutorBase';
+import { RecordManager } from './drivers/RecordManager';
+import { RecordManagerBase } from './drivers/RecordManagerBase';
+import { MemoryDataSource } from './drivers/memory/MemoryDataSource';
+import { MemoryDriver } from './drivers/memory/MemoryDriver';
+import { MemoryExecutorFactory } from './drivers/memory/MemoryExecutorFactory';
+import { MemoryQueryBuilder } from './drivers/memory/MemoryQueryBuilder';
+import { MemoryQueryBuilderHandler } from './drivers/memory/MemoryQueryBuilderHandler';
+import { MemoryQueryBuilderFactory } from './drivers/memory/MemoryQueryBuilderFactory';
+import { MemoryQueryExecutor } from './drivers/memory/MemoryQueryExecutor';
+import { MemoryQueryLog } from './drivers/memory/MemoryQueryLog';
+import { MemoryRecordExecutor } from './drivers/memory/MemoryRecordExecutor';
+import { NotFoundError } from './errors/NotFoundError';
+import { RelationNotDefinedError } from './errors/RelationNotDefinedError';
+import { RelationNotFoundInNewInstanceError } from './errors/RelationNotFoundInNewInstanceError';
+import { FactoryBuilder } from './factory/FactoryBuilder';
+import { FactoryManager } from './factory/FactoryManager';
+import { EventFeature } from './features/EventFeature';
+import { FeatureBase } from './features/FeatureBase';
+import { FillableFeature } from './features/FillableFeature';
+import { QueryFeature } from './features/QueryFeature';
+import { RelationFeature } from './features/RelationFeature';
+import { SerializationFeature } from './features/SerializationFeature';
+import { SettingFeature } from './features/SettingFeature';
+import { SoftDeletesFeature } from './features/SoftDeletesFeature';
+import { TimestampsFeature } from './features/TimestampsFeature';
+import { EventPublicApi } from './features/mixin/EventPublicApi';
+import { FillablePublicApi } from './features/mixin/FillablePublicApi';
+import { RecordManagerPublicApi } from './features/mixin/RecordManagerPublicApi';
+import { RelationPublicApi } from './features/mixin/RelationPublicApi';
+import { SerializationPublicApi } from './features/mixin/SerializationPublicApi';
+import { SoftDeletesPublicApi } from './features/mixin/SoftDeletesPublicApi';
+import { TimestampsPublicApi } from './features/mixin/TimestampsPublicApi';
 import { DriverProvider } from './providers/DriverProvider';
-import { ComponentProvider } from './providers/ComponentProvider';
-import { KnexProvider } from './providers/KnexProvider';
-import { MongodbProvider } from './providers/MongodbProvider';
-import { MongooseProvider } from './providers/MongooseProvider';
-import { GenericQueryBuilder } from './query-builders/GenericQueryBuilder';
-import { MongodbConditionConverter } from './query-builders/mongodb/MongodbConditionConverter';
-import { MongooseQueryBuilder } from './query-builders/mongodb/MongooseQueryBuilder';
-import { MongodbQueryLog } from './query-builders/mongodb/MongodbQueryLog';
-import { QueryBuilderWrapper } from './wrappers/QueryBuilderWrapper';
-import { MongooseQueryBuilderWrapper } from './wrappers/MongooseQueryBuilderWrapper';
-import { MongodbQueryBuilderWrapper } from './wrappers/MongodbQueryBuilderWrapper';
-import { MongodbQueryBuilder } from './query-builders/mongodb/MongodbQueryBuilder';
-export declare type BuiltinClasses = {
-    FacadeContainer: IFacadeContainer;
-    Model: {
-        Component: {
-            ModelAttribute: typeof ModelAttribute;
-            ModelFillable: typeof ModelFillable;
-            ModelSerialization: typeof ModelSerialization;
-            ModelQuery: typeof ModelQuery;
-            ModelTimestamps: typeof ModelTimestamps;
-            ModelSoftDeletes: typeof ModelSoftDeletes;
-            ModelActiveRecord: typeof ModelActiveRecord;
-            ModelSetting: typeof ModelSetting;
-            DynamicAttribute: typeof DynamicAttribute;
-            StaticQuery: typeof StaticQuery;
-        };
-    };
-    Provider: {
-        DriverProvider: typeof DriverProvider;
-        ComponentProvider: typeof ComponentProvider;
-        KnexProvider: typeof KnexProvider;
-        MongodbProvider: typeof MongodbProvider;
-        MongooseProvider: typeof MongooseProvider;
-    };
-    QueryBuilder: {
-        GenericQueryBuilder: typeof GenericQueryBuilder;
-        Mongodb: {
-            MongodbConditionConverter: typeof MongodbConditionConverter;
-            MongodbQueryBuilder: typeof MongodbQueryBuilder;
-            MongooseQueryBuilder: typeof MongooseQueryBuilder;
-            MongodbQueryLog: typeof MongodbQueryLog;
-        };
-    };
-    Wrapper: {
-        QueryBuilderWrapper: typeof QueryBuilderWrapper;
-        MongodbQueryBuilderWrapper: typeof MongodbQueryBuilderWrapper;
-        MongooseQueryBuilderWrapper: typeof MongooseQueryBuilderWrapper;
-    };
+import { MemoryDataSourceProvider } from './providers/MemoryDataSourceProvider';
+import { QueryBuilder } from './query-builders/QueryBuilder';
+import { QueryBuilderHandlerBase } from './query-builders/QueryBuilderHandlerBase';
+import { AdvancedQuery } from './query-builders/mixin/AdvancedQuery';
+import { ConditionQuery } from './query-builders/mixin/ConditionQuery';
+import { ExecuteQuery } from './query-builders/mixin/ExecuteQuery';
+import { Query } from './query-builders/mixin/Query';
+import { BasicQuery } from './query-builders/shared/BasicQuery';
+import { BasicQueryConverter } from './query-builders/shared/BasicQueryConverter';
+import { ConditionQueryHandler } from './query-builders/shared/ConditionQueryHandler';
+import { DefaultConvention } from './query-builders/shared/DefaultConvention';
+import { ExecutorUtils } from './query-builders/shared/ExecutorUtils';
+import { Operator } from './query-builders/shared/Operator';
+import { QueryCondition } from './query-builders/shared/QueryCondition';
+import { FlipFlopQueryLog } from './query-log/FlipFlopQueryLog';
+import { ClassSetting } from './util/ClassSetting';
+import { PrototypeManager } from './util/PrototypeManager';
+import { SettingType } from './util/SettingType';
+export declare type DataPackage = {
+    DataBuffer: typeof DataBuffer;
+    DataCollector: typeof DataCollector;
+    DataConditionMatcher: typeof DataConditionMatcher;
+};
+export declare type DriverPackage = {
+    DriverBase: typeof DriverBase;
+    ExecutorBase: typeof ExecutorBase;
+    QueryLogBase: typeof QueryLogBase;
+    Record: typeof Record;
+    RecordConditionMatcher: typeof RecordConditionMatcher;
+    RecordConditionMatcherFactory: typeof RecordConditionMatcherFactory;
+    RecordDataReader: typeof RecordDataReader;
+    RecordDataSourceBase: typeof RecordDataSourceBase;
+    RecordExecutorBase: typeof RecordExecutorBase;
+    RecordManager: typeof RecordManager;
+    RecordManagerBase: typeof RecordManagerBase;
+    Memory: DriverMemoryPackage;
+};
+export declare type DriverMemoryPackage = {
+    MemoryDataSource: typeof MemoryDataSource;
+    MemoryDriver: typeof MemoryDriver;
+    MemoryExecutorFactory: typeof MemoryExecutorFactory;
+    MemoryQueryBuilder: typeof MemoryQueryBuilder;
+    MemoryQueryBuilderHandler: typeof MemoryQueryBuilderHandler;
+    MemoryQueryBuilderFactory: typeof MemoryQueryBuilderFactory;
+    MemoryQueryExecutor: typeof MemoryQueryExecutor;
+    MemoryQueryLog: typeof MemoryQueryLog;
+    MemoryRecordExecutor: typeof MemoryRecordExecutor;
+};
+export declare type ErrorPackage = {
+    NotFoundError: typeof NotFoundError;
+    RelationNotDefinedError: typeof RelationNotDefinedError;
+    RelationNotFoundInNewInstanceError: typeof RelationNotFoundInNewInstanceError;
+};
+export declare type FactoryPackage = {
+    FactoryBuilder: typeof FactoryBuilder;
+    FactoryManager: typeof FactoryManager;
+};
+export declare type FeaturePackage = {
+    EventFeature: typeof EventFeature;
+    FeatureBase: typeof FeatureBase;
+    FillableFeature: typeof FillableFeature;
+    QueryFeature: typeof QueryFeature;
+    RelationFeature: typeof RelationFeature;
+    SerializationFeature: typeof SerializationFeature;
+    SettingFeature: typeof SettingFeature;
+    SoftDeletesFeature: typeof SoftDeletesFeature;
+    TimestampsFeature: typeof TimestampsFeature;
+    Mixin: FeatureMixinPackage;
+};
+export declare type FeatureMixinPackage = {
+    EventPublicApi: typeof EventPublicApi;
+    FillablePublicApi: typeof FillablePublicApi;
+    RecordManagerPublicApi: typeof RecordManagerPublicApi;
+    RelationPublicApi: typeof RelationPublicApi;
+    SerializationPublicApi: typeof SerializationPublicApi;
+    SoftDeletesPublicApi: typeof SoftDeletesPublicApi;
+    TimestampsPublicApi: typeof TimestampsPublicApi;
+};
+export declare type ProviderPackage = {
+    DriverProvider: typeof DriverProvider;
+    MemoryDataSourceProvider: typeof MemoryDataSourceProvider;
+};
+export declare type QueryBuilderPackage = {
+    QueryBuilder: typeof QueryBuilder;
+    QueryBuilderHandlerBase: typeof QueryBuilderHandlerBase;
+    Mixin: QueryBuilderMixinPackage;
+    Shared: QueryBuilderSharedPackage;
+};
+export declare type QueryBuilderMixinPackage = {
+    AdvancedQuery: typeof AdvancedQuery;
+    ConditionQuery: typeof ConditionQuery;
+    ExecuteQuery: typeof ExecuteQuery;
+    Query: typeof Query;
+};
+export declare type QueryBuilderSharedPackage = {
+    BasicQuery: typeof BasicQuery;
+    BasicQueryConverter: typeof BasicQueryConverter;
+    ConditionQueryHandler: typeof ConditionQueryHandler;
+    DefaultConvention: typeof DefaultConvention;
+    ExecutorUtils: typeof ExecutorUtils;
+    Operator: typeof Operator;
+    QueryCondition: typeof QueryCondition;
+};
+export declare type QueryLogPackage = {
+    FlipFlopQueryLog: typeof FlipFlopQueryLog;
+};
+export declare type UtilPackage = {
+    ClassSetting: typeof ClassSetting;
+    PrototypeManager: typeof PrototypeManager;
+    SettingType: typeof SettingType;
+};
+export declare const Builtin: {
+    Data: DataPackage;
+    Driver: DriverPackage;
+    Error: ErrorPackage;
+    Factory: FactoryPackage;
+    Feature: FeaturePackage;
+    Provider: ProviderPackage;
+    QueryBuilder: QueryBuilderPackage;
+    QueryLog: QueryLogPackage;
+    Util: UtilPackage;
 };

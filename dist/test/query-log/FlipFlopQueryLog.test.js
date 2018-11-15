@@ -5,7 +5,7 @@ require("jest");
 const constants_1 = require("../../lib/constants");
 const najs_facade_1 = require("najs-facade");
 const FlipFlopQueryLog_1 = require("../../lib/query-log/FlipFlopQueryLog");
-const Moment = require('moment');
+const MomentProviderFacade_1 = require("../../lib/facades/global/MomentProviderFacade");
 describe('FlipFlopQueryLog', function () {
     const QueryLog = new FlipFlopQueryLog_1.FlipFlopQueryLog();
     it('extends Facade class, implements IAutoload', function () {
@@ -70,7 +70,7 @@ describe('FlipFlopQueryLog', function () {
         });
         it('pushes item to the pipe with when = Moment.now()', function () {
             const now = new Date(1988, 1, 1);
-            Moment.now = () => now;
+            MomentProviderFacade_1.MomentProvider.setNow(() => now);
             QueryLog.clear();
             QueryLog.push('anything');
             expect(QueryLog['flip'][0].when.toDate()).toEqual(now);
@@ -87,80 +87,80 @@ describe('FlipFlopQueryLog', function () {
         });
         it('returns logs in pipe sorted by time asc', function () {
             QueryLog.clear().enable();
-            Moment.now = () => new Date(2018, 1, 2);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 1, 2));
             QueryLog.push('second');
-            Moment.now = () => new Date(2018, 1, 1);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 1, 1));
             QueryLog.push('first');
             const logs = QueryLog.pull();
             expect(logs).toHaveLength(2);
-            expect(logs[0].query).toEqual('first');
-            expect(logs[1].query).toEqual('second');
+            expect(logs[0].data).toEqual('first');
+            expect(logs[1].data).toEqual('second');
         });
         it('returns all logs group is undefined', function () {
             QueryLog.clear().enable();
-            Moment.now = () => new Date(2018, 1, 2);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 1, 2));
             QueryLog.push('second', 'test');
-            Moment.now = () => new Date(2018, 1, 1);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 1, 1));
             QueryLog.push('first', 'all');
             const logs = QueryLog.pull();
             expect(logs).toHaveLength(2);
-            expect(logs[0].query).toEqual('first');
-            expect(logs[1].query).toEqual('second');
+            expect(logs[0].data).toEqual('first');
+            expect(logs[1].data).toEqual('second');
         });
         it('filters by group if provided', function () {
             QueryLog.clear().enable();
-            Moment.now = () => new Date(2018, 0, 5);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 0, 5));
             QueryLog.push('second', 'test');
-            Moment.now = () => new Date(2018, 0, 1);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 0, 1));
             QueryLog.push('first', 'all');
             let logs = QueryLog.pull('test');
             expect(logs).toHaveLength(1);
-            expect(logs[0].query).toEqual('second');
+            expect(logs[0].data).toEqual('second');
             logs = QueryLog.pull('all');
             expect(logs).toHaveLength(1);
-            expect(logs[0].query).toEqual('first');
+            expect(logs[0].data).toEqual('first');
         });
         it('filters by since if provided', function () {
             QueryLog.clear().enable();
-            Moment.now = () => new Date(2018, 0, 5);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 0, 5));
             QueryLog.push('second', 'test');
-            Moment.now = () => new Date(2018, 0, 10);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 0, 10));
             QueryLog.push('third', 'test');
-            Moment.now = () => new Date(2018, 0, 1);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 0, 1));
             QueryLog.push('first', 'all');
-            const logs = QueryLog.pull(Moment('2018-01-03'));
+            const logs = QueryLog.pull(MomentProviderFacade_1.MomentProvider.make('2018-01-03'));
             expect(logs).toHaveLength(2);
-            expect(logs[0].query).toEqual('second');
-            expect(logs[1].query).toEqual('third');
+            expect(logs[0].data).toEqual('second');
+            expect(logs[1].data).toEqual('third');
         });
         it('filters by until if provided', function () {
             QueryLog.clear().enable();
-            Moment.now = () => new Date(2018, 0, 5);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 0, 5));
             QueryLog.push('second', 'test');
-            Moment.now = () => new Date(2018, 0, 10);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 0, 10));
             QueryLog.push('third', 'test');
-            Moment.now = () => new Date(2018, 0, 1);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 0, 1));
             QueryLog.push('first', 'all');
-            const logs = QueryLog.pull(Moment('2018-01-03'), Moment('2018-01-07'));
+            const logs = QueryLog.pull(MomentProviderFacade_1.MomentProvider.make('2018-01-03'), MomentProviderFacade_1.MomentProvider.make('2018-01-07'));
             expect(logs).toHaveLength(1);
-            expect(logs[0].query).toEqual('second');
+            expect(logs[0].data).toEqual('second');
         });
         it('transforms the query if provided', function () {
             QueryLog.clear().enable();
-            Moment.now = () => new Date(2018, 0, 2);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 0, 2));
             QueryLog.push('second', 'test');
-            Moment.now = () => new Date(2018, 0, 1);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 0, 1));
             QueryLog.push('first', 'all');
-            const logs = QueryLog.pull((item) => ({ query: item.query + '-test', when: item.when, group: item.group }));
+            const logs = QueryLog.pull((item) => ({ data: item.data + '-test', when: item.when, group: item.group }));
             expect(logs).toHaveLength(2);
-            expect(logs[0].query).toEqual('first-test');
-            expect(logs[1].query).toEqual('second-test');
+            expect(logs[0].data).toEqual('first-test');
+            expect(logs[1].data).toEqual('second-test');
         });
         it('put back to the other pipe if not match', function () {
             QueryLog.clear().enable();
-            Moment.now = () => new Date(2018, 0, 2);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 0, 2));
             QueryLog.push('second', 'test');
-            Moment.now = () => new Date(2018, 0, 1);
+            MomentProviderFacade_1.MomentProvider.setNow(() => new Date(2018, 0, 1));
             QueryLog.push('first', 'all');
             const logs = QueryLog.pull('not-found');
             expect(logs).toHaveLength(0);
@@ -210,7 +210,7 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform']).toBeUndefined();
         });
         it('pull(group: string, since: Moment.Moment)', function () {
-            const since = new Moment('2018-01-01');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
             const result = QueryLog['parsePullArguments'](['test', since]);
             expect(result['group']).toEqual('test');
             expect(result['since'].isSame(since)).toBe(true);
@@ -218,8 +218,8 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform']).toBeUndefined();
         });
         it('pull(group: string, since: Moment.Moment, until: Moment.Moment)', function () {
-            const since = new Moment('2018-01-01');
-            const until = new Moment('2018-01-31');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
+            const until = MomentProviderFacade_1.MomentProvider.make('2018-01-31');
             const result = QueryLog['parsePullArguments'](['test', since, until]);
             expect(result['group']).toEqual('test');
             expect(result['since'].isSame(since)).toBe(true);
@@ -227,8 +227,8 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform']).toBeUndefined();
         });
         it('pull(group: string, since: Moment.Moment, until: Moment.Moment, transform: QueryLogTransform)', function () {
-            const since = new Moment('2018-01-01');
-            const until = new Moment('2018-01-31');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
+            const until = MomentProviderFacade_1.MomentProvider.make('2018-01-31');
             const transform = () => { };
             const result = QueryLog['parsePullArguments'](['test', since, until, transform]);
             expect(result['group']).toEqual('test');
@@ -237,7 +237,7 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform'] === transform).toBe(true);
         });
         it('pull(group: string, since: Moment.Moment, transform: QueryLogTransform)', function () {
-            const since = new Moment('2018-01-01');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
             const transform = () => { };
             const result = QueryLog['parsePullArguments'](['test', since, transform]);
             expect(result['group']).toEqual('test');
@@ -254,7 +254,7 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform'] === transform).toBe(true);
         });
         it('pull(since: Moment.Moment)', function () {
-            const since = new Moment('2018-01-01');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
             const result = QueryLog['parsePullArguments']([since]);
             expect(result['group']).toBeUndefined();
             expect(result['since'].isSame(since)).toBe(true);
@@ -262,7 +262,7 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform']).toBeUndefined();
         });
         it('pull(since: Moment.Moment, group: string)', function () {
-            const since = new Moment('2018-01-01');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
             const result = QueryLog['parsePullArguments']([since, 'test']);
             expect(result['group']).toEqual('test');
             expect(result['since'].isSame(since)).toBe(true);
@@ -270,8 +270,8 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform']).toBeUndefined();
         });
         it('pull(since: Moment.Moment, until: Moment.Moment)', function () {
-            const since = new Moment('2018-01-01');
-            const until = new Moment('2018-01-31');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
+            const until = MomentProviderFacade_1.MomentProvider.make('2018-01-31');
             const result = QueryLog['parsePullArguments']([since, until]);
             expect(result['group']).toBeUndefined();
             expect(result['since'].isSame(since)).toBe(true);
@@ -279,8 +279,8 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform']).toBeUndefined();
         });
         it('pull(since: Moment.Moment, until: Moment.Moment, group: string)', function () {
-            const since = new Moment('2018-01-01');
-            const until = new Moment('2018-01-31');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
+            const until = MomentProviderFacade_1.MomentProvider.make('2018-01-31');
             const result = QueryLog['parsePullArguments']([since, until, 'test']);
             expect(result['group']).toEqual('test');
             expect(result['since'].isSame(since)).toBe(true);
@@ -288,8 +288,8 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform']).toBeUndefined();
         });
         it('pull(since: Moment.Moment, until: Moment.Moment, transform: QueryLogTransform, group: string)', function () {
-            const since = new Moment('2018-01-01');
-            const until = new Moment('2018-01-31');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
+            const until = MomentProviderFacade_1.MomentProvider.make('2018-01-31');
             const transform = () => { };
             const result = QueryLog['parsePullArguments']([since, until, transform, 'test']);
             expect(result['group']).toEqual('test');
@@ -298,7 +298,7 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform'] === transform).toBe(true);
         });
         it('pull(since: Moment.Moment, transform: QueryLogTransform)', function () {
-            const since = new Moment('2018-01-01');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
             const transform = () => { };
             const result = QueryLog['parsePullArguments']([since, transform]);
             expect(result['group']).toBeUndefined();
@@ -307,7 +307,7 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform'] === transform).toBe(true);
         });
         it('pull(since: Moment.Moment, transform: QueryLogTransform, group: string)', function () {
-            const since = new Moment('2018-01-01');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
             const transform = () => { };
             const result = QueryLog['parsePullArguments']([since, transform, 'test']);
             expect(result['group']).toEqual('test');
@@ -332,7 +332,7 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform'] === transform).toBe(true);
         });
         it('pull(transform: QueryLogTransform, since: Moment.Moment)', function () {
-            const since = new Moment('2018-01-01');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
             const transform = () => { };
             const result = QueryLog['parsePullArguments']([transform, since]);
             expect(result['group']).toBeUndefined();
@@ -341,7 +341,7 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform'] === transform).toBe(true);
         });
         it('pull(transform: QueryLogTransform, since: Moment.Moment, group: string)', function () {
-            const since = new Moment('2018-01-01');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
             const transform = () => { };
             const result = QueryLog['parsePullArguments']([transform, since, 'test']);
             expect(result['group']).toEqual('test');
@@ -350,8 +350,8 @@ describe('FlipFlopQueryLog', function () {
             expect(result['transform'] === transform).toBe(true);
         });
         it('pull(transform: QueryLogTransform, since: Moment.Moment, until: Moment.Moment, group: string)', function () {
-            const since = new Moment('2018-01-01');
-            const until = new Moment('2018-01-31');
+            const since = MomentProviderFacade_1.MomentProvider.make('2018-01-01');
+            const until = MomentProviderFacade_1.MomentProvider.make('2018-01-31');
             const transform = () => { };
             const result = QueryLog['parsePullArguments']([transform, since, until, 'test']);
             expect(result['group']).toEqual('test');

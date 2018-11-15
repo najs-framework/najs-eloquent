@@ -1,5 +1,5 @@
 import 'jest'
-import { in_array, parse_string_with_dot_notation } from '../../lib/util/functions'
+import { in_array, parse_string_with_dot_notation, find_base_prototypes } from '../../lib/util/functions'
 
 describe('in_array()', function() {
   it('returns false if haystack is not found', function() {
@@ -44,5 +44,23 @@ describe('parse_string_with_dot_notation()', function() {
       const result = parse_string_with_dot_notation(string)
       expect(result).toEqual(dataset[string])
     }
+  })
+})
+
+describe('find_base_prototypes', function() {
+  class A {}
+  class B extends A {}
+  class C extends B {}
+  class D extends C {}
+
+  it('used for finding the base prototypes of class', function() {
+    const bases = find_base_prototypes(D.prototype, Object.prototype)
+    expect(bases).toEqual([C.prototype, B.prototype, A.prototype, Object.prototype])
+  })
+
+  it('used for finding the base prototypes until the root class', function() {
+    expect(find_base_prototypes(D.prototype, C.prototype)).toEqual([C.prototype])
+    expect(find_base_prototypes(D.prototype, B.prototype)).toEqual([C.prototype, B.prototype])
+    expect(find_base_prototypes(D.prototype, A.prototype)).toEqual([C.prototype, B.prototype, A.prototype])
   })
 })

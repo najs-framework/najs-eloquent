@@ -63,3 +63,11 @@ export function parse_string_with_dot_notation(input: string): DotNotationInfo {
   }
   return result
 }
+
+export function override_setting_property_of_model(model: object, property: string, values: string[]) {
+  if (typeof model['internalData']['overridden'] === 'undefined') {
+    model['internalData']['overridden'] = {}
+  }
+  model['internalData']['overridden'][property] = true
+  model[property] = values
+}

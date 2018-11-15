@@ -1,10 +1,10 @@
-/// <reference path="./interfaces/ISettingReader.ts" />
+/// <reference path="../definitions/utils/IClassSetting.ts" />
 
 import { make, getClassName } from 'najs-binding'
 
 export const CREATE_SAMPLE = 'create-sample'
 
-export class ClassSetting {
+export class ClassSetting implements NajsEloquent.Util.IClassSetting {
   protected sample: Object
   protected definition: Function
   protected instance: Object
@@ -26,9 +26,9 @@ export class ClassSetting {
    */
   read<T>(property: string, reader: NajsEloquent.Util.ISettingReader<T>): T {
     return reader(
-      this.definition[property] ? this.definition[property] : undefined,
-      this.sample[property] ? this.sample[property] : undefined,
-      this.instance[property] ? this.instance[property] : undefined
+      typeof this.definition[property] !== 'undefined' ? this.definition[property] : undefined,
+      typeof this.sample[property] !== 'undefined' ? this.sample[property] : undefined,
+      typeof this.instance[property] !== 'undefined' ? this.instance[property] : undefined
     )
   }
 
@@ -61,14 +61,12 @@ export class ClassSetting {
 
   static get(instance: Object, cache: boolean = true): ClassSetting {
     const className = getClassName(instance)
-    // console.log('get', className)
     if (!this.samples[className] || !cache) {
       const sample = make(className, [CREATE_SAMPLE])
       sample['__sample'] = true
       this.samples[className] = new ClassSetting(sample)
       this.samples[className]
     }
-    // console.log('sample', this.samples[className])
     return this.samples[className]
   }
 

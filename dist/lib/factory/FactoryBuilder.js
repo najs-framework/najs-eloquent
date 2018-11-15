@@ -1,11 +1,13 @@
 "use strict";
 /// <reference path="../contracts/FactoryBuilder.ts" />
+/// <reference path="../definitions/collect.js/index.d.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const najs_binding_1 = require("najs-binding");
 const lodash_1 = require("lodash");
 const collect_js_1 = require("collect.js");
-const Eloquent_1 = require("../model/Eloquent");
+const Model_1 = require("../model/Model");
 const constants_1 = require("../constants");
+const factory_1 = require("../util/factory");
 class FactoryBuilder {
     constructor(className, name, definitions, states, faker) {
         this.className = className;
@@ -27,22 +29,22 @@ class FactoryBuilder {
     }
     async create(attributes) {
         const result = this.make(attributes);
-        if (result instanceof Eloquent_1.Eloquent) {
-            await result['save']();
+        if (result instanceof Model_1.Model) {
+            await result.save();
             return result;
         }
         return result.each(async (item) => {
-            await item['save']();
+            await item.save();
         });
     }
     make(attributes) {
         if (typeof this.amount === 'undefined') {
-            return this.makeInstance(attributes);
+            return this.makeModelInstance(attributes);
         }
         if (this.amount < 1) {
-            return najs_binding_1.make(this.className, []).newCollection([]);
+            return factory_1.make_collection([]);
         }
-        return najs_binding_1.make(this.className, []).newCollection(lodash_1.range(0, this.amount).map((item) => this.getRawAttributes(attributes)));
+        return factory_1.make_collection(lodash_1.range(0, this.amount), item => this.makeModelInstance(attributes));
     }
     raw(attributes) {
         if (typeof this.amount === 'undefined') {
@@ -53,8 +55,7 @@ class FactoryBuilder {
         }
         return collect_js_1.default(lodash_1.range(0, this.amount).map((item) => this.getRawAttributes(attributes)));
     }
-    makeInstance(attributes) {
-        // The false value is isGuarded
+    makeModelInstance(attributes) {
         return najs_binding_1.make(this.className, [this.getRawAttributes(attributes), false]);
     }
     getRawAttributes(attributes) {
@@ -84,7 +85,7 @@ class FactoryBuilder {
             if (lodash_1.isFunction(attributes[name])) {
                 attributes[name] = attributes[name].call(undefined, attributes);
             }
-            if (attributes[name] instanceof Eloquent_1.Eloquent) {
+            if (attributes[name] instanceof Model_1.Model) {
                 attributes[name] = attributes[name].getPrimaryKey();
             }
             if (lodash_1.isPlainObject(attributes[name])) {

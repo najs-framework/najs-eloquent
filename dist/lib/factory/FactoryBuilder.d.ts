@@ -1,9 +1,10 @@
 /// <reference path="../contracts/FactoryBuilder.d.ts" />
+/// <reference path="../../../lib/definitions/collect.js/index.d.ts" />
 import { ChanceFaker } from './FactoryManager';
-import { Eloquent } from '../model/Eloquent';
-export interface FactoryBuilder<T extends Eloquent> extends Najs.Contracts.Eloquent.FactoryBuilder<T>, Najs.Contracts.Eloquent.FactoryBuilderCollection<T> {
+import { Model } from '../model/Model';
+export interface FactoryBuilder<T extends Model> extends Najs.Contracts.Eloquent.FactoryBuilder<T> {
 }
-export declare class FactoryBuilder<T extends Eloquent> {
+export declare class FactoryBuilder<T extends Model> {
     protected className: string;
     protected name: string;
     protected definitions: Object;
@@ -18,8 +19,8 @@ export declare class FactoryBuilder<T extends Eloquent> {
     create(attributes?: Object): Promise<any>;
     make(attributes?: Object): any;
     raw(attributes?: Object): any;
-    protected makeInstance(attributes?: Object): any;
-    protected getRawAttributes(attributes?: Object): any;
-    protected applyStates(definition: Object, attributes?: Object): Object;
-    protected triggerReferenceAttributes(attributes: Object): Object;
+    makeModelInstance(attributes?: Object): any;
+    getRawAttributes(attributes?: Object): any;
+    applyStates(definition: Object, attributes?: Object): Object;
+    triggerReferenceAttributes(attributes: Object): Object;
 }

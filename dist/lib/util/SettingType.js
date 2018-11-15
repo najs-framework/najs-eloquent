@@ -1,5 +1,5 @@
 "use strict";
-/// <reference path="interfaces/ISettingReader.ts" />
+/// <reference path="../definitions/utils/IClassSetting.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions_1 = require("./functions");
 class SettingType {

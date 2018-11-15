@@ -2,19 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jest");
 const Sinon = require("sinon");
+const najs_binding_1 = require("najs-binding");
 const chance_1 = require("chance");
 const najs_facade_1 = require("najs-facade");
-const Eloquent_1 = require("../../lib/model/Eloquent");
-const DummyDriver_1 = require("../../lib/drivers/DummyDriver");
-const EloquentDriverProviderFacade_1 = require("../../lib/facades/global/EloquentDriverProviderFacade");
-const constants_1 = require("../../lib/constants");
+const MemoryDriver_1 = require("../../lib/drivers/memory/MemoryDriver");
+const DriverProviderFacade_1 = require("../../lib/facades/global/DriverProviderFacade");
 const FactoryManager_1 = require("../../lib/factory/FactoryManager");
 const FactoryBuilder_1 = require("../../lib/factory/FactoryBuilder");
+DriverProviderFacade_1.DriverProviderFacade.register(MemoryDriver_1.MemoryDriver, 'memory', true);
 describe('FactoryManager', function () {
-    it('extends Facade and implements IAutoload', function () {
+    it('extends Facade and implements IAutoload under name "NajsEloquent.Factory.FactoryManager"', function () {
         const factoryManager = new FactoryManager_1.FactoryManager();
         expect(factoryManager).toBeInstanceOf(najs_facade_1.Facade);
-        expect(factoryManager.getClassName()).toEqual(constants_1.NajsEloquent.Factory.FactoryManager);
+        expect(factoryManager.getClassName()).toEqual('NajsEloquent.Factory.FactoryManager');
     });
     describe('constructor()', function () {
         it('using chance library and creates faker', function () {
@@ -22,33 +22,18 @@ describe('FactoryManager', function () {
             expect(factoryManager['faker']).toBeInstanceOf(chance_1.Chance);
         });
     });
-    describe('protected .parseModelName()', function () {
+    describe('protected .getModelName()', function () {
         it('returns if the param is a string', function () {
             const factoryManager = new FactoryManager_1.FactoryManager();
-            expect(factoryManager['parseModelName']('Class')).toEqual('Class');
+            expect(factoryManager['getModelName']('Class')).toEqual('Class');
         });
-        it("calls Eloquent.register() and return a class's name if the param is Function", function () {
+        it("calls and returns a class's name by getClassName() of NajsBinding if the param is not string", function () {
             class Class {
             }
             Class.className = 'Class';
-            const registerStub = Sinon.stub(Eloquent_1.Eloquent, 'register');
+            najs_binding_1.register(Class);
             const factoryManager = new FactoryManager_1.FactoryManager();
-            expect(factoryManager['parseModelName'](Class)).toEqual('Class');
-            expect(registerStub.calledWith(Class)).toBe(true);
-            registerStub.restore();
-        });
-        it("calls Eloquent.register() and return a class's name if the param is Eloquent", function () {
-            EloquentDriverProviderFacade_1.EloquentDriverProviderFacade.register(DummyDriver_1.DummyDriver, 'dummy', true);
-            class Class extends Eloquent_1.Eloquent {
-                getClassName() {
-                    return 'Test';
-                }
-            }
-            const registerStub = Sinon.stub(Eloquent_1.Eloquent, 'register');
-            const factoryManager = new FactoryManager_1.FactoryManager();
-            expect(factoryManager['parseModelName'](Class)).toEqual('Test');
-            expect(registerStub.calledWith(Class)).toBe(true);
-            registerStub.restore();
+            expect(factoryManager['getModelName'](Class)).toEqual('Class');
         });
     });
     describe('.define()', function () {
@@ -67,27 +52,6 @@ describe('FactoryManager', function () {
                 }
             });
             factoryManager.define('Class', definition, 'test');
-            expect(factoryManager['definitions']).toEqual({
-                Class: {
-                    test: definition,
-                    default: definition
-                }
-            });
-        });
-        it('calls Eloquent.register() and return a className if the param is function or Eloquent', function () {
-            class Class {
-            }
-            Class.className = 'Class';
-            const definition = () => { };
-            const factoryManager = new FactoryManager_1.FactoryManager();
-            expect(factoryManager['definitions']).toEqual({});
-            factoryManager.define(Class, definition);
-            expect(factoryManager['definitions']).toEqual({
-                Class: {
-                    default: definition
-                }
-            });
-            factoryManager.define(Class, definition, 'test');
             expect(factoryManager['definitions']).toEqual({
                 Class: {
                     test: definition,

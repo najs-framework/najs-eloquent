@@ -1,6 +1,6 @@
-/// <reference path="interfaces/ISettingReader.d.ts" />
+/// <reference path="../definitions/utils/IClassSetting.d.ts" />
 export declare const CREATE_SAMPLE = "create-sample";
-export declare class ClassSetting {
+export declare class ClassSetting implements NajsEloquent.Util.IClassSetting {
     protected sample: Object;
     protected definition: Function;
     protected instance: Object;
@@ -21,7 +21,7 @@ export declare class ClassSetting {
      * Get definition of the class.
      */
     getDefinition(): Function;
-    private clone(instance);
+    private clone;
     /**
      * store ClassSetting instance with "sample"
      */

@@ -1,13 +1,13 @@
 "use strict";
 /// <reference path="../contracts/FactoryManager.ts" />
 /// <reference path="../contracts/FactoryBuilder.ts" />
-/// <reference path="../model/interfaces/IModel.ts" />
+/// <reference path="../definitions/model/IModel.ts" />
+/// <reference path="../definitions/factory/IFactoryDefinition.ts" />
 /// <reference types="chance" />
 Object.defineProperty(exports, "__esModule", { value: true });
 require("./FactoryBuilder");
 const najs_facade_1 = require("najs-facade");
 const najs_binding_1 = require("najs-binding");
-const Eloquent_1 = require("../model/Eloquent");
 const chance_1 = require("chance");
 const constants_1 = require("../constants");
 class FactoryManager extends najs_facade_1.Facade {
@@ -21,16 +21,15 @@ class FactoryManager extends najs_facade_1.Facade {
         return constants_1.NajsEloquent.Factory.FactoryManager;
     }
     addDefinition(bag, className, name, definition) {
-        const modelName = this.parseModelName(className);
+        const modelName = this.getModelName(className);
         if (!this[bag][modelName]) {
             this[bag][modelName] = {};
         }
         this[bag][modelName][name] = definition;
         return this;
     }
-    parseModelName(className) {
+    getModelName(className) {
         if (typeof className === 'function') {
-            Eloquent_1.Eloquent.register(className);
             return najs_binding_1.getClassName(className);
         }
         return className;
@@ -46,7 +45,7 @@ class FactoryManager extends najs_facade_1.Facade {
     }
     of(className, name = 'default') {
         return najs_binding_1.make(constants_1.NajsEloquent.Factory.FactoryBuilder, [
-            this.parseModelName(className),
+            this.getModelName(className),
             name,
             this.definitions,
             this.states,

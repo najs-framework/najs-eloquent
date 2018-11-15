@@ -1,11 +1,11 @@
 "use strict";
 /// <reference path="../contracts/QueryLog.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
-const Moment = require("moment");
 const najs_binding_1 = require("najs-binding");
 const najs_facade_1 = require("najs-facade");
 const constants_1 = require("../constants");
 const lodash_1 = require("lodash");
+const MomentProviderFacade_1 = require("../facades/global/MomentProviderFacade");
 class FlipFlopQueryLog extends najs_facade_1.Facade {
     constructor() {
         super();
@@ -23,15 +23,15 @@ class FlipFlopQueryLog extends najs_facade_1.Facade {
     parse_pull_arguments_starts_with_string(args) {
         return {
             group: args[0],
-            since: args[1] && Moment.isMoment(args[1]) ? args[1] : undefined,
-            until: args[2] && Moment.isMoment(args[2]) ? args[2] : undefined,
+            since: args[1] && MomentProviderFacade_1.MomentProvider.isMoment(args[1]) ? args[1] : undefined,
+            until: args[2] && MomentProviderFacade_1.MomentProvider.isMoment(args[2]) ? args[2] : undefined,
             transform: this.assign_if_last_argument_is('function', args)
         };
     }
     parse_pull_arguments_starts_with_moment(args) {
         return {
             since: args[0],
-            until: args[1] && Moment.isMoment(args[1]) ? args[1] : undefined,
+            until: args[1] && MomentProviderFacade_1.MomentProvider.isMoment(args[1]) ? args[1] : undefined,
             group: this.assign_if_last_argument_is('string', args),
             transform: args[1] && lodash_1.isFunction(args[1]) ? args[1] : args[2] && lodash_1.isFunction(args[2]) ? args[2] : undefined
         };
@@ -40,8 +40,8 @@ class FlipFlopQueryLog extends najs_facade_1.Facade {
         return {
             transform: args[0],
             group: this.assign_if_last_argument_is('string', args),
-            since: args[1] && Moment.isMoment(args[1]) ? args[1] : undefined,
-            until: args[2] && Moment.isMoment(args[2]) ? args[2] : undefined
+            since: args[1] && MomentProviderFacade_1.MomentProvider.isMoment(args[1]) ? args[1] : undefined,
+            until: args[2] && MomentProviderFacade_1.MomentProvider.isMoment(args[2]) ? args[2] : undefined
         };
     }
     isEnabled() {
@@ -61,13 +61,13 @@ class FlipFlopQueryLog extends najs_facade_1.Facade {
         this.circle = 'flip';
         return this;
     }
-    push(query, group = 'all') {
+    push(data, group = 'all') {
         if (!this.enabled) {
             return this;
         }
         this[this.circle].push({
-            query: query,
-            when: Moment(),
+            data: data,
+            when: MomentProviderFacade_1.MomentProvider.make(),
             group: group
         });
         return this;
@@ -76,7 +76,7 @@ class FlipFlopQueryLog extends najs_facade_1.Facade {
         if (lodash_1.isString(args[0])) {
             return this.parse_pull_arguments_starts_with_string(args);
         }
-        if (Moment.isMoment(args[0])) {
+        if (MomentProviderFacade_1.MomentProvider.isMoment(args[0])) {
             return this.parse_pull_arguments_starts_with_moment(args);
         }
         if (lodash_1.isFunction(args[0])) {
@@ -118,4 +118,4 @@ class FlipFlopQueryLog extends najs_facade_1.Facade {
 }
 FlipFlopQueryLog.className = constants_1.NajsEloquent.QueryLog.FlipFlopQueryLog;
 exports.FlipFlopQueryLog = FlipFlopQueryLog;
-najs_binding_1.register(FlipFlopQueryLog);
+najs_binding_1.register(FlipFlopQueryLog, constants_1.NajsEloquent.QueryLog.FlipFlopQueryLog);

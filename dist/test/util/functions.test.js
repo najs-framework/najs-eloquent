@@ -40,3 +40,22 @@ describe('parse_string_with_dot_notation()', function () {
         }
     });
 });
+describe('find_base_prototypes', function () {
+    class A {
+    }
+    class B extends A {
+    }
+    class C extends B {
+    }
+    class D extends C {
+    }
+    it('used for finding the base prototypes of class', function () {
+        const bases = functions_1.find_base_prototypes(D.prototype, Object.prototype);
+        expect(bases).toEqual([C.prototype, B.prototype, A.prototype, Object.prototype]);
+    });
+    it('used for finding the base prototypes until the root class', function () {
+        expect(functions_1.find_base_prototypes(D.prototype, C.prototype)).toEqual([C.prototype]);
+        expect(functions_1.find_base_prototypes(D.prototype, B.prototype)).toEqual([C.prototype, B.prototype]);
+        expect(functions_1.find_base_prototypes(D.prototype, A.prototype)).toEqual([C.prototype, B.prototype, A.prototype]);
+    });
+});
