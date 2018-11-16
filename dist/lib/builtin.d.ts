@@ -238,7 +238,7 @@ export declare namespace NajsEloquent.QueryBuilder.Shared {
     }
 }
 import { FlipFlopQueryLog as FlipFlopQueryLogClass } from './query-log/FlipFlopQueryLog';
-export declare namespace NajsEloquent.QueryBuilder.Shared {
+export declare namespace NajsEloquent.QueryLog {
     const FlipFlopQueryLog: typeof FlipFlopQueryLogClass;
     interface FlipFlopQueryLog extends FlipFlopQueryLogClass {
     }

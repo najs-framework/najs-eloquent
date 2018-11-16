@@ -214,13 +214,10 @@ const QueryCondition_1 = require("./query-builders/shared/QueryCondition");
 // package QueryLog
 const FlipFlopQueryLog_1 = require("./query-log/FlipFlopQueryLog");
 (function (NajsEloquent) {
-    var QueryBuilder;
-    (function (QueryBuilder) {
-        var Shared;
-        (function (Shared) {
-            Shared.FlipFlopQueryLog = FlipFlopQueryLog_1.FlipFlopQueryLog;
-        })(Shared = QueryBuilder.Shared || (QueryBuilder.Shared = {}));
-    })(QueryBuilder = NajsEloquent.QueryBuilder || (NajsEloquent.QueryBuilder = {}));
+    var QueryLog;
+    (function (QueryLog) {
+        QueryLog.FlipFlopQueryLog = FlipFlopQueryLog_1.FlipFlopQueryLog;
+    })(QueryLog = NajsEloquent.QueryLog || (NajsEloquent.QueryLog = {}));
 })(NajsEloquent = exports.NajsEloquent || (exports.NajsEloquent = {}));
 // ---------------------------------------------------------------------------------------------------------------------
 // package Util
