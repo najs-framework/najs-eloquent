@@ -1,6 +1,7 @@
 /// <reference path="../../definitions/query-builders/IConvention.ts" />
 /// <reference path="../../definitions/query-grammars/IBasicQuery.ts" />
 /// <reference path="../../definitions/query-grammars/IBasicConditionQuery.ts" />
+
 import IConvention = NajsEloquent.QueryBuilder.IConvention
 import IBasicQuery = NajsEloquent.QueryGrammar.IBasicQuery
 import IBasicConditionQuery = NajsEloquent.QueryGrammar.IBasicConditionQuery

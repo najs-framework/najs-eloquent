@@ -53,12 +53,13 @@
 /// <reference path="definitions/relations/IRelationDataBucket.d.ts" />
 /// <reference path="definitions/relations/IRelationship.d.ts" />
 /// <reference path="definitions/relations/IRelationshipFactory.d.ts" />
+/// <reference path="builtin.d.ts" />
 import { Model } from './model/Model';
 export declare const Relation: NajsEloquent.Relation.IRelationshipStatic;
 export { Model, Model as Eloquent };
 export { PivotModel as Pivot } from './relations/relationships/pivot/PivotModel';
 export { isModel, isCollection, isObjectId } from './util/helpers';
-export { Builtin as NajsEloquent } from './builtin';
+export { NajsEloquent } from './builtin';
 export declare type HasOne<T extends Model> = T | undefined | null;
 export declare type HasMany<T extends Model> = CollectJs.Collection<T> | undefined;
 export declare type BelongsTo<T extends Model> = T | undefined | null;
@@ -68,6 +69,7 @@ export declare type BelongsToMany<T extends Model, R extends Model = Model, K ex
 export declare type MorphOne<T extends Model> = T | undefined | null;
 export declare type MorphMany<T extends Model> = CollectJs.Collection<T> | undefined;
 export declare type MorphTo<T extends Model> = T | undefined | null;
+export { container as NajsEloquentFacadeContainer } from './facades/container';
 export { DriverProvider, DriverProvider as ModelDriverProvider, DriverProvider as EloquentDriverProvider, DriverProviderFacade, DriverProviderFacade as ModelDriverProviderFacade, DriverProviderFacade as EloquentDriverProviderFacade } from './facades/global/DriverProviderFacade';
 export { factory, Factory, FactoryFacade } from './facades/global/FactoryFacade';
 export { QueryLog, QueryLogFacade } from './facades/global/QueryLogFacade';

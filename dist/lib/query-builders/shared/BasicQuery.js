@@ -1,4 +1,7 @@
 "use strict";
+/// <reference path="../../definitions/query-builders/IConvention.ts" />
+/// <reference path="../../definitions/query-grammars/IBasicQuery.ts" />
+/// <reference path="../../definitions/query-grammars/IBasicConditionQuery.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const QueryCondition_1 = require("./QueryCondition");
 const lodash_1 = require("lodash");

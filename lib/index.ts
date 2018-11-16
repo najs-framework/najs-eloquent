@@ -64,6 +64,8 @@
 /// <reference path="definitions/relations/IRelationship.ts" />
 /// <reference path="definitions/relations/IRelationshipFactory.ts" />
 
+/// <reference path="./builtin.ts" />
+
 import { MemoryDataSourceProvider } from './facades/global/MemoryDataSourceProviderFacade'
 import { MemoryDataSource } from './drivers/memory/MemoryDataSource'
 import { Model } from './model/Model'
@@ -80,7 +82,8 @@ export const Relation: NajsEloquent.Relation.IRelationshipStatic = Relationship
 export { Model, Model as Eloquent }
 export { PivotModel as Pivot } from './relations/relationships/pivot/PivotModel'
 export { isModel, isCollection, isObjectId } from './util/helpers'
-export { Builtin as NajsEloquent } from './builtin'
+
+export { NajsEloquent } from './builtin'
 
 export type HasOne<T extends Model> = T | undefined | null
 export type HasMany<T extends Model> = CollectJs.Collection<T> | undefined
@@ -94,6 +97,7 @@ export type MorphOne<T extends Model> = T | undefined | null
 export type MorphMany<T extends Model> = CollectJs.Collection<T> | undefined
 export type MorphTo<T extends Model> = T | undefined | null
 
+export { container as NajsEloquentFacadeContainer } from './facades/container'
 export {
   DriverProvider,
   DriverProvider as ModelDriverProvider,
