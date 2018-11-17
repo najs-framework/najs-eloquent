@@ -46,11 +46,11 @@ declare namespace NajsEloquent.QueryGrammar {
          * Find first record by id and throws NotFoundException if there is no record
          * @param {string} id
          */
-        findOrFail(id: any): Promise<Result>;
+        findOrFail(id?: any): Promise<Result>;
         /**
          * Find first record by id and throws NotFoundException if there is no record
          * @param {string} id
          */
-        firstOrFail(id: any): Promise<Result>;
+        firstOrFail(id?: any): Promise<Result>;
     }
 }

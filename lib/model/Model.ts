@@ -336,7 +336,7 @@ export class Model {
    * Find first record by id and throws NotFoundException if there is no record
    * @param {string} id
    */
-  static findOrFail<T extends typeof Model>(this: T, id: any): Promise<InstanceType<T>> {
+  static findOrFail<T extends typeof Model>(this: T, id?: any): Promise<InstanceType<T>> {
     const query = this.newQuery()
     return query.findOrFail.apply(query, arguments)
   }
@@ -345,7 +345,7 @@ export class Model {
    * Find first record by id and throws NotFoundException if there is no record
    * @param {string} id
    */
-  static firstOrFail<T extends typeof Model>(this: T, id: any): Promise<InstanceType<T>> {
+  static firstOrFail<T extends typeof Model>(this: T, id?: any): Promise<InstanceType<T>> {
     const query = this.newQuery()
     return query.firstOrFail.apply(query, arguments)
   }
