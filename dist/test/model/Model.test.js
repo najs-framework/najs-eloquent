@@ -64,6 +64,67 @@ describe('Model', function () {
                 newQuerySpy.restore();
             });
         });
+        describe('.eventEmitter()', function () {
+            it('creates an instance of Model then calls and return .getDriver().getGlobalEventEmitter()', function () {
+                const driver = {
+                    getGlobalEventEmitter() {
+                        return 'anything';
+                    }
+                };
+                const getDriverStub = Sinon.stub(Model_1.Model.prototype, 'getDriver');
+                getDriverStub.returns(driver);
+                expect(Model_1.Model.eventEmitter()).toEqual('anything');
+                getDriverStub.restore();
+            });
+        });
+        describe('.on()', function () {
+            it('calls .eventEmitter() then passes params to .on()', function () {
+                const eventEmitter = {
+                    on() {
+                        return 'anything';
+                    }
+                };
+                const eventEmitterStub = Sinon.stub(Model_1.Model, 'eventEmitter');
+                eventEmitterStub.returns(eventEmitter);
+                const spy = Sinon.spy(eventEmitter, 'on');
+                const listener = () => { };
+                expect(Model_1.Model.on('test', listener) === Model_1.Model).toBe(true);
+                expect(spy.calledWith('test', listener)).toBe(true);
+                eventEmitterStub.restore();
+            });
+        });
+        describe('.once()', function () {
+            it('calls .eventEmitter() then passes params to .once()', function () {
+                const eventEmitter = {
+                    once() {
+                        return 'anything';
+                    }
+                };
+                const eventEmitterStub = Sinon.stub(Model_1.Model, 'eventEmitter');
+                eventEmitterStub.returns(eventEmitter);
+                const spy = Sinon.spy(eventEmitter, 'once');
+                const listener = () => { };
+                expect(Model_1.Model.once('test', listener) === Model_1.Model).toBe(true);
+                expect(spy.calledWith('test', listener)).toBe(true);
+                eventEmitterStub.restore();
+            });
+        });
+        describe('.off()', function () {
+            it('calls .eventEmitter() then passes params to .off()', function () {
+                const eventEmitter = {
+                    off() {
+                        return 'anything';
+                    }
+                };
+                const eventEmitterStub = Sinon.stub(Model_1.Model, 'eventEmitter');
+                eventEmitterStub.returns(eventEmitter);
+                const spy = Sinon.spy(eventEmitter, 'off');
+                const listener = () => { };
+                expect(Model_1.Model.off('test', listener) === Model_1.Model).toBe(true);
+                expect(spy.calledWith('test', listener)).toBe(true);
+                eventEmitterStub.restore();
+            });
+        });
         describe('.queryName()', function () {
             it('simply calls and returns .newQuery()', function () {
                 const spy = Sinon.spy(Model_1.Model, 'newQuery');

@@ -11,327 +11,129 @@
 [![npm license](https://img.shields.io/npm/l/najs-eloquent.svg?style=flat-square)](http://badge.fury.io/js/najs-eloquent)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-If you are Laravel Eloquent lover and want to use it in `Node JS` you will love `Najs Eloquent`. `Najs Eloquent` is
-Laravel Eloquent, written in `Typescript` (with some helpers you can use it in Javascript for sure).
+> _Warning: This is a documentation for v0.4.x, if you are using v0.3.x please checkout readme for [v0.3.x in here](https://github.com/najs-framework/najs-eloquent/blob/master/README-v3.md)._
 
-You can take a look on [full documentation and usage](https://najs-framework.github.io/docs/najs-eloquent/getting-started/) or setup example in [najs-eloquent-example](https://github.com/najs-framework/najs-eloquent-example) repository.
+If you are Laravel Eloquent lover and want to use it in `Node JS` you will love `Najs Eloquent`. `Najs Eloquent` is Laravel Eloquent, written in `Typescript`.
 
-# Installation
+## Installation
 
-Add `najs-binding`, `moment`, `najs-eloquent`
+Add `najs-binding`, `najs-eloquent`
 
 ```bash
-yarn add najs-binding moment najs-eloquent
+yarn add najs-binding najs-eloquent
 ```
 
 or
 
 ```bash
-npm install najs-binding moment najs-eloquent
-```
-
-By default `najs-eloquent` uses a builtin mongoose instance and require `mongodb` running at port 27017. If you want
-to use `mongoose` with your own instance you have to provide a custom class implements `Najs.Contracts.Eloquent.MongooseProvider` contract.
-
-```typescript
-/// <reference types="najs-eloquent" />
-
-import { register, bind } from 'najs-binding'
-import { MongooseProviderFacade } from 'najs-eloquent'
-import { Schema, Document, Model, model } from 'mongoose'
-const mongoose = require('mongoose')
-
-export class CustomMongooseProvider implements Najs.Contracts.Eloquent.MongooseProvider {
-  static className: string = 'CustomMongooseProvider'
-
-  getClassName() {
-    return CustomMongooseProvider.className
-  }
-
-  getMongooseInstance() {
-    return mongoose
-  }
-
-  createModelFromSchema<T extends Document>(modelName: string, schema: Schema): Model<T> {
-    return model<T>(modelName, schema)
-  }
-}
-register(CustomMongooseProvider)
-
-// binding your custom class to replace the builtin class
-bind('NajsEloquent.Provider.MongooseProvider', CustomMongooseProvider.className)
-
-// reload mongoose provider instance
-// ensure that this file is loaded before any files which use najs-eloquent
-MongooseProviderFacade.reloadFacadeRoot()
+npm install najs-binding najs-eloquent
 ```
 
 That's it.
 
-# Quick Usage
+## Drivers
 
-This is a quick usage only, you can see [Full Documentation in here](https://najs-framework.github.io/docs/najs-eloquent/getting-started/) _(in progress, please give me a hand if you have time)_.
+NajsEloquent runs with Memory driver by default that means all data is saved in memory. There are some available drivers that you can use
 
-## I. Defining Models
+- [mongoose](https://github.com/najs-framework/najs-eloquent-mongoose)
 
-### Create model for `Mongodb` using `Mongoose`
+> **I'm writing detail documentation, please try the library and give me a hand if you can.**
+
+## Quick Usage
+
+### I. Define a model
+
+Simply create new class extends from a `Model` class
 
 ```typescript
-// file: User.ts
-import Eloquent from 'najs-eloquent'
-import { Schema } from 'mongoose'
+import { Model } from 'najs-eloquent'
 
-// This interface can be shared between Server-side and Client-side
-export interface IUser {
-  id?: string
-  first_name: string
-  last_name: string
-}
+export class User extends Model {
+  // define a property belongs to User model
+  email: string
 
-export interface User extends IUser {}
-export class User extends Eloquent.Mongoose<IUser>() {
-  static className: string = 'User'
-
+  // define a class name which used for Dependency injection
+  // (this feature provided by "najs-binding" package)
   getClassName() {
-    return User.className
-  }
-
-  getSchema() {
-    return new Schema({
-      first_name: { type: String },
-      last_name: { type: String }
-    })
+    return 'YourNamespace.User'
   }
 }
+
+// Register the User class
+Model.register(User)
 ```
 
-## II. Querying
+### II. Querying
 
-### Retrieve models
+You can query entries from database via static Query or instance query via `.newQuery()`.
+
+Retrieve entries via static query
 
 ```typescript
-async function getAll() {
-  const users: Collection<User> = await User.get()
-}
+const result = await User.where('id', '>', 10).get()
 ```
 
-### Find one model
+Retrieve entries via instance query
 
 ```typescript
-const users: User = await User.orderBy('age', 'desc').find()
-```
-
-### Find a model by primary key
-
-```typescript
-const users: User = await User.find('0000000000000000000000000000')
-```
-
-### Count
-
-```typescript
-const count: number = await User.count()
-```
-
-### Pluck
-
-```typescript
-const data: Object = await User.pluck('first_name')
-// -> { [id]: first_name, ... }
-
-const hash: Object = await User.pluck('first_name', 'age')
-// -> { [age]: first_name, ... }
-```
-
-### Select Specific Columns
-
-```typescript
-const data: number = await User.select('first_name').get()
-// -> Collection({ first_name: value }, ...)
-```
-
-### Query Builder
-
-```typescript
-async function customQuery() {
-  return await User.queryName('Your custom query name')
-    .where('first_name', 'tony')
-    .where('age', '>', 10)
-    .get()
-}
-```
-
-#### Operators
-
-##### Not Equal: `!=` or `<>`
-
-```typescript
-await User.where('first_name', '!=', 'tony').get()
-// -> { first_name: { $ne: 'tony' } }
-```
-
-##### Less than: `<`
-
-```typescript
-await User.where('age', '<', 20).get()
-// -> { age: { $lt: 20 } }
-```
-
-##### Less than or equal: `<=` or `=<`
-
-```typescript
-await User.where('age', '<=', 20).get()
-// -> { age: { $lte: 20 } }
-```
-
-##### Greater than or equal: `>=` or `=>`
-
-```typescript
-await User.where('age', '>=', 20).get()
-// -> { age: { $gte: 20 } }
-```
-
-##### Greater than: `>`
-
-```typescript
-await User.where('age', '>', 20).get()
-// -> { age: { $gt: 20 } }
-```
-
-##### Finding a value in an array
-
-```typescript
-// Using .whereIn()
-return await User.whereIn('first_name', ['tony']).get()
-// -> { first_name: { $in: ['tony'] } }
-
-// Using .where() with operator 'in'
-return await User.where('first_name', 'in', ['tony']).get()
-// -> { first_name: { $in: ['tony'] } }
-```
-
-##### Finding a value NOT in an array
-
-```typescript
-// Using .whereIn()
-await User.whereNotIn('first_name', ['tony']).get()
-// -> { first_name: { $nin: ['tony'] } }
-
-// Using .where() with operator 'not-in'
-await User.where('first_name', 'not-in', ['tony']).get()
-// -> { first_name: { $nin: ['tony'] } }
-```
-
-#### AND conditions
-
-```typescript
-User.where('first_name', 'tony')
-  .where('last_name', 'stark')
+const result = new User()
+  .newQuery()
+  .where('id', '>', 10)
   .get()
-// -> { first_name: 'tony', last_name: 'stark' }
-
-// Using .where() with operator 'not'
-await User.where('first_name', 'tony')
-  .where('last_name', '!=', 'stark')
-  .get()
-// -> { first_name: 'tony', last_name: { $ne: 'stark' } }
 ```
 
-#### OR conditions
+You can build grouped query via sub-query, like this
 
 ```typescript
-User.where('first_name', 'tony')
-  .orWhere('last_name', 'stark')
-  .get()
-// -> { $or: [ { first_name: 'tony' }, { last_name: 'stark' }] }
-
-await User.where('first_name', 'tony')
-  .where('last_name', 'stark')
-  .orWhere('age', 40)
-  .get()
-// -> { first_name: 'tony', $or: [ { last_name: 'stark' }, { age: 40 }] }
-
-await User.queryName('(A and B) or (C and D)')
-  .where(function(query) {
-    return query.where('first_name', 'tony').where('last_name', 'stark')
-  })
-  .orWhere(function(query) {
-    return query.where('age', '<', 20).where('age', '>', 40)
-  })
-  .get()
-// ->
-// {
-//   $or: [
-//     { first_name: 'tony', last_name: 'stark' },
-//     { $and: [ { age: { $lt: 20} }, { age: { $gt: 40 } } ] }
-//   ]
-// }
-```
-
-#### Using Mongoose
-
-```typescript
-// Build native query from model
-User.native(function(model) {
-  return model.find({
-    first_name: 'tony'
-  })
-}).get()
-
-// Continue build query by native mongoose
-User.where('first_name', 'tony')
-  .native(function(query) {
-    return query.populate('roles')
+// a = 1 AND (b = 2 OR c = 3)
+const result = await User.where('a', 1)
+  .where(function(subQuery) {
+    subQuery.where('b', 2).orWhere('c', 3)
   })
   .get()
 ```
 
-## III. ActiveRecord - Create, Update & Delete
+All querying functions support auto-completed/auto-suggestion to help you prevent any typo mistake. If you are familiar with Laravel Query Builder you can start write query without learning anything.
 
-### Creating A New Model
+### III. ActiveRecord - Create, Update & Delete
+
+Create new model
 
 ```typescript
-// create model with data
-const user = new User({
-  first_name: 'tony',
-  last_name: 'stark'
-})
-await user.save()
-
-// create model without data
 const user = new User()
-user.first_name = 'tony'
-user.last_name: 'stark'
+user.email = 'email@test.com'
 await user.save()
 ```
 
-### Updating Models
+Update a model
 
 ```typescript
-// create model without data
-const user = await User.orderBy('age').find()
-user.first_name = 'tony'
-user.last_name: 'stark'
+const user = await User.firstOrFail('id')
+user.email = 'email@test.com'
 await user.save()
 ```
 
-### Deleting Models
+Delete a model
 
 ```typescript
-// create model without data
-const user = await User.orderBy('age').find()
+const user = await User.firstOrFail('id')
 await user.delete()
+
+// or you can use query builder
+await User.where('id', 'deleted-id').delete()
 ```
 
-## IV. Accessors and Mutators
+### IV. Accessors and Mutators
 
-### Accessor
+#### Accessors
 
 You can define an accessor by `getter` or a function like Laravel Eloquent
 
 ```typescript
 // file: Accessor.ts
-export class User extends User.Class<IAdminUser, User>() {
+import { Model } from 'najs-eloquent'
+
+export class User extends Model {
   get full_name() {
     return this.attributes['first_name'] + ' ' + this.attributes['last_name']
   }
@@ -344,13 +146,15 @@ export class User extends User.Class<IAdminUser, User>() {
 }
 ```
 
-### Mutator
+#### Mutators
 
 You can define a mutator by `setter` or a function like Laravel Eloquent
 
 ```typescript
 // file: Mutator.ts
-export class User extends User.Class<IAdminUser, User>() {
+import { Model } from 'najs-eloquent'
+
+export class User extends Model {
   set full_name(value: any) {
     // ...
   }
@@ -363,186 +167,225 @@ export class User extends User.Class<IAdminUser, User>() {
 }
 ```
 
-## IV. Timestamps
+### V. Settings Properties
 
-You can simply define timestamps for models by changing static variable named `timestamps`
+#### `fillable` & `guarded`
+
+Just like Laravel, you can define mass assignable fields by `fillable` or `guarded` property
 
 ```typescript
-// file: Timestamps.ts
-export class User extends User.Class<IAdminUser, User>() {
-  static timestamps = true
+export class User extends Model {
+  protected fillable = ['email', 'username']
+
+  // This way also works :)
+  // static fillable = ['email', 'username']
 }
 ```
 
-By default, Najs will create 2 fields named `created_at` and `updated_at`, you can custom the fields' name:
+Only defined properties in fillable can be filled with `.fill()`
 
 ```typescript
-// file: Timestamps.ts
-export class User extends User.Class<IAdminUser, User>() {
-  static timestamps = { createdAt: 'created', updatedAt: 'updated' }
+const user = new User()
+user.fill({ email: 'a', password: 'x' })
+
+console.log(user.toObject()) // => { email: a }
+```
+
+You can skip `fillable` setting by using `.forceFill()`
+
+#### `visible` & `hidden`
+
+You can define serialized fields by `visible` or `hidden` property
+
+```typescript
+export class User extends Model {
+  protected fillable = ['email', 'username']
+  protected hidden = ['password']
+
+  // This way also works :)
+  // static hidden = ['password']
 }
 ```
 
-Najs gets now value from `Moment` so if you can do this way to provide specific date in tests:
+When using `.toObject()` or `.attributesToObject()` the `password` field will be skipped
 
 ```typescript
-// file: Test.ts
-const Model = require('moment')
+const user = new User()
+user.forceFill({ email: 'a', password: 'x' })
 
-export class User extends User.Class<IAdminUser, User>() {
-  static timestamps = { createdAt: 'created', updatedAt: 'updated' }
+console.log(user.toObject()) // => { email: a }
+```
+
+#### `timestamps`
+
+You can simply define timestamps for models by changing static (or protected) variable named `timestamps`. By using this feature every time the model get saved, `created_at` and `updated_at` will updated automatically
+
+```typescript
+export class User extends Model {
+  protected timestamps = true
+
+  // This way also works :)
+  // static timestamps = true
 }
+```
 
-describe('Custom now value', function() {
-  it('comes in handy', function() {
-    const now = new Date(1999, 0, 1)
-    Moment.now = () => now
+By default, Najs Eloquent will create 2 fields named `created_at` and `updated_at`, you can custom the fields' name:
 
-    const user = new User()
-    await user.save()
+```typescript
+export class User extends Model {
+  protected timestamps = { createdAt: 'created', updatedAt: 'updated' }
 
-    console.log(user.created_at) // -> 01/01/1999
-    console.log(user.updated_at) // -> 01/01/1999
-  })
+  // This way also works :)
+  // static timestamps = { createdAt: 'created', updatedAt: 'updated' }
+}
+```
+
+#### `softDeletes`
+
+You can simply define soft deletes feature for models by changing static (or protected) variable named `softDeletes`.
+
+```typescript
+export class User extends Model {
+  protected softDeletes = true
+
+  // This way also works :)
+  // static softDeletes = true
+}
+```
+
+By using this feature every time the model get deleted the data ind database not actually deleted, it update `deleted_at` from `null` to date object. You can custom the `deleted_at` field name:
+
+```typescript
+export class User extends Model {
+  protected softDeletes = { deletedAt: 'deleted' }
+
+  // This way also works :)
+  // static softDeletes = { deletedAt: 'deleted' }
+}
+```
+
+With soft deletes model all retrieve operators like `find()` or `get()` automatically return non-deleted entries only, you can use `.withTrashed()` or `.onlyTrashed()` to receive deleted entries
+
+```typescript
+const users = await User.withTrashed().get()
+```
+
+### VI. Events
+
+You can listen to events `creating`, `created`, `saving`, `saved`, `updating`, `updated`, `deleting`, `deleted`, `restoring`, `restored` by using `.on()` or just trigger for 1 event only by `.once()`. All event listener is async
+
+```typescript
+const user = new User()
+user.on('created', async function(createdModel: User) {
+  // ...
+})
+user.email = '...'
+user.save()
+```
+
+You can listen to global event like this
+
+```typescript
+User.on('created', function(createdModel: any) {
+  // ...
 })
 ```
 
-## V. Soft Deletes
+### VII. Relationships
 
-You can simply define soft deletes for models by changing static variable named `softDeletes`
+`najs-eloquent` supports `HasOne`, `HasMany`, `ManyToMany`, `MorphOne` and `MorphMany` relationships. This feature doesn't look like Laravel. We couldn't give the same name the data and relation in Typescript, then you have to separate it
 
 ```typescript
-// file: SoftDelete.ts
-export class User extends User.Class<IAdminUser, User>() {
-  static softDeletes = true
+import { Model, HasMany, BelongsTo } from 'najs-eloquent'
+
+class User extends Model {
+  // Define property "posts" which receive data from relation "postsRelation"
+  posts: HasMany<Post>
+
+  // Define property "postsRelation" which handle this relationship
+  get postsRelation() {
+    return this.defineRelation('posts').hasMany(Post)
+  }
+}
+
+class Post extends Model {
+  // define property which is foreign key and point to User model
+  user_id: string
+
+  // Inverse relation data property
+  user: BelongsTo<User>
+
+  // Define inverse relation
+  get userRelation() {
+    return this.defineRelation('user').belongsTo(User)
+  }
 }
 ```
 
-By default, Najs will create 1 field named `deleted_at` with value is `null` when document is not deleted and contains `Date` when it was deleted. You can custom the field's name
+So we can assign new Post to user like this
 
 ```typescript
-// file: SoftDelete.ts
-export class User extends User.Class<IAdminUser, User>() {
-  static softDeletes = { deletedAt: 'deleteAt' }
-}
+const post = new Post()
+const user = new User()
+user.postsRelation.associate(post)
+
+// when you save the user model, post will be saved and associate to User automatically
+await user.save()
+
+// eager load posts when loading users
+const result = await User.with('posts').firstOrFail()
+console.log(result.posts) // a collection of posts belongs to current user
+
+// lazy load posts from user
+await user.postsRelation.lazyLoad()
+
+// or just load relation, najs-eloquent uses eager loading if possible
+await user.load('posts')
 ```
 
-You can query the trashed documents just like laravel
+> **I'm writing detail documentation, please try the library and give me a hand if you can.**
+
+### VIII. Factory
+
+`najs-eloquent` has Factory feature which use [`chance`](http://chancejs.com) as a faker:
 
 ```typescript
-User.queryName('Select un-deleted document only')
-  .where('first_name', 'john')
-  .get() // -> return all john which are not deleted
+import { Factory, factory } from 'najs-eloquent'
+import { User } from 'somewhere...'
 
-User.queryName('Select all documents, including deleted')
-  .withTrashed()
-  .where('first_name', 'john')
-  .get() // -> return all john including deleted ones
-
-User.queryName('Select deleted documents only')
-  .onlyTrashed()
-  .where('first_name', 'john')
-  .get() // -> return all john which are deleted
-```
-
-The `withTrashed` or `onlyTrashed` can be used after the `where` or any query statements, for example
-
-```typescript
-User.select('last_name')
-  .withTrashed()
-  .get()
-
-User.limit(10)
-  .where('age' > 10)
-  .onlyTrashed()
-  .find()
-```
-
-Like `timestamp` above, Najs gets now value from `Moment`
-
-```typescript
-// file: Test.ts
-const Model = require('moment')
-
-export class User extends User.Class<IAdminUser, User>() {
-  static timestamps = true
-  static softDeletes = true
-}
-
-describe('Custom now value', function() {
-  it('comes in handy', function() {
-    let now = new Date(1999, 0, 1)
-    Moment.now = () => now
-
-    const user = new User()
-    await user.save()
-
-    console.log(user.created_at) // -> 01/01/1999
-    console.log(user.updated_at) // -> 01/01/1999
-
-    now = new Date(2010, 0, 1)
-    Moment.now = () => now
-    await user.delete()
-
-    console.log(user.deleted_at) // -> 01/01/2010
-  })
+// define a factory for User model
+Factory.define(User, function(faker, attributes) {
+  return Object.assign(
+    {
+      email: faker.email()
+    },
+    attributes
+  )
 })
+
+// create model and save to database by factory()
+await factory(User).create()
+
+// make model instance only by factory()
+const fakeUser = factory(User).make()
+
+// make 3 model instances by factory()
+const fakeUsers = factory(User)
+  .times(3)
+  .make()
 ```
 
-## VII. Put them all together in Repository
+### IX. Builtin classes
 
-You can create Repository for models with very _najs_ and clear syntax
+All classes you need to implement new driver are available in `NajsEloquent` object.
 
-```typescript
-// file: UserRepository.ts
-import { User } from './User'
-import { Collection } from 'collect.js'
+> **I'm writing detail documentation, please try the library and give me a hand if you can.**
 
-class UserRepository {
-  async createUser(firstName: string, lastName: string): Promise<User> {
-    const user = new User({
-      first_name: firstName,
-      last_name: lastName
-    })
-    await user.save()
-    return user
-  }
-
-  async updateUser(id: string, firstName: string, lastName: string): Promise<User> {
-    const user = await User.find(id)
-    user.first_name = firstName
-    user.last_name = lastName
-    await user.save()
-    return user
-  }
-
-  async deleteUser(firstName: string, lastName: string): Promise<any> {
-    return User.queryName('delete user by first name and last name')
-      .where('first_name', firstName)
-      .where('last_name', lastName)
-      .delete()
-  }
-
-  async getAllUsers(): Promise<Collection<User>> {
-    // Using custom static function
-    return User.getAllUsers()
-  }
-
-  async getUserByFirstName(firstName: string): Promise<Collection<User>> {
-    return User.where('first_name', firstName).get()
-  }
-
-  async findUser(id: string): Promise<User | undefined> {
-    return User.find(id)
-  }
-}
-```
-
-# Contribute
+## Contribute
 
 PRs are welcomed to this project, and help is needed in order to keep up with the changes of Laravel Eloquent. If you want to improve the library, add functionality or improve the docs please feel free to submit a PR.
 
-# Sponsors
+## Sponsors
 
 If you want to become a sponsor please [let me know](mailto:nhat@ntworld.net).
 
@@ -550,6 +393,6 @@ You can buy me a beer via [Paypal](https://paypal.me/beerfornhat) or [Patreon](h
 
 Thanks in advance!
 
-# License
+## License
 
 MIT © Nhat Phan

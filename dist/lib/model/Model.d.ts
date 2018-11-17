@@ -29,6 +29,35 @@ export declare class Model {
      */
     static newQuery<T extends typeof Model>(this: T, name: string): IQueryBuilder<InstanceType<T>>;
     /**
+     * Get global event emitter which used by all models.
+     */
+    static eventEmitter<T extends typeof Model>(this: T): Najs.Contracts.Event.AsyncEventEmitter;
+    /**
+     * Adds the listener function to the end of the listeners array for the event named eventName.
+     * No checks are made to see if the listener has already been added.
+     * Multiple calls passing the same combination of eventName and listener will result in the listener being added,
+     * and called, multiple times.
+     *
+     * @param {string} eventName
+     * @param {Function} listener
+     */
+    static on<T extends typeof Model>(this: T, eventName: string, listener: Function): T;
+    /**
+     * Adds a one-time listener function for the event named eventName.
+     * The next time eventName is triggered, this listener is removed and then invoked.
+     *
+     * @param {string} eventName
+     * @param {Function} listener
+     */
+    static once<T extends typeof Model>(this: T, eventName: string, listener: Function): T;
+    /**
+     * Removes the specified listener from the listener array for the event named eventName.
+     *
+     * @param {string} eventName
+     * @param {Function} listener
+     */
+    static off<T extends typeof Model>(this: T, eventName: string, listener: Function): T;
+    /**
      * Set the query with given name
      *
      * @param {string} name
